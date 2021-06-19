@@ -5,12 +5,14 @@ const SplashScreen = () => {
   return (
     <View style={styles.container}>
      <StatusBar
-      animated={true}
       backgroundColor="#FFFFFF"
       barStyle={'dark-content'} />
       <Image style={styles.logo} source={require('../src/logo.png')} />
       <Text style={styles.bottom_text}>
         Moon Meet
+      </Text>
+      <Text style={styles.slogan_text}>
+        We give people the closest distance.
       </Text>
     </View>
   );
@@ -36,6 +38,13 @@ const styles = StyleSheet.create({
     bottom: 10,
     color: '#566193',
   },
+  slogan_text: {
+    position: 'absolute',
+    textAlign: 'center',
+    fontSize: 16,
+    bottom: 10,
+    color: '#DADADA',
+  }
 });
 
 export default SplashScreen;
