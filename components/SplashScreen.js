@@ -7,7 +7,9 @@ const SplashScreen = () => {
      <StatusBar
       animated={true}
       backgroundColor="#fff"
-      barStyle={'dark-content'} />
+      barStyle={'dark-content'} 
+      translucent = {true}
+      />
       <Image style={styles.logo} source={require('../src/logo.png')} />
       <Text style={styles.bottomText}>
         Moon Meet
