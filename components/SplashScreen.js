@@ -7,12 +7,12 @@ const SplashScreen = () => {
      <StatusBar
       backgroundColor="#FFFFFF"
       barStyle={'dark-content'} />
-      <Image style={styles.logo} source={require('../src/logo.png')} />
+      <Image style={styles.logo} source={require('../src/assets/images/logo.png')} />
       <Text style={styles.bottom_text}>
         Moon Meet
       </Text>
       <Text style={styles.slogan_text}>
-        We give people the closest distance.
+        We give people the closest distances
       </Text>
     </View>
   );
@@ -28,22 +28,22 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   logo: {
-    height: 180,
-    width: 180,
+    height: 230,
+    width: 230,
   },
   bottom_text: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
-    bottom: 10,
+    bottom: 50,
     color: '#566193',
   },
   slogan_text: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 16,
-    bottom: 10,
-    color: '#DADADA',
+    bottom: 20,
+    color: '#909090',
   }
 });
 
