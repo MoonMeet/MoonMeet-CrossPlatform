@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, StatusBar } from "react-native";
+import { StyleSheet, View, Text, Image, StatusBar, Button, Alert, TouchableOpacity } from "react-native";
 
 const SplashScreen = () => {
   return (
@@ -10,9 +10,13 @@ const SplashScreen = () => {
       barStyle={'dark-content'} 
       translucent = {true}
       />
-      <Image style={styles.logo} source={require('../src/logo.png')} />
+      <Image style={styles.logo} source={require('../src/assets/images/logo.png')} />
       <Text style={styles.bottomText}>
         Moon Meet
+      </Text>
+
+      <Text style={styles.slogan}>
+        We give you the closest distances.
       </Text>
       
     </View>
@@ -38,7 +42,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
-    bottom: 30,
+    bottom: 60,
     color: '#566193',
   },
   slogan: {
