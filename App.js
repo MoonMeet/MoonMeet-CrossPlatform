@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import SplashScreen from "./components/SplashScreen";
+import IntroScreen from "./components/IntroScreen"; // unused for now.
 
 const App = () => {
   return (
