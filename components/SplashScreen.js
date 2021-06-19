@@ -9,7 +9,7 @@ const SplashScreen = () => {
       backgroundColor="#fff"
       barStyle={'dark-content'} />
       <Image style={styles.logo} source={require('../src/logo.png')} />
-      <Text style={styles.bottom_text}>
+      <Text style={styles.bottomText}>
         Moon Meet
       </Text>
     </View>
@@ -34,8 +34,8 @@ const styles = StyleSheet.create({
   bottomText: {
     position: 'absolute',
     textAlign: 'center',
-    fontSize: 200,
-    bottom: 100,
+    fontSize: 20,
+    bottom: 20,
     color: '#566193',
   },
 });
