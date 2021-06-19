@@ -1,5 +1,4 @@
 ### MoonMeet Project (Official Repo.)
-This repo is archived. Please see & contrubute at https://github.com/MoonMeet/MoonMeet-Website
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-Project" />
 <img src="https://img.shields.io/github/last-commit/MoonMeet/MoonMeet-Project" />
