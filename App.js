@@ -6,7 +6,7 @@ import IntroScreen from "./components/IntroScreen"; // unused for now.
 const App = () => {
   return (
     <View style={styles.container}>
-     <SplashScreen />
+     <IntroScreen />
     </View>
   );
 };
