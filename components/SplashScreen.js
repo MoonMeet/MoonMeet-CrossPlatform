@@ -6,10 +6,10 @@ const SplashScreen = () => {
     <View style={styles.container}>
      <StatusBar
       animated={true}
-      backgroundColor="#FFFFFF"
+      backgroundColor="#fff"
       barStyle={'dark-content'} />
       <Image style={styles.logo} source={require('../src/logo.png')} />
-      <Text style={styles.bottom_text}>
+      <Text style={styles.bottomText}>
         Moon Meet
       </Text>
     </View>
@@ -28,8 +28,10 @@ const styles = StyleSheet.create({
   logo: {
     height: 180,
     width: 180,
+    position: "absolute",
+    top: "80%"
   },
-  bottom_text: {
+  bottomText: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
