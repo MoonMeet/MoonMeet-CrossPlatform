@@ -2,6 +2,7 @@ import React from "react";
 import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
+import {FONTS} from "../config/miscellaneous";
 
 const IntroScreen = () => {
   return (
@@ -58,6 +59,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     color: "#566193",
+    fontFamily: FONTS.bold_italic
   },
   introduction_bottom_text: {
     position: "relative",
