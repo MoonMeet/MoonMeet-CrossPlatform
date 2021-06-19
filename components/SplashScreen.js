@@ -1,24 +1,19 @@
 import React from "react";
-import { StyleSheet, View, Text, Image, StatusBar, Button, Alert, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image, StatusBar } from "react-native";
 
 const SplashScreen = () => {
   return (
     <View style={styles.container}>
      <StatusBar
-      animated={true}
-      backgroundColor="#fff"
-      barStyle={'dark-content'} 
-      translucent = {true}
-      />
+      backgroundColor="#FFFFFF"
+      barStyle={'dark-content'} />
       <Image style={styles.logo} source={require('../src/assets/images/logo.png')} />
-      <Text style={styles.bottomText}>
+      <Text style={styles.bottom_text}>
         Moon Meet
       </Text>
-
-      <Text style={styles.slogan}>
-        We give you the closest distances.
+      <Text style={styles.slogan_text}>
+        We give people the closest distances
       </Text>
-      
     </View>
   );
 };
@@ -33,25 +28,23 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   logo: {
-    height: 200,
-    width: 200,
-    position: "absolute",
-    top: "30%"
+    height: 230,
+    width: 230,
   },
-  bottomText: {
+  bottom_text: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
-    bottom: 60,
+    bottom: 50,
     color: '#566193',
   },
-  slogan: {
+  slogan_text: {
     position: 'absolute',
     textAlign: 'center',
-    fontSize: 15,
-    bottom: 30,
-    color: '#566193',
-  },
+    fontSize: 16,
+    bottom: 20,
+    color: '#909090',
+  }
 });
 
 export default SplashScreen;
