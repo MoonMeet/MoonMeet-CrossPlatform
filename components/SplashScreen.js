@@ -8,7 +8,7 @@ const SplashScreen = () => {
       animated={true}
       backgroundColor="#FFFFFF"
       barStyle={'dark-content'} />
-      <Image style={styles.logo} source={require('./src/logo.png')} />
+      <Image style={styles.logo} source={require('../src/logo.png')} />
       <Text style={styles.bottom_text}>
         Moon Meet
       </Text>
