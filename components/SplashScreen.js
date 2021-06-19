@@ -12,6 +12,7 @@ const SplashScreen = () => {
       <Text style={styles.bottomText}>
         Moon Meet
       </Text>
+      
     </View>
   );
 };
@@ -35,7 +36,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
-    bottom: 20,
+    bottom: 30,
+    color: '#566193',
+  },
+  slogan: {
+    position: 'absolute',
+    textAlign: 'center',
+    fontSize: 15,
+    bottom: 30,
     color: '#566193',
   },
 });
