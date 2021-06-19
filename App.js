@@ -1,20 +1,10 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import SplashScreen from "./components/SplashScreen";
-import IntroScreen from "./components/IntroScreen"; // unused for now.
+import StackNavigator from "./src/config/stack";
 
 const App = () => {
   return (
-    <View style={styles.container}>
-     <IntroScreen />
-    </View>
+     <StackNavigator />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;

@@ -1,13 +1,20 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import {useNavigation} from "@react-navigation/native";
 
 const SplashScreen = () => {
+  const navigation = useNavigation()
+  useEffect(()=>{
+    setTimeout(()=>{
+      navigation.navigate('onboarding')
+    }, 2000)
+  })
   return (
     <View style={styles.container}>
       <StatusBar
         backgroundColor="#FFFFFF"
         barStyle={"dark-content"} />
-      <Image style={styles.logo} source={require("../src/assets/images/logo.png")} />
+      <Image style={styles.logo} source={require("../assets/images/logo.png")} />
       <Text style={styles.bottom_text}>
         Moon Meet
       </Text>

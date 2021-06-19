@@ -10,23 +10,23 @@ const IntroScreen = () => {
         backgroundColor="#FFFFFF"
         barStyle={"dark-content"} />
       <View style={styles.PagerRender} key="1">
-        <Image style={styles.illustration} source={require("../src/assets/images/startup_intro.png")} />
+        <Image style={styles.illustration} source={require("../assets/images/startup_intro.png")} />
         <Text style={styles.introduction_top_text}>Welcome to Moon Meet</Text>
         <Text style={styles.introduction_bottom_text}>Moon Meet is a chat application that completely focus on Privacy,
           Connection and Features.</Text>
       </View>
       <View style={styles.PagerRender} key="2">
-        <Image style={styles.illustration} source={require("../src/assets/images/chatting_intro.png")} />
+        <Image style={styles.illustration} source={require("../assets/images/chatting_intro.png")} />
         <Text style={styles.introduction_top_text}>Hanging out with your Relationships</Text>
         <Text style={styles.introduction_bottom_text}>Get in touch with your Relationships by inviting them to use Moon
           Meet and join the party with you.</Text>
       </View>
       <View style={styles.PagerRender} key="3">
-        <Image style={styles.illustration} source={require("../src/assets/images/get_started.png")} />
+        <Image style={styles.illustration} source={require("../assets/images/get_started.png")} />
         <Text style={styles.introduction_top_text}>Let's get started</Text>
         <Text style={styles.introduction_bottom_text}>Press the Continue button bellow to access to your Moon Meet
           Account or Sign Up</Text>
-        <Button style={styles.introduction_button} uppercase={false} color="#566193" mode="outlined"
+        <Button style={styles.introduction_button}  uppercase={false} color="#566193" mode="outlined"
                 onPress={() => console.log("Pressed")}>
           Continue
         </Button>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     textAlign: "center",
     fontSize: 20,
-    bottom: 10,
+    bottom: 20,
   },
 });
 
