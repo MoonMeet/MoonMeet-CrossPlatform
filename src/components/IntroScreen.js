@@ -3,8 +3,10 @@ import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
 import {FONTS} from "../config/miscellaneous";
+import { useNavigation } from "@react-navigation/native";
 
 const IntroScreen = () => {
+  const navigation = useNavigation()
   return (
     <PagerView style={styles.PagerView} initialPage={0}>
       <StatusBar
@@ -28,7 +30,7 @@ const IntroScreen = () => {
         <Text style={styles.introduction_bottom_text}>Press the Continue button bellow to access to your Moon Meet
           Account or Sign Up</Text>
         <Button style={styles.introduction_button}  uppercase={false} color="#566193" mode="outlined"
-                onPress={() => console.log("Pressed")}>
+                onPress={() => navigation.navigate('splash')}>
           Continue
         </Button>
       </View>
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     color: "#566193",
-    fontFamily: FONTS.bold_italic
+    fontFamily: FONTS.regular,
   },
   introduction_bottom_text: {
     position: "relative",
@@ -67,12 +69,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     top: 20,
     color: "#999999",
+    fontFamily: FONTS.regular,
   },
   introduction_button: {
     position: "absolute",
     textAlign: "center",
     fontSize: 20,
     bottom: 20,
+    fontFamily: FONTS.regular,
   },
 });
 
