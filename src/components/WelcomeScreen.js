@@ -31,7 +31,7 @@ const WelcomeScreen = () => {
               uppercase={false}
               color="#566193"
               mode="outlined"
-              onPress={() => navigation.navigate("splash")}>
+              onPress={() => navigation.navigate("register")}>
         Register
       </Button>
       <Button style={styles.login_button}

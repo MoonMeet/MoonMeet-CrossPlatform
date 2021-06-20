@@ -21,7 +21,7 @@ const StackNavigator = () => {
         <Stack.Screen name={"splash"} component={SplashScreen} />
         <Stack.Screen name={"onboarding"} component={IntroScreen} />
         <Stack.Screen name={"welcome"} component={WelcomeScreen} />
-        <Stack.Screen name={"login"} component={RegisterScreen} />
+        <Stack.Screen name={"register"} component={RegisterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
