@@ -6,20 +6,23 @@
  */
 
 import React from "react";
-import {createNativeStackNavigator} from "react-native-screens/native-stack";
-import {NavigationContainer} from "@react-navigation/native";
+import { createNativeStackNavigator } from "react-native-screens/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
 import IntroScreen from "../components/IntroScreen";
 import SplashScreen from "../components/SplashScreen";
-const Stack= createNativeStackNavigator()
-const StackNavigator = () => {
-    return(
-        <NavigationContainer>
-            <Stack.Navigator screenOptions={{headerShown: false}}>
-                <Stack.Screen name={'splash'} component={SplashScreen}/>
-                <Stack.Screen name={'onboarding'} component={IntroScreen}/>
-            </Stack.Navigator>
-        </NavigationContainer>
-    )
-}
+import LoginScreen from "../components/LoginScreen";
 
-export default StackNavigator
+const Stack = createNativeStackNavigator();
+const StackNavigator = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name={"splash"} component={SplashScreen} />
+        <Stack.Screen name={"onboarding"} component={IntroScreen} />
+        <Stack.Screen name={"login"} component={LoginScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+export default StackNavigator;

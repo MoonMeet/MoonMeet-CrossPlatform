@@ -16,4 +16,15 @@ const FONTS = {
     semi_bold: 'OpenSans-SemiBold',
     semi_bold_italic: 'OpenSans-SemiBoldItalic',
 }
-export {FONTS}
+
+const COLORS = {
+    primary: "#FFFFFF",
+    accent: "#566193",
+    controlNormal: "#DADADA",
+    controlHighlight: "#DADADA",
+    darkGrey: "#999999"
+}
+
+export { COLORS }
+
+export { FONTS }
