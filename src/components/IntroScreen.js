@@ -32,7 +32,7 @@ const IntroScreen = () => {
                   uppercase={false}
                   color="#566193"
                   mode="outlined"
-                  onPress={() => navigation.navigate("login")}>
+                  onPress={() => navigation.navigate("welcome")}>
                   Continue
           </Button>
         </View>

@@ -11,6 +11,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import IntroScreen from "../components/IntroScreen";
 import SplashScreen from "../components/SplashScreen";
 import LoginScreen from "../components/LoginScreen";
+import WelcomeScreen from "../components/WelcomeScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
@@ -19,6 +20,7 @@ const StackNavigator = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name={"splash"} component={SplashScreen} />
         <Stack.Screen name={"onboarding"} component={IntroScreen} />
+        <Stack.Screen name={"welcome"} component={WelcomeScreen} />
         <Stack.Screen name={"login"} component={LoginScreen} />
       </Stack.Navigator>
     </NavigationContainer>

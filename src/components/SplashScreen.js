@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Image, StatusBar, StyleSheet, Text, View } from "react-native";
+import { Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 
@@ -11,6 +11,7 @@ const SplashScreen = () => {
     }, 2000)
   })
   return (
+    <SafeAreaView style={{flex: 1}}>
     <View style={styles.container}>
       <StatusBar
         backgroundColor="#FFFFFF"
@@ -23,6 +24,7 @@ const SplashScreen = () => {
         We give people the closest distances
       </Text>
     </View>
+    </SafeAreaView>
   );
 };
 
