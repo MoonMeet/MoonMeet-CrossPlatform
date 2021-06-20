@@ -3,7 +3,7 @@ import { SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 import { TextInput } from "react-native-paper";
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const [text, setText] = React.useState("");
   return (
     <SafeAreaView nativeID={"container"} style={styles.container}>
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
