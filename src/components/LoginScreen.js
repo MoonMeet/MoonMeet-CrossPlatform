@@ -33,7 +33,7 @@ const LoginScreen = () => {
         placeholder="Enter your phone number"
         type="numeric"
       /></View>   
-  <Button style={styles.submitBtn} title="Continue" />
+  <Button color="#566193" style={styles.submitBtn}  title="Continue" />
       </View>
     </SafeAreaView>
   );
@@ -60,7 +60,7 @@ phoneInput: {
     borderWidth: 1
 },
 submitBtn: {
-  color: "#566193",
+  position: 'absolute', bottom: '10px'
 },
   top_bar: {
     flexDirection: "row",
