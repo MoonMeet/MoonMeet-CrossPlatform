@@ -1,11 +1,14 @@
 import * as React from "react";
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
-import { TextInput } from "react-native-paper";
-import TextInputMask from "react-native-text-input-mask";
+import { Button, TextInput } from "react-native-paper";
 
 const LoginScreen = () => {
-  const [text, setText] = React.useState("");
+  const [CountryText, CountrySetText] = React.useState("");
+  const [NumberText, NumberSetText] = React.useState("");
+  const onCodeTextInputFocus = () => {
+    console.log('CountryEditText focused!')
+  }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -22,63 +25,72 @@ const LoginScreen = () => {
       </View>
       <View style={{
         padding: 10,
-        flexDirection: 'row',
+        flexDirection: "row",
       }}>
         <TextInput style={{
           width: 140,
           padding: 4,
         }}
-          mode="outlined"
-          label="Country Code"
-          value={text}
-          placeholder={'eg, +1'}
-          multiline={false}
-          render={props =>
-          <TextInputMask
-            {...props}
-            mask="+ [0000]"
-          />
-        }
-          theme={{ colors: {
-            text: COLORS.accent,
-            primary: COLORS.accent,
-            backgroundColor: COLORS.rippleColor,
-            placeholder: COLORS.darkGrey,
-            underlineColor: '#566193',
-            selectionColor: '#DADADA',
-            outlineColor: '#566193',
-          } }}
-          onChangeText={text => setText(text)}
+                   mode="outlined"
+                   keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
+                   label="Country Code"
+                   value={CountryText}
+                   onFocus={() => onCodeTextInputFocus()}
+                   placeholder={"eg, +1"}
+                   multiline={false}
+                   theme={{
+                     colors: {
+                       text: COLORS.accent,
+                       primary: COLORS.accent,
+                       backgroundColor: COLORS.rippleColor,
+                       placeholder: COLORS.darkGrey,
+                       underlineColor: "#566193",
+                       selectionColor: "#DADADA",
+                       outlineColor: "#566193",
+                     },
+                   }}
+                   onChangeText={CountryText => CountrySetText(CountryText)}
         />
         <TextInput style={{
           width: 240,
           padding: 4,
         }}
                    mode="outlined"
+                   keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
                    label="Phone Number"
-                   value={text}
-                   placeholder={'eg, +1 (566) 874 364'}
+                   value={NumberText}
+                   placeholder={"eg, +1 (566) 874 364"}
                    multiline={false}
-                   render={props =>
-                     <TextInputMask
-                       {...props}
-                       mask="[000] [000] [000]"
-                     />
-                   }
-                   theme={{ colors: {
-                     text: COLORS.accent,
-                     primary: COLORS.accent,
-                     backgroundColor: COLORS.rippleColor,
-                     placeholder: COLORS.darkGrey,
-                     underlineColor: '#566193',
-                     selectionColor: '#DADADA',
-                     outlineColor: '#566193',
-                   } }}
-                   onChangeText={text => setText(text)}
+                   theme={{
+                     colors: {
+                       text: COLORS.accent,
+                       primary: COLORS.accent,
+                       backgroundColor: COLORS.rippleColor,
+                       placeholder: COLORS.darkGrey,
+                       underlineColor: "#566193",
+                       selectionColor: "#DADADA",
+                       outlineColor: "#566193",
+                     },
+                   }}
+                   onChangeText={NumberText => NumberSetText(NumberText)}
         />
       </View>
-    </SafeAreaView>
-  );
+      <View style={{
+        padding: 16,
+        position: 'relative',
+        bottom: 40,
+      }}>
+      <Button
+        style={styles.SendCode}
+        uppercase={false}
+        color="#566193"
+        mode="outlined"
+        onPress={() => console.log("button clicked")}>
+        Send Code
+      </Button>
+    </View>
+</SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({
@@ -97,7 +109,6 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: "relative",
-    right: 0,
     fontSize: 20,
     color: COLORS.accent,
     fontFamily: FONTS.regular,
@@ -106,8 +117,13 @@ const styles = StyleSheet.create({
     height: 35,
     width: -1,
   },
-  dial_code_edittext: {
-  }
+  SendCode: {
+    position: "relative",
+    top: 30,
+    textAlign: "center",
+    fontSize: 20,
+    fontFamily: FONTS.regular,
+  },
 });
 
 export default LoginScreen;
