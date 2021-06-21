@@ -4,6 +4,10 @@ import { COLORS, FONTS } from "../config/miscellaneous";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
+/*
+  Unused for now !
+ */
+
 
 const WelcomeScreen = () => {
   const navigation = useNavigation()

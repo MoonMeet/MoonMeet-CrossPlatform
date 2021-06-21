@@ -22,7 +22,8 @@ const COLORS = {
     accent: "#566193",
     controlNormal: "#DADADA",
     controlHighlight: "#DADADA",
-    darkGrey: "#999999"
+    darkGrey: "#999999",
+    rippleColor: '#EEEEEE',
 }
 
 export { COLORS }
