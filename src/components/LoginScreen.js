@@ -1,94 +1,99 @@
-import * as React from "react";
-import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import React, {useState} from "react";
+import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 import { Button, TextInput } from "react-native-paper";
-
+import { useNavigation } from "@react-navigation/native";
 const LoginScreen = () => {
-  const [CountryText, CountrySetText] = React.useState("");
-  const [NumberText, NumberSetText] = React.useState("");
+  const navigation = useNavigation();
+  const [CountryText, CountrySetText] = useState("+");
+  const [NumberText, NumberSetText] = useState("");
   const onCodeTextInputFocus = () => {
     console.log('CountryEditText focused!')
   }
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
-        backgroundColor="#FFFFFF"
-        barStyle={"dark-content"} />
-      <View style={styles.top_bar}>
-        <Text style={styles.top_text}>
-          Your Phone
-        </Text>
-      </View>
+          animated={true}
+          backgroundColor="#FFFFFF"
+          barStyle={"dark-content"} />
+
+      <TouchableOpacity activeOpacity={0.2}
+                          underlayColor="#193566">
+          <View onPress={() => navigation.goBack()} style={styles.top_bar}>
+              <Text style={styles.top_text}>
+                  Your Phone
+              </Text>
+          </View>
+      </TouchableOpacity>
       <View style={styles.divider}>
       </View>
       <View style={styles.dummy}>
       </View>
-      <View style={{
-        padding: 10,
-        flexDirection: "row",
-      }}>
-        <TextInput style={{
-          width: 140,
-          padding: 4,
-        }}
-                   mode="outlined"
-                   keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
-                   label="Country Code"
-                   value={CountryText}
-                   onFocus={() => onCodeTextInputFocus()}
-                   placeholder={"eg, +1"}
-                   multiline={false}
-                   theme={{
-                     colors: {
-                       text: COLORS.accent,
-                       primary: COLORS.accent,
-                       backgroundColor: COLORS.rippleColor,
-                       placeholder: COLORS.darkGrey,
-                       underlineColor: "#566193",
-                       selectionColor: "#DADADA",
-                       outlineColor: "#566193",
-                     },
-                   }}
-                   onChangeText={CountryText => CountrySetText(CountryText)}
-        />
-        <TextInput style={{
-          width: 240,
-          padding: 4,
-        }}
-                   mode="outlined"
-                   keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
-                   label="Phone Number"
-                   value={NumberText}
-                   placeholder={"eg, +1 (566) 874 364"}
-                   multiline={false}
-                   theme={{
-                     colors: {
-                       text: COLORS.accent,
-                       primary: COLORS.accent,
-                       backgroundColor: COLORS.rippleColor,
-                       placeholder: COLORS.darkGrey,
-                       underlineColor: "#566193",
-                       selectionColor: "#DADADA",
-                       outlineColor: "#566193",
-                     },
-                   }}
-                   onChangeText={NumberText => NumberSetText(NumberText)}
-        />
-      </View>
-      <View style={{
-        padding: 16,
-        position: 'relative',
-        bottom: 40,
-      }}>
-      <Button
-        style={styles.SendCode}
-        uppercase={false}
-        color="#566193"
-        mode="outlined"
-        onPress={() => console.log("button clicked")}>
-        Send Code
-      </Button>
-    </View>
+
+        <View>
+            <View style={{
+                padding: 10,
+                flexDirection: "row",
+            }}>
+                <TextInput style={{
+                    width: '50%',
+                    padding: 4,
+                }}
+                           mode="outlined"
+                           keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
+                           label="Country Code"
+                           value={CountryText}
+                           onFocus={() => onCodeTextInputFocus()}
+                           placeholder={"eg: +1"}
+                           multiline={false}
+                           theme={{
+                               colors: {
+                                   text: COLORS.accent,
+                                   primary: COLORS.accent,
+                                   backgroundColor: COLORS.rippleColor,
+                                   placeholder: COLORS.darkGrey,
+                                   underlineColor: "#566193",
+                                   selectionColor: "#DADADA",
+                                   outlineColor: "#566193",
+                               },
+                           }}
+                           onChangeText={CountryText => CountrySetText(CountryText)}
+                />
+                <TextInput style={{
+                    width: '50%',
+                    padding: 4,
+                }}
+                           mode="outlined"
+                           keyboardType={Platform.OS === 'android' ? "numeric" : "number-pad"}
+                           label="Phone Number"
+                           value={NumberText}
+                           placeholder={"eg: +1 (566) 874 364"}
+                           multiline={false}
+                           theme={{
+                               colors: {
+                                   text: COLORS.accent,
+                                   primary: COLORS.accent,
+                                   backgroundColor: COLORS.rippleColor,
+                                   placeholder: COLORS.darkGrey,
+                                   underlineColor: "#566193",
+                                   selectionColor: "#DADADA",
+                                   outlineColor: "#566193",
+                               },
+                           }}
+                           onChangeText={NumberText => NumberSetText(NumberText)}
+                />
+
+            </View>
+            <Button
+                style={styles.SendCodeButton}
+                uppercase={false}
+                color="#566193"
+                mode="outlined"
+                onPress={() => alert("button pressed")}>
+                Send Code
+            </Button>
+        </View>
+
 </SafeAreaView>
 );
 };
@@ -117,12 +122,13 @@ const styles = StyleSheet.create({
     height: 35,
     width: -1,
   },
-  SendCode: {
+  SendCodeButton: {
     position: "relative",
-    top: 30,
+    bottom: '3%',
     textAlign: "center",
     fontSize: 20,
     fontFamily: FONTS.regular,
+      padding: 4
   },
 });
 
