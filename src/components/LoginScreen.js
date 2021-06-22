@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableHighlight, TouchableOpacity, Image } from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 import { Button, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -17,14 +17,17 @@ const LoginScreen = () => {
           backgroundColor="#FFFFFF"
           barStyle={"dark-content"} />
 
-      <TouchableOpacity activeOpacity={0.2}
-                          underlayColor="#193566">
-          <View onPress={() => navigation.goBack()} style={styles.top_bar}>
-              <Text style={styles.top_text}>
-                  Your Phone
-              </Text>
-          </View>
-      </TouchableOpacity>
+
+          <TouchableOpacity>
+              <View style={styles.top_bar}>
+                  <Text style={styles.top_text}>
+                      Your Phone
+                  </Text>
+              </View>
+          </TouchableOpacity>
+
+
+
       <View style={styles.divider}>
       </View>
       <View style={styles.dummy}>
@@ -118,6 +121,12 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     fontFamily: FONTS.regular,
   },
+    GoBackImg: {
+        width: 27,
+        height: 27,
+        marginRight: 5,
+
+    },
   dummy: {
     height: 35,
     width: -1,
