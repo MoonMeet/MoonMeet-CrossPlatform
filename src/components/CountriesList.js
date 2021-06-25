@@ -6,7 +6,6 @@ import LoginScreen from "./LoginScreen";
 import { IconButton } from "react-native-paper";
 
 const MyList = CountriesJson;
-const loginScreenVar = LoginScreen;
 const SearchImage = require('../assets/images/search.png')
 
 const styles = StyleSheet.create({
@@ -21,6 +20,7 @@ const styles = StyleSheet.create({
   top_bar: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: 'center'
   },
   title_text: {
     color: COLORS.accent,
@@ -41,7 +41,11 @@ const styles = StyleSheet.create({
   },
 });
 
+
 export default class CountriesList extends Component {
+  isSearchBarVisible: false;
+  setSearchBarVisible: false;
+  loginScreenVar = LoginScreen;
   constructor() {
     super();
   }
@@ -59,13 +63,17 @@ export default class CountriesList extends Component {
                       color={'#999999'}
                       size={24}
                       style={{ paddingBottom: '0%'}}
-                      onPress={() => console.log('Pressed')}
+                      onPress={() => {
+
+                      }}
           />
         </View>
         <FlatList showsVerticalScrollIndicator={false} data={MyList} renderItem={({ item }) =>
           <View style={styles.container}>
             <Text onPress={() => {
-              loginScreenVar.UserSelectedCountry = "hello";
+              this.loginScreenVar.UserSelectedCountry = item.dial_code;
+              this.loginScreenVar.arguments.setModalVisible = false;
+              console.log(this.loginScreenVar.arguments.setModalVisible = false)
             }}
                   style={styles.country_text}>
               {item.name}

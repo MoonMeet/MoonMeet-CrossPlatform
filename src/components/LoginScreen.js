@@ -12,9 +12,12 @@ const LoginScreen = () => {
   const [NumberText, NumberSetText] = React.useState('');
   const [PrivacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
   const [CountriesVisible, setCountriesVisible] = React.useState(false);
+  function HideCountries(props) {
+    setCountriesVisible(!CountriesVisible)
+  }
   let isUserAcceptedPrivacyPolicy = React.useState(false);
   const SaveUserAcceptedPrivacyPolicy = "save_state";
-  const UserSelectedCountry = React.useState('')
+  const UserSelectedCountry = React.useState('+')
   const readData = async () => {
     try {
       const getSavedPrivacyPolicyState = await AsyncStorage.getItem(SaveUserAcceptedPrivacyPolicy);
@@ -79,7 +82,7 @@ const LoginScreen = () => {
                    mode="outlined"
                    keyboardType={Platform.OS === "android" ? "numeric" : "number-pad"}
                    label="Country Code"
-                   value={CountryText}
+                   value={UserSelectedCountry || "+"}
                    onFocus={() => onCodeTextInputFocus()}
                    multiline={false}
                    theme={{
@@ -97,7 +100,7 @@ const LoginScreen = () => {
         />
         <Modal
           style={{
-            margin: 5,
+            margin: '5%',
           }}
           animationType={"slide"}
           transparent={false}
