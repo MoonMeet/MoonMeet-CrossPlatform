@@ -8,10 +8,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "react-native-screens/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import IntroScreen from "../components/IntroScreen";
-import SplashScreen from "../components/SplashScreen";
-import LoginScreen from "../components/LoginScreen";
-import WelcomeScreen from "../components/WelcomeScreen";
+import IntroScreen from "../activities/IntroScreen";
+import SplashScreen from "../activities/SplashScreen";
+import LoginScreen from "../activities/LoginScreen";
+import WelcomeScreen from "../activities/WelcomeScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {

@@ -21,7 +21,7 @@ const COLORS = {
     primary: "#FFFFFF",
     accent: "#566193",
     controlNormal: "#DADADA",
-    controlHighlight: "#DADADA",
+    controlHighlight: "#ADADAD",
     darkGrey: "#999999",
     rippleColor: '#EEEEEE',
 }
