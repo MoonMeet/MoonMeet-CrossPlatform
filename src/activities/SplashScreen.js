@@ -6,7 +6,7 @@ import { COLORS, FONTS } from "../config/miscellaneous";
 const SplashScreen = () => {
   const navigation = useNavigation()
   useEffect(()=>{
-    setTimeout(()=>{
+    setTimeout(() => {
       navigation.navigate('onboarding')
     }, 2000)
   })

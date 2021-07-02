@@ -1,26 +1,77 @@
-import React from "react";
-import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { FlatList, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import CountriesJson from "../assets/data/json/country-codes.json";
 import { COLORS, FONTS } from "../config/miscellaneous";
 import { IconButton, Searchbar } from "react-native-paper";
 
 const CountriesList = (props) => {
 
+  useEffect(() => {
+    setCountriesData();
+    return () => {
+
+    };
+  }, []);
+
+  const _countriesJson = CountriesJson;
+
   const [SearchBarVisible, setSearchBarVisible] = React.useState(false);
 
-  const MyList = CountriesJson;
+  const [isDataNotFound, setDataNotFound] = React.useState(false);
+
+  const [SearchData, setSearchData] = React.useState("");
+  const [FilteredData, setFilteredData] = React.useState([]);
+  const [MasterData, setMasterData] = React.useState([]);
+
   const SearchImage = require("../assets/images/search.png");
   const ClearImage = require("../assets/images/clear.png");
 
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const onChangeSearch = query => setSearchQuery(query);
+  const setCountriesData = () => {
+    setFilteredData(_countriesJson);
+    setMasterData(_countriesJson);
+  };
 
   const CloseModal = (bool, MyData) => {
     props.changeCountriesVisibility(bool);
     props.setModalData(MyData);
   };
 
+  const SearchInData = (text) => {
+    if (text) {
+      const newData = MasterData.filter((item) => {
+        const itemData = item.name ?
+          item.name.toUpperCase()
+          : "".toLowerCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredData(newData);
+      setSearchData(text);
+    } else {
+      setDataNotFound(!isDataNotFound)
+    }
+  };
+
+  const _renderItem = (item, index) => {
+    return (
+      <View style={styles.container}>
+        <Pressable style={styles.container}
+                   onPress={() => CloseModal(false, item.dial_code)}
+                   android_ripple={"#193566"}>
+
+          <Text style={styles.country_text}>
+            {item.name}
+          </Text>
+          <Text style={styles.dial_text}>
+            {item.dial_code}
+          </Text>
+        </Pressable>
+      </View>
+    );
+  };
+
   return (
+
     <View style={{
       marginBottom: "5%",
     }}>
@@ -33,34 +84,30 @@ const CountriesList = (props) => {
                     size={24}
                     style={{ paddingBottom: "0%" }}
                     onPress={() => {
+                      setSearchBarVisible(!SearchBarVisible);
                     }}
         />
       </View>
-      <Searchbar
-        placeholder="Search"
-        onChangeText={onChangeSearch}
-        value={searchQuery}
-        placeholder={'E.g Tunisia'}
-        icon={SearchImage}
-        selectionColor={COLORS.controlNormal}
-        platform={Platform.OS}
-        inputStyle={{
-          color: COLORS.accent
-        }}
-        clearIcon={ClearImage}
-      />
-      <FlatList showsVerticalScrollIndicator={false} data={MyList} keyExtractor={(item) => item.dial_code} renderItem={({ item }) =>
-        <View style={styles.container}>
-          <Text onPress={() => CloseModal(false, item.dial_code)
-          }
-                style={styles.country_text}>
-            {item.name}
-          </Text>
-          <Text style={styles.dial_text}>
-            {item.dial_code}
-          </Text>
-        </View>
-      }>
+      {SearchBarVisible ? (
+        <Searchbar
+          placeholder="Search"
+          onChangeText={(text) => SearchInData(text)}
+          value={SearchData}
+          placeholder={"E.g Tunisia"}
+          icon={SearchImage}
+          selectionColor={COLORS.controlNormal}
+          platform={Platform.OS}
+          inputStyle={{
+            color: COLORS.accent,
+          }}
+          clearIcon={ClearImage}
+        />
+      ) : null
+      }
+      <FlatList showsVerticalScrollIndicator={false}
+                data={FilteredData}
+                keyExtractor={(item) => item.dial_code}
+                renderItem={({ item, index }) => _renderItem(item, index)}>
       </FlatList>
     </View>
   );
