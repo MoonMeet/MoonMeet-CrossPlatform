@@ -17,23 +17,26 @@ const IntroScreen = () => {
         <View style={styles.PagerRender} key="1">
           <Image style={styles.illustration} source={require("../assets/images/startup_intro.png")} />
           <Text style={styles.introduction_top_text}>Welcome to Moon Meet</Text>
-          <Text style={styles.introduction_bottom_text}>Moon Meet is a chat application that completely focus on Privacy, Connection and Features.</Text>
+          <Text style={styles.introduction_bottom_text}>Moon Meet is a chat application that completely focus on
+            Privacy, Connection and Features.</Text>
         </View>
         <View style={styles.PagerRender} key="2">
           <Image style={styles.illustration} source={require("../assets/images/chatting_intro.png")} />
           <Text style={styles.introduction_top_text}>Hanging out with your Relationships</Text>
-          <Text style={styles.introduction_bottom_text}>Get in touch with your Relationships by inviting them to use Moon Meet and join the party with you.</Text>
+          <Text style={styles.introduction_bottom_text}>Get in touch with your Relationships by inviting them to use
+            Moon Meet and join the party with you.</Text>
         </View>
         <View style={styles.PagerRender} key="3">
           <Image style={styles.illustration} source={require("../assets/images/get_started.png")} />
           <Text style={styles.introduction_top_text}>Let's get started</Text>
-          <Text style={styles.introduction_bottom_text}>Press the Continue button bellow to access to your Moon Meet Account or Sign Up</Text>
+          <Text style={styles.introduction_bottom_text}>Press the Continue button bellow to access to your Moon Meet
+            Account or Sign Up</Text>
           <Button style={styles.introduction_button}
                   uppercase={false}
                   color="#566193"
                   mode="outlined"
                   onPress={() => navigation.navigate("login")}>
-                  Continue
+            Continue
           </Button>
         </View>
       </PagerView>
@@ -51,12 +54,12 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    padding: 8,
+    padding: "2%",
   },
   illustration: {
     height: 300,
     width: 300,
-    bottom: 100,
+    bottom: "12.5%",
     position: "relative",
   },
   introduction_top_text: {
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
     position: "relative",
     textAlign: "center",
     fontSize: 16,
-    top: 20,
+    top: "2.5%",
     color: COLORS.darkGrey,
     fontFamily: FONTS.regular,
   },
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     textAlign: "center",
     fontSize: 20,
-    bottom: 20,
+    bottom: "2.5%",
     fontFamily: FONTS.regular,
   },
 });

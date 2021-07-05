@@ -4,26 +4,26 @@ import { useNavigation } from "@react-navigation/native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 
 const SplashScreen = () => {
-  const navigation = useNavigation()
-  useEffect(()=>{
+  const navigation = useNavigation();
+  useEffect(() => {
     setTimeout(() => {
-      navigation.navigate('onboarding')
-    }, 2000)
-  })
+      navigation.navigate("onboarding");
+    }, 2000);
+  });
   return (
-    <SafeAreaView style={{flex: 1}}>
-    <View style={styles.container}>
-      <StatusBar
-        backgroundColor="#FFFFFF"
-        barStyle={"dark-content"} />
-      <Image style={styles.logo} source={require("../assets/images/logo.png")} />
-      <Text style={styles.bottom_text}>
-        Moon Meet
-      </Text>
-      <Text style={styles.slogan_text}>
-        We give people the closest distances
-      </Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar
+          backgroundColor="#FFFFFF"
+          barStyle={"dark-content"} />
+        <Image style={styles.logo} source={require("../assets/images/logo.png")} />
+        <Text style={styles.bottom_text}>
+          Moon Meet
+        </Text>
+        <Text style={styles.slogan_text}>
+          We give people the closest distances
+        </Text>
+      </View>
     </SafeAreaView>
   );
 };
@@ -35,19 +35,19 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    padding: 8,
+    padding: "2%",
   },
   logo: {
     height: 230,
     width: 230,
     position: "relative",
-    bottom: 100,
+    bottom: "13%",
   },
   bottom_text: {
     position: "absolute",
     textAlign: "center",
     fontSize: 20,
-    bottom: 50,
+    bottom: "6.5%",
     color: COLORS.accent,
     fontFamily: FONTS.regular,
   },
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     textAlign: "center",
     fontSize: 16,
-    bottom: 20,
+    bottom: "2.5%",
     color: COLORS.darkGrey,
     fontFamily: FONTS.regular,
   },

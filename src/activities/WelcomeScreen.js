@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 
 
 const WelcomeScreen = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -93,16 +93,16 @@ const styles = StyleSheet.create({
     bottom: 200,
   },
   welcome_bottom_text: {
-    position: 'relative',
-    textAlign: 'center',
+    position: "relative",
+    textAlign: "center",
     fontSize: 22,
     bottom: 165,
     color: COLORS.accent,
     fontFamily: FONTS.regular,
   },
   mini_text: {
-    position: 'relative',
-    textAlign: 'center',
+    position: "relative",
+    textAlign: "center",
     fontSize: 16,
     bottom: 150,
     color: COLORS.darkGrey,

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import CountriesJson from "../assets/data/json/country-codes.json";
 import { COLORS, FONTS } from "../config/miscellaneous";
-import { IconButton, Searchbar } from "react-native-paper";
+import { Divider, IconButton, Searchbar } from "react-native-paper";
 
 const CountriesList = (props) => {
 
@@ -17,8 +17,6 @@ const CountriesList = (props) => {
 
   const [SearchBarVisible, setSearchBarVisible] = React.useState(false);
 
-  const [isDataNotFound, setDataNotFound] = React.useState(false);
-
   const [SearchData, setSearchData] = React.useState("");
   const [FilteredData, setFilteredData] = React.useState([]);
   const [MasterData, setMasterData] = React.useState([]);
@@ -30,6 +28,14 @@ const CountriesList = (props) => {
     setFilteredData(_countriesJson);
     setMasterData(_countriesJson);
   };
+
+  const ResetListData = (text) => {
+    const textLength = text.length
+    if (textLength < 1) {
+      setCountriesData()
+      setSearchData('');
+    }
+  }
 
   const CloseModal = (bool, MyData) => {
     props.changeCountriesVisibility(bool);
@@ -48,18 +54,23 @@ const CountriesList = (props) => {
       setFilteredData(newData);
       setSearchData(text);
     } else {
-      setDataNotFound(!isDataNotFound)
+      setFilteredData(FilteredData);
+      setSearchData('');
     }
   };
 
-  const _renderItem = (item, index) => {
+  const _renderSeparator = () => (
+    <Divider />
+  );
+
+  const _renderItem = (item) => {
     return (
       <View style={styles.container}>
         <Pressable style={styles.container}
-                   onPress={() => CloseModal(false, item.dial_code)}
-                   android_ripple={"#193566"}>
+                   onPress={() => CloseModal(false, item.dial_code)}>
 
-          <Text style={styles.country_text}>
+          <Text style={styles.country_text}
+          onPress={() => CloseModal(false, item.dial_code)}>
             {item.name}
           </Text>
           <Text style={styles.dial_text}>
@@ -71,7 +82,6 @@ const CountriesList = (props) => {
   };
 
   return (
-
     <View style={{
       marginBottom: "5%",
     }}>
@@ -91,7 +101,10 @@ const CountriesList = (props) => {
       {SearchBarVisible ? (
         <Searchbar
           placeholder="Search"
-          onChangeText={(text) => SearchInData(text)}
+          onChangeText={(CharSequence) => {
+            SearchInData(CharSequence)
+            ResetListData(CharSequence)
+          }}
           value={SearchData}
           placeholder={"E.g Tunisia"}
           icon={SearchImage}
@@ -106,8 +119,11 @@ const CountriesList = (props) => {
       }
       <FlatList showsVerticalScrollIndicator={false}
                 data={FilteredData}
-                keyExtractor={(item) => item.dial_code}
-                renderItem={({ item, index }) => _renderItem(item, index)}>
+                removeClippedSubviews={true}
+                initialNumToRender={7}
+                keyExtractor={(item) => item.name}
+                ItemSeparatorComponent={_renderSeparator}
+                renderItem={({ item }) => _renderItem(item)}>
       </FlatList>
     </View>
   );
