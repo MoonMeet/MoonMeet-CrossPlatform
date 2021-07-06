@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
-import { FlatList, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, Pressable, Text, View, StyleSheet } from "react-native";
 import CountriesJson from "../assets/data/json/country-codes.json";
 import { COLORS, FONTS } from "../config/miscellaneous";
-import { Divider, IconButton, Searchbar } from "react-native-paper";
+import { ActivityIndicator, Divider, IconButton, Searchbar } from "react-native-paper";
 
 const CountriesList = (props) => {
 
   useEffect(() => {
     setCountriesData();
+    setTimeout(() => {
+      setDadaLoading(!DataLoading);
+    }, 750);
     return () => {
 
     };
@@ -20,6 +23,7 @@ const CountriesList = (props) => {
   const [SearchData, setSearchData] = React.useState("");
   const [FilteredData, setFilteredData] = React.useState([]);
   const [MasterData, setMasterData] = React.useState([]);
+  const [DataLoading, setDadaLoading] = React.useState(true);
 
   const SearchImage = require("../assets/images/search.png");
   const ClearImage = require("../assets/images/clear.png");
@@ -30,12 +34,12 @@ const CountriesList = (props) => {
   };
 
   const ResetListData = (text) => {
-    const textLength = text.length
+    const textLength = text.length;
     if (textLength < 1) {
-      setCountriesData()
-      setSearchData('');
+      setCountriesData();
+      setSearchData("");
     }
-  }
+  };
 
   const CloseModal = (bool, MyData) => {
     props.changeCountriesVisibility(bool);
@@ -55,7 +59,7 @@ const CountriesList = (props) => {
       setSearchData(text);
     } else {
       setFilteredData(FilteredData);
-      setSearchData('');
+      setSearchData("");
     }
   };
 
@@ -70,7 +74,7 @@ const CountriesList = (props) => {
                    onPress={() => CloseModal(false, item.dial_code)}>
 
           <Text style={styles.country_text}
-          onPress={() => CloseModal(false, item.dial_code)}>
+                onPress={() => CloseModal(false, item.dial_code)}>
             {item.name}
           </Text>
           <Text style={styles.dial_text}>
@@ -85,46 +89,57 @@ const CountriesList = (props) => {
     <View style={{
       marginBottom: "5%",
     }}>
-      <View style={styles.top_bar}>
-        <Text style={styles.title_text}>
-          Select your country
-        </Text>
-        <IconButton icon={SearchImage}
-                    color={"#999999"}
-                    size={24}
-                    style={{ paddingBottom: "0%" }}
-                    onPress={() => {
-                      setSearchBarVisible(!SearchBarVisible);
-                    }}
-        />
-      </View>
-      {SearchBarVisible ? (
-        <Searchbar
-          placeholder="Search"
-          onChangeText={(CharSequence) => {
-            SearchInData(CharSequence)
-            ResetListData(CharSequence)
-          }}
-          value={SearchData}
-          placeholder={"E.g Tunisia"}
-          icon={SearchImage}
-          selectionColor={COLORS.controlNormal}
-          platform={Platform.OS}
-          inputStyle={{
-            color: COLORS.accent,
-          }}
-          clearIcon={ClearImage}
-        />
-      ) : null
+      {DataLoading ?
+        (
+          <View style={{
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <ActivityIndicator size={"large"} animating={true} color={COLORS.accent} />
+          </View>
+        ) :
+        <View>
+          <View style={styles.top_bar}>
+            <Text style={styles.title_text}>
+              Select your country
+            </Text>
+            <IconButton icon={SearchImage}
+                        color={"#999999"}
+                        size={24}
+                        style={{ paddingBottom: "0%" }}
+                        onPress={() => {
+                          setSearchBarVisible(!SearchBarVisible);
+                        }}
+            />
+          </View>
+          {SearchBarVisible ? (
+            <Searchbar
+              onChangeText={(CharSequence) => {
+                SearchInData(CharSequence);
+                ResetListData(CharSequence);
+              }}
+              value={SearchData}
+              placeholder={"E.g Tunisia"}
+              icon={SearchImage}
+              selectionColor={COLORS.controlNormal}
+              platform={Platform.OS}
+              inputStyle={{
+                color: COLORS.accent,
+              }}
+              clearIcon={ClearImage}
+            />
+          ) : null
+          }
+          <FlatList showsVerticalScrollIndicator={false}
+                    data={FilteredData}
+                    removeClippedSubviews={true}
+                    initialNumToRender={7}
+                    keyExtractor={(item) => item.name}
+                    ItemSeparatorComponent={_renderSeparator}
+                    renderItem={({ item }) => _renderItem(item)}>
+          </FlatList>
+        </View>
       }
-      <FlatList showsVerticalScrollIndicator={false}
-                data={FilteredData}
-                removeClippedSubviews={true}
-                initialNumToRender={7}
-                keyExtractor={(item) => item.name}
-                ItemSeparatorComponent={_renderSeparator}
-                renderItem={({ item }) => _renderItem(item)}>
-      </FlatList>
     </View>
   );
 };

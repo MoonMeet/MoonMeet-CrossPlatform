@@ -1,5 +1,14 @@
 import React, { useEffect } from "react";
-import { Keyboard, Platform, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
 import { Button, IconButton, Menu, Provider, TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
@@ -11,7 +20,9 @@ import { useNavigation } from "@react-navigation/native";
 const LoginScreen = () => {
 
   useEffect(() => {
-    getCountryNameFromApiAsync();
+    setTimeout(() => {
+      getCountryNameFromApi()
+    }, 500)
     return () => {
 
     };
@@ -30,19 +41,27 @@ const LoginScreen = () => {
 
   const closeMenu = () => setMenuVisible(false);
 
-  const [chooseData, setChooseData] = React.useState();
-
-  const getCountryNameFromApiAsync = () => {
+  const getCountryNameFromApi = () => {
     try {
-      let response = fetch(
+      const response = fetch(
         "https://ipapi.co/country_calling_code",
-      );
-      setChooseData(response.data);
-      return response.data;
-    } catch (error) {
-      console.error(error);
+      ).then(function(_countryDialCode){
+        return _countryDialCode.text()
+      })
+        .then(function(data){
+          console.warn(data)
+          CountrySetText(data)
+        })
+    } catch (e) {
+      console.error(e)
     }
   };
+
+
+  const _countryCodeOnFocus = () => {
+    Keyboard.dismiss()
+    setCountriesVisible(!CountriesVisible)
+  }
 
   const changeCountriesVisibility = (bool) => {
     setCountriesVisible(bool);
@@ -52,19 +71,17 @@ const LoginScreen = () => {
     setPrivacyPolicyVisible(bool);
   };
 
-
-  function onCodeTextInputFocus() {
-    Keyboard.dismiss();
-    setCountriesVisible(!CountriesVisible);
-  }
-
   const setData = (data) => {
-    setChooseData(data);
+    CountrySetText(data);
   };
 
   const DotsImage = require("../assets/images/dots.png");
 
   return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
     <Provider>
       <SafeAreaView style={styles.container}>
         <StatusBar
@@ -84,12 +101,10 @@ const LoginScreen = () => {
                                 }} />
             }>
             <Menu.Item onPress={() => {
-              console.log(getCountryNameFromApiAsync());
               navigation.navigate("login_help");
             }} title="Help" />
           </Menu>
         </View>
-        <View style={styles.dummy} />
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             Enter your phone number
@@ -104,6 +119,7 @@ const LoginScreen = () => {
             color: COLORS.darkGrey,
             fontSize: 16,
             textAlign: "center",
+            paddingBottom: '4%',
             fontFamily: FONTS.regular,
           }}>
             You will receive a verification code, Carrier rates may apply.
@@ -114,11 +130,6 @@ const LoginScreen = () => {
           flexDirection: "row",
           justifyContent: "center",
         }}>
-          <Text style={{
-            padding: "2%",
-            fontSize: 24,
-            fontFamily: FONTS.regular,
-          }}>+</Text>
           <TextInput style={{
             width: "37%",
             padding: "1%",
@@ -126,8 +137,10 @@ const LoginScreen = () => {
                      mode="outlined"
                      keyboardType={Platform.OS === "android" ? "numeric" : "number-pad"}
                      label="Country Code"
-                     value={chooseData}
-                     onFocus={() => onCodeTextInputFocus()}
+                     value={CountryText}
+                     onFocus={() => {
+                       _countryCodeOnFocus()
+                     }}
                      multiline={false}
                      theme={{
                        colors: {
@@ -163,7 +176,7 @@ const LoginScreen = () => {
             </SafeAreaView>
           </Modal>
           <TextInput style={{
-            width: "57%",
+            width: "65%",
             paddingRight: "2%",
             paddingTop: "1%",
           }}
@@ -171,6 +184,7 @@ const LoginScreen = () => {
                      keyboardType={Platform.OS === "android" ? "numeric" : "number-pad"}
                      label="Phone Number"
                      value={NumberText}
+                     onFocus={() => {}}
                      placeholder={"eg, +1 (566) 874 364"}
                      multiline={false}
                      theme={{
@@ -229,7 +243,7 @@ const LoginScreen = () => {
             style={styles.SendCode}
             uppercase={false}
             color="#566193"
-            mode="outlined"
+            mode="contained"
             onPress={() => {
               console.log("send code button pressed");
             }}>
@@ -257,6 +271,7 @@ const LoginScreen = () => {
         </View>
       </SafeAreaView>
     </Provider>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -280,10 +295,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: COLORS.accent,
     fontFamily: FONTS.regular,
-  },
-  dummy: {
-    height: "1%",
-    width: "-1%",
   },
   SendCode: {
     position: "relative",

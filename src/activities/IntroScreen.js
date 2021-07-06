@@ -34,7 +34,7 @@ const IntroScreen = () => {
           <Button style={styles.introduction_button}
                   uppercase={false}
                   color="#566193"
-                  mode="outlined"
+                  mode="contained"
                   onPress={() => navigation.navigate("login")}>
             Continue
           </Button>
