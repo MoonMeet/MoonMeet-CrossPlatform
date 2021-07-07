@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { COLORS, FONTS } from "../config/miscellaneous";
-import { Button, IconButton, Menu, Provider, TextInput } from "react-native-paper";
+import { Button, IconButton, Menu, Provider, Snackbar, TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
 import CountriesList from "../modals/CountriesList";
 import PrivacyPolicy from "../modals/PrivacyPolicy";
@@ -41,17 +41,26 @@ const LoginScreen = () => {
 
   const closeMenu = () => setMenuVisible(false);
 
+  const isSMSSendingAcceptable = () => {
+    return CountryText.length > 1 && NumberText.length > 4;
+  }
+
+  const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
+
+  const onToggleErrorSnackBar = () => setErrorSnackBarVisible(!ErrorSnackBarVisible);
+
+  const onDismissErrorSnackBar = () => setErrorSnackBarVisible(!ErrorSnackBarVisible);
+
   const getCountryNameFromApi = () => {
     try {
-      const response = fetch(
-        "https://ipapi.co/country_calling_code",
-      ).then(function(_countryDialCode){
-        return _countryDialCode.text()
+      const ApiURL = "https://ipapi.co/country_calling_code"
+      fetch(ApiURL).then(function(_countryDialCode) {
+        return _countryDialCode.text();
       })
-        .then(function(data){
-          console.warn(data)
-          CountrySetText(data)
-        })
+        .then(function(data) {
+          console.warn(data);
+          CountrySetText(data);
+        });
     } catch (e) {
       console.error(e)
     }
@@ -245,7 +254,11 @@ const LoginScreen = () => {
             color="#566193"
             mode="contained"
             onPress={() => {
-              console.log("send code button pressed");
+              if (isSMSSendingAcceptable()) {
+                //TODO: Handle Code Sending
+              } else {
+                onToggleErrorSnackBar()
+              }
             }}>
             Send Code
           </Button>
@@ -269,6 +282,21 @@ const LoginScreen = () => {
             </Modal>
           </View>
         </View>
+        <Snackbar
+          visible={ErrorSnackBarVisible}
+          onDismiss={onDismissErrorSnackBar}
+          duration={5000}
+          action={{
+            label: 'OK',
+            onPress: () => {
+              onDismissErrorSnackBar()
+            },
+          }}
+        style={{
+          margin: '4%'
+        }}>
+          Enter a valid Country Code and Phone Number.
+        </Snackbar>
       </SafeAreaView>
     </Provider>
     </KeyboardAvoidingView>

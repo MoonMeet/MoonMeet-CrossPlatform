@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "119469912377",
+    "firebase_url": "https://moonmeet1920.firebaseio.com",
+    "project_id": "moonmeet1920",
+    "storage_bucket": "moonmeet1920.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119469912377:android:68a00922e9ecbb58b2b8e8",
+        "android_client_info": {
+          "package_name": "org.moon.moonmeet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "119469912377-diclka1mcjkp4jamab118i2redu1li6b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.moon.moonmeet",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "119469912377-sl215jofnbn0s6qk1t1jlscji31u35iq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2xTNJEv9AWLRn3ad4OAJQYbS1UfCLXaE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "119469912377-sl215jofnbn0s6qk1t1jlscji31u35iq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

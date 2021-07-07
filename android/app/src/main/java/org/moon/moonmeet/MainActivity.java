@@ -1,4 +1,4 @@
-package org.moon.moonmeeet;
+package org.moon.moonmeet;
 
 import com.facebook.react.ReactActivity;
 

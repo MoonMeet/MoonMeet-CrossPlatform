@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 
@@ -131,7 +132,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.moon.moonmeeet"
+        applicationId "org.moon.moonmeet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
@@ -196,6 +197,8 @@ dependencies {
     }
 
     implementation 'androidx.multidex:multidex:2.0.1'
+
+    implementation "androidx.browser:browser:1.3.0"
 
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'

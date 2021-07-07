@@ -64,7 +64,12 @@ const CountriesList = (props) => {
   };
 
   const _renderSeparator = () => (
-    <Divider />
+    <View
+      style={{
+        backgroundColor: COLORS.controlNormal,
+        height: 0.5,
+      }}
+    />
   );
 
   const _renderItem = (item) => {

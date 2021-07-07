@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="org.moon.moonmeeet">
+  package="org.moon.moonmeet">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
