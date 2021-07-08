@@ -34,7 +34,13 @@ const LoginScreen = () => {
   useEffect(() => {
     addNetInfoObserver()
     setTimeout(() => {
-      getCountryNameFromApi()
+      console.log(isConnected)
+      if (isConnected) {
+        getCountryCodeFromApi()
+      } else {
+        setErrorSnackbarText('Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login')
+        onToggleErrorSnackBar()
+      }
     }, 500)
     return () => {
 
