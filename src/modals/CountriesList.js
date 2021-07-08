@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { FlatList, Platform, Pressable, Text, View, StyleSheet } from "react-native";
 import CountriesJson from "../assets/data/json/country-codes.json";
-import { COLORS, FONTS } from "../config/miscellaneous";
-import { ActivityIndicator, Divider, IconButton, Searchbar } from "react-native-paper";
+import { COLORS, FONTS } from "../config/Miscellaneous";
+import { ActivityIndicator, IconButton, Searchbar } from "react-native-paper";
 
 const CountriesList = (props) => {
 
@@ -10,7 +10,7 @@ const CountriesList = (props) => {
     setCountriesData();
     setTimeout(() => {
       setDadaLoading(!DataLoading);
-    }, 750);
+    }, 500);
     return () => {
 
     };
@@ -63,15 +63,6 @@ const CountriesList = (props) => {
     }
   };
 
-  const _renderSeparator = () => (
-    <View
-      style={{
-        backgroundColor: COLORS.controlNormal,
-        height: 0.5,
-      }}
-    />
-  );
-
   const _renderItem = (item) => {
     return (
       <View style={styles.container}>
@@ -100,7 +91,7 @@ const CountriesList = (props) => {
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <ActivityIndicator size={"large"} animating={true} color={COLORS.accent} />
+            <ActivityIndicator size={"large"} animating={true} color={COLORS.accentLight} />
           </View>
         ) :
         <View>
@@ -129,7 +120,7 @@ const CountriesList = (props) => {
               selectionColor={COLORS.controlNormal}
               platform={Platform.OS}
               inputStyle={{
-                color: COLORS.accent,
+                color: COLORS.accentLight,
               }}
               clearIcon={ClearImage}
             />
@@ -140,7 +131,6 @@ const CountriesList = (props) => {
                     removeClippedSubviews={true}
                     initialNumToRender={7}
                     keyExtractor={(item) => item.name}
-                    ItemSeparatorComponent={_renderSeparator}
                     renderItem={({ item }) => _renderItem(item)}>
           </FlatList>
         </View>
@@ -156,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: "3%",
     paddingBottom: "3%",
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
   },
   top_bar: {
     flexDirection: "row",
@@ -164,12 +154,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title_text: {
-    color: COLORS.accent,
+    color: COLORS.accentLight,
     fontFamily: FONTS.regular,
     fontSize: 24,
   },
   country_text: {
-    color: COLORS.accent,
+    color: COLORS.accentLight,
     fontFamily: FONTS.regular,
     fontSize: 20,
     textAlign: "left",

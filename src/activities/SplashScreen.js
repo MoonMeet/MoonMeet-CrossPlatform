@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { COLORS, FONTS } from "../config/miscellaneous";
+import { COLORS, FONTS } from "../config/Miscellaneous";
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
     padding: "2%",
   },
   logo: {
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
     bottom: "6.5%",
-    color: COLORS.accent,
+    color: COLORS.accentLight,
     fontFamily: FONTS.regular,
   },
   slogan_text: {

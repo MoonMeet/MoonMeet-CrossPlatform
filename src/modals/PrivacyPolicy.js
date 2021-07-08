@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONTS } from "../config/miscellaneous";
+import { COLORS, FONTS } from "../config/Miscellaneous";
 import { Colors, IconButton } from "react-native-paper";
 
 const PrivacyPolicy = (props) => {
@@ -13,7 +13,7 @@ const PrivacyPolicy = (props) => {
 
   const styles = StyleSheet.create({
     headerText: {
-      color: COLORS.accent,
+      color: COLORS.accentLight,
       fontFamily: FONTS.regular,
       fontSize: 20,
       padding: 8,
@@ -40,7 +40,7 @@ const PrivacyPolicy = (props) => {
   return (
     <SafeAreaView style={{
       flex: 1,
-      backgroundColor: COLORS.primary,
+      backgroundColor: COLORS.primaryLight,
     }}>
       <View style={{
         alignItems: 'flex-start'

@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
-import { COLORS, FONTS } from "../config/miscellaneous";
+import { COLORS, FONTS } from "../config/Miscellaneous";
 import { Colors, IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
@@ -118,10 +118,10 @@ const LoginHelp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
   },
   headerText: {
-    color: COLORS.accent,
+    color: COLORS.accentLight,
     fontFamily: FONTS.regular,
     fontSize: 25,
     paddingLeft: '4%',

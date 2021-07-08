@@ -2,7 +2,7 @@ import * as React from "react";
 import { Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
-import { COLORS, FONTS } from "../config/miscellaneous";
+import { COLORS, FONTS } from "../config/Miscellaneous";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryLight,
     padding: "2%",
   },
   illustration: {

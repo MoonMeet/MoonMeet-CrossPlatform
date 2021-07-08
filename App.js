@@ -1,5 +1,5 @@
 import React from "react";
-import StackNavigator from "./src/config/stack";
+import StackNavigator from "./src/config/Stack";
 
 const App = () => {
   return (
