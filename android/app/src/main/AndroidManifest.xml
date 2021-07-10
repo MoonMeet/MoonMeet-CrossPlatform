@@ -1,7 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="org.moon.moonmeet">
 
+    <supports-screens
+            android:anyDensity="true"
+            android:largeScreens="true"
+            android:normalScreens="true"
+            android:resizeable="true"
+            android:smallScreens="true"
+            android:xlargeScreens="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
       android:name=".MainApplication"
@@ -10,6 +19,7 @@
       android:icon="@drawable/ic_launcher"
       android:roundIcon="@drawable/ic_launcher"
       android:allowBackup="false"
+      android:hardwareAccelerated="true"
       android:requestLegacyExternalStorage="true"
       android:theme="@style/AppTheme">
       <activity

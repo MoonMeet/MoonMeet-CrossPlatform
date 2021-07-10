@@ -1,13 +1,27 @@
 import * as React from "react";
-import { Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { BackHandler, Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
 import { COLORS, FONTS } from "../config/Miscellaneous";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
 
 const IntroScreen = () => {
+
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const _backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    }
+    const _backHandler = BackHandler.addEventListener(
+      "hardwareBackPress"
+      , _backAction
+    );
+    return () => _backHandler.remove()
+  }, [])
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PagerView style={styles.PagerView} initialPage={0}>
@@ -74,7 +88,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     top: "2.5%",
-    color: COLORS.darkGrey,
+    color: COLORS.black,
+    opacity: 0.6,
     fontFamily: FONTS.regular,
   },
   introduction_button: {

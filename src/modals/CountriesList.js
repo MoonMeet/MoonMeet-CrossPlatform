@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FlatList, Platform, Pressable, Text, View, StyleSheet } from "react-native";
+import { Platform, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
 import CountriesJson from "../assets/data/json/country-codes.json";
 import { COLORS, FONTS } from "../config/Miscellaneous";
 import { ActivityIndicator, IconButton, Searchbar } from "react-native-paper";
@@ -131,7 +131,10 @@ const CountriesList = (props) => {
                     removeClippedSubviews={true}
                     initialNumToRender={7}
                     keyExtractor={(item) => item.name}
-                    renderItem={({ item }) => _renderItem(item)}>
+                    renderItem={({ item, index, section }) => _renderItem(item, index, section)}
+                    stickySectionHeadersEnabled={true}
+
+                    itemHeight={35}>
           </FlatList>
         </View>
       }
