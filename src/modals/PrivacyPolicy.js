@@ -1,7 +1,7 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONTS } from "../config/Miscellaneous";
-import { Colors, IconButton } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 
 const PrivacyPolicy = (props) => {
 
@@ -20,19 +20,19 @@ const PrivacyPolicy = (props) => {
       textAlign: "left",
     },
     subText: {
-      color: Colors.black,
+      color: COLORS.black,
       fontFamily: FONTS.regular,
       fontSize: 18,
       padding: 8,
-      opacity: 0.7,
+      opacity: 0.6,
       textAlign: "left",
     },
     lastUpdate: {
-      color: '#757575',
+      color: COLORS.black,
       fontFamily: FONTS.regular,
       fontSize: 18,
       padding: 8,
-      opacity: 0.7,
+      opacity: 0.4,
       textAlign: "left",
     },
   });

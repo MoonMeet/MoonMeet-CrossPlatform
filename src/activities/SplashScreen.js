@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     bottom: "2.5%",
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    opacity: 0.6
+    opacity: 0.4
   },
 });
 

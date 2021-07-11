@@ -14,7 +14,7 @@
 
         <!-- Optional, if your app is drawing behind the status bar also. -->
         <item name="android:statusBarColor">
-            @android:color/transparent
+            #80000000
         </item>
 
         <item name="android:windowDisablePreview">true</item>

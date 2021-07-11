@@ -3,25 +3,27 @@ import { BackHandler, Image, SafeAreaView, StatusBar, StyleSheet, Text, View } f
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
 import { COLORS, FONTS } from "../config/Miscellaneous";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 
 const IntroScreen = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const _backAction = () => {
-      BackHandler.exitApp();
-      return true;
-    }
-    const _backHandler = BackHandler.addEventListener(
-      "hardwareBackPress"
-      , _backAction
-    );
-    return () => _backHandler.remove()
-  }, [])
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <PagerView style={styles.PagerView} initialPage={0}>
@@ -49,7 +51,9 @@ const IntroScreen = () => {
                   uppercase={false}
                   color="#566193"
                   mode="contained"
-                  onPress={() => navigation.navigate("login")}>
+                  onPress={() => {
+                    navigation.navigate("login")
+                  }}>
             Continue
           </Button>
         </View>
@@ -89,7 +93,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     top: "2.5%",
     color: COLORS.black,
-    opacity: 0.6,
+    opacity: 0.4,
     fontFamily: FONTS.regular,
   },
   introduction_button: {

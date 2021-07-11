@@ -1,7 +1,7 @@
 import React from "react";
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { COLORS, FONTS } from "../config/Miscellaneous";
-import { Colors, IconButton } from "react-native-paper";
+import { IconButton } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 const LoginHelp = () => {
@@ -67,7 +67,7 @@ const LoginHelp = () => {
           3. Enter the 6-digit code you receive via SMS.
         </Text>
         <Text style={{
-          color: COLORS.darkGrey,
+          color: COLORS.accentLight,
           fontFamily: FONTS.extra_bold,
           fontSize: 23,
           paddingLeft: '4%',
@@ -75,6 +75,7 @@ const LoginHelp = () => {
           paddingBottom: '2%',
           paddingRight: '1%',
           textAlign: "left",
+
         }}>
           If you didn't receive the 6-digit code by SMS
         </Text>
@@ -91,7 +92,7 @@ const LoginHelp = () => {
           Troubleshooting steps
         </Text>
         <Text style={{
-          color: Colors.black,
+          color: COLORS.accentLight,
           fontFamily: FONTS.regular,
           fontSize: 18,
           paddingLeft: '4%',
@@ -131,14 +132,15 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   subText: {
-    color: COLORS.darkGrey,
+    color: COLORS.black,
     fontFamily: FONTS.regular,
     fontSize: 23,
     paddingLeft: '4%',
     textAlign: "left",
+    opacity: 0.4,
   },
   instruction: {
-    color: Colors.black,
+    color: COLORS.black,
     fontFamily: FONTS.regular,
     fontSize: 18,
     paddingLeft: '4%',
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
     paddingBottom: '2%',
     paddingRight: '1%',
     textAlign: "left",
-    opacity: 0.75,
+    opacity: 0.6,
   }
 });
 export default LoginHelp;

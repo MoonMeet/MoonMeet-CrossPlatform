@@ -168,10 +168,11 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   dial_text: {
-    color: COLORS.darkGrey,
+    color: COLORS.black,
     fontFamily: FONTS.regular,
     fontSize: 20,
     textAlign: "right",
+    opacity: 0.4,
   },
 });
 
