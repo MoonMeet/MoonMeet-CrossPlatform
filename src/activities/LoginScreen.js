@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -17,6 +16,7 @@ import PrivacyPolicy from "../modals/PrivacyPolicy";
 import NetInfo from "@react-native-community/netinfo";
 
 import { useNavigation } from "@react-navigation/native";
+import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
 
 const LoginScreen = () => {
 
@@ -109,7 +109,7 @@ const LoginScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={isIOS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <Provider>
@@ -137,8 +137,8 @@ const LoginScreen = () => {
           </View>
           <View style={styles.top_bar}>
             <Text style={styles.top_text}>
-              Enter your phone number
-              to get started
+              Enter your phone number to
+              get started
             </Text>
           </View>
           <View style={{
@@ -165,7 +165,7 @@ const LoginScreen = () => {
               padding: "1%",
             }}
                        mode="outlined"
-                       keyboardType={Platform.OS === "android" ? "numeric" : "number-pad"}
+                       keyboardType={isAndroid === "android" ? "numeric" : "number-pad"}
                        label="Country Code"
                        value={CountryText}
                        onFocus={() => {
@@ -211,7 +211,7 @@ const LoginScreen = () => {
               paddingTop: "1%",
             }}
                        mode="outlined"
-                       keyboardType={Platform.OS === "android" ? "numeric" : "number-pad"}
+                       keyboardType={isAndroid === "android" ? "numeric" : "number-pad"}
                        label="Phone Number"
                        value={NumberText}
                        onFocus={() => {
@@ -345,7 +345,11 @@ const styles = StyleSheet.create({
   },
   top_bar: {
     flexDirection: "row",
-    padding: "3%",
+    paddingTop: "3%",
+    paddingBottom: "3%",
+    paddingLeft: "2%",
+    paddingRight: "2%",
+    justifyContent: 'center',
   },
   divider: {
     width: "-1%",
@@ -354,7 +358,9 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: "relative",
-    fontSize: 26,
+    fontSize: 28,
+    paddingLeft: "3%",
+    paddingRight: "3%",
     textAlign: "center",
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,

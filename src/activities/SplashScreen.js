@@ -8,7 +8,7 @@ const SplashScreen = () => {
 
   const navigation = useNavigation();
 
-  const [getViewPagerStats, setViewPagerStats] = React.useState('')
+  /*const [getViewPagerStats, setViewPagerStats] = React.useState('')
 
   const getViewPagerCompleted = () => {
     AsyncStorage.getItem('isViewPagerCompleted').then((stringValue?) => {
@@ -18,16 +18,17 @@ const SplashScreen = () => {
       }
       return false;
     })
-  }
+  }*/
 
   useEffect(() => {
-    getViewPagerCompleted()
+    //getViewPagerCompleted()
     setTimeout(() => {
-      if (getViewPagerStats === "true") {
+      /*if (getViewPagerStats === "true") {
         navigation.navigate("login")
       } else {
         navigation.navigate("onboarding");
-      }
+      }*/
+      navigation.navigate("onboarding");
     }, 2000);
   });
 
