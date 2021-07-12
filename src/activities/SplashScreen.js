@@ -2,14 +2,35 @@ import React, { useEffect } from "react";
 import { Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, FONTS } from "../config/Miscellaneous";
+import AsyncStorage from "@react-native-community/async-storage";
 
 const SplashScreen = () => {
+
   const navigation = useNavigation();
+
+  const [getViewPagerStats, setViewPagerStats] = React.useState('')
+
+  const getViewPagerCompleted = () => {
+    AsyncStorage.getItem('isViewPagerCompleted').then((stringValue?) => {
+      if (stringValue !== null) {
+        setViewPagerStats(stringValue)
+        return;
+      }
+      return false;
+    })
+  }
+
   useEffect(() => {
+    getViewPagerCompleted()
     setTimeout(() => {
-      navigation.navigate("onboarding");
+      if (getViewPagerStats === "true") {
+        navigation.navigate("login")
+      } else {
+        navigation.navigate("onboarding");
+      }
     }, 2000);
   });
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

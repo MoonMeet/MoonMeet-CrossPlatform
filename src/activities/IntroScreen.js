@@ -1,9 +1,10 @@
-import * as React from "react";
+import React, { useCallback } from "react";
 import { BackHandler, Image, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import { Button } from "react-native-paper";
 import { COLORS, FONTS } from "../config/Miscellaneous";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-community/async-storage";
 
 
 const IntroScreen = () => {
@@ -11,7 +12,7 @@ const IntroScreen = () => {
   const navigation = useNavigation();
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const onBackPress = () => {
         BackHandler.exitApp();
         return true
@@ -23,6 +24,12 @@ const IntroScreen = () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [])
   );
+
+  const [ViewPagerPassed, setIsViewPagerPassed] = React.useState('')
+
+  const storeViewPagerCompleted = () => {
+      AsyncStorage.setItem('isViewPagerCompleted', ViewPagerPassed);
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -52,6 +59,8 @@ const IntroScreen = () => {
                   color="#566193"
                   mode="contained"
                   onPress={() => {
+                    setIsViewPagerPassed('true')
+                    storeViewPagerCompleted();
                     navigation.navigate("login")
                   }}>
             Continue
