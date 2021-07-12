@@ -8,27 +8,29 @@ const SplashScreen = () => {
 
   const navigation = useNavigation();
 
-  /*const [getViewPagerStats, setViewPagerStats] = React.useState('')
+  const [getViewPagerStats, setViewPagerStats] = React.useState("");
 
+  /**
+   * Getting Data from AysncStorage
+   */
   const getViewPagerCompleted = () => {
-    AsyncStorage.getItem('isViewPagerCompleted').then((stringValue?) => {
+    AsyncStorage.getItem("isViewPagerCompleted").then((stringValue) => {
       if (stringValue !== null) {
-        setViewPagerStats(stringValue)
+        setViewPagerStats(stringValue);
         return;
       }
       return false;
-    })
-  }*/
+    });
+  };
 
   useEffect(() => {
-    //getViewPagerCompleted()
+    getViewPagerCompleted();
     setTimeout(() => {
-      /*if (getViewPagerStats === "true") {
-        navigation.navigate("login")
+      if (getViewPagerStats === "true") {
+        navigation.navigate("login");
       } else {
         navigation.navigate("onboarding");
-      }*/
-      navigation.navigate("onboarding");
+      }
     }, 2000);
   });
 
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
     bottom: "2.5%",
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    opacity: 0.4
+    opacity: 0.4,
   },
 });
 

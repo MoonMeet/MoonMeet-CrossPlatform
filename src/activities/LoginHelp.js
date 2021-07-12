@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 const LoginHelp = () => {
 
   const BackImage = require("../assets/images/back.png");
+
   const navigation = useNavigation();
 
   //TODO: Implement Iphone LoginHelp.

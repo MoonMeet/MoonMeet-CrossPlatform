@@ -15,21 +15,21 @@ const IntroScreen = () => {
     useCallback(() => {
       const onBackPress = () => {
         BackHandler.exitApp();
-        return true
+        return true;
       };
 
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
 
       return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [])
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, []),
   );
 
-  /*const [ViewPagerPassed, setIsViewPagerPassed] = React.useState('')
+  const [ViewPagerPassed, setIsViewPagerPassed] = React.useState("");
 
   const storeViewPagerCompleted = () => {
-      AsyncStorage.setItem('isViewPagerCompleted', ViewPagerPassed);
-  }*/
+    AsyncStorage.setItem("isViewPagerCompleted", ViewPagerPassed);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -59,9 +59,9 @@ const IntroScreen = () => {
                   color="#566193"
                   mode="contained"
                   onPress={() => {
-                    /*setIsViewPagerPassed('true')
-                    storeViewPagerCompleted();*/
-                    navigation.navigate("login")
+                    setIsViewPagerPassed("true");
+                    storeViewPagerCompleted();
+                    navigation.navigate("login");
                   }}>
             Continue
           </Button>

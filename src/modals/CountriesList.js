@@ -8,11 +8,11 @@ const CountriesList = (props) => {
 
   useEffect(() => {
     setCountriesData();
-    setTimeout(() => {
+    const CountriesListTimerTask = setTimeout(() => {
       setDadaLoading(!DataLoading);
     }, 500);
     return () => {
-
+      clearTimeout(CountriesListTimerTask);
     };
   }, []);
 
@@ -20,19 +20,33 @@ const CountriesList = (props) => {
 
   const [SearchBarVisible, setSearchBarVisible] = React.useState(false);
 
+
   const [SearchData, setSearchData] = React.useState("");
+
   const [FilteredData, setFilteredData] = React.useState([]);
+
   const [MasterData, setMasterData] = React.useState([]);
+
   const [DataLoading, setDadaLoading] = React.useState(true);
 
+
   const SearchImage = require("../assets/images/search.png");
+
   const ClearImage = require("../assets/images/clear.png");
 
+  /**
+   * set FlatList Data.
+   */
   const setCountriesData = () => {
     setFilteredData(_countriesJson);
     setMasterData(_countriesJson);
   };
 
+  /**
+   * Reset list to look like first launch .
+   * @param {String} text
+   * @constructor
+   */
   const ResetListData = (text) => {
     const textLength = text.length;
     if (textLength < 1) {
@@ -41,11 +55,22 @@ const CountriesList = (props) => {
     }
   };
 
+  /**
+   *
+   * @param {boolean} bool
+   * @param {NaN,String} MyData /* Mixed NaN & String can be used.
+   * @constructor
+   */
   const CloseModal = (bool, MyData) => {
     props.changeCountriesVisibility(bool);
     props.setModalData(MyData);
   };
 
+  /**
+   * Search in JSON Data.
+   * @param {String} text
+   * @constructor
+   */
   const SearchInData = (text) => {
     if (text) {
       const newData = MasterData.filter((item) => {
@@ -63,6 +88,12 @@ const CountriesList = (props) => {
     }
   };
 
+  /**
+   * Seperated Render Item for FlatList.
+   * @param {function, NaN, String} item /* when converting anonymous function it shows {item} is function, but we can return both NaN and String.
+   * @returns {JSX.Element}
+   * @private
+   */
   const _renderItem = (item) => {
     return (
       <View style={styles.container}>
@@ -88,8 +119,8 @@ const CountriesList = (props) => {
       {DataLoading ?
         (
           <View style={{
-            alignItems: 'center',
-            justifyContent: 'center'
+            alignItems: "center",
+            justifyContent: "center",
           }}>
             <ActivityIndicator size={"large"} animating={true} color={COLORS.accentLight} />
           </View>

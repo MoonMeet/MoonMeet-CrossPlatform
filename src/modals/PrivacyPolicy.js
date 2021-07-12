@@ -7,6 +7,11 @@ const PrivacyPolicy = (props) => {
 
   const BackImage = require('../assets/images/back.png')
 
+  /**
+   * Closing modal from LoginScreen.js
+   * @param {boolean} bool
+   * @constructor {props}
+   */
   const CloseModal = (bool) => {
     props.changePrivacyPolicyVisibility(bool);
   };
