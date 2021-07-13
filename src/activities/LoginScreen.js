@@ -8,7 +8,7 @@ import {
   Text, View,
 } from "react-native";
 import { COLORS, FONTS } from "../config/Miscellaneous";
-import { Button, IconButton, Menu, Provider, Snackbar, TextInput } from "react-native-paper";
+import { Button, IconButton, Menu, Provider, Snackbar, TextInput, ActivityIndicator } from "react-native-paper";
 import Modal from "react-native-modal";
 import CountriesList from "../modals/CountriesList";
 import PrivacyPolicy from "../modals/PrivacyPolicy";
@@ -19,12 +19,14 @@ import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
 
 import auth from '@react-native-firebase/auth';
 import { showMessage } from "../utils/device/toast/ToastMultiPlatform";
+import Spinner from "../components/loader/Spinner";
+
 
 const LoginScreen = () => {
 
   /**
-   *
-   * @type {Promise<NetInfoState>} Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   * @type {Promise<NetInfoState>}
    */
   let isConnected = NetInfo.fetch().then(networkState => {
     isConnected = networkState.isConnected
@@ -43,6 +45,7 @@ const LoginScreen = () => {
 
   useEffect(() => {
     addNetInfoObserver()
+    //setConfirmCode(!ConfirmCode)
     const LoginScreenTimerTask = setTimeout(() => {
       if (isConnected) {
         getCountryCodeFromApi()
@@ -92,7 +95,7 @@ const LoginScreen = () => {
 
   /**
    * function to send code to specific phone number.
-   * @param {NaN, String} phoneNumber /* can be string but contains only numbers !
+   * @param {NaN, String} phoneNumber
    * @returns {Promise<void>}
    */
 
@@ -127,8 +130,14 @@ const LoginScreen = () => {
   const onDismissErrorSnackBar = () => setErrorSnackBarVisible(!ErrorSnackBarVisible);
 
   /**
+   * Spinner Stuff
+   */
+
+  const [SpinnerVisible, setSpinnerVisible] = React.useState(false)
+
+  /**
    * get Country code from internet API
-   * @return {NaN, String} data to {CountryText} /* can be string but contains only numbers !
+   * @return {NaN, String} data to {CountryText}
    */
   const getCountryCodeFromApi = () => {
     try {
@@ -168,7 +177,7 @@ const LoginScreen = () => {
 
   /**
    *
-   * @param {NaN, String} data /* can be string but contains only numbers
+   * @param {NaN, String} data
    */
 
   const setData = (data) => {
@@ -176,7 +185,7 @@ const LoginScreen = () => {
   };
   /**
    * Clean up NumberText
-   * @param {NaN, String} text /* can be string but contains only numbers
+   * @param {NaN, String} text
    */
   const onNumberTextChange = (text) => {
     /**
@@ -191,6 +200,7 @@ const LoginScreen = () => {
   const DotsImage = require("../assets/images/dots.png");
 
   return (
+    //////////////////////////// FIRST PART ////////////////////////////
     <KeyboardAvoidingView
       behavior={isIOS === "ios" ? "padding" : "height"}
       style={styles.container}
@@ -198,6 +208,17 @@ const LoginScreen = () => {
       <StatusBar
         backgroundColor="#FFFFFF"
         barStyle={"dark-content"} />
+      <Spinner
+        visible={SpinnerVisible}
+        textContent={'Sending Code'}
+        animation={'slide'}
+        customIndicator={<ActivityIndicator animating={true} size={'large'} color={COLORS.accentLight}/>}
+        color={COLORS.accentLight}
+        overlayColor={"#DADADA"}
+        textStyle={{
+          color: COLORS.accentLight,
+        }}
+      />
       <Provider>
         {!ConfirmCode ? (
           <SafeAreaView style={styles.container}>
@@ -371,6 +392,7 @@ const LoginScreen = () => {
                   if (isConnected) {
                     if (isSMSSendingAcceptable()) {
                       //TODO: Handle Code Sending
+                      setSpinnerVisible(!SpinnerVisible)
                       //signInWithPhoneNumber(CountryText + NumberText)
                     } else {
                       setErrorSnackbarText('Please enter a valid Country Code and Phone Number')
@@ -426,11 +448,11 @@ const LoginScreen = () => {
             </Snackbar>
           </SafeAreaView>
         ) :
+          //////////////////////////// SECOND PART ////////////////////////////
           /**
            * Render ConfirmScreen when user is in ConfirmCode mode.
            */
           <SafeAreaView style={styles.container}>
-
           </SafeAreaView>
         }
       </Provider>

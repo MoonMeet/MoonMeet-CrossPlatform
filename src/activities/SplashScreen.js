@@ -25,13 +25,16 @@ const SplashScreen = () => {
 
   useEffect(() => {
     getViewPagerCompleted();
-    setTimeout(() => {
+    const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === "true") {
         navigation.navigate("login");
       } else {
         navigation.navigate("onboarding");
       }
     }, 2000);
+    return () => {
+      clearTimeout(SplashScreenTimerTask)
+    }
   });
 
   return (
