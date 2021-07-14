@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Platform, Pressable, Text, View, StyleSheet, FlatList } from "react-native";
-import CountriesJson from "../assets/data/json/country-codes.json";
-import { COLORS, FONTS } from "../config/Miscellaneous";
+import CountriesJson from "../../assets/data/json/country-codes.json";
 import { ActivityIndicator, IconButton, Searchbar } from "react-native-paper";
+import { COLORS, FONTS } from "../../config/Miscellaneous";
 
 const CountriesList = (props) => {
 
@@ -30,9 +30,9 @@ const CountriesList = (props) => {
   const [DataLoading, setDadaLoading] = React.useState(true);
 
 
-  const SearchImage = require("../assets/images/search.png");
+  const SearchImage = require("../../assets/images/search.png");
 
-  const ClearImage = require("../assets/images/clear.png");
+  const ClearImage = require("../../assets/images/clear.png");
 
   /**
    * set FlatList Data.

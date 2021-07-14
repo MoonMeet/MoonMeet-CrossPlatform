@@ -7,11 +7,8 @@ import {
   StyleSheet,
   Text, View,
 } from "react-native";
-import { COLORS, FONTS } from "../config/Miscellaneous";
-import { Button, IconButton, Menu, Provider, Snackbar, TextInput, ActivityIndicator } from "react-native-paper";
+import { Button, IconButton, Menu, Provider, Snackbar, TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
-import CountriesList from "../modals/CountriesList";
-import PrivacyPolicy from "../modals/PrivacyPolicy";
 import NetInfo from "@react-native-community/netinfo";
 
 import { useNavigation } from "@react-navigation/native";
@@ -19,7 +16,9 @@ import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
 
 import auth from '@react-native-firebase/auth';
 import { showMessage } from "../utils/device/toast/ToastMultiPlatform";
-import Spinner from "../components/loader/Spinner";
+import CountriesList from "../modals/LoginScreen/CountriesList";
+import PrivacyPolicy from "../modals/LoginScreen/PrivacyPolicy";
+import { COLORS, FONTS } from "../config/Miscellaneous";
 
 
 const LoginScreen = () => {
@@ -130,12 +129,6 @@ const LoginScreen = () => {
   const onDismissErrorSnackBar = () => setErrorSnackBarVisible(!ErrorSnackBarVisible);
 
   /**
-   * Spinner Stuff
-   */
-
-  const [SpinnerVisible, setSpinnerVisible] = React.useState(false)
-
-  /**
    * get Country code from internet API
    * @return {NaN, String} data to {CountryText}
    */
@@ -208,17 +201,6 @@ const LoginScreen = () => {
       <StatusBar
         backgroundColor="#FFFFFF"
         barStyle={"dark-content"} />
-      <Spinner
-        visible={SpinnerVisible}
-        textContent={'Sending Code'}
-        animation={'slide'}
-        customIndicator={<ActivityIndicator animating={true} size={'large'} color={COLORS.accentLight}/>}
-        color={COLORS.accentLight}
-        overlayColor={"#DADADA"}
-        textStyle={{
-          color: COLORS.accentLight,
-        }}
-      />
       <Provider>
         {!ConfirmCode ? (
           <SafeAreaView style={styles.container}>
@@ -392,7 +374,6 @@ const LoginScreen = () => {
                   if (isConnected) {
                     if (isSMSSendingAcceptable()) {
                       //TODO: Handle Code Sending
-                      setSpinnerVisible(!SpinnerVisible)
                       //signInWithPhoneNumber(CountryText + NumberText)
                     } else {
                       setErrorSnackbarText('Please enter a valid Country Code and Phone Number')
