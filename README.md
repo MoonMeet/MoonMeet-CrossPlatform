@@ -15,7 +15,6 @@
 - **Moon Meet** is an Open Source Project licensed under the GNU GPL License 2.0.
 - **Moon Meet** is an Open Source Project means that anyone can see, change, get the source code and can contribute to make this project more better.
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it Alive !
-- Contribute !
 
 ### Commit message
 When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that *commit*.
@@ -49,7 +48,7 @@ Thanks, they help to keep **Moon Meet** alive. It's better to have multiple peop
 
 ### License
    ```
-   Moon Meet Project Copyright(C) 2021 CortexTN & AzizVirus.
+   Moon Meet Project Copyright(C) 2021 CortexTN.
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License.
