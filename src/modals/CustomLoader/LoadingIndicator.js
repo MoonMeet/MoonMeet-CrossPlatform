@@ -1,36 +1,46 @@
-import { StyleSheet } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { COLORS, FONTS } from "../../config/Miscellaneous";
-import { View } from "native-base";
+import { rgbaColor } from "react-native-reanimated/src/reanimated2/Colors";
 
 
 const LoadingIndicator = (props) => {
 
-  const setLoaderText = (text) => {
-    return props.setLoaderText(text)
-  }
-  const closeLoader = (bool) => {
-    props.changeLoaderVisibility(bool)
-  }
+  useEffect(() => {
+    initializeLoaderText();
+  });
 
-  return(
+  const [LoaderText, getLoaderText] = React.useState("");
+
+  /**
+   * get loader text from LoginScreen
+   */
+  const initializeLoaderText = () => {
+    getLoaderText(props.setLoaderText);
+  };
+
+  return (
     <View style={styles.container}>
-      <ActivityIndicator animating={true} size={"large"} color={COLORS.accentLight}/>
-      <Text style={loaderText}>{setLoaderText}</Text>
+      <ActivityIndicator animating={true} size={"large"} color={COLORS.accentLight} />
+      <Text style={styles.loaderText}>{LoaderText}</Text>
     </View>
   );
 };
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.white,
-      opacity: 0.4
-    },
-    loaderText: {
-      fontSize: 22,
-      color: COLORS.black,
-      fontFamily: FONTS.regular,
-      opacity: 0.4,
-    }
-  });
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 20,
+    backgroundColor: rgbaColor(220,220,220, 0.3)
+  },
+  loaderText: {
+    fontSize: 22,
+    padding: '2%',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+    opacity: 0.6
+  },
+});
 export default LoadingIndicator;
