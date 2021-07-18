@@ -1,9 +1,9 @@
-import React from "react";
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import React, {useCallback} from "react";
+import {BackHandler, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View} from "react-native";
 import { COLORS, FONTS } from "../config/Miscellaneous";
 import { IconButton } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
-import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import { isAndroid } from "../utils/device/DeviceInfo";
 
 const LoginHelp = () => {
 
@@ -11,7 +11,19 @@ const LoginHelp = () => {
 
   const navigation = useNavigation();
 
-  //TODO: Implement Iphone LoginHelp.
+  useFocusEffect(
+      useCallback(() => {
+        const onBackPress = () => {
+          navigation.goBack()
+          return true;
+        };
+
+        BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+        return () =>
+            BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      }, []),
+  );
 
   return (
     <SafeAreaView style={styles.container}>

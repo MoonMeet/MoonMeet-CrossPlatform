@@ -11,10 +11,10 @@ const SplashScreen = () => {
   const [getViewPagerStats, setViewPagerStats] = React.useState("");
 
   /**
-   * Getting Data from AysncStorage
+   * Getting Data from AsyncStorage
    */
   const getViewPagerCompleted = () => {
-    AsyncStorage.getItem("isViewPagerCompleted").then((stringValue) => {
+    AsyncStorage.getItem("isViewPagerCompleted").then(stringValue => {
       if (stringValue !== null) {
         setViewPagerStats(stringValue);
         return;

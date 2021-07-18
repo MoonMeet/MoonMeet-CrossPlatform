@@ -115,12 +115,14 @@ const CountriesList = (props) => {
   return (
     <View style={{
       marginBottom: "5%",
+      flex: 1
     }}>
       {DataLoading ?
         (
           <View style={{
             alignItems: "center",
             justifyContent: "center",
+            flex: 1,
           }}>
             <ActivityIndicator size={"large"} animating={true} color={COLORS.accentLight} />
           </View>
@@ -159,13 +161,12 @@ const CountriesList = (props) => {
           }
           <FlatList showsVerticalScrollIndicator={false}
                     data={FilteredData}
+                    disableVirtualization
                     removeClippedSubviews={true}
-                    initialNumToRender={7}
+                    initialNumToRender={10}
                     keyExtractor={(item) => item.name}
                     renderItem={({ item, index, section }) => _renderItem(item, index, section)}
-                    stickySectionHeadersEnabled={true}
-
-                    itemHeight={35}>
+                    stickySectionHeadersEnabled={true}>
           </FlatList>
         </View>
       }

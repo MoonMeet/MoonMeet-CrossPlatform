@@ -1,17 +1,17 @@
-import React, { useEffect } from "react";
+import React, {useCallback, useEffect} from "react";
 import {
+  BackHandler,
   Keyboard,
-  KeyboardAvoidingView,
-  SafeAreaView,
+  KeyboardAvoidingView, SafeAreaView,
   StatusBar,
   StyleSheet,
   Text, View,
 } from "react-native";
-import { Button, IconButton, Menu, Provider, Snackbar, TextInput } from "react-native-paper";
+import {Button, IconButton, Menu, Provider, Snackbar, TextInput} from "react-native-paper";
 import Modal from "react-native-modal";
 import NetInfo from "@react-native-community/netinfo";
 
-import { useNavigation } from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
 
 import auth from "@react-native-firebase/auth";
@@ -44,9 +44,23 @@ const LoginScreen = () => {
     });
   };
 
+  useFocusEffect(
+      useCallback(() => {
+        const onBackPress = () => {
+          BackHandler.exitApp();
+          return true;
+        };
+
+        BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+        return () =>
+            BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+      }, []),
+  );
+
   useEffect(() => {
     addNetInfoObserver();
-    setConfirmCode(!ConfirmCode);
+    const currentSubscriber = auth().onAuthStateChanged(onAuthStateChanged);
     const LoginScreenTimerTask = setTimeout(() => {
       if (isConnected) {
         getCountryCodeFromApi();
@@ -56,6 +70,7 @@ const LoginScreen = () => {
       }
     }, 500);
     return () => {
+      currentSubscriber()
       clearTimeout(LoginScreenTimerTask);
     };
   }, []);
@@ -78,8 +93,8 @@ const LoginScreen = () => {
   const closeMenu = () => setMenuVisible(false);
 
   /**
-   *
-   * @returns {boolean} allow SMS sending if country code and number is probably real
+   * allow SMS sending if country code and number is probably real
+   * @returns {boolean}
    */
 
   const isSMSSendingAcceptable = () => {
@@ -90,9 +105,13 @@ const LoginScreen = () => {
    * Firebase Phone Auth Stuff
    */
 
-  const [ConfirmCode, setConfirmCode] = React.useState(null);
+  function onAuthStateChanged(currentUser) {
+    setMoonMeetUser(currentUser);
+  }
 
-  const [ReceivedCode, setReceivedCode] = React.useState("");
+  const [MoonMeetUser, setMoonMeetUser] = React.useState();
+
+  const [ConfirmCode, setConfirmCode] = React.useState(null);
 
   /**
    * Loader stuff
@@ -108,18 +127,31 @@ const LoginScreen = () => {
   async function signInWithPhoneNumber(phoneNumber) {
     const _sendCode = await auth().signInWithPhoneNumber(phoneNumber);
     setConfirmCode(_sendCode);
+    setLoaderVisible(!LoaderVisible)
   }
 
   /**
-   * void to confirm code, else we handle a Toast Exception.
+   * void to confirm code, else we handle an Exception.
    * @returns {Promise<void>}
    */
 
-  async function confirmCode() {
+  async function confirmCode(text) {
     try {
-      await confirm.confirm(ReceivedCode);
+      ConfirmCode.confirm(text);
+      console.log(text)
+      const credential = auth.PhoneAuthProvider.credential(ConfirmCode.verificationId, text);
+      let userData = await auth().currentUser.linkWithCredential(credential);
+      console.log(userData + " " + userData.user)
+      setMoonMeetUser(userData.user);
     } catch (error) {
-      showMessage("Invalid Code. + Error: " + error.toString(), true);
+      if (error !== null) {
+        if (error.code === 'auth/invalid-verification-code') {
+          console.log('Invalid code.');
+        } else {
+          console.log('Account linking error')
+          console.log(error.toString())
+        }
+      }
     }
   }
 
@@ -187,6 +219,12 @@ const LoginScreen = () => {
 
   const [OTPCharSequence, setOTPCharSequence] = React.useState("");
 
+  const addCodeObserver = (text) => {
+    if (text.length > 5) {
+      Keyboard.dismiss()
+      confirmCode(text);
+    }
+  }
 
   /**
    *
@@ -370,13 +408,14 @@ const LoginScreen = () => {
                   fontSize: 18,
                   opacity: 0.4,
                   fontFamily: FONTS.regular,
-                }}>You agree to the</Text>
+                }}>You agree to the </Text>
                 <Text style={{
                   color: COLORS.accentLight,
                   fontSize: 18,
                   fontFamily: FONTS.regular,
-                }}
-                      onPress={() => setPrivacyPolicyVisible(!PrivacyPolicyVisible)}> Terms of Service</Text>
+                }} onPress={() => setPrivacyPolicyVisible(!PrivacyPolicyVisible)}>
+                  Terms of Service
+                </Text>
               </View>
               <View style={{
                 paddingTop: "4%",
@@ -393,9 +432,9 @@ const LoginScreen = () => {
                     Keyboard.dismiss();
                     if (isConnected) {
                       if (isSMSSendingAcceptable()) {
-                        //TODO: Handle Code Sending
+                        setLoaderText("Loading")
                         setLoaderVisible(!LoaderVisible);
-                        //signInWithPhoneNumber(CountryText + NumberText)
+                        signInWithPhoneNumber(CountryText + NumberText)
                       } else {
                         setErrorSnackbarText("Please enter a valid Country Code and Phone Number");
                         onToggleErrorSnackBar();
@@ -486,19 +525,52 @@ const LoginScreen = () => {
             }}>
               <OTPTextView
                 inputCount={6}
+                ref={() => {}}
                 tintColor={COLORS.accentLight}
                 offTintColor={COLORS.controlHighlight}
                 containerStyle={styles.TextInputContainer}
                 textInputStyle={styles.RoundedTextInput}
                 handleTextChange={(text) => {
                   setOTPCharSequence(text)
+                  console.log(text)
                   addCodeObserver(text)
                 }}
                 keyboardType={'numeric'}/>
             </View>
-            <View>
-              <Text>
+            <View style={{
+              flex: 1,
+              flexDirection: "row",
+              paddingTop: "3%",
+              paddingBottom: "3%",
+              paddingLeft: "2%",
+              paddingRight: "2%",
+            }}>
+              <View style={{
+                flex: 1
+              }}>
+              <Text style={{
+                position: "relative",
+                fontSize: 16,
+                color: COLORS.black,
+                opacity: 0.4,
+                textAlign: 'left',
+                fontFamily: FONTS.regular,
+              }}>
                 WRONG NUMBER
+              </Text>
+              </View>
+              <Text style={{
+                position: "relative",
+                fontSize: 16,
+                color: COLORS.black,
+                opacity: 0.4,
+                textAlign: 'right',
+                fontFamily: FONTS.regular
+              }}
+              onPress={() => {
+                setOTPCharSequence('')
+              }}>
+                CLEAR CODE
               </Text>
             </View>
           </SafeAreaView>
@@ -546,7 +618,7 @@ const styles = StyleSheet.create({
   },
   RoundedTextInput: {
     borderRadius: 10,
-    borderWidth: 4,
+    borderWidth: 2,
   },
 });
 export default LoginScreen;

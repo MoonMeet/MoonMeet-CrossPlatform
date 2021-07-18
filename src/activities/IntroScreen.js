@@ -25,10 +25,10 @@ const IntroScreen = () => {
     }, []),
   );
 
-  const [ViewPagerPassed, setIsViewPagerPassed] = React.useState("");
+  const ViewPagerPassed = 'true';
 
-  const storeViewPagerCompleted = () => {
-    AsyncStorage.setItem("isViewPagerCompleted", ViewPagerPassed);
+  const storeViewPagerCompleted = (stringValue) => {
+    AsyncStorage.setItem("isViewPagerCompleted", stringValue);
   };
 
   return (
@@ -59,8 +59,7 @@ const IntroScreen = () => {
                   color="#566193"
                   mode="contained"
                   onPress={() => {
-                    setIsViewPagerPassed("true");
-                    storeViewPagerCompleted();
+                    storeViewPagerCompleted(ViewPagerPassed);
                     navigation.navigate("login");
                   }}>
             Continue
