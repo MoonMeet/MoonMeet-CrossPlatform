@@ -139,10 +139,10 @@ const LoginScreen = () => {
     try {
       ConfirmCode.confirm(text);
       console.log(text)
-      const credential = auth.PhoneAuthProvider.credential(ConfirmCode.verificationId, text);
-      let userData = await auth().currentUser.linkWithCredential(credential);
-      console.log(userData + " " + userData.user)
-      setMoonMeetUser(userData.user);
+      // const credential = auth.PhoneAuthProvider.credential(ConfirmCode.verificationId, text);
+      // let userData = await auth().currentUser.linkWithCredential(credential);
+      // console.log(userData + " " + userData.user)
+      // setMoonMeetUser(userData.user);
     } catch (error) {
       if (error !== null) {
         if (error.code === 'auth/invalid-verification-code') {
@@ -222,7 +222,11 @@ const LoginScreen = () => {
   const addCodeObserver = (text) => {
     if (text.length > 5) {
       Keyboard.dismiss()
-      confirmCode(text);
+      confirmCode(text).then(()=>{
+        // auth().currentUser
+        // navigation.navigate("")
+        console.log(MoonMeetUser?.uid)
+      })
     }
   }
 
