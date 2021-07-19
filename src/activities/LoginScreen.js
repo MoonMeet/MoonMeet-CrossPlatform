@@ -15,12 +15,13 @@ import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import { isAndroid, isIOS } from "../utils/device/DeviceInfo";
 
 import auth from "@react-native-firebase/auth";
-import { showMessage } from "../utils/device/toast/ToastMultiPlatform";
 import CountriesList from "../modals/LoginScreen/CountriesList";
 import PrivacyPolicy from "../modals/LoginScreen/PrivacyPolicy";
 import { COLORS, FONTS } from "../config/Miscellaneous";
 import LoadingIndicator from "../modals/CustomLoader/LoadingIndicator";
 import OTPTextView from "../components/OtpView/OTPTextInput";
+import {getUserPhoneNumber, getUserUID, UserAuthenticated} from "../utils/database/Authentication";
+import database from '@react-native-firebase/database';
 
 
 const LoginScreen = () => {
@@ -113,6 +114,8 @@ const LoginScreen = () => {
 
   const [ConfirmCode, setConfirmCode] = React.useState(null);
 
+  //const databaseRef = database().ref(`/users/${auth?.()?.currentUser?.uid}`)
+
   /**
    * Loader stuff
    */
@@ -137,12 +140,8 @@ const LoginScreen = () => {
 
   async function confirmCode(text) {
     try {
-      ConfirmCode.confirm(text);
+     ConfirmCode.confirm(text);
       console.log(text)
-      // const credential = auth.PhoneAuthProvider.credential(ConfirmCode.verificationId, text);
-      // let userData = await auth().currentUser.linkWithCredential(credential);
-      // console.log(userData + " " + userData.user)
-      // setMoonMeetUser(userData.user);
     } catch (error) {
       if (error !== null) {
         if (error.code === 'auth/invalid-verification-code') {
@@ -214,18 +213,40 @@ const LoginScreen = () => {
   const [LoaderText, setLoaderText] = React.useState("");
 
   /**
-   * OTPTextInput Stuff
+   * this function is amazing, it gives you a drink
+   * @param min
+   * @param max
+   * @return {*}
    */
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-  const [OTPCharSequence, setOTPCharSequence] = React.useState("");
-
-  const addCodeObserver = (text) => {
+  function addCodeObserver(text) {
     if (text.length > 5) {
       Keyboard.dismiss()
-      confirmCode(text).then(()=>{
-        // auth().currentUser
-        // navigation.navigate("")
-        console.log(MoonMeetUser?.uid)
+      confirmCode(text).then(async () => {
+        if (UserAuthenticated) {
+          const _username = auth().currentUser.uid.substring(0, 4).concat(getRandomInt(100000, 999999))
+          database()
+              .ref(`/users/${auth().currentUser.uid}`)
+              .set({
+                uid: auth().currentUser.uid,
+                username: _username,
+                phone_number: CountryText + " " + NumberText,
+                phone_status: 'none',
+                country_code: CountryText,
+              })
+              .then(() => {
+                console.log('Data set.')
+                navigation.navigate('setup')
+              })
+              .catch((e) => {
+                console.log(e.toString())
+              })
+        }
       })
     }
   }
@@ -535,7 +556,6 @@ const LoginScreen = () => {
                 containerStyle={styles.TextInputContainer}
                 textInputStyle={styles.RoundedTextInput}
                 handleTextChange={(text) => {
-                  setOTPCharSequence(text)
                   console.log(text)
                   addCodeObserver(text)
                 }}
@@ -572,7 +592,6 @@ const LoginScreen = () => {
                 fontFamily: FONTS.regular
               }}
               onPress={() => {
-                setOTPCharSequence('')
               }}>
                 CLEAR CODE
               </Text>

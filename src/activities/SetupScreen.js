@@ -16,7 +16,7 @@ const SetupScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.accentLight,
+        backgroundColor: COLORS.primaryLight,
     }
 })
 export default SetupScreen;
