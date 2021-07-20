@@ -5,5 +5,5 @@
  * @flow strict-local
  */
 module.exports = {
-    assets: ['./src/assets/fonts/opensans'],
+    assets: ['./src/assets/fonts/product'],
 };
