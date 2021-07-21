@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   BackHandler,
   Keyboard,
@@ -87,7 +87,7 @@ const LoginScreen = () => {
       currentSubscriber();
       clearTimeout(LoginScreenTimerTask);
     };
-  }, [isConnected, onToggleErrorSnackBar]);
+  }, []);
 
   const navigation = useNavigation();
 
@@ -121,7 +121,7 @@ const LoginScreen = () => {
   function onAuthStateChanged(currentUser) {
     setMoonMeetUser(currentUser);
   }
-
+  const phoneRef = useRef();
   const [MoonMeetUser, setMoonMeetUser] = React.useState();
 
   const [ConfirmCode, setConfirmCode] = React.useState(null);
@@ -152,8 +152,7 @@ const LoginScreen = () => {
 
   async function confirmCode(text) {
     try {
-      ConfirmCode.confirm(text);
-      console.log(text);
+      await ConfirmCode.confirm(text);
     } catch (error) {
       if (error !== null) {
         if (error.code === 'auth/invalid-verification-code') {
@@ -241,28 +240,41 @@ const LoginScreen = () => {
   function addCodeObserver(text) {
     if (text.length > 5) {
       Keyboard.dismiss();
-      confirmCode(text).then(async () => {
-        if (UserAuthenticated) {
-          const _username = auth()
-            .currentUser.uid.substring(0, 4)
-            .concat(getRandomInt(100000, 999999));
+      confirmCode(text).then(() => {
+        if (auth().currentUser != null) {
           database()
             .ref(`/users/${auth().currentUser.uid}`)
-            .set({
-              uid: auth().currentUser.uid,
-              username: _username,
-              phone: NumberText,
-              phone_number: CountryText + ' ' + NumberText,
-              phone_status: 'none',
-              country_code: CountryText,
-            })
-            .then(() => {
-              console.log('Data set.');
-              navigation.navigate('setup');
-            })
-            .catch(e => {
-              console.log(e.toString());
+            .once('value')
+            .then(snapshot => {
+              if (snapshot?.val()?.uid) {
+                alert('user setup done');
+              } else {
+                const _username = auth()
+                  .currentUser.uid.substring(0, 4)
+                  .concat(getRandomInt(100000, 999999));
+                // database()
+                //   .ref(`/users/${auth().currentUser.uid}`)
+                //   .set()
+                //   .then(() => {
+                //     console.log('Data set.');
+                navigation.navigate('setup', {
+                  user: {
+                    uid: auth().currentUser.uid,
+                    username: _username,
+                    phone: NumberText,
+                    phone_number: CountryText + ' ' + NumberText,
+                    phone_status: 'none',
+                    country_code: CountryText,
+                  },
+                });
+                // })
+                // .catch(e => {
+                //   console.log(e.toString());
+                // });
+              }
             });
+        } else {
+          console.log('our user is null');
         }
       });
     }
@@ -589,7 +601,7 @@ const LoginScreen = () => {
               }}>
               <OTPTextView
                 inputCount={6}
-                ref={() => {}}
+                ref={phoneRef}
                 tintColor={COLORS.accentLight}
                 offTintColor={COLORS.controlHighlight}
                 containerStyle={styles.TextInputContainer}
@@ -635,7 +647,9 @@ const LoginScreen = () => {
                   textAlign: 'right',
                   fontFamily: FONTS.regular,
                 }}
-                onPress={() => {}}>
+                onPress={() => {
+                  phoneRef.current.clear();
+                }}>
                 CLEAR CODE
               </Text>
             </View>

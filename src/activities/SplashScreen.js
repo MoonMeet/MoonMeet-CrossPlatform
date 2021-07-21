@@ -33,8 +33,7 @@ const SplashScreen = () => {
     getViewPagerCompleted();
     const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === 'true') {
-        //navigation.navigate("login");
-        navigation.navigate('setup');
+        navigation.navigate('login');
       } else {
         navigation.navigate('onboarding');
       }

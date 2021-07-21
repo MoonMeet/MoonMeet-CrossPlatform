@@ -12,7 +12,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import {IconButton} from 'react-native-paper';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {isAndroid} from '../utils/device/DeviceInfo';
-import BaseView from '../components/base-view/base-view';
+import BaseView from '../components/BaseView/BaseView';
 
 const LoginHelp = () => {
   const BackImage = require('../assets/images/back.png');

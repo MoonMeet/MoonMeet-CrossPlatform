@@ -1,33 +1,34 @@
 import React from 'react';
-import {
-  KeyboardAvoidingView,
-  Pressable,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, FAB, IconButton, TextInput} from 'react-native-paper';
-import BaseView from '../components/base-view/base-view';
+import BaseView from '../components/BaseView/BaseView';
+import {openCamera, openImagePicker} from '../config/image-picker-config';
+import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
-const SetupScreen = () => {
+const SetupScreen = ({route}) => {
   /**
    * Importing `pick-photo, arrow-forward` from assets
    */
+  const placeHolderPhoto = require('../assets/images/pick-photo.png');
 
-  const AddPhoto = require('../assets/images/pick-photo.png');
+  const [UserPhoto, setUserPhoto] = React.useState(null);
 
   const ArrowForward = require('../assets/images/arrow-forward.png');
 
   /**
    * TextInput stuffs (setter & getter)
    */
+  const user = route?.params?.user;
 
   const [firstName, setFirstName] = React.useState('');
 
   const [lastName, setLastName] = React.useState('');
+
+  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
 
   return (
     <BaseView>
@@ -37,22 +38,41 @@ const SetupScreen = () => {
         </Text>
       </View>
       <View style={styles.large_box}>
-        <View
+        <Pressable
+          onPress={() => {
+            setIsPickerVisible(true);
+          }}
           style={{
             justifyContent: 'center',
             paddingLeft: '2.5%',
           }}>
-          <Avatar.Icon
-            size={55}
-            color={COLORS.rippleColor}
-            icon={AddPhoto}
-            theme={{
-              colors: {
-                primary: COLORS.accentLight,
-              },
-            }}
-          />
-        </View>
+          <View
+            style={{
+              height: 55,
+              width: 55,
+              backgroundColor: COLORS.rippleColor,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 27,
+              overflow: 'hidden',
+            }}>
+            <Image
+              style={{
+                height: UserPhoto ? 55 : 30,
+                width: UserPhoto ? 55 : 30,
+                backgroundColor: COLORS.rippleColor,
+                resizeMode: 'cover',
+              }}
+              color={COLORS.rippleColor}
+              source={UserPhoto ? {uri: UserPhoto.path} : placeHolderPhoto}
+              theme={{
+                colors: {
+                  primary: COLORS.accentLight,
+                },
+              }}
+            />
+          </View>
+        </Pressable>
 
         <View
           style={{
@@ -115,11 +135,6 @@ const SetupScreen = () => {
           />
         </View>
       </View>
-      <Pressable style={styles.fab}>
-        <View>
-          <IconButton icon={ArrowForward} />
-        </View>
-      </Pressable>
       <FAB
         style={styles.fab}
         normal
@@ -130,7 +145,45 @@ const SetupScreen = () => {
             accent: COLORS.accentLight,
           },
         }}
-        onPress={() => console.log('Pressed')}
+        onPress={async () => {
+          const storageRef = storage().ref(
+            `avatars/${auth().currentUser.uid}.${UserPhoto.path?.substr(
+              UserPhoto.path?.lastIndexOf('.') + 1,
+              3,
+            )}`,
+          );
+
+          storageRef.putFile(UserPhoto?.path).then(() => {
+            database()
+              .ref(`/users/${auth().currentUser.uid}`)
+              .set({
+                ...user,
+                first_name: firstName,
+                last_name: lastName,
+              })
+              .then(() => {
+                console.log('Data set.');
+              });
+          });
+        }}
+      />
+      <ImagePickerActionSheet
+        hideModal={() => {
+          setIsPickerVisible(false);
+        }}
+        onCameraPress={() => {
+          openCamera().then(image => {
+            setUserPhoto(image);
+            console.log(image);
+          });
+        }}
+        onFilePicker={() => {
+          openImagePicker().then(image => {
+            setUserPhoto(image);
+            console.log(image);
+          });
+        }}
+        isVisible={isPickerVisible}
       />
     </BaseView>
   );
