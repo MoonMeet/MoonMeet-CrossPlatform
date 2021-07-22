@@ -10,7 +10,6 @@ export const openImagePicker = () => {
   return new Promise((resolve, reject) => {
     ImagePicker.openPicker(picker)
       .then(image => {
-        console.log(image);
         resolve(image);
       })
       .catch(err => {

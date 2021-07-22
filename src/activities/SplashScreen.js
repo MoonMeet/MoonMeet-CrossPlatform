@@ -10,6 +10,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import AsyncStorage from '@react-native-community/async-storage';
+import {firebase} from '@react-native-firebase/auth';
 
 const SplashScreen = () => {
   const navigation = useNavigation();

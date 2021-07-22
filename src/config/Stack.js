@@ -13,6 +13,7 @@ import SplashScreen from '../activities/SplashScreen';
 import LoginScreen from '../activities/LoginScreen';
 import LoginHelp from '../activities/LoginHelp';
 import SetupScreen from '../activities/SetupScreen';
+import HomeScreen from '../activities/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
@@ -24,6 +25,7 @@ const StackNavigator = () => {
         <Stack.Screen name={'login'} component={LoginScreen} />
         <Stack.Screen name={'login_help'} component={LoginHelp} />
         <Stack.Screen name={'setup'} component={SetupScreen} />
+        <Stack.Screen name={'home'} component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

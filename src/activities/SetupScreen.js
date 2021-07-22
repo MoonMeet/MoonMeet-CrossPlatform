@@ -1,9 +1,9 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Avatar, FAB, IconButton, TextInput} from 'react-native-paper';
+import {Avatar, FAB, TextInput} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
-import {openCamera, openImagePicker} from '../config/image-picker-config';
+import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -11,7 +11,7 @@ import database from '@react-native-firebase/database';
 
 const SetupScreen = ({route}) => {
   /**
-   * Importing `pick-photo, arrow-forward` from assets
+   * Importing needed images/icon from assets
    */
   const placeHolderPhoto = require('../assets/images/pick-photo.png');
 
@@ -20,15 +20,30 @@ const SetupScreen = ({route}) => {
   const ArrowForward = require('../assets/images/arrow-forward.png');
 
   /**
+   * getting params from stack navigator
+   * you can use the following static values:
+   * user#uid, user#phone etc...
+   */
+
+  const user = route?.params?.user;
+
+  /**
    * TextInput stuffs (setter & getter)
    */
-  const user = route?.params?.user;
 
   const [firstName, setFirstName] = React.useState('');
 
   const [lastName, setLastName] = React.useState('');
 
+  /**
+   * Open a modal as BottomSheet
+   */
   const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+  /**
+   * set whether the FAB Loading or not
+   */
+
+  const [isFABLoading, setFABLoading] = React.useState(false);
 
   return (
     <BaseView>
@@ -46,32 +61,44 @@ const SetupScreen = ({route}) => {
             justifyContent: 'center',
             paddingLeft: '2.5%',
           }}>
-          <View
-            style={{
-              height: 55,
-              width: 55,
-              backgroundColor: COLORS.rippleColor,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 27,
-              overflow: 'hidden',
-            }}>
-            <Image
+          {UserPhoto ? (
+            <Avatar.Image
               style={{
-                height: UserPhoto ? 55 : 30,
-                width: UserPhoto ? 55 : 30,
+                height: 55,
+                width: 55,
                 backgroundColor: COLORS.rippleColor,
-                resizeMode: 'cover',
               }}
               color={COLORS.rippleColor}
-              source={UserPhoto ? {uri: UserPhoto.path} : placeHolderPhoto}
+              size={55}
+              source={{uri: UserPhoto?.path}}
               theme={{
                 colors: {
                   primary: COLORS.accentLight,
                 },
               }}
             />
-          </View>
+          ) : (
+            <View
+              style={{
+                height: 55,
+                width: 55,
+                backgroundColor: COLORS.darkGrey,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 27,
+                overflow: 'hidden',
+              }}>
+              <Image
+                style={{
+                  height: 30,
+                  width: 30,
+                  backgroundColor: COLORS.darkGrey,
+                  resizeMode: 'cover',
+                }}
+                source={placeHolderPhoto}
+              />
+            </View>
+          )}
         </Pressable>
 
         <View
@@ -140,30 +167,68 @@ const SetupScreen = ({route}) => {
         normal
         icon={ArrowForward}
         color={COLORS.primaryLight}
+        animated={true}
+        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,
           },
         }}
         onPress={async () => {
-          const storageRef = storage().ref(
-            `avatars/${auth().currentUser.uid}.${UserPhoto.path?.substr(
-              UserPhoto.path?.lastIndexOf('.') + 1,
-              3,
-            )}`,
-          );
+          setFABLoading(!isFABLoading);
+          /**
+           * Reference to users image path
+           * @type {FirebaseStorageTypes.Reference}
+           */
+          let _userAvatarRef = `avatars/${
+            auth()?.currentUser?.uid
+          }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
 
-          storageRef.putFile(UserPhoto?.path).then(() => {
+          const storageRef = storage().ref(_userAvatarRef);
+
+          /**
+           * Uploading image to Firebase Storage
+           * @type {FirebaseStorageTypes.Task}
+           */
+          console.log('ref done');
+          const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+          console.log('put done');
+          /**
+           * Add observer to image uploading.*/
+
+          uploadImageTask.on('state_changed', taskSnapshot => {
+            console.log(
+              `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+            );
+          });
+          console.log('task on');
+          /**
+           * an async function to get {avatarUrl} and upload all user data.
+           */
+
+          uploadImageTask.then(async () => {
+            const avatarUrl = await storage()
+              .ref(
+                `avatars/${auth()?.currentUser?.uid}.${UserPhoto.path?.substr(
+                  UserPhoto.path?.lastIndexOf('.') + 1,
+                  3,
+                )}`,
+              )
+              .getDownloadURL();
+
+            console.log('task then');
             database()
-              .ref(`/users/${auth().currentUser.uid}`)
+              .ref(`/users/${auth()?.currentUser?.uid}`)
               .set({
                 ...user,
                 first_name: firstName,
                 last_name: lastName,
+                avatar: avatarUrl,
               })
               .then(() => {
                 console.log('Data set.');
               });
+            console.log('done');
           });
         }}
       />
@@ -172,16 +237,24 @@ const SetupScreen = ({route}) => {
           setIsPickerVisible(false);
         }}
         onCameraPress={() => {
-          openCamera().then(image => {
-            setUserPhoto(image);
-            console.log(image);
-          });
+          openCamera()
+            .then(image => {
+              console.log(image);
+              setUserPhoto(image);
+            })
+            .catch(e => {
+              console.log(e.toString());
+            });
         }}
         onFilePicker={() => {
-          openImagePicker().then(image => {
-            setUserPhoto(image);
-            console.log(image);
-          });
+          openImagePicker()
+            .then(image => {
+              console.log(image);
+              setUserPhoto(image);
+            })
+            .catch(e => {
+              console.log(e.toString());
+            });
         }}
         isVisible={isPickerVisible}
       />

@@ -247,16 +247,11 @@ const LoginScreen = () => {
             .once('value')
             .then(snapshot => {
               if (snapshot?.val()?.uid) {
-                alert('user setup done');
+                navigation.navigate('home');
               } else {
                 const _username = auth()
                   .currentUser.uid.substring(0, 4)
                   .concat(getRandomInt(100000, 999999));
-                // database()
-                //   .ref(`/users/${auth().currentUser.uid}`)
-                //   .set()
-                //   .then(() => {
-                //     console.log('Data set.');
                 navigation.navigate('setup', {
                   user: {
                     uid: auth().currentUser.uid,
@@ -267,10 +262,6 @@ const LoginScreen = () => {
                     country_code: CountryText,
                   },
                 });
-                // })
-                // .catch(e => {
-                //   console.log(e.toString());
-                // });
               }
             });
         } else {
@@ -531,11 +522,8 @@ const LoginScreen = () => {
                   }}
                   animationType={'slide'}
                   transpaerent={true}
-                  visible={LoaderVisible}
-                  onRequestClose={() => {
-                    setLoaderVisible(!LoaderVisible);
-                  }}>
-                  <LoadingIndicator setLoaderText={'Loading...'} />
+                  visible={LoaderVisible}>
+                  <LoadingIndicator text={'Loading...'} />
                 </Modal>
               </View>
               <View

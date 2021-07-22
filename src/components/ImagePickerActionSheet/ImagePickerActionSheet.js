@@ -32,12 +32,12 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           flex: 1,
           top: '70%',
           padding: '3%',
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
         }}>
         <View
           style={{
-            backgroundColor: 'white',
+            backgroundColor: COLORS.white,
             marginTop: '1%',
           }}>
           <View style={styles.greyPiece} />
@@ -94,7 +94,7 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
 
 const styles = StyleSheet.create({
   greyPiece: {
-    height: 5,
+    height: '2.5%',
     borderRadius: 2.5,
     alignSelf: 'center',
     width: '20%',
@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
   },
   arrowStyle: {
     marginRight: '2%',
-    tintColor: COLORS.accentLight,
+    tintColor: COLORS.black,
+    opacity: 0.4,
     height: 24,
     width: 24,
   },
