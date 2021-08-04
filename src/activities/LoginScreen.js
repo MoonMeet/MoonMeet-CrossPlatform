@@ -11,30 +11,29 @@ import {
 } from 'react-native';
 import {
   Button,
+  FAB,
   IconButton,
   Menu,
   Provider,
   Snackbar,
   TextInput,
 } from 'react-native-paper';
-import Modal from 'react-native-modal';
 import NetInfo from '@react-native-community/netinfo';
 
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {isAndroid, isIOS} from '../utils/device/DeviceInfo';
 
 import auth from '@react-native-firebase/auth';
-import CountriesList from '../modals/LoginScreen/CountriesList';
-import PrivacyPolicy from '../modals/LoginScreen/PrivacyPolicy';
+import CountriesList from '../components/Modals/LoginScreen/CountriesList';
+import PrivacyPolicy from '../components/Modals/LoginScreen/PrivacyPolicy';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import LoadingIndicator from '../modals/CustomLoader/LoadingIndicator';
 import OTPTextView from '../components/OtpView/OTPTextInput';
-import {
-  getUserPhoneNumber,
-  getUserUID,
-  UserAuthenticated,
-} from '../utils/database/Authentication';
 import database from '@react-native-firebase/database';
+import LoginHelp from '../components/Modals/LoginScreen/LoginHelp';
+import ArrowForward from '../assets/images/arrow-forward.png';
+import BaseView from '../components/BaseView/BaseView';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 
 const LoginScreen = () => {
   /**
@@ -122,16 +121,21 @@ const LoginScreen = () => {
     setMoonMeetUser(currentUser);
   }
   const phoneRef = useRef();
+
   const [MoonMeetUser, setMoonMeetUser] = React.useState();
 
   const [ConfirmCode, setConfirmCode] = React.useState(null);
 
-  //const databaseRef = database().ref(`/users/${auth?.()?.currentUser?.uid}`)
+  /**
+   * LoginHelp stuff :PensiveFast:
+   */
+  const [isLoginHelpVisible, setLoginHelpVisible] = React.useState(false);
 
   /**
    * Loader stuff
    */
   const [LoaderVisible, setLoaderVisible] = React.useState(false);
+  const [isFABLoading, setFABLoading] = React.useState(false);
 
   /**
    * function to send code to specific phone number.
@@ -154,6 +158,9 @@ const LoginScreen = () => {
     try {
       await ConfirmCode.confirm(text);
     } catch (error) {
+      if (isFABLoading) {
+        setFABLoading(!isFABLoading);
+      }
       if (error !== null) {
         if (error.code === 'auth/invalid-verification-code') {
           console.log('Invalid code.');
@@ -204,22 +211,6 @@ const LoginScreen = () => {
   };
 
   /**
-   * changing Modal Visibility from CountriesList.js
-   * @param {boolean} bool
-   */
-  const changeCountriesVisibility = bool => {
-    setCountriesVisible(bool);
-  };
-
-  /**
-   * changing Modal Visibility from PrivacyPolicy.js
-   * @param {boolean} bool
-   */
-  const changePrivacyPolicyVisibility = bool => {
-    setPrivacyPolicyVisible(bool);
-  };
-
-  /**
    * Loader stuff
    */
 
@@ -265,6 +256,9 @@ const LoginScreen = () => {
               }
             });
         } else {
+          if (isFABLoading) {
+            setFABLoading(!isFABLoading);
+          }
           console.log('our user is null');
         }
       });
@@ -297,10 +291,7 @@ const LoginScreen = () => {
 
   return (
     //////////////////////////// FIRST PART ////////////////////////////
-    <KeyboardAvoidingView
-      behavior={isIOS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
-      <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
+    <BaseView>
       <Provider>
         <View
           style={{
@@ -321,14 +312,14 @@ const LoginScreen = () => {
             }>
             <Menu.Item
               onPress={() => {
-                navigation.navigate('login_help');
+                setLoginHelpVisible(!isLoginHelpVisible);
               }}
               title="Help"
             />
           </Menu>
         </View>
         {!ConfirmCode ? (
-          <SafeAreaView style={styles.container}>
+          <MiniBaseView>
             <View style={styles.top_bar}>
               <Text style={styles.top_text}>
                 Enter your phone number to get started
@@ -381,31 +372,10 @@ const LoginScreen = () => {
                     outlineColor: '#566193',
                   },
                 }}
-                onChangeText={CountryText => {
-                  CountrySetText(CountryText);
+                onChangeText={_CountryText => {
+                  CountrySetText(_CountryText);
                 }}
               />
-              <Modal
-                style={{
-                  margin: '5%',
-                }}
-                animationType={'slide'}
-                transparent={false}
-                visible={CountriesVisible}
-                onRequestClose={() => {
-                  changeCountriesVisibility(!CountriesVisible);
-                }}>
-                <SafeAreaView
-                  style={{
-                    flex: 1,
-                    backgroundColor: COLORS.primaryLight,
-                  }}>
-                  <CountriesList
-                    changeCountriesVisibility={changeCountriesVisibility}
-                    setModalData={setData}
-                  />
-                </SafeAreaView>
-              </Modal>
               <TextInput
                 style={{
                   width: '65%',
@@ -430,8 +400,8 @@ const LoginScreen = () => {
                     outlineColor: '#566193',
                   },
                 }}
-                onChangeText={NumberText => {
-                  onNumberTextChange(NumberText);
+                onChangeText={_NumberText => {
+                  onNumberTextChange(_NumberText);
                 }}
               />
             </View>
@@ -477,78 +447,6 @@ const LoginScreen = () => {
                 Terms of Service
               </Text>
             </View>
-            <View
-              style={{
-                paddingTop: '4%',
-                paddingLeft: '3%',
-                paddingRight: '3%',
-                position: 'relative',
-              }}>
-              <Button
-                style={styles.SendCode}
-                uppercase={false}
-                color="#566193"
-                mode="contained"
-                onPress={() => {
-                  Keyboard.dismiss();
-                  if (isConnected) {
-                    if (isSMSSendingAcceptable()) {
-                      setLoaderText('Loading');
-                      setLoaderVisible(!LoaderVisible);
-                      signInWithPhoneNumber(CountryText + NumberText);
-                    } else {
-                      setErrorSnackbarText(
-                        'Please enter a valid Country Code and Phone Number',
-                      );
-                      onToggleErrorSnackBar();
-                    }
-                  } else {
-                    setErrorSnackbarText(
-                      'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
-                    );
-                    onToggleErrorSnackBar();
-                  }
-                }}>
-                Send Code
-              </Button>
-              <View
-                style={{
-                  padding: '3%',
-                  flex: 1,
-                }}>
-                <Modal
-                  style={{
-                    margin: '0%',
-                  }}
-                  animationType={'slide'}
-                  transpaerent={true}
-                  visible={LoaderVisible}>
-                  <LoadingIndicator text={'Loading...'} />
-                </Modal>
-              </View>
-              <View
-                style={{
-                  padding: '3%',
-                  flex: 1,
-                }}>
-                <Modal
-                  style={{
-                    margin: '4%',
-                  }}
-                  animationType={'slide'}
-                  transparent={false}
-                  visible={PrivacyPolicyVisible}
-                  onRequestClose={() => {
-                    setPrivacyPolicyVisible(!PrivacyPolicyVisible);
-                  }}>
-                  <PrivacyPolicy
-                    changePrivacyPolicyVisibility={
-                      changePrivacyPolicyVisibility
-                    }
-                  />
-                </Modal>
-              </View>
-            </View>
             <Snackbar
               visible={ErrorSnackBarVisible}
               onDismiss={onDismissErrorSnackBar}
@@ -570,7 +468,69 @@ const LoginScreen = () => {
               }}>
               {ErrorSnackbarText}
             </Snackbar>
-          </SafeAreaView>
+            <FAB
+              style={styles.fab}
+              normal
+              icon={ArrowForward}
+              color={COLORS.primaryLight}
+              animated={true}
+              loading={isFABLoading}
+              theme={{
+                colors: {
+                  accent: COLORS.accentLight,
+                },
+              }}
+              onPress={() => {
+                try {
+                  Keyboard.dismiss();
+                  if (isConnected) {
+                    if (isSMSSendingAcceptable()) {
+                      setLoaderText('Loading');
+                      setLoaderVisible(!LoaderVisible);
+                      setFABLoading(!isFABLoading);
+                      signInWithPhoneNumber(CountryText + NumberText);
+                    } else {
+                      setErrorSnackbarText(
+                        'Please enter a valid Country Code and Phone Number',
+                      );
+                      onToggleErrorSnackBar();
+                    }
+                  } else {
+                    setErrorSnackbarText(
+                      'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
+                    );
+                    onToggleErrorSnackBar();
+                  }
+                } catch (e) {
+                  console.log(e.toString());
+                  setFABLoading(!isFABLoading);
+                }
+              }}
+            />
+            <PrivacyPolicy
+              hideModal={() => {
+                setPrivacyPolicyVisible(!PrivacyPolicyVisible);
+              }}
+              isVisible={PrivacyPolicyVisible}
+            />
+            <CountriesList
+              isVisible={CountriesVisible}
+              hideModal={() => {
+                setCountriesVisible(!CountriesVisible);
+              }}
+              CountriesData={setData}
+            />
+            <LoginHelp
+              isVisible={isLoginHelpVisible}
+              hideModal={() => {
+                setLoginHelpVisible(!isLoginHelpVisible);
+              }}
+            />
+            <LoadingIndicator
+              isVisible={LoaderVisible}
+              loaderText={LoaderText}
+            />
+          </MiniBaseView>
         ) : (
           //////////////////////////// SECOND PART ////////////////////////////
           /**
@@ -644,7 +604,7 @@ const LoginScreen = () => {
           </SafeAreaView>
         )}
       </Provider>
-    </KeyboardAvoidingView>
+    </BaseView>
   );
 };
 
@@ -687,6 +647,12 @@ const styles = StyleSheet.create({
   RoundedTextInput: {
     borderRadius: 10,
     borderWidth: 2,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   },
 });
 export default LoginScreen;

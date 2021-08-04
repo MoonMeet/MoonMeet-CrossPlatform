@@ -8,6 +8,7 @@ import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePi
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
+import {useNavigation} from '@react-navigation/native';
 
 const SetupScreen = ({route}) => {
   /**
@@ -38,12 +39,20 @@ const SetupScreen = ({route}) => {
   /**
    * Open a modal as BottomSheet
    */
+
   const [isPickerVisible, setIsPickerVisible] = React.useState(false);
+
   /**
    * set whether the FAB Loading or not
    */
 
   const [isFABLoading, setFABLoading] = React.useState(false);
+
+  /**
+   * Using react navigation.
+   */
+
+  const navigation = useNavigation();
 
   return (
     <BaseView>
@@ -175,61 +184,68 @@ const SetupScreen = ({route}) => {
           },
         }}
         onPress={async () => {
-          setFABLoading(!isFABLoading);
           /**
            * Reference to users image path
            * @type {FirebaseStorageTypes.Reference}
            */
-          let _userAvatarRef = `avatars/${
-            auth()?.currentUser?.uid
-          }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+          try {
+            setFABLoading(!isFABLoading);
+            let _userAvatarRef = `avatars/${
+              auth()?.currentUser?.uid
+            }.${UserPhoto.path?.substr(
+              UserPhoto.path?.lastIndexOf('.') + 1,
+              3,
+            )}`;
 
-          const storageRef = storage().ref(_userAvatarRef);
+            const storageRef = storage().ref(_userAvatarRef);
 
-          /**
-           * Uploading image to Firebase Storage
-           * @type {FirebaseStorageTypes.Task}
-           */
-          console.log('ref done');
-          const uploadImageTask = storageRef.putFile(UserPhoto?.path);
-          console.log('put done');
-          /**
-           * Add observer to image uploading.*/
+            /**
+             * Uploading image to Firebase Storage
+             * @type {FirebaseStorageTypes.Task}
+             */
 
-          uploadImageTask.on('state_changed', taskSnapshot => {
-            console.log(
-              `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-            );
-          });
-          console.log('task on');
-          /**
-           * an async function to get {avatarUrl} and upload all user data.
-           */
+            const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
-          uploadImageTask.then(async () => {
-            const avatarUrl = await storage()
-              .ref(
-                `avatars/${auth()?.currentUser?.uid}.${UserPhoto.path?.substr(
-                  UserPhoto.path?.lastIndexOf('.') + 1,
-                  3,
-                )}`,
-              )
-              .getDownloadURL();
+            /**
+             * Add observer to image uploading.
+             */
 
-            console.log('task then');
-            database()
-              .ref(`/users/${auth()?.currentUser?.uid}`)
-              .set({
-                ...user,
-                first_name: firstName,
-                last_name: lastName,
-                avatar: avatarUrl,
-              })
-              .then(() => {
-                console.log('Data set.');
-              });
-            console.log('done');
-          });
+            uploadImageTask.on('state_changed', taskSnapshot => {
+              console.log(
+                `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+              );
+            });
+
+            /**
+             * an async function to get {avatarUrl} and upload all user data.
+             */
+
+            uploadImageTask.then(async () => {
+              const avatarUrl = await storage()
+                .ref(_userAvatarRef)
+                .getDownloadURL();
+
+              /**
+               * Since we go everything except a girlfriend.
+               * we must push data to firebase.
+               */
+
+              database()
+                .ref(`/users/${auth()?.currentUser?.uid}`)
+                .set({
+                  ...user,
+                  first_name: firstName,
+                  last_name: lastName,
+                  avatar: avatarUrl,
+                })
+                .then(() => {
+                  navigation.navigate('home');
+                });
+            });
+          } catch (e) {
+            console.log(e.toString());
+            setFABLoading(!isFABLoading);
+          }
         }}
       />
       <ImagePickerActionSheet

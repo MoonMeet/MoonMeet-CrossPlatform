@@ -130,7 +130,7 @@
     "code": "BT"
   },
   {
-    "name": "Bolivia, Plurinational State of",
+    "name": "Bolivia",
     "dial_code": "+591",
     "code": "BO"
   },
@@ -245,7 +245,7 @@
     "code": "CG"
   },
   {
-    "name": "Congo, The Democratic Republic of the Congo",
+    "name": "Democratic Republic of Congo",
     "dial_code": "+243",
     "code": "CD"
   },
@@ -495,7 +495,7 @@
     "code": "ID"
   },
   {
-    "name": "Iran, Islamic Republic of Persian Gulf",
+    "name": "Iran",
     "dial_code": "+98",
     "code": "IR"
   },
@@ -560,12 +560,12 @@
     "code": "KI"
   },
   {
-    "name": "Korea, Democratic People's Republic of Korea",
+    "name": "Korea",
     "dial_code": "+850",
     "code": "KP"
   },
   {
-    "name": "Korea, Republic of South Korea",
+    "name": "South Korea",
     "dial_code": "+82",
     "code": "KR"
   },
@@ -695,7 +695,7 @@
     "code": "MX"
   },
   {
-    "name": "Micronesia, Federated States of Micronesia",
+    "name": "Micronesia",
     "dial_code": "+691",
     "code": "FM"
   },
@@ -905,7 +905,7 @@
     "code": "BL"
   },
   {
-    "name": "Saint Helena, Ascension and Tristan Da Cunha",
+    "name": "Saint Helena, Ascension, Tristan Da Cunha",
     "dial_code": "+290",
     "code": "SH"
   },
@@ -1010,7 +1010,7 @@
     "code": "SS"
   },
   {
-    "name": "South Georgia and the South Sandwich Islands",
+    "name": "South Georgia, South Sandwich Islands",
     "dial_code": "+500",
     "code": "GS"
   },
@@ -1070,7 +1070,7 @@
     "code": "TJ"
   },
   {
-    "name": "Tanzania, United Republic of Tanzania",
+    "name": "Tanzania",
     "dial_code": "+255",
     "code": "TZ"
   },
@@ -1170,7 +1170,7 @@
     "code": "VU"
   },
   {
-    "name": "Venezuela, Bolivarian Republic of Venezuela",
+    "name": "Venezuela",
     "dial_code": "+58",
     "code": "VE"
   },

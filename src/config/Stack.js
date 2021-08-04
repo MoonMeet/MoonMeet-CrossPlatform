@@ -11,7 +11,6 @@ import {NavigationContainer} from '@react-navigation/native';
 import IntroScreen from '../activities/IntroScreen';
 import SplashScreen from '../activities/SplashScreen';
 import LoginScreen from '../activities/LoginScreen';
-import LoginHelp from '../activities/LoginHelp';
 import SetupScreen from '../activities/SetupScreen';
 import HomeScreen from '../activities/HomeScreen';
 
@@ -23,7 +22,6 @@ const StackNavigator = () => {
         <Stack.Screen name={'splash'} component={SplashScreen} />
         <Stack.Screen name={'onboarding'} component={IntroScreen} />
         <Stack.Screen name={'login'} component={LoginScreen} />
-        <Stack.Screen name={'login_help'} component={LoginHelp} />
         <Stack.Screen name={'setup'} component={SetupScreen} />
         <Stack.Screen name={'home'} component={HomeScreen} />
       </Stack.Navigator>

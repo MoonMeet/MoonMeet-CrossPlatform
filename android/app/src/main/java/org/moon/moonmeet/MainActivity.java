@@ -2,14 +2,14 @@ package org.moon.moonmeet;
 
 import com.facebook.react.ReactActivity;
 
-import androidx.core.view.*;
-import android.os.*;
-import android.view.*;
-import androidx.core.graphics.*;
-
-import static android.view.ViewGroup.MarginLayoutParams;
+import android.os.Bundle;
 
 public class MainActivity extends ReactActivity {
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+   super.onCreate(savedInstanceState);
+  }
 
   @Override
   protected String getMainComponentName() {
