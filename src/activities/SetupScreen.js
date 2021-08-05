@@ -224,9 +224,12 @@ const SetupScreen = ({route}) => {
               const avatarUrl = await storage()
                 .ref(_userAvatarRef)
                 .getDownloadURL();
+              console.log(avatarUrl);
+              const trimmedAvatar = avatarUrl.toString();
+              console.log(trimmedAvatar);
 
               /**
-               * Since we go everything except a girlfriend.
+               * Since we got everything except a girlfriend.
                * we must push data to firebase.
                */
 

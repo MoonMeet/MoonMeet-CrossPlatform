@@ -555,7 +555,6 @@ const LoginScreen = () => {
                 containerStyle={styles.TextInputContainer}
                 textInputStyle={styles.RoundedTextInput}
                 handleTextChange={text => {
-                  console.log(text);
                   addCodeObserver(text);
                 }}
                 keyboardType={'numeric'}
