@@ -32,8 +32,8 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           flex: 1,
           top: '70%',
           padding: '3%',
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
         }}>
         <View
           style={{
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     height: '2.5%',
     borderRadius: 2.5,
     alignSelf: 'center',
-    width: '20%',
+    width: '15%',
     backgroundColor: COLORS.controlNormal,
     marginBottom: 30,
   },

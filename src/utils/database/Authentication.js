@@ -1,5 +1,5 @@
-import auth from "@react-native-firebase/auth";
-import database from "@react-native-firebase/database";
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 
 /**
  * check if user is authenticated ?
@@ -57,18 +57,13 @@ export const getLastName = () => {
  */
 
 export const getAvatarURL = () => {
-  try {
-    database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().avatar) {
-          return snapshot?.val().avatar;
-        }
-      });
-  } catch (e) {
-    console.log(e.toString());
-  }
-  return null;
+  database()
+    .ref(`/users/${auth()?.currentUser?.uid}`)
+    .on('value', snapshot => {
+      if (snapshot?.val().avatar) {
+        return snapshot?.val().avatar;
+      }
+    });
 };
 
 /**export const getCustomData =  => {

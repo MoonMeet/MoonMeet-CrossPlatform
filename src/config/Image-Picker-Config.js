@@ -1,8 +1,8 @@
 import ImagePicker from 'react-native-image-crop-picker';
 
 const picker = {
-  width: 300,
-  height: 400,
+  width: 500,
+  height: 600,
   cropping: true,
 };
 
@@ -22,7 +22,6 @@ export const openCamera = () => {
   return new Promise((resolve, reject) => {
     ImagePicker.openCamera(picker)
       .then(image => {
-        console.log(image);
         resolve(image);
       })
       .catch(err => {
