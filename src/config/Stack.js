@@ -15,6 +15,7 @@ import SetupScreen from '../activities/SetupScreen';
 import HomeScreen from '../activities/HomeScreen';
 
 const Stack = createNativeStackNavigator();
+
 const StackNavigator = () => {
   return (
     <NavigationContainer>

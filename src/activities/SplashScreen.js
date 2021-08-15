@@ -10,7 +10,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import AsyncStorage from '@react-native-community/async-storage';
-import {UserAuthenticated} from '../utils/database/Authentication';
+import auth from '@react-native-firebase/auth';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -35,7 +35,7 @@ const SplashScreen = () => {
     getViewPagerCompleted();
     const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === 'true') {
-        if (UserAuthenticated) {
+        if (auth()?.currentUser !== null) {
           navigation.navigate('home');
         } else {
           navigation.navigate('login');
