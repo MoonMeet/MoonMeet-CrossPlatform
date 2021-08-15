@@ -19,7 +19,13 @@ const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Navigator
+        initialRouteName={'home'}
+        screenOptions={{
+          headerShown: false,
+          stackPresentation: 'transparentModal',
+          stackAnimation: 'slide_from_right',
+        }}>
         <Stack.Screen name={'splash'} component={SplashScreen} />
         <Stack.Screen name={'onboarding'} component={IntroScreen} />
         <Stack.Screen name={'login'} component={LoginScreen} />

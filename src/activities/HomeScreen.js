@@ -246,12 +246,15 @@ const HomeScreen = () => {
             ) : (
               <View style={styles.flatListHolder}>
                 <FlatList
-                  showsHorizontalScrollIndicator={true}
                   horizontal
-                  scrollEnabled
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingStart: '1%',
+                    paddingEnd: '12%',
+                  }}
                   data={_testj}
                   renderItem={({item}) => (
-                    <View
+                    <Pressable
                       style={{
                         padding: '2%',
                         height: 85,
@@ -272,7 +275,7 @@ const HomeScreen = () => {
                         }}>
                         {item.name}
                       </Text>
-                    </View>
+                    </Pressable>
                   )}
                   keyExtractor={item => item.name}
                 />
