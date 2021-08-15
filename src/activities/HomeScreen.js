@@ -1,5 +1,13 @@
 import React, {useEffect} from 'react';
-import {FlatList, Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import BaseView from '../components/BaseView/BaseView';
 import database from '@react-native-firebase/database';
@@ -53,7 +61,7 @@ const HomeScreen = () => {
       paddingLeft: '3%',
       paddingRight: '3%',
       textAlign: 'center',
-      color: COLORS.accentLight,
+      color: COLORS.black,
       fontFamily: FONTS.regular,
     },
     left_side: {
@@ -126,19 +134,19 @@ const HomeScreen = () => {
     },
     storyText: {
       position: 'relative',
-      fontSize: 16,
+      fontSize: 15,
       paddingLeft: '3%',
       paddingRight: '3%',
+      paddingTop: '0.2%',
       textAlign: 'center',
       color: COLORS.black,
-      opacity: 0.4,
       fontFamily: FONTS.regular,
     },
     flatListHolder: {
       flexDirection: 'row',
+      justifyContent: 'center',
     },
     activeStoriesRow: {
-      flex: 1,
       flexDirection: 'column',
     },
   });
@@ -227,7 +235,7 @@ const HomeScreen = () => {
               }}
             />
             <Text style={styles.storyText}>
-              {showStoriesOrOnline ? 'Discover people' : 'Add story'}
+              {showStoriesOrOnline ? 'Discover people' : 'Post story'}
             </Text>
           </View>
           <View style={styles.activeStoriesRow}>
@@ -238,18 +246,32 @@ const HomeScreen = () => {
             ) : (
               <View style={styles.flatListHolder}>
                 <FlatList
-                  horizontal={true}
+                  showsHorizontalScrollIndicator={true}
+                  horizontal
+                  scrollEnabled
                   data={_testj}
                   renderItem={({item}) => (
                     <View
                       style={{
                         padding: '2%',
-                        backgroundColor: COLORS.accentLight,
+                        height: 85,
+                        width: 70,
+                        backgroundColor: COLORS.primaryLight,
                       }}>
-                      <View>
-                        <Image source={{uri: item.avatar}} />
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                        <Avatar.Image size={45} source={{uri: item.avatar}} />
                       </View>
-                      <Text>{item.name}</Text>
+                      <Text
+                        style={{
+                          textAlign: 'center',
+                          color: COLORS.black,
+                        }}>
+                        {item.name}
+                      </Text>
                     </View>
                   )}
                   keyExtractor={item => item.name}
