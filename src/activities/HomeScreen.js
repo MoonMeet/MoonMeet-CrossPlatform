@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import {FlatList, Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import BaseView from '../components/BaseView/BaseView';
 import database from '@react-native-firebase/database';
@@ -8,14 +8,16 @@ import {Avatar, Surface} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
 import AddImage from '../assets/images/add.png';
+import TestJson from '../assets/data/json/test/stories.json';
 
 const HomeScreen = () => {
+  const _testj = TestJson;
   const [avatarURL, setAvatarURL] = React.useState('');
   const [activeStateColor, setActiveStateColor] = React.useState(
     COLORS.accentLight,
   );
   const [disabledStateColor, setDisabledStateColor] = React.useState(
-    COLORS.darkGrey,
+    COLORS.black,
   );
 
   const [showStoriesOrOnline, setShowStoriesOrOnline] = React.useState(false);
@@ -87,18 +89,26 @@ const HomeScreen = () => {
       paddingTop: '2%',
       paddingBottom: '2%',
       paddingLeft: '3%',
-      paddingRight: '3%',
+      paddingRight: '2.5%',
+    },
+    pressContainerTopRight: {
+      position: 'relative',
+      paddingTop: '2%',
+      paddingBottom: '2%',
+      paddingLeft: '1.5%',
     },
     mini_text_left: {
-      fontSize: 18,
+      fontSize: 16,
       textAlign: 'center',
       color: activeStateColor,
+      opacity: activeStateColor === COLORS.accentLight ? 1 : 0.4,
       fontFamily: FONTS.regular,
     },
     mini_text_right: {
-      fontSize: 18,
+      fontSize: 16,
       textAlign: 'center',
       color: disabledStateColor,
+      opacity: disabledStateColor === COLORS.accentLight ? 1 : 0.4,
       fontFamily: FONTS.regular,
     },
     storyHolder: {
@@ -112,6 +122,7 @@ const HomeScreen = () => {
     storyHolderLeft: {
       flexDirection: 'column',
       alignItems: 'center',
+      width: '17%',
     },
     storyText: {
       position: 'relative',
@@ -122,6 +133,13 @@ const HomeScreen = () => {
       color: COLORS.black,
       opacity: 0.4,
       fontFamily: FONTS.regular,
+    },
+    flatListHolder: {
+      flexDirection: 'row',
+    },
+    activeStoriesRow: {
+      flex: 1,
+      flexDirection: 'column',
     },
   });
 
@@ -180,18 +198,18 @@ const HomeScreen = () => {
             style={styles.pressContainerTop}
             onPress={() => {
               setActiveStateColor(COLORS.accentLight);
-              setDisabledStateColor(COLORS.darkGrey);
+              setDisabledStateColor(COLORS.black);
               setShowStoriesOrOnline(!showStoriesOrOnline);
             }}>
             <Text style={styles.mini_text_left}>Stories</Text>
           </Pressable>
           <Pressable
             onPress={() => {
-              setActiveStateColor(COLORS.darkGrey);
+              setActiveStateColor(COLORS.black);
               setDisabledStateColor(COLORS.accentLight);
               setShowStoriesOrOnline(!showStoriesOrOnline);
             }}
-            style={styles.pressContainerTop}>
+            style={styles.pressContainerTopRight}>
             <Text style={styles.mini_text_right}>Online</Text>
           </Pressable>
         </View>
@@ -212,8 +230,35 @@ const HomeScreen = () => {
               {showStoriesOrOnline ? 'Discover people' : 'Add story'}
             </Text>
           </View>
+          <View style={styles.activeStoriesRow}>
+            {showStoriesOrOnline ? (
+              <View style={styles.flatListHolder}>
+                <FlatList data={null} renderItem={null} />
+              </View>
+            ) : (
+              <View style={styles.flatListHolder}>
+                <FlatList
+                  horizontal={true}
+                  data={_testj}
+                  renderItem={({item}) => (
+                    <View
+                      style={{
+                        padding: '2%',
+                        backgroundColor: COLORS.accentLight,
+                      }}>
+                      <View>
+                        <Image source={{uri: item.avatar}} />
+                      </View>
+                      <Text>{item.name}</Text>
+                    </View>
+                  )}
+                  keyExtractor={item => item.name}
+                />
+              </View>
+            )}
+          </View>
+          <FlatList data={null} renderItem={null} />
         </View>
-        <FlatList data={null} renderItem={null} />
       </View>
     </BaseView>
   );
