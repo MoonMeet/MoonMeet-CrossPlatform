@@ -1,9 +1,8 @@
 import React, {useEffect} from 'react';
 import {
   FlatList,
-  Image,
+  Platform,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
@@ -12,15 +11,31 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import BaseView from '../components/BaseView/BaseView';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {Avatar, Surface} from 'react-native-paper';
+import {Avatar, Searchbar, Surface} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
 import AddImage from '../assets/images/add.png';
 import TestJson from '../assets/data/json/test/stories.json';
+import SearchImage from '../assets/images/search.png';
+import ClearImage from '../assets/images/clear.png';
+import ChatsJson from '../assets/data/json/test/chats.json';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
-  const _testj = TestJson;
+  const navigation = useNavigation();
+
+  const _testStories = TestJson;
+
+  const _testChats = ChatsJson;
+
   const [avatarURL, setAvatarURL] = React.useState('');
+
+  const [SearchData, setSearchData] = React.useState('');
+
+  const [FilteredData, setFilteredData] = React.useState([]);
+
+  const [MasterData, setMasterData] = React.useState([]);
+
   const [activeStateColor, setActiveStateColor] = React.useState(
     COLORS.accentLight,
   );
@@ -62,10 +77,11 @@ const HomeScreen = () => {
       paddingRight: '3%',
       textAlign: 'center',
       color: COLORS.black,
-      fontFamily: FONTS.regular,
+      fontFamily: FONTS.bold,
     },
     left_side: {
       justifyContent: 'flex-start',
+      alignItems: 'center',
       flexDirection: 'row',
     },
     mid_side: {
@@ -149,6 +165,11 @@ const HomeScreen = () => {
     activeStoriesRow: {
       flexDirection: 'column',
     },
+    userHaveStory: {
+      borderWidth: /*1.5*/ 0,
+      borderColor: COLORS.accentLight,
+      overflow: 'hidden',
+    },
   });
 
   return (
@@ -156,33 +177,43 @@ const HomeScreen = () => {
       <View style={styles.container}>
         <Surface style={styles.toolbar}>
           <View style={styles.left_side}>
-            {avatarURL ? (
-              <Avatar.Image
-                size={35}
-                source={avatarURL ? {uri: avatarURL} : null}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
-            ) : (
-              <Avatar.Icon
-                icon={PersonImage}
-                size={35}
-                color={COLORS.accentLight}
-                style={{
-                  overflow: 'hidden',
-                  paddingBottom: '0.2%',
-                  paddingRight: '0.2%',
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
-            )}
+            <Pressable
+              onPress={() => {
+                navigation.navigate('settings');
+              }}>
+              {avatarURL ? (
+                <Avatar.Image
+                  size={35}
+                  source={avatarURL ? {uri: avatarURL} : null}
+                  style={{
+                    overflow: 'hidden',
+                    marginBottom: '1%',
+                    marginRight: '-1%',
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.rippleColor,
+                    },
+                  }}
+                />
+              ) : (
+                <Avatar.Icon
+                  icon={PersonImage}
+                  size={35}
+                  color={COLORS.accentLight}
+                  style={{
+                    overflow: 'hidden',
+                    marginBottom: '0.2%',
+                    marginRight: '0.2%',
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.rippleColor,
+                    },
+                  }}
+                />
+              )}
+            </Pressable>
           </View>
           <View style={styles.mid_side}>
             <Text style={styles.top_text}>Chats</Text>
@@ -201,21 +232,46 @@ const HomeScreen = () => {
             />
           </View>
         </Surface>
+        <View
+          style={{
+            padding: '2%',
+          }}>
+          <Searchbar
+            onChangeText={null}
+            value={SearchData}
+            placeholder={'Search here'}
+            icon={SearchImage}
+            selectionColor={COLORS.controlNormal}
+            platform={Platform.OS}
+            style={{
+              borderRadius: 150 / 2,
+            }}
+            inputStyle={{
+              color: COLORS.accentLight,
+            }}
+            clearIcon={ClearImage}
+          />
+        </View>
+
         <View style={styles.above_stories}>
           <Pressable
             style={styles.pressContainerTop}
             onPress={() => {
-              setActiveStateColor(COLORS.accentLight);
-              setDisabledStateColor(COLORS.black);
-              setShowStoriesOrOnline(!showStoriesOrOnline);
+              if (showStoriesOrOnline === true) {
+                setActiveStateColor(COLORS.accentLight);
+                setDisabledStateColor(COLORS.black);
+                setShowStoriesOrOnline(false);
+              }
             }}>
             <Text style={styles.mini_text_left}>Stories</Text>
           </Pressable>
           <Pressable
             onPress={() => {
-              setActiveStateColor(COLORS.black);
-              setDisabledStateColor(COLORS.accentLight);
-              setShowStoriesOrOnline(!showStoriesOrOnline);
+              if (showStoriesOrOnline === false) {
+                setActiveStateColor(COLORS.black);
+                setDisabledStateColor(COLORS.accentLight);
+                setShowStoriesOrOnline(true);
+              }
             }}
             style={styles.pressContainerTopRight}>
             <Text style={styles.mini_text_right}>Online</Text>
@@ -252,7 +308,7 @@ const HomeScreen = () => {
                     paddingStart: '1%',
                     paddingEnd: '12%',
                   }}
-                  data={_testj}
+                  data={_testStories}
                   renderItem={({item}) => (
                     <Pressable
                       style={{
@@ -266,7 +322,11 @@ const HomeScreen = () => {
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}>
-                        <Avatar.Image size={45} source={{uri: item.avatar}} />
+                        <Avatar.Image
+                          style={styles.userHaveStory}
+                          size={50}
+                          source={{uri: item.avatar}}
+                        />
                       </View>
                       <Text
                         style={{
@@ -282,8 +342,53 @@ const HomeScreen = () => {
               </View>
             )}
           </View>
-          <FlatList data={null} renderItem={null} />
         </View>
+      </View>
+      <View style={{flex: 1}}>
+        <FlatList
+          style={{flex: 1}}
+          data={_testChats}
+          contentContainerStyle={{
+            paddingStart: '1%',
+            paddingEnd: '2%',
+          }}
+          renderItem={({item}) => (
+            <Pressable
+              style={{
+                flexDirection: 'row',
+              }}>
+              <View
+                style={{
+                  padding: '2%',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                }}>
+                <Avatar.Image
+                  style={styles.userHaveStory}
+                  size={50}
+                  source={{uri: item.avatar}}
+                />
+              </View>
+              <View
+                style={{
+                  padding: '2%',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                }}>
+                <Text>{item.name}</Text>
+                <Text>{item.lastmessage}</Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                }}>
+                <Text>{item.time}</Text>
+              </View>
+            </Pressable>
+          )}
+        />
       </View>
     </BaseView>
   );

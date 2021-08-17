@@ -13,6 +13,7 @@ import SplashScreen from '../activities/SplashScreen';
 import LoginScreen from '../activities/LoginScreen';
 import SetupScreen from '../activities/SetupScreen';
 import HomeScreen from '../activities/HomeScreen';
+import SettingsScreen from '../activities/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,17 +21,15 @@ const StackNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={'home'}
         screenOptions={{
           headerShown: false,
-          stackPresentation: 'transparentModal',
-          stackAnimation: 'slide_from_right',
         }}>
         <Stack.Screen name={'splash'} component={SplashScreen} />
         <Stack.Screen name={'onboarding'} component={IntroScreen} />
         <Stack.Screen name={'login'} component={LoginScreen} />
         <Stack.Screen name={'setup'} component={SetupScreen} />
         <Stack.Screen name={'home'} component={HomeScreen} />
+        <Stack.Screen name={'settings'} component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
