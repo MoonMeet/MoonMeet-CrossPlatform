@@ -27,6 +27,7 @@ const COLORS = {
   yellowDarkWarning: '#ffca28',
   black: '#000000',
   white: '#FFFFFF',
+  transparent: '#00000000',
 };
 
 export {COLORS, FONTS};

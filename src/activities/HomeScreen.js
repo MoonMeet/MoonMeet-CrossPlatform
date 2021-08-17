@@ -88,6 +88,7 @@ const HomeScreen = () => {
       flex: 2,
       backgroundColor: 'white',
       flexDirection: 'row',
+      alignItems: 'center',
       fontSize: 18,
       marginLeft: 10,
       marginRight: 10,
@@ -245,6 +246,9 @@ const HomeScreen = () => {
             platform={Platform.OS}
             style={{
               borderRadius: 150 / 2,
+              borderWidth: 1,
+              elevation: 0,
+              borderColor: COLORS.rippleColor,
             }}
             inputStyle={{
               color: COLORS.accentLight,
