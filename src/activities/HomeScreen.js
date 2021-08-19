@@ -20,6 +20,7 @@ import SearchImage from '../assets/images/search.png';
 import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useNavigation} from '@react-navigation/native';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -29,12 +30,6 @@ const HomeScreen = () => {
   const _testChats = ChatsJson;
 
   const [avatarURL, setAvatarURL] = React.useState('');
-
-  const [SearchData, setSearchData] = React.useState('');
-
-  const [FilteredData, setFilteredData] = React.useState([]);
-
-  const [MasterData, setMasterData] = React.useState([]);
 
   const [activeStateColor, setActiveStateColor] = React.useState(
     COLORS.accentLight,
@@ -72,12 +67,12 @@ const HomeScreen = () => {
     },
     top_text: {
       position: 'relative',
-      fontSize: 26,
+      fontSize: 22,
       paddingLeft: '3%',
       paddingRight: '3%',
       textAlign: 'center',
-      color: COLORS.black,
-      fontFamily: FONTS.bold,
+      color: COLORS.accentLight,
+      fontFamily: FONTS.regular,
     },
     left_side: {
       justifyContent: 'flex-start',
@@ -104,6 +99,7 @@ const HomeScreen = () => {
       overflow: 'hidden',
       paddingBottom: '0.2%',
       paddingRight: '0.2%',
+      opacity: 0.4,
     },
     above_stories: {
       flexDirection: 'row',
@@ -174,177 +170,174 @@ const HomeScreen = () => {
   });
 
   return (
-    <BaseView>
-      <View style={styles.container}>
-        <Surface style={styles.toolbar}>
-          <View style={styles.left_side}>
-            <Pressable
-              onPress={() => {
-                navigation.navigate('settings');
-              }}>
-              {avatarURL ? (
-                <Avatar.Image
-                  size={35}
-                  source={avatarURL ? {uri: avatarURL} : null}
-                  style={{
-                    overflow: 'hidden',
-                    marginBottom: '1%',
-                    marginRight: '-1%',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
-              ) : (
-                <Avatar.Icon
-                  icon={PersonImage}
-                  size={35}
-                  color={COLORS.accentLight}
-                  style={{
-                    overflow: 'hidden',
-                    marginBottom: '0.2%',
-                    marginRight: '0.2%',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
-              )}
-            </Pressable>
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.top_text}>Chats</Text>
-          </View>
-          <View style={styles.right_side}>
-            <Avatar.Icon
-              icon={CreateImage}
-              size={35}
-              color={COLORS.black}
-              style={styles.right_icon}
-              theme={{
-                colors: {
-                  primary: COLORS.rippleColor,
-                },
-              }}
-            />
-          </View>
-        </Surface>
-        <View
-          style={{
-            padding: '2%',
-          }}>
-          <Searchbar
-            onChangeText={null}
-            value={SearchData}
-            placeholder={'Search here'}
-            icon={SearchImage}
-            selectionColor={COLORS.controlNormal}
-            platform={Platform.OS}
-            style={{
-              borderRadius: 150 / 2,
-              borderWidth: 1,
-              elevation: 0,
-              borderColor: COLORS.rippleColor,
+    <MiniBaseView>
+      <Surface style={styles.toolbar}>
+        <View style={styles.left_side}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate('settings');
+            }}>
+            {avatarURL ? (
+              <Avatar.Image
+                size={37.5}
+                source={avatarURL ? {uri: avatarURL} : null}
+                style={{
+                  overflow: 'hidden',
+                  marginRight: '-1%',
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            ) : (
+              <Avatar.Icon
+                icon={PersonImage}
+                size={37.5}
+                color={COLORS.black}
+                style={{
+                  overflow: 'hidden',
+                  marginRight: '-1%',
+                  opacity: 0.4,
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            )}
+          </Pressable>
+        </View>
+        <View style={styles.mid_side}>
+          <Text style={styles.top_text}>Chats</Text>
+        </View>
+        <View style={styles.right_side}>
+          <Avatar.Icon
+            icon={CreateImage}
+            size={37.5}
+            color={COLORS.black}
+            style={styles.right_icon}
+            theme={{
+              colors: {
+                primary: COLORS.rippleColor,
+              },
             }}
-            inputStyle={{
-              color: COLORS.accentLight,
-            }}
-            clearIcon={ClearImage}
           />
         </View>
-        <View style={styles.above_stories}>
-          <Pressable
-            style={styles.pressContainerTop}
-            onPress={() => {
-              if (showStoriesOrOnline === true) {
-                setActiveStateColor(COLORS.accentLight);
-                setDisabledStateColor(COLORS.black);
-                setShowStoriesOrOnline(false);
-              }
-            }}>
-            <Text style={styles.mini_text_left}>Stories</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              if (showStoriesOrOnline === false) {
-                setActiveStateColor(COLORS.black);
-                setDisabledStateColor(COLORS.accentLight);
-                setShowStoriesOrOnline(true);
-              }
+      </Surface>
+      <View
+        style={{
+          padding: '2%',
+        }}>
+        <Searchbar
+          onChangeText={null}
+          value={null}
+          placeholder={'Search here'}
+          icon={SearchImage}
+          selectionColor={COLORS.controlNormal}
+          platform={Platform.OS}
+          style={{
+            borderRadius: 150 / 2,
+            borderWidth: 1,
+            elevation: 0,
+            borderColor: COLORS.rippleColor,
+          }}
+          inputStyle={{
+            color: COLORS.accentLight,
+          }}
+          clearIcon={ClearImage}
+        />
+      </View>
+      <View style={styles.above_stories}>
+        <Pressable
+          style={styles.pressContainerTop}
+          onPress={() => {
+            if (showStoriesOrOnline === true) {
+              setActiveStateColor(COLORS.accentLight);
+              setDisabledStateColor(COLORS.black);
+              setShowStoriesOrOnline(false);
+            }
+          }}>
+          <Text style={styles.mini_text_left}>Stories</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            if (showStoriesOrOnline === false) {
+              setActiveStateColor(COLORS.black);
+              setDisabledStateColor(COLORS.accentLight);
+              setShowStoriesOrOnline(true);
+            }
+          }}
+          style={styles.pressContainerTopRight}>
+          <Text style={styles.mini_text_right}>Online</Text>
+        </Pressable>
+      </View>
+      <View style={styles.storyHolder}>
+        <View style={styles.storyHolderLeft}>
+          <Avatar.Icon
+            icon={AddImage}
+            size={50}
+            color={COLORS.black}
+            style={styles.right_icon}
+            theme={{
+              colors: {
+                primary: COLORS.rippleColor,
+              },
             }}
-            style={styles.pressContainerTopRight}>
-            <Text style={styles.mini_text_right}>Online</Text>
-          </Pressable>
+          />
+          <Text style={styles.storyText}>
+            {showStoriesOrOnline ? 'Discover people' : 'Post story'}
+          </Text>
         </View>
-        <View style={styles.storyHolder}>
-          <View style={styles.storyHolderLeft}>
-            <Avatar.Icon
-              icon={AddImage}
-              size={50}
-              color={COLORS.black}
-              style={styles.right_icon}
-              theme={{
-                colors: {
-                  primary: COLORS.rippleColor,
-                },
-              }}
-            />
-            <Text style={styles.storyText}>
-              {showStoriesOrOnline ? 'Discover people' : 'Post story'}
-            </Text>
-          </View>
-          <View style={styles.activeStoriesRow}>
-            {showStoriesOrOnline ? (
-              <View style={styles.flatListHolder}>
-                <FlatList data={null} renderItem={null} />
-              </View>
-            ) : (
-              <View style={styles.flatListHolder}>
-                <FlatList
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{
-                    paddingStart: '1%',
-                    paddingEnd: '12%',
-                  }}
-                  data={_testStories}
-                  renderItem={({item}) => (
-                    <Pressable
+        <View style={styles.activeStoriesRow}>
+          {showStoriesOrOnline ? (
+            <View style={styles.flatListHolder}>
+              <FlatList data={null} renderItem={null} />
+            </View>
+          ) : (
+            <View style={styles.flatListHolder}>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingStart: '1%',
+                  paddingEnd: '12%',
+                }}
+                data={_testStories}
+                renderItem={({item}) => (
+                  <Pressable
+                    style={{
+                      padding: '2%',
+                      height: 85,
+                      width: 70,
+                      backgroundColor: COLORS.primaryLight,
+                    }}>
+                    <View
                       style={{
-                        padding: '2%',
-                        height: 85,
-                        width: 70,
-                        backgroundColor: COLORS.primaryLight,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <Avatar.Image
-                          style={styles.userHaveStory}
-                          size={50}
-                          source={{uri: item.avatar}}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          color: COLORS.black,
-                        }}>
-                        {item.name}
-                      </Text>
-                    </Pressable>
-                  )}
-                  keyExtractor={item => item.name}
-                />
-              </View>
-            )}
-          </View>
+                      <Avatar.Image
+                        style={styles.userHaveStory}
+                        size={50}
+                        source={{uri: item.avatar}}
+                      />
+                    </View>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        color: COLORS.black,
+                      }}>
+                      {item.name}
+                    </Text>
+                  </Pressable>
+                )}
+                keyExtractor={item => item.name}
+              />
+            </View>
+          )}
         </View>
       </View>
       <View style={{flex: 1}}>
@@ -393,7 +386,7 @@ const HomeScreen = () => {
           )}
         />
       </View>
-    </BaseView>
+    </MiniBaseView>
   );
 };
 export default React.memo(HomeScreen);

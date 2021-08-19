@@ -654,4 +654,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default LoginScreen;
+export default React.memo(LoginScreen);

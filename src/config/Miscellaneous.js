@@ -28,6 +28,9 @@ const COLORS = {
   black: '#000000',
   white: '#FFFFFF',
   transparent: '#00000000',
+  purple: '#9B59B6',
+  blue: '#2471A3',
+  green: '#229954',
 };
 
 export {COLORS, FONTS};

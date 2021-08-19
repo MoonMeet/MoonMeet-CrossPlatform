@@ -1,13 +1,16 @@
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, Surface} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import BackImage from '../assets/images/back.png';
+import EditIcon from '../assets/images/create.png';
+import {useNavigation} from '@react-navigation/native';
 
 const SettingsScreen = () => {
+  const navigation = useNavigation();
   const [avatarURL, setAvatarURL] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -41,8 +44,6 @@ const SettingsScreen = () => {
     },
     under_header: {
       padding: '2%',
-      marginTop: '2%',
-      height: '12.5%',
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -67,7 +68,7 @@ const SettingsScreen = () => {
     },
     toolbar_text: {
       fontSize: 22,
-      paddingLeft: '3%',
+      paddingLeft: '2%',
       paddingRight: '3%',
       textAlign: 'center',
       color: COLORS.black,
@@ -83,48 +84,95 @@ const SettingsScreen = () => {
       color: COLORS.black,
       fontFamily: FONTS.regular,
     },
-    spacer: {
-      height: '2.5%',
+    titleView: {
+      padding: '2%',
+      flexDirection: 'row',
+    },
+    titleTextView: {
+      fontSize: 18,
+      paddingLeft: '3%',
+      paddingRight: '3%',
+      textAlign: 'center',
+      color: COLORS.accentLight,
+      fontFamily: FONTS.regular,
+    },
+    titleViewContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      paddingLeft: '6%',
+      paddingRight: '2%',
+      paddingBottom: '2%',
+      paddingTop: '2%',
+    },
+    titleTextContainer: {
+      fontSize: 18,
+      paddingLeft: '3%',
+      paddingRight: '3%',
+      textAlign: 'center',
+      color: COLORS.black,
+      fontFamily: FONTS.regular,
     },
   });
   return (
     <MiniBaseView>
       <Surface style={styles.toolbar}>
         <View style={styles.left_side}>
+          <Pressable
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <Avatar.Icon
+              icon={BackImage}
+              size={37.5}
+              color={COLORS.black}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+                opacity: 0.4,
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          </Pressable>
+        </View>
+        <View style={styles.mid_side}>
+          <Text style={styles.toolbar_text}>Settings</Text>
+        </View>
+      </Surface>
+      <ScrollView>
+        <View style={styles.under_header}>
+          <Avatar.Image
+            size={85}
+            source={avatarURL ? {uri: avatarURL} : null}
+          />
+          <Text style={styles.under_header_text}>
+            {firstName + ' ' + lastName}
+          </Text>
+        </View>
+        <View style={styles.titleView}>
+          <Text style={styles.titleTextView}>Account</Text>
+        </View>
+        <View style={styles.titleViewContainer}>
           <Avatar.Icon
-            icon={BackImage}
-            size={40}
-            color={COLORS.black}
+            icon={EditIcon}
+            size={37.5}
+            color={COLORS.white}
             style={{
               overflow: 'hidden',
-              marginBottom: '0.2%',
-              marginRight: '0.2%',
-              opacity: 0.4,
+              marginRight: '-1%',
             }}
             theme={{
               colors: {
-                primary: COLORS.transparent,
+                primary: COLORS.purple,
               },
             }}
           />
+          <Text style={styles.titleTextContainer}>Edit Profile</Text>
         </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Me</Text>
-        </View>
-      </Surface>
-      <ScrollView style={{flex: 1}}>
-        <SafeAreaView>
-          <View style={styles.spacer} />
-          <View style={styles.under_header}>
-            <Avatar.Image
-              size={85}
-              source={avatarURL ? {uri: avatarURL} : null}
-            />
-            <Text style={styles.under_header_text}>
-              {firstName + ' ' + lastName}
-            </Text>
-          </View>
-        </SafeAreaView>
       </ScrollView>
     </MiniBaseView>
   );
