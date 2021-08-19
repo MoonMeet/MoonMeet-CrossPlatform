@@ -14,6 +14,7 @@ import LoginScreen from '../activities/LoginScreen';
 import SetupScreen from '../activities/SetupScreen';
 import HomeScreen from '../activities/HomeScreen';
 import SettingsScreen from '../activities/SettingsScreen';
+import SearchChatsScreen from '../activities/SearchChatsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ const StackNavigator = () => {
         <Stack.Screen name={'login'} component={LoginScreen} />
         <Stack.Screen name={'setup'} component={SetupScreen} />
         <Stack.Screen name={'home'} component={HomeScreen} />
+        <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />
         <Stack.Screen name={'settings'} component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -3,6 +3,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
 } from 'react-native';
 import {isIOS} from '../../utils/device/DeviceInfo';
@@ -12,17 +13,8 @@ import {COLORS} from '../../config/Miscellaneous';
 const MiniBaseView = ({children}) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Pressable
-        style={styles.container}
-        onPress={() => {
-          Keyboard.dismiss();
-        }}>
-        <KeyboardAvoidingView
-          style={styles.container}
-          behavior={isIOS === 'ios' ? 'padding' : 'height'}>
-          {children}
-        </KeyboardAvoidingView>
-      </Pressable>
+      <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
+      {children}
     </SafeAreaView>
   );
 };

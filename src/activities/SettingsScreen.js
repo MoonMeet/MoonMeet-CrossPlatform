@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {StyleSheet, Text, View} from 'react-native';
+import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, Surface} from 'react-native-paper';
 import database from '@react-native-firebase/database';
@@ -11,6 +11,7 @@ const SettingsScreen = () => {
   const [avatarURL, setAvatarURL] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
+  const [userName, setUserName] = React.useState('');
   const fetchUser = () => {
     database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
@@ -18,11 +19,13 @@ const SettingsScreen = () => {
         if (
           snapshot?.val().avatar &&
           snapshot?.val().first_name &&
-          snapshot?.val().last_name
+          snapshot?.val().last_name &&
+          snapshot?.val().username
         ) {
           setAvatarURL(snapshot?.val().avatar);
           setFirstName(snapshot?.val().first_name);
           setLastName(snapshot?.val().last_name);
+          setUserName(snapshot?.val().username);
         }
       });
   };
@@ -34,7 +37,7 @@ const SettingsScreen = () => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: COLORS.accentLight,
+      backgroundColor: COLORS.primaryLight,
     },
     under_header: {
       padding: '2%',
@@ -72,12 +75,16 @@ const SettingsScreen = () => {
     },
     under_header_text: {
       position: 'relative',
-      fontSize: 26,
+      fontSize: 24,
       paddingLeft: '3%',
       paddingRight: '3%',
+      paddingTop: '1%',
       textAlign: 'center',
       color: COLORS.black,
       fontFamily: FONTS.regular,
+    },
+    spacer: {
+      height: '2.5%',
     },
   });
   return (
@@ -105,13 +112,21 @@ const SettingsScreen = () => {
           <Text style={styles.toolbar_text}>Me</Text>
         </View>
       </Surface>
-      <View style={styles.under_header}>
-        <Avatar.Image size={85} source={avatarURL ? {uri: avatarURL} : null} />
-        <Text style={styles.under_header_text}>
-          {firstName + ' ' + lastName}
-        </Text>
-      </View>
+      <ScrollView style={{flex: 1}}>
+        <SafeAreaView>
+          <View style={styles.spacer} />
+          <View style={styles.under_header}>
+            <Avatar.Image
+              size={85}
+              source={avatarURL ? {uri: avatarURL} : null}
+            />
+            <Text style={styles.under_header_text}>
+              {firstName + ' ' + lastName}
+            </Text>
+          </View>
+        </SafeAreaView>
+      </ScrollView>
     </MiniBaseView>
   );
 };
-export default SettingsScreen;
+export default React.memo(SettingsScreen);

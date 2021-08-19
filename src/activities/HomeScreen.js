@@ -256,7 +256,6 @@ const HomeScreen = () => {
             clearIcon={ClearImage}
           />
         </View>
-
         <View style={styles.above_stories}>
           <Pressable
             style={styles.pressContainerTop}
@@ -397,4 +396,4 @@ const HomeScreen = () => {
     </BaseView>
   );
 };
-export default HomeScreen;
+export default React.memo(HomeScreen);
