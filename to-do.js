@@ -9,6 +9,7 @@
  * #NOTNOW TODO: Fix ProGuard with android studio debugger
  * #AHMEDTASKS :
  * #NOTNOW TODO: Configure Redux.
+ * TODO: Add a multiplatform toast, a cute one.
  * #TODO : Fix FlatList always at bottom in HomeScreen.js, needs to be under stories.
  * #ADDITIONAL TASKS FOR AHMED :
  * #ADDIS TODO: Add some design
