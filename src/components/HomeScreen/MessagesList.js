@@ -53,8 +53,6 @@ const MessagesList = ({_testChats}) => {
   );
 };
 
-export default React.memo(MessagesList);
-
 const styles = StyleSheet.create({
   userHaveStory: {
     borderWidth: /*1.5*/ 0,
@@ -62,3 +60,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
+
+export default React.memo(MessagesList);

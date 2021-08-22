@@ -1,7 +1,7 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import AddImage from '../../assets/images/add.png';
-import {COLORS} from '../../config/Miscellaneous';
+import {COLORS, FONTS} from '../../config/Miscellaneous';
 import React from 'react';
 
 const StoriesList = ({showStoriesOrOnline, _testStories}) => {
@@ -34,8 +34,7 @@ const StoriesList = ({showStoriesOrOnline, _testStories}) => {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
-                paddingStart: '1%',
-                paddingEnd: '12%',
+                paddingEnd: '13%',
               }}
               data={_testStories}
               renderItem={({item}) => (
@@ -88,6 +87,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '17%',
   },
+  storyText: {
+    position: 'relative',
+    fontSize: 16,
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    paddingTop: '0.2%',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  flatListHolder: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  activeStoriesRow: {
+    flexDirection: 'column',
+  },
+  userHaveStory: {
+    borderWidth: /*1.5*/ 0,
+    borderColor: COLORS.accentLight,
+    overflow: 'hidden',
+  },
 });
 
-export default StoriesList;
+export default React.memo(StoriesList);

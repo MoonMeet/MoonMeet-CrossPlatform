@@ -8,6 +8,7 @@ import auth from '@react-native-firebase/auth';
 import BackImage from '../assets/images/back.png';
 import EditIcon from '../assets/images/create.png';
 import {useNavigation} from '@react-navigation/native';
+import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
@@ -84,35 +85,6 @@ const SettingsScreen = () => {
       color: COLORS.black,
       fontFamily: FONTS.regular,
     },
-    titleView: {
-      padding: '2%',
-      flexDirection: 'row',
-    },
-    titleTextView: {
-      fontSize: 18,
-      paddingLeft: '3%',
-      paddingRight: '3%',
-      textAlign: 'center',
-      color: COLORS.accentLight,
-      fontFamily: FONTS.regular,
-    },
-    titleViewContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      paddingLeft: '6%',
-      paddingRight: '2%',
-      paddingBottom: '2%',
-      paddingTop: '2%',
-    },
-    titleTextContainer: {
-      fontSize: 18,
-      paddingLeft: '3%',
-      paddingRight: '3%',
-      textAlign: 'center',
-      color: COLORS.black,
-      fontFamily: FONTS.regular,
-    },
   });
   return (
     <MiniBaseView>
@@ -153,26 +125,7 @@ const SettingsScreen = () => {
             {firstName + ' ' + lastName}
           </Text>
         </View>
-        <View style={styles.titleView}>
-          <Text style={styles.titleTextView}>Account</Text>
-        </View>
-        <View style={styles.titleViewContainer}>
-          <Avatar.Icon
-            icon={EditIcon}
-            size={37.5}
-            color={COLORS.white}
-            style={{
-              overflow: 'hidden',
-              marginRight: '-1%',
-            }}
-            theme={{
-              colors: {
-                primary: COLORS.purple,
-              },
-            }}
-          />
-          <Text style={styles.titleTextContainer}>Edit Profile</Text>
-        </View>
+        <ScrollViewData />
       </ScrollView>
     </MiniBaseView>
   );

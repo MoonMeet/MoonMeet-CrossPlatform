@@ -12,7 +12,7 @@ import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {MessagesList, StoriesList} from '../components/homeScreen';
+import {MessagesList, StoriesList} from '../components/HomeScreen';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -112,7 +112,7 @@ const HomeScreen = () => {
         <Searchbar
           onChangeText={null}
           value={null}
-          placeholder={'Search here'}
+          placeholder={'Search'}
           icon={SearchImage}
           selectionColor={COLORS.controlNormal}
           platform={Platform.OS}
@@ -160,7 +160,6 @@ const HomeScreen = () => {
     </MiniBaseView>
   );
 };
-export default React.memo(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -243,39 +242,6 @@ const styles = StyleSheet.create({
       fontFamily: FONTS.regular,
     };
   },
-  storyHolder: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '3%',
-    paddingRight: '3%',
-  },
-  storyHolderLeft: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '17%',
-  },
-  storyText: {
-    position: 'relative',
-    fontSize: 15,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    paddingTop: '0.2%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
-  flatListHolder: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  activeStoriesRow: {
-    flexDirection: 'column',
-  },
-  userHaveStory: {
-    borderWidth: /*1.5*/ 0,
-    borderColor: COLORS.accentLight,
-    overflow: 'hidden',
-  },
 });
+
+export default React.memo(HomeScreen);
