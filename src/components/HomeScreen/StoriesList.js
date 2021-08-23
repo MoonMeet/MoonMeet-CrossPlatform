@@ -4,7 +4,7 @@ import AddImage from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import React from 'react';
 
-const StoriesList = ({showStoriesOrOnline, _testStories}) => {
+const StoriesList = ({CurrentSection, ListData}) => {
   return (
     <View style={styles.storyHolder}>
       <View style={styles.storyHolderLeft}>
@@ -20,11 +20,11 @@ const StoriesList = ({showStoriesOrOnline, _testStories}) => {
           }}
         />
         <Text style={styles.storyText}>
-          {showStoriesOrOnline ? 'Discover people' : 'Post story'}
+          {CurrentSection ? 'Discover people' : 'Post story'}
         </Text>
       </View>
       <View style={styles.activeStoriesRow}>
-        {showStoriesOrOnline ? (
+        {CurrentSection ? (
           <View style={styles.flatListHolder}>
             <FlatList data={null} renderItem={null} />
           </View>
@@ -36,7 +36,7 @@ const StoriesList = ({showStoriesOrOnline, _testStories}) => {
               contentContainerStyle={{
                 paddingEnd: '13%',
               }}
-              data={_testStories}
+              data={ListData}
               renderItem={({item}) => (
                 <Pressable
                   style={{

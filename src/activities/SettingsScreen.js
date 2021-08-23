@@ -58,8 +58,8 @@ const SettingsScreen = () => {
       flexDirection: 'row',
       alignItems: 'center',
       fontSize: 18,
-      marginLeft: 10,
-      marginRight: 10,
+      marginLeft: '2.5%',
+      marginRight: '2.5%',
     },
     toolbar: {
       padding: '2%',

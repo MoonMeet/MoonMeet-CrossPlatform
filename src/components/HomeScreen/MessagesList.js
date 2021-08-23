@@ -3,11 +3,11 @@ import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
 
-const MessagesList = ({_testChats}) => {
+const MessagesList = ({ListData}) => {
   return (
     <View style={{flex: 1}}>
       <FlatList
-        data={_testChats}
+        data={ListData}
         contentContainerStyle={{
           paddingStart: '1%',
           paddingEnd: '2%',

@@ -153,10 +153,10 @@ const HomeScreen = () => {
         </Pressable>
       </View>
       <StoriesList
-        _testStories={_testStories}
-        showStoriesOrOnline={showStoriesOrOnline}
+        ListData={_testStories}
+        CurrentSection={showStoriesOrOnline}
       />
-      <MessagesList _testChats={_testChats} />
+      <MessagesList ListData={_testChats} />
     </MiniBaseView>
   );
 };
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     fontSize: 18,
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: '2.5%',
+    marginRight: '2.5%',
   },
   right_side: {
     flex: 1,
