@@ -250,4 +250,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CountriesList;
+export default React.memo(CountriesList);

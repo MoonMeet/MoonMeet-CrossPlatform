@@ -25,7 +25,7 @@ import {isAndroid, isIOS} from '../utils/device/DeviceInfo';
 
 import auth from '@react-native-firebase/auth';
 import CountriesList from '../components/Modals/LoginScreen/CountriesList';
-import PrivacyPolicy from '../components/Modals/LoginScreen/PrivacyPolicy';
+import PrivacyPolicy from '../components/Modals/PrivacyPolicy/PrivacyPolicy';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
 import database from '@react-native-firebase/database';

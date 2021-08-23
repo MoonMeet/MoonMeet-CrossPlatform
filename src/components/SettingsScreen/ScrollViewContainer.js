@@ -21,9 +21,13 @@ import {COLORS} from '../../config/Miscellaneous';
 import DataItemCustom from './DataItemCustom';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
+import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/FrequentlyAskedQuestions';
 
 const ScrollViewContainer = () => {
   const navigation = useNavigation();
+  const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
+  const [FAQVisible, setFAQVisible] = React.useState(false);
   return (
     <View>
       <DataItemTitle titleItem={'Miscellaneous'} />
@@ -118,27 +122,35 @@ const ScrollViewContainer = () => {
       <DataItem
         leftIcon={DevicesIcon}
         leftIconColor={COLORS.amazingPurple}
-        titleTextContainer={'Chat Settings'}
+        titleTextContainer={'Devices'}
         onPressTrigger={null}
       />
       <DataItemTitle titleItem={'Help'} />
       <DataItem
         leftIcon={PriPoIcon}
         leftIconColor={COLORS.maroon}
-        titleTextContainer={'Privacy and Policy'}
-        onPressTrigger={null}
+        titleTextContainer={'Privacy Policy'}
+        onPressTrigger={() => setPrivacyPolicyVisible(!privacyPolicyVisible)}
       />
       <DataItem
         leftIcon={FAQIcon}
         leftIconColor={COLORS.pink}
         titleTextContainer={'Frequently asked questions'}
-        onPressTrigger={null}
+        onPressTrigger={() => setFAQVisible(!FAQVisible)}
       />
       <DataItem
         leftIcon={ReportIcon}
         leftIconColor={COLORS.accentLight}
         titleTextContainer={'Report technical problem'}
-        onPressTrigger={null}
+        onPressTrigger={() => navigation.navigate('bugreport')}
+      />
+      <PrivacyPolicy
+        hideModal={() => setPrivacyPolicyVisible(!privacyPolicyVisible)}
+        isVisible={privacyPolicyVisible}
+      />
+      <FrequentlyAskedQuestions
+        hideModal={() => setFAQVisible(!FAQVisible)}
+        isVisible={FAQVisible}
       />
     </View>
   );

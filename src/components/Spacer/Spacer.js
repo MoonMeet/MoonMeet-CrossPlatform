@@ -13,4 +13,4 @@ const Spacer = (props: SpacerProps) => {
   });
   return <View style={styles.spacerStyle} />;
 };
-export default Spacer;
+export default React.memo(Spacer);

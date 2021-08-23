@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
-export default PrivacyPolicy;
+export default React.memo(PrivacyPolicy);

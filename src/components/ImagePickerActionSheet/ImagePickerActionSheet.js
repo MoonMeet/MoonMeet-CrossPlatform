@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ImagePickerActionSheet;
+export default React.memo(ImagePickerActionSheet);

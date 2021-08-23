@@ -2,11 +2,10 @@ import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Avatar, Surface} from 'react-native-paper';
+import {Avatar, TouchableRipple} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import BackImage from '../assets/images/back.png';
-import EditIcon from '../assets/images/create.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
@@ -65,7 +64,6 @@ const SettingsScreen = () => {
     toolbar: {
       padding: '2%',
       flexDirection: 'row',
-      elevation: 3,
     },
     toolbar_text: {
       fontSize: 22,
@@ -88,9 +86,11 @@ const SettingsScreen = () => {
   });
   return (
     <MiniBaseView>
-      <Surface style={styles.toolbar}>
+      <View style={styles.toolbar}>
         <View style={styles.left_side}>
-          <Pressable
+          <TouchableRipple
+            rippleColor={COLORS.rippleColor}
+            borderless={false}
             onPress={() => {
               navigation.goBack();
             }}>
@@ -105,16 +105,16 @@ const SettingsScreen = () => {
               }}
               theme={{
                 colors: {
-                  primary: COLORS.rippleColor,
+                  primary: COLORS.transparent,
                 },
               }}
             />
-          </Pressable>
+          </TouchableRipple>
         </View>
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Settings</Text>
         </View>
-      </Surface>
+      </View>
       <ScrollView>
         <View style={styles.under_header}>
           <Avatar.Image

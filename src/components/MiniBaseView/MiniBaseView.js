@@ -26,4 +26,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MiniBaseView;
+export default React.memo(MiniBaseView);
