@@ -30,7 +30,13 @@ const COLORS = {
   transparent: '#00000000',
   purple: '#9B59B6',
   blue: '#2471A3',
+  blue_second: '#6495ED',
+  amazingPurple: '#AB9FE2',
   green: '#229954',
+  yellow: '#DFFF00',
+  maroon: '#800000',
+  orange: '#FF7F50',
+  pink: '#DE3163',
 };
 
 export {COLORS, FONTS};

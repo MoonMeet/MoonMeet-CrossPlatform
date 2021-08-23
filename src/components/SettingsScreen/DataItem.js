@@ -5,8 +5,8 @@ import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {IconSource} from 'react-native-paper/lib/typescript/components/Icon';
 
 interface DataItemInterface {
-  rightIcon: IconSource;
-  rightIconColor: string;
+  leftIcon: IconSource;
+  leftIconColor: string;
   titleTextContainer: string;
   onPressTrigger: Function;
 }
@@ -18,7 +18,7 @@ const DataItem = (props: DataItemInterface) => {
       onPress={props.onPressTrigger}
       style={styles.titleViewContainer}>
       <Avatar.Icon
-        icon={props.rightIcon}
+        icon={props.leftIcon}
         size={36.5}
         color={COLORS.white}
         style={{
@@ -27,7 +27,7 @@ const DataItem = (props: DataItemInterface) => {
         }}
         theme={{
           colors: {
-            primary: props.rightIconColor,
+            primary: props.leftIconColor,
           },
         }}
       />

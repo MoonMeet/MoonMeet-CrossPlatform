@@ -5,8 +5,8 @@ import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {IconSource} from 'react-native-paper/lib/typescript/components/Icon';
 
 interface DataItemCustomInterface {
-  rightIcon: IconSource;
-  rightIconColor: string;
+  leftIcon: IconSource;
+  leftIconColor: string;
   titleTextContainer: string;
   rippleColor: string;
   imageSize: Number;
@@ -25,7 +25,7 @@ const DataItemCustom = (props: DataItemCustomInterface) => {
       onPress={props.onPressTrigger}
       style={styles.titleViewContainer}>
       <Avatar.Icon
-        icon={props.rightIcon}
+        icon={props.leftIcon}
         size={props.imageSize}
         color={props.iconColor}
         style={{
@@ -34,7 +34,7 @@ const DataItemCustom = (props: DataItemCustomInterface) => {
         }}
         theme={{
           colors: {
-            primary: props.rightIconColor,
+            primary: props.leftIconColor,
           },
         }}
       />
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   titleTextContainer: titleColor => {
     return {
       fontSize: 17,
-      paddingLeft: '1%',
+      paddingLeft: '0.5%',
       paddingRight: '1%',
       textAlign: 'left',
       color: titleColor,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   descriptionContainer: descriptionColor => {
     return {
       fontSize: 15,
-      paddingLeft: '1%',
+      paddingLeft: '0.5%',
       paddingRight: '1%',
       textAlign: 'left',
       color: descriptionColor,
