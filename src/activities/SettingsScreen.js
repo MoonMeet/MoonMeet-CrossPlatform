@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, TouchableRipple} from 'react-native-paper';
 import database from '@react-native-firebase/database';
@@ -125,7 +125,12 @@ const SettingsScreen = () => {
             {firstName + ' ' + lastName}
           </Text>
         </View>
-        <ScrollViewData />
+        <ScrollViewData
+          firstName={firstName}
+          lastName={lastName}
+          username={userName}
+          avatar={avatarURL}
+        />
       </ScrollView>
     </MiniBaseView>
   );

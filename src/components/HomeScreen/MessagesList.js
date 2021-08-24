@@ -1,17 +1,23 @@
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
+import BigList from 'react-native-big-list';
 
 const MessagesList = ({ListData}) => {
   return (
     <View style={{flex: 1}}>
-      <FlatList
+      <BigList
         data={ListData}
         contentContainerStyle={{
           paddingStart: '1%',
           paddingEnd: '2%',
         }}
+        itemHeight={65}
+        showsVerticalScrollIndicator={false}
+        disableVirtualization
+        removeClippedSubviews={true}
+        initialNumToRender={10}
         renderItem={({item}) => (
           <Pressable
             style={{

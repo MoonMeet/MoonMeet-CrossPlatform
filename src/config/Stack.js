@@ -15,7 +15,10 @@ import SetupScreen from '../activities/SetupScreen';
 import HomeScreen from '../activities/HomeScreen';
 import SettingsScreen from '../activities/SettingsScreen';
 import SearchChatsScreen from '../activities/SearchChatsScreen';
-import ReportProblem from '../activities/ReportProblem';
+import ReportProblem from '../activities/ReportProblemScreen';
+import Toast from 'react-native-toast-message';
+import ActiveStatusScreen from '../activities/ActiveStatusScreen';
+import ChangeUsernameScreen from '../activities/ChangeUsernameScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,7 +37,13 @@ const StackNavigator = () => {
         <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />
         <Stack.Screen name={'settings'} component={SettingsScreen} />
         <Stack.Screen name={'bugreport'} component={ReportProblem} />
+        <Stack.Screen name={'activeStatus'} component={ActiveStatusScreen} />
+        <Stack.Screen
+          name={'changeUsername'}
+          component={ChangeUsernameScreen}
+        />
       </Stack.Navigator>
+      <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>
   );
 };

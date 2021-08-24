@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import BaseView from '../components/BaseView/BaseView';
 import {StyleSheet, Text, View} from 'react-native';
 import {
@@ -13,16 +13,102 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
 import ArrowForward from '../assets/images/arrow-forward.png';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import NetInfo from '@react-native-community/netinfo';
+import {
+  SuccessToast,
+  ErrorToast,
+} from '../components/ToastInitializer/ToastInitializer';
 
-const ReportProblem = () => {
+const ReportProblemScreen = () => {
   const navigation = useNavigation();
+
+  /**
+   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   */
+  let isConnected = NetInfo.fetch().then(networkState => {
+    isConnected = networkState?.isConnected;
+  });
+
+  /**
+   * Dummy NetInfoObserver
+   */
+
+  const addNetInfoObserver = () => {
+    NetInfo.addEventListener(networkState => {
+      console.info(networkState.details);
+      console.info(networkState.type);
+    });
+  };
+
   const [ReportText, setReportText] = React.useState('');
   const [isFABLoading, setIsFABLoading] = React.useState(false);
+
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+
   const onReportTextChange = _reportText => setReportText(_reportText);
 
-  const hasErrors = () => {
+  function getUserData() {
+    database()
+      .ref(`/users/${auth().currentUser.uid}`)
+      .on('value', snapshot => {
+        if (snapshot?.val().first_name && snapshot?.val().last_name) {
+          setFirstName(snapshot?.val().first_name);
+          setLastName(snapshot?.val().last_name);
+        }
+      });
+  }
+
+  function pushReport() {
+    setIsFABLoading(!isFABLoading);
+    database()
+      .ref(`/reports/${auth().currentUser.uid}`)
+      .set({
+        uid: auth().currentUser.uid,
+        first_name: firstName,
+        last_name: lastName,
+        report_message: ReportText,
+        time: Date.now(),
+      })
+      .then(() => {
+        setIsFABLoading(!isFABLoading);
+        SuccessToast(
+          'bottom',
+          'Report Delivered',
+          'Thank you for reporting bugs to our server',
+          true,
+          4000,
+        );
+        navigation.goBack();
+      })
+      .catch(error => {
+        ErrorToast(
+          'bottom',
+          'Reporting Failed',
+          'An error occurred when sending your rapport',
+          true,
+          4000,
+        );
+        navigation.goBack();
+        setIsFABLoading(!isFABLoading);
+      });
+  }
+
+  const hasMoreLength = () => {
     return ReportText.length > 241;
   };
+
+  const hasLessLength = () => {
+    return ReportText.length < 20;
+  };
+
+  useEffect(() => {
+    getUserData();
+    addNetInfoObserver();
+    return () => {};
+  }, []);
 
   return (
     <BaseView>
@@ -85,9 +171,15 @@ const ReportProblem = () => {
         }}
         onChangeText={onReportTextChange}
       />
-      <HelperText type="error" visible={hasErrors()}>
-        Report message must be less than 240 characters.
-      </HelperText>
+      {hasMoreLength() ? (
+        <HelperText type="error" visible={hasMoreLength()}>
+          Report message must be less than 240 characters.
+        </HelperText>
+      ) : (
+        <HelperText type="info" visible={hasLessLength()}>
+          Report message must be longer than 20 characters.
+        </HelperText>
+      )}
       <FAB
         style={styles.fab}
         normal
@@ -101,9 +193,27 @@ const ReportProblem = () => {
           },
         }}
         onPress={() => {
-          setIsFABLoading(!isFABLoading);
-          console.log(ReportText);
-          setIsFABLoading(!isFABLoading);
+          if (isConnected) {
+            if (!hasMoreLength() && !hasLessLength()) {
+              pushReport();
+            } else {
+              ErrorToast(
+                'bottom',
+                'Invalid report message',
+                'Report message must be between 20 and 240 characters',
+                true,
+                4000,
+              );
+            }
+          } else {
+            ErrorToast(
+              'bottom',
+              'Network unavailable',
+              'Network connection is needed to send bug reports',
+              true,
+              4000,
+            );
+          }
         }}
       />
     </BaseView>
@@ -155,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ReportProblem);
+export default React.memo(ReportProblemScreen);

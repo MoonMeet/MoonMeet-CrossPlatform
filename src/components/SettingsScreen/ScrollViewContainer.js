@@ -1,7 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
+
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
+import DataItemCustom from './DataItemCustom';
 
 import EditIcon from '../../assets/images/create.png';
 import DarkModeIcon from '../../assets/images/dark_mode.png';
@@ -18,13 +20,23 @@ import FAQIcon from '../../assets/images/quiz.png';
 import ReportIcon from '../../assets/images/bug.png';
 
 import {COLORS} from '../../config/Miscellaneous';
-import DataItemCustom from './DataItemCustom';
-import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+
 import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
 import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/FrequentlyAskedQuestions';
 
-const ScrollViewContainer = () => {
+import Clipboard from '@react-native-clipboard/clipboard';
+import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
+
+interface ScrollViewContainerInterface {
+  firstName: string;
+  lastName: string;
+  username: string;
+  avatar: string;
+}
+
+const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const navigation = useNavigation();
   const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
   const [FAQVisible, setFAQVisible] = React.useState(false);
@@ -43,6 +55,7 @@ const ScrollViewContainer = () => {
         descriptionText={'System'}
         descriptionColor={COLORS.black}
         onPressTrigger={null}
+        onLongPressTrigger={null}
       />
       <DataItemTitle titleItem={'Account'} />
       <DataItem
@@ -91,7 +104,8 @@ const ScrollViewContainer = () => {
         enableDescription={true}
         descriptionText={'Online now'}
         descriptionColor={COLORS.black}
-        onPressTrigger={null}
+        onPressTrigger={() => navigation.navigate('activeStatus')}
+        onLongPressTrigger={null}
       />
       <DataItemCustom
         leftIcon={UsernameIcon}
@@ -102,9 +116,29 @@ const ScrollViewContainer = () => {
         iconColor={COLORS.white}
         titleColor={COLORS.black}
         enableDescription={true}
-        descriptionText={'MoonMeet.me/JohnnyK1920'}
+        descriptionText={props.username}
         descriptionColor={COLORS.black}
-        onPressTrigger={null}
+        onPressTrigger={() => navigation.navigate('changeUsername')}
+        onLongPressTrigger={() => {
+          try {
+            Clipboard.setString(props.username);
+            SuccessToast(
+              'bottom',
+              'Copied!',
+              'Your username is copied successfully to Clipboard',
+              true,
+              4000,
+            );
+          } catch (e) {
+            ErrorToast(
+              'bottom',
+              'Error Copying!',
+              'An error occurred when copying your username',
+              true,
+              4000,
+            );
+          }
+        }}
       />
       <DataItemTitle titleItem={'Settings'} />
       <DataItem

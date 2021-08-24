@@ -12,6 +12,7 @@ interface DataItemCustomInterface {
   imageSize: Number;
   iconColor: string;
   onPressTrigger: Function;
+  onLongPressTrigger: Function;
   titleColor: string;
   enableDescription: boolean;
   descriptionText: string;
@@ -23,6 +24,7 @@ const DataItemCustom = (props: DataItemCustomInterface) => {
     <Pressable
       android_ripple={{color: props.rippleColor}}
       onPress={props.onPressTrigger}
+      onLongPress={props.onLongPressTrigger}
       style={styles.titleViewContainer}>
       <Avatar.Icon
         icon={props.leftIcon}
