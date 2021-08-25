@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -6,10 +6,59 @@ import {Avatar, HelperText, Switch, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
+import NetInfo from '@react-native-community/netinfo';
+import {
+  ErrorToast,
+  SuccessToast,
+} from '../components/ToastInitializer/ToastInitializer';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 const ActiveStatusScreen = () => {
   const navigation = useNavigation();
+
+  /**
+   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   */
+  let isConnected = NetInfo.fetch().then(networkState => {
+    isConnected = networkState?.isConnected;
+  });
+
+  const [newActiveTime, setNewActiveTime] = React.useState('');
+
+  const getUserActiveStatus = () => {
+    database()
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .on('value', snapshot => {
+        if (snapshot?.val().active_status && snapshot?.val().active_time) {
+          if (snapshot?.val().active_status === 'normal') {
+            setSwitchState(true);
+          } else {
+            setSwitchState(false);
+          }
+          setNewActiveTime(snapshot?.val().active_time);
+        }
+      });
+  };
+
+  /**
+   * Dummy NetInfoObserver
+   */
+
+  const addNetInfoObserver = () => {
+    NetInfo.addEventListener(networkState => {
+      console.info(networkState.details);
+      console.info(networkState.type);
+    });
+  };
+
   const [switchState, setSwitchState] = React.useState(false);
+
+  useEffect(() => {
+    addNetInfoObserver();
+    getUserActiveStatus();
+    return () => {};
+  }, []);
   return (
     <MiniBaseView>
       <View style={styles.toolbar}>
@@ -48,7 +97,45 @@ const ActiveStatusScreen = () => {
           <Switch
             value={switchState}
             color={COLORS.accentLight}
-            onValueChange={() => setSwitchState(!switchState)}
+            onValueChange={() => {
+              if (isConnected) {
+                setSwitchState(!switchState);
+                database()
+                  .ref(`/users/${auth()?.currentUser.uid}`)
+                  .update({
+                    active_status: switchState === true ? 'recently' : 'normal',
+                    active_time:
+                      newActiveTime === 'Last seen recently'
+                        ? Date.now()
+                        : 'Last seen recently',
+                  })
+                  .then(() => {
+                    SuccessToast(
+                      'bottom',
+                      'Active status changed',
+                      "You're active status has changed",
+                      true,
+                      4000,
+                    );
+                    navigation.goBack();
+                  })
+                  .catch(() => {
+                    ErrorToast(
+                      'bottom',
+                      'Changing active status failed',
+                      'An error occurred when changing your Active Status',
+                    );
+                  });
+              } else {
+                ErrorToast(
+                  'bottom',
+                  'Network unavailable',
+                  'Network connection is needed to change your active status',
+                  true,
+                  4000,
+                );
+              }
+            }}
           />
         </View>
       </View>

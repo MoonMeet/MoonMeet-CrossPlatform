@@ -87,7 +87,7 @@ const ReportProblemScreen = () => {
         ErrorToast(
           'bottom',
           'Reporting Failed',
-          'An error occurred when sending your rapport',
+          'An error occurred when sending your report',
           true,
           4000,
         );

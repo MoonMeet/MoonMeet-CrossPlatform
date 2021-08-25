@@ -1,13 +1,12 @@
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
-import BigList from 'react-native-big-list';
 
 const MessagesList = ({ListData}) => {
   return (
     <View style={{flex: 1}}>
-      <BigList
+      <FlatList
         data={ListData}
         contentContainerStyle={{
           paddingStart: '1%',

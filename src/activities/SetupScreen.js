@@ -240,6 +240,8 @@ const SetupScreen = ({route}) => {
                   first_name: firstName,
                   last_name: lastName,
                   avatar: avatarUrl,
+                  active_status: 'normal',
+                  active_time: Date.now(),
                 })
                 .then(() => {
                   navigation.navigate('home');

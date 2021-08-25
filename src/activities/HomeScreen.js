@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   toolbar: {
     padding: '2%',
     flexDirection: 'row',
-    elevation: 3,
+    elevation: 0,
   },
   top_text: {
     position: 'relative',
