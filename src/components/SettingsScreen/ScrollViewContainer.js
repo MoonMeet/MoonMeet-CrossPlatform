@@ -28,12 +28,16 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
+import transformTime from '../../utils/TimeHandler/TimeHandler';
 
 interface ScrollViewContainerInterface {
   firstName: string;
   lastName: string;
   username: string;
   avatar: string;
+  userBio: string;
+  activeStatus: string;
+  activeTime: string;
 }
 
 const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
@@ -102,7 +106,11 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         iconColor={COLORS.white}
         titleColor={COLORS.black}
         enableDescription={true}
-        descriptionText={'Online now'}
+        descriptionText={
+          props.activeStatus === 'recently'
+            ? 'Last seen recently'
+            : transformTime(props?.activeTime)
+        }
         descriptionColor={COLORS.black}
         onPressTrigger={() => navigation.navigate('activeStatus')}
         onLongPressTrigger={null}

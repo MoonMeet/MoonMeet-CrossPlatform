@@ -11,79 +11,45 @@ import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
+
   const [avatarURL, setAvatarURL] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [userName, setUserName] = React.useState('');
-  const fetchUser = () => {
-    database()
+  const [userBio, setUserBio] = React.useState('');
+  const [activeStatus, setActiveStatus] = React.useState('');
+  const [activeTime, setActiveTime] = React.useState('');
+
+  useEffect(() => {
+    const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
       .on('value', snapshot => {
         if (
           snapshot?.val().avatar &&
           snapshot?.val().first_name &&
           snapshot?.val().last_name &&
-          snapshot?.val().username
+          snapshot?.val().username &&
+          snapshot?.val().active_status &&
+          snapshot?.val().active_time
         ) {
           setAvatarURL(snapshot?.val().avatar);
           setFirstName(snapshot?.val().first_name);
           setLastName(snapshot?.val().last_name);
           setUserName(snapshot?.val().username);
+          setActiveStatus(snapshot?.val().active_status);
+          setActiveTime(snapshot?.val().active_time);
+          if (snapshot?.val().bio) {
+            setUserBio(snapshot?.val().bio);
+          }
         }
       });
-  };
-  useEffect(() => {
-    fetchUser();
-    return () => {};
+    return () => {
+      database()
+        .ref(`/users/${auth()?.currentUser.uid}`)
+        .off('value', onValueChange);
+    };
   }, []);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.primaryLight,
-    },
-    under_header: {
-      padding: '2%',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    left_side: {
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      flexDirection: 'row',
-    },
-    mid_side: {
-      flex: 2,
-      backgroundColor: 'white',
-      flexDirection: 'row',
-      alignItems: 'center',
-      fontSize: 18,
-      marginLeft: '2.5%',
-      marginRight: '2.5%',
-    },
-    toolbar: {
-      padding: '2%',
-      flexDirection: 'row',
-    },
-    toolbar_text: {
-      fontSize: 22,
-      paddingLeft: '2%',
-      paddingRight: '3%',
-      textAlign: 'center',
-      color: COLORS.black,
-      fontFamily: FONTS.regular,
-    },
-    under_header_text: {
-      position: 'relative',
-      fontSize: 24,
-      paddingLeft: '3%',
-      paddingRight: '3%',
-      paddingTop: '1%',
-      textAlign: 'center',
-      color: COLORS.black,
-      fontFamily: FONTS.regular,
-    },
-  });
   return (
     <MiniBaseView>
       <View style={styles.toolbar}>
@@ -124,15 +90,93 @@ const SettingsScreen = () => {
           <Text style={styles.under_header_text}>
             {firstName + ' ' + lastName}
           </Text>
+          {userBio ? (
+            <Text
+              onPress={() => navigation.navigate('addBio')}
+              style={styles.bioText(userBio)}>
+              {userBio}
+            </Text>
+          ) : (
+            <Text
+              style={styles.bioText(userBio)}
+              onPress={() => navigation.navigate('addBio')}>
+              Tap to add a bio
+            </Text>
+          )}
         </View>
         <ScrollViewData
           firstName={firstName}
           lastName={lastName}
           username={userName}
           avatar={avatarURL}
+          userbio={userBio}
+          activeStatus={activeStatus}
+          activeTime={activeTime}
         />
       </ScrollView>
     </MiniBaseView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.primaryLight,
+  },
+  under_header: {
+    padding: '2%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  left_side: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  mid_side: {
+    flex: 2,
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontSize: 18,
+    marginLeft: '2.5%',
+    marginRight: '2.5%',
+  },
+  toolbar: {
+    padding: '2%',
+    flexDirection: 'row',
+  },
+  toolbar_text: {
+    fontSize: 22,
+    paddingLeft: '2%',
+    paddingRight: '3%',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  under_header_text: {
+    position: 'relative',
+    fontSize: 24,
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    paddingTop: '1%',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  bioText: userBio => {
+    return {
+      position: 'relative',
+      fontSize: 16,
+      paddingLeft: '2.5%',
+      paddingRight: '2.5%',
+      paddingTop: '1%',
+      textAlign: 'center',
+      color: COLORS.black,
+      opacity: userBio ? 0.6 : 0.4,
+      fontFamily: FONTS.regular,
+    };
+  },
+});
+
 export default React.memo(SettingsScreen);

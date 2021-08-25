@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react';
-import BaseView from '../components/BaseView/BaseView';
 import {StyleSheet, Text, View} from 'react-native';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+import BaseView from '../components/BaseView/BaseView';
 import {
   Avatar,
   FAB,
@@ -9,6 +8,7 @@ import {
   TextInput,
   TouchableRipple,
 } from 'react-native-paper';
+import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
@@ -17,12 +17,18 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import NetInfo from '@react-native-community/netinfo';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import NetInfo from '@react-native-community/netinfo';
 
-const ChangeUsernameScreen = () => {
+const AddBioActivity = () => {
   const navigation = useNavigation();
+
+  const [BioText, setBioText] = React.useState('');
+  const [oldBioText, setOldBioText] = React.useState('');
+  const onBioTextChange = _bioText => setBioText(_bioText);
+
+  const [isFABLoading, setIsFABLoading] = React.useState(false);
 
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
@@ -31,32 +37,13 @@ const ChangeUsernameScreen = () => {
     isConnected = networkState?.isConnected;
   });
 
-  /**
-   * Dummy NetInfoObserver
-   */
-
-  const addNetInfoObserver = () => {
-    NetInfo.addEventListener(networkState => {
-      console.info(networkState.details);
-      console.info(networkState.type);
-    });
-  };
-
-  const [isFABLoading, setIsFABLoading] = React.useState(false);
-
-  const [UsernameText, setUsernameText] = React.useState('');
-
-  const [oldUsernameText, setOldUsernameText] = React.useState('');
-
-  const onUsernameTextChange = _usernameText => setUsernameText(_usernameText);
-
   useEffect(() => {
     const onValueChange = database()
-      .ref(`/users/${auth().currentUser.uid}`)
+      .ref(`/users/${auth()?.currentUser.uid}`)
       .on('value', snapshot => {
-        if (snapshot?.val().username) {
-          setUsernameText(snapshot?.val().username);
-          setOldUsernameText(snapshot?.val().username);
+        if (snapshot?.val().bio) {
+          setBioText(snapshot?.val().bio);
+          setOldBioText(snapshot?.val().bio);
         }
       });
     return () => {
@@ -66,19 +53,23 @@ const ChangeUsernameScreen = () => {
     };
   }, []);
 
-  function pushUsername() {
+  const hasMoreLength = () => {
+    return BioText.length > 71;
+  };
+
+  function pushBio() {
     setIsFABLoading(!isFABLoading);
     database()
       .ref(`/users/${auth().currentUser.uid}`)
       .update({
-        username: UsernameText,
+        bio: BioText,
       })
       .then(() => {
         setIsFABLoading(!isFABLoading);
         SuccessToast(
           'bottom',
-          'Username updated',
-          'You have successfully changed your username.',
+          'Bio updated',
+          'You have successfully changed your Bio.',
           true,
           4000,
         );
@@ -87,8 +78,8 @@ const ChangeUsernameScreen = () => {
       .catch(error => {
         ErrorToast(
           'bottom',
-          'Updating Failed',
-          'An error occurred while updating your username.',
+          'Reporting Failed',
+          'An error occurred when sending your report.',
           true,
           4000,
         );
@@ -96,14 +87,6 @@ const ChangeUsernameScreen = () => {
         setIsFABLoading(!isFABLoading);
       });
   }
-
-  const hasMoreLength = () => {
-    return UsernameText.length > 30;
-  };
-
-  const hasLessLength = () => {
-    return UsernameText.length < 6;
-  };
 
   return (
     <BaseView>
@@ -133,7 +116,7 @@ const ChangeUsernameScreen = () => {
           </TouchableRipple>
         </View>
         <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Change Username</Text>
+          <Text style={styles.toolbar_text}>Add Bio</Text>
         </View>
       </View>
       <Spacer height={'1%'} />
@@ -145,10 +128,10 @@ const ChangeUsernameScreen = () => {
           paddingTop: '1%',
         }}
         mode="outlined"
-        label="Change username"
+        label="Add a bio"
         multiline={false}
-        value={UsernameText}
-        placeholder={'Type your new username here.'}
+        value={BioText}
+        placeholder={'Type your new bio here.'}
         theme={{
           colors: {
             text: COLORS.black,
@@ -160,23 +143,15 @@ const ChangeUsernameScreen = () => {
             outlineColor: '#566193',
           },
         }}
-        onChangeText={onUsernameTextChange}
+        onChangeText={onBioTextChange}
       />
       <HelperText type="info" visible={true}>
-        You can choose a username on Moon Meet, if you do, people will be able
-        to find you by this username and contact you without needing your phone
-        number.
+        You can add a few lines about yourself. Anyone who opens your profile
+        will see this text.
       </HelperText>
-      {hasMoreLength() ? (
-        <HelperText type="error" visible={hasMoreLength()}>
-          Username must be less than 30 characters.
-        </HelperText>
-      ) : (
-        <HelperText type="info" visible={hasLessLength()}>
-          Username message can contains a-z, 0-9 and underscores and must be
-          longer than 5 characters.
-        </HelperText>
-      )}
+      <HelperText type="error" visible={hasMoreLength()}>
+        Bio text must be less or equal 70 characters.
+      </HelperText>
       <FAB
         style={styles.fab}
         normal
@@ -191,11 +166,11 @@ const ChangeUsernameScreen = () => {
         }}
         onPress={() => {
           if (isConnected) {
-            if (!hasMoreLength() && !hasLessLength()) {
-              if (UsernameText === oldUsernameText) {
+            if (!hasMoreLength()) {
+              if (BioText === oldBioText) {
                 navigation.goBack();
               } else {
-                pushUsername();
+                pushBio();
               }
             } else {
               ErrorToast(
@@ -254,4 +229,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default React.memo(ChangeUsernameScreen);
+export default React.memo(AddBioActivity);

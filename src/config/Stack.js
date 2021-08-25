@@ -19,6 +19,7 @@ import ReportProblem from '../activities/ReportProblemScreen';
 import Toast from 'react-native-toast-message';
 import ActiveStatusScreen from '../activities/ActiveStatusScreen';
 import ChangeUsernameScreen from '../activities/ChangeUsernameScreen';
+import AddBioActivity from '../activities/AddBioActivity';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,7 @@ const StackNavigator = () => {
           name={'changeUsername'}
           component={ChangeUsernameScreen}
         />
+        <Stack.Screen name={'addBio'} component={AddBioActivity} />
       </Stack.Navigator>
       <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>

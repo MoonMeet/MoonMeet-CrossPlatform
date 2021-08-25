@@ -50,17 +50,6 @@ const ReportProblemScreen = () => {
 
   const onReportTextChange = _reportText => setReportText(_reportText);
 
-  function getUserData() {
-    database()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().first_name && snapshot?.val().last_name) {
-          setFirstName(snapshot?.val().first_name);
-          setLastName(snapshot?.val().last_name);
-        }
-      });
-  }
-
   function pushReport() {
     setIsFABLoading(!isFABLoading);
     database()
@@ -77,7 +66,7 @@ const ReportProblemScreen = () => {
         SuccessToast(
           'bottom',
           'Report Delivered',
-          'Thank you for reporting bugs to our server',
+          'Thank you for reporting bugs to our server.',
           true,
           4000,
         );
@@ -87,7 +76,7 @@ const ReportProblemScreen = () => {
         ErrorToast(
           'bottom',
           'Reporting Failed',
-          'An error occurred when sending your report',
+          'An error occurred while sending your report.',
           true,
           4000,
         );
@@ -97,17 +86,27 @@ const ReportProblemScreen = () => {
   }
 
   const hasMoreLength = () => {
-    return ReportText.length > 241;
+    return ReportText.length > 240;
   };
 
   const hasLessLength = () => {
-    return ReportText.length < 20;
+    return ReportText.length < 19;
   };
 
   useEffect(() => {
-    getUserData();
-    addNetInfoObserver();
-    return () => {};
+    const onValueChange = database()
+      .ref(`/users/${auth().currentUser.uid}`)
+      .on('value', snapshot => {
+        if (snapshot?.val().first_name && snapshot?.val().last_name) {
+          setFirstName(snapshot?.val().first_name);
+          setLastName(snapshot?.val().last_name);
+        }
+      });
+    return () => {
+      database()
+        .ref(`/users/${auth()?.currentUser.uid}`)
+        .off('value', onValueChange);
+    };
   }, []);
 
   return (
@@ -141,7 +140,7 @@ const ReportProblemScreen = () => {
           <Text style={styles.toolbar_text}>What happened ?</Text>
         </View>
       </View>
-      <Spacer height={'2.5%'} />
+      <Spacer height={'1%'} />
       <Text style={styles.bugInfo}>
         We will need to help as soon as you describe the problem in the
         paragraphs bellow
@@ -200,7 +199,7 @@ const ReportProblemScreen = () => {
               ErrorToast(
                 'bottom',
                 'Invalid report message',
-                'Report message must be between 20 and 240 characters',
+                'Report message must be between 20 and 240 characters.',
                 true,
                 4000,
               );
@@ -209,7 +208,7 @@ const ReportProblemScreen = () => {
             ErrorToast(
               'bottom',
               'Network unavailable',
-              'Network connection is needed to send bug reports',
+              'Network connection is needed to send bug reports.',
               true,
               4000,
             );
