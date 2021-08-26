@@ -44,8 +44,6 @@ const EditProfileScreen = () => {
 
   const [PickerActionSheet, setPickerActionSheet] = React.useState(false);
 
-  const [newAvatarURL, setNewAvatarURL] = React.useState('');
-
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
   const onFirstnameTextChange = _firstnameText => setFirstName(_firstnameText);
@@ -57,12 +55,10 @@ const EditProfileScreen = () => {
     const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
       .on('value', snapshot => {
-        if (
-          snapshot?.val().avatar &&
-          snapshot?.val().first_name &&
-          snapshot?.val().last_name
-        ) {
-          setAvatarURL(snapshot?.val().avatar);
+        if (snapshot?.val().first_name && snapshot?.val().last_name) {
+          if (snapshot?.val().avatar) {
+            setAvatarURL(snapshot?.val().avatar);
+          }
           setFirstName(snapshot?.val().first_name);
           setLastName(snapshot?.val().last_name);
 
@@ -85,7 +81,7 @@ const EditProfileScreen = () => {
     return lastName.length < 3;
   };
 
-  function pushUserData() {
+  async function pushUserData() {
     setIsFABLoading(!isFABLoading);
     let _avatarRef = `avatars/${
       auth()?.currentUser?.uid
@@ -101,41 +97,30 @@ const EditProfileScreen = () => {
     const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
     /**
-     * Add observer to image uploading.
-     */
-
-    uploadImageTask.on('state_changed', taskSnapshot => {
-      console.log(
-        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-      );
-    });
-
-    /**
      * an async function to get {avatarUrl} and upload all user data.
      */
     uploadImageTask.then(async () => {
-      let _avatar = await storage().ref(_avatarRef).getDownloadURL();
-      console.warn(_avatar);
-      setNewAvatarURL(_avatar);
-      database()
-        .ref(`/users/${auth().currentUser.uid}`)
-        .set({
-          avatar: newAvatarURL,
-        })
-        .then(() => {
-          pushNames();
-        })
-        .catch(error => {
-          setIsFABLoading(!isFABLoading);
-          ErrorToast(
-            'bottom',
-            'Avatar update failed',
-            'An error occurred when updating your avatar.',
-            true,
-            4000,
-          );
-        });
+      const _avatar = await storage().ref(_avatarRef).getDownloadURL();
+      pushImage(_avatar);
     });
+  }
+
+  function pushImage(pureImageUrl) {
+    database()
+      .ref(`/users/${auth().currentUser.uid}`)
+      .update({
+        avatar: pureImageUrl,
+      })
+      .catch(error => {
+        setIsFABLoading(!isFABLoading);
+        ErrorToast(
+          'bottom',
+          'Avatar update failed',
+          'An error occurred when updating your avatar.',
+          true,
+          4000,
+        );
+      });
   }
 
   function pushNames() {
@@ -154,7 +139,6 @@ const EditProfileScreen = () => {
           true,
           4000,
         );
-        navigation.goBack();
       })
       .catch(error => {
         setIsFABLoading(!isFABLoading);
@@ -343,8 +327,11 @@ const EditProfileScreen = () => {
               } else {
                 if (UserPhoto) {
                   pushUserData();
+                  pushImage();
                 }
-                pushNames();
+                if (firstName !== oldFirstname || lastName !== oldLastname) {
+                  pushNames();
+                }
               }
             } else {
               ErrorToast(
@@ -383,6 +370,7 @@ const EditProfileScreen = () => {
         onFilePicker={() => {
           openImagePicker()
             .then(image => {
+              console.log(image);
               setUserPhoto(image);
             })
             .catch(e => {
