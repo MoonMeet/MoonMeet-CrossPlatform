@@ -63,7 +63,6 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
                 fontSize: 20,
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
-                opacity: 0.4,
               }}>
               Take photo
             </Text>
@@ -81,7 +80,6 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
                 fontSize: 20,
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
-                opacity: 0.4,
               }}>
               Upload from Gallery
             </Text>

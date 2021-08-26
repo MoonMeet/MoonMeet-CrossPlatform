@@ -21,7 +21,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 
-const AddBioActivity = () => {
+const AddBioScreen = () => {
   const navigation = useNavigation();
 
   const [BioText, setBioText] = React.useState('');
@@ -229,4 +229,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default React.memo(AddBioActivity);
+export default React.memo(AddBioScreen);

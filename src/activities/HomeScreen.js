@@ -33,19 +33,19 @@ const HomeScreen = () => {
   const [showStoriesOrOnline, setShowStoriesOrOnline] = React.useState(false);
 
   useEffect(() => {
-    fetchAvatar();
-    return () => {};
-  }, []);
-
-  const fetchAvatar = () => {
-    database()
+    const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
       .on('value', snapshot => {
         if (snapshot?.val().avatar) {
           setAvatarURL(snapshot?.val().avatar);
         }
       });
-  };
+    return () => {
+      database()
+        .ref(`/users/${auth()?.currentUser.uid}`)
+        .off('value', onValueChange);
+    };
+  }, []);
 
   return (
     <MiniBaseView>

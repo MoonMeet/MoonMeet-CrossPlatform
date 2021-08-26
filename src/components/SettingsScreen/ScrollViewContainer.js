@@ -66,7 +66,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={EditIcon}
         leftIconColor={COLORS.purple}
         titleTextContainer={'Edit profile'}
-        onPressTrigger={null}
+        onPressTrigger={() => navigation.navigate('editProfile')}
       />
       <DataItem
         leftIcon={PassCodeIcon}
@@ -129,7 +129,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         onPressTrigger={() => navigation.navigate('changeUsername')}
         onLongPressTrigger={() => {
           try {
-            Clipboard.setString(props.username);
+            Clipboard.setString(props?.username);
             SuccessToast(
               'bottom',
               'Copied!',
