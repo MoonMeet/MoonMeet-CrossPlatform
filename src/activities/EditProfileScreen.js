@@ -86,65 +86,56 @@ const EditProfileScreen = () => {
   };
 
   function pushUserData() {
-    try {
-      setIsFABLoading(!isFABLoading);
-      if (UserPhoto) {
-        let _userAvatarRef = `avatars/${
-          auth()?.currentUser?.uid
-        }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+    setIsFABLoading(!isFABLoading);
+    let _avatarRef = `avatars/${
+      auth()?.currentUser?.uid
+    }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
 
-        const storageRef = storage().ref(_userAvatarRef);
+    const storageRef = storage().ref(_avatarRef);
 
-        /**
-         * Uploading image to Firebase Storage
-         * @type {FirebaseStorageTypes.Task}
-         */
+    /**
+     * Uploading image to Firebase Storage
+     * @type {FirebaseStorageTypes.Task}
+     */
 
-        const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+    const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
-        /**
-         * Add observer to image uploading.
-         */
+    /**
+     * Add observer to image uploading.
+     */
 
-        uploadImageTask.on('state_changed', taskSnapshot => {
-          console.log(
-            `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+    uploadImageTask.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+      );
+    });
+
+    /**
+     * an async function to get {avatarUrl} and upload all user data.
+     */
+    uploadImageTask.then(async () => {
+      let _avatar = await storage().ref(_avatarRef).getDownloadURL();
+      console.warn(_avatar);
+      setNewAvatarURL(_avatar);
+      database()
+        .ref(`/users/${auth().currentUser.uid}`)
+        .set({
+          avatar: newAvatarURL,
+        })
+        .then(() => {
+          pushNames();
+        })
+        .catch(error => {
+          setIsFABLoading(!isFABLoading);
+          ErrorToast(
+            'bottom',
+            'Avatar update failed',
+            'An error occurred when updating your avatar.',
+            true,
+            4000,
           );
         });
-
-        /**
-         * an async function to get {avatarUrl} and upload all user data.
-         */
-        uploadImageTask.then(async () => {
-          let _avatar = await storage().ref(_userAvatarRef).getDownloadURL();
-          console.warn(_avatar);
-          setNewAvatarURL(_avatar);
-        });
-        database()
-          .ref(`/users/${auth().currentUser.uid}`)
-          .update({
-            avatar:
-              newAvatarURL !== avatarURL
-                ? newAvatarURL
-                : 'https://www.google.com/',
-          })
-          .then(() => {
-            pushNames();
-          })
-          .catch(error => {
-            setIsFABLoading(!isFABLoading);
-            ErrorToast(
-              'bottom',
-              'Avatar update failed',
-              'An error occurred when updating your avatar.',
-              true,
-              4000,
-            );
-          });
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    });
   }
 
   function pushNames() {
@@ -350,7 +341,10 @@ const EditProfileScreen = () => {
               ) {
                 navigation.goBack();
               } else {
-                pushUserData();
+                if (UserPhoto) {
+                  pushUserData();
+                }
+                pushNames();
               }
             } else {
               ErrorToast(
@@ -389,7 +383,6 @@ const EditProfileScreen = () => {
         onFilePicker={() => {
           openImagePicker()
             .then(image => {
-              console.log(image);
               setUserPhoto(image);
             })
             .catch(e => {
