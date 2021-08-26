@@ -9,8 +9,6 @@ interface FAQInterface {
   isVisible: boolean;
   hideModal: Function;
 }
-const a =
-  "Q&A 6 : can i delete a message ?\n\n— Yes you can delete your messages anytime.\n\nQ&A 7 : can i change my informations ?\n\n— Yes, you can change them anytime.\n\nQ&A 8 : can i delete my account ?\n\n-- Sure, you can delete your accountn anytime.\n\nQ&A 9 : who can see me online ?\n\n-- Anyone in the platform can see you online because Moon Meet is a fully public platform.\n\nQ&A 10 : are our passwords in safety ?\n\n-- of Course ! your passwords are fully hashed and no one can see it.\n\nQ&A 11 : who is behind Moon Meet ?\n\n-- Behind Moon Meet, there is Aziz Becha ( Co, Founder & Web Developer) And Rayen Mark ( CO, Founder & Mobile Developer) and we are from Tunisia.\n\nQ&A 12 : can i report a problem ?\n\n-- Sure ! reporting bugs / problems is the duty of everyone on our platform !\n\nQ&A 13 : can i help to improove this platform ?\n\n-- Yes, if you have some good ideas you can share it with us and be one of the contributors.\n\nQ&A 14 : who can see my profile ?\n\n-- Everyone on the platform can see your profile, but he cannot see your phon number for security purposes.\n\nQ&A 15 : which informations can Moon Meet gather about me ?\n\n-- Moon Meet collects public informations about you like firtname, lastname, birth date, username, bio, email (shortly, the informations that you enter while doing the registration.)';";
 const FrequentlyAskedQuestions = (props: FAQInterface) => {
   return (
     <Modal
@@ -57,7 +55,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 3: Why Moon Meet?</Text>
           <Text style={styles.subText}>
-            of course it's your choice to use our application and our special
+            Of course it's your choice to use our application and our special
             platform.
           </Text>
           <Text style={styles.subText}>Q&A: How i can get Moon Meet ?</Text>
@@ -83,9 +81,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 8: Who can see me online ?</Text>
           <Text style={styles.subText}>
-            Anyone in the platform can see you online because Moon Meet is a
-            fully public platform but don't worry, you can change it to Last
-            Seen Recently from Settings.
+            By default, your active status is visible to everyone. You can hide your online status from the settings anytime
           </Text>
           <Text style={styles.subText}>Q&A 9: Who is Behind Moon Meet ?</Text>
           <Text style={styles.subText}>
