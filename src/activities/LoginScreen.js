@@ -190,15 +190,16 @@ const LoginScreen = () => {
    * get Country code from internet API
    * @return {NaN, String} data to {CountryText}
    */
-  const getCountryCodeFromApi = () => {
+  const getCountryCodeFromApi = async () => {
     try {
       const ApiURL = 'https://ipapi.co/country_calling_code';
-      fetch(ApiURL)
+      await fetch(ApiURL)
         .then(function (_countryDialCode) {
           return _countryDialCode.text();
         })
         .then(function (data) {
           CountrySetText(data);
+          console.log(data);
         });
     } catch (e) {
       console.error(e);

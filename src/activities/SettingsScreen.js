@@ -101,7 +101,6 @@ const SettingsScreen = () => {
           tintColor={COLORS.accentLight}
           title={"Swipe to refresh"}
         />}
-      
       >
         <View style={styles.under_header}>
           <Avatar.Image
