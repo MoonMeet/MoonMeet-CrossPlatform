@@ -8,19 +8,7 @@ import auth from '@react-native-firebase/auth';
 import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
-import {
-  getApplicationName,
-  getBrand,
-  getDevice,
-  getDeviceName,
-  getDeviceType,
-  getManufacturer,
-  getModel,
-  getProduct,
-  getSystemName,
-  getSystemVersion,
-  getVersion,
-} from 'react-native-device-info';
+
 const wait = (timeout) => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
