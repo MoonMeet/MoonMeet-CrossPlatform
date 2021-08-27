@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -44,6 +44,26 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const navigation = useNavigation();
   const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
   const [FAQVisible, setFAQVisible] = React.useState(false);
+  
+  const DevicesScreen = Platform.select({
+    ios: () => (
+      <DataItem
+        leftIcon={DevicesIcon}
+        leftIconColor={COLORS.amazingPurple}
+        titleTextContainer={'Devices'}
+        onPressTrigger={() => navigation.navigate('devices')}
+      />
+    ),
+    android: () => (
+      <DataItem
+        leftIcon={DevicesIcon}
+        leftIconColor={COLORS.amazingPurple}
+        titleTextContainer={'Devices'}
+        onPressTrigger={() => navigation.navigate('devices')}
+      />
+    ),
+    default: () => <View />,
+  });
   return (
     <View>
       <DataItemTitle titleItem={'Miscellaneous'} />
@@ -161,12 +181,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleTextContainer={'Chat Settings'}
         onPressTrigger={null}
       />
-      <DataItem
-        leftIcon={DevicesIcon}
-        leftIconColor={COLORS.amazingPurple}
-        titleTextContainer={'Devices'}
-        onPressTrigger={null}
-      />
+      <DevicesScreen />
       <DataItemTitle titleItem={'Help'} />
       <DataItem
         leftIcon={PriPoIcon}
