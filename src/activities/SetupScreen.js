@@ -9,6 +9,14 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import {useNavigation} from '@react-navigation/native';
+import {
+  getManufacturer,
+  getModel,
+  getProduct,
+  getSystemName,
+  getSystemVersion,
+  getVersion,
+} from 'react-native-device-info';
 
 const SetupScreen = ({route}) => {
   /**
@@ -53,6 +61,25 @@ const SetupScreen = ({route}) => {
    */
 
   const navigation = useNavigation();
+
+  /**
+   * Used for getting Device Information, useful for DeviceScreen.js
+   */
+
+  const [systemName, setSystemName] = React.useState(getSystemName());
+  const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
+  const [Manufacturer, setManufacturer] = React.useState(
+    getManufacturer().then(manufacturer => {
+      setManufacturer(manufacturer);
+    }),
+  );
+  const [Product, setProduct] = React.useState(
+    getProduct().then(product => {
+      setProduct(product);
+    }),
+  );
+  const [Model, setModel] = React.useState(getModel());
+  const [appVersion, setAppVersion] = React.useState(getVersion());
 
   return (
     <BaseView>
@@ -227,6 +254,28 @@ const SetupScreen = ({route}) => {
               console.log(avatarUrl);
               const trimmedAvatar = avatarUrl.toString();
               console.log(trimmedAvatar);
+
+              /**
+               * pushing device information for later use in DeviceScreen.js
+               */
+
+              const referenceKey = database()
+                .ref(`/devices/${auth()?.currentUser.uid}`)
+                .push().key;
+
+              database()
+                .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
+                .set({
+                  manufacturer: Manufacturer,
+                  system_name: systemName,
+                  system_version: systemVersion,
+                  product: Product,
+                  model: Model,
+                  app_version: appVersion,
+                })
+                .catch(error => {
+                  console.error(error);
+                });
 
               /**
                * Since we got everything except a girlfriend.

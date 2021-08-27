@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Text} from 'react-native-paper';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
-//import {rgbaColor} from 'react-native-reanimated/src/reanimated2/Colors';
 import Modal from 'react-native-modal';
+// import {rgbaColor} from '../../../utils/device/DeviceInfo';
 
 interface LoadingIndicatorInterface {
   isVisible: boolean;
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
-    //backgroundColor: rgba(220, 220, 220, 0.3),
+    // backgroundColor: rgbaColor(220, 220, 220, 0.3),
   },
   loaderText: {
     fontSize: 22,

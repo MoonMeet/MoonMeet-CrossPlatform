@@ -44,7 +44,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const navigation = useNavigation();
   const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
   const [FAQVisible, setFAQVisible] = React.useState(false);
-  
+
   const DevicesScreen = Platform.select({
     ios: () => (
       <DataItem
@@ -62,7 +62,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         onPressTrigger={() => navigation.navigate('devices')}
       />
     ),
-    default: () => <View />,
+    default: () => null,
   });
   return (
     <View>
