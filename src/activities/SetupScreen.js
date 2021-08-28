@@ -20,6 +20,7 @@ import {
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import AsyncStorage from '@react-native-community/async-storage';
+import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 const SetupScreen = ({route}) => {
   /**
@@ -268,25 +269,26 @@ const SetupScreen = ({route}) => {
               /**
                * pushing device information for later use in DeviceScreen.js
                */
+              if (!isWindows && !isWeb) {
+                const referenceKey = database()
+                  .ref(`/devices/${auth()?.currentUser.uid}`)
+                  .push().key;
 
-              const referenceKey = database()
-                .ref(`/devices/${auth()?.currentUser.uid}`)
-                .push().key;
-
-              database()
-                .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
-                .set({
-                  manufacturer: Manufacturer,
-                  system_name: systemName,
-                  system_version: systemVersion,
-                  product: Product,
-                  model: Model,
-                  app_version: appVersion,
-                  time: Date.now(),
-                })
-                .catch(error => {
-                  console.error(error);
-                });
+                database()
+                  .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
+                  .set({
+                    manufacturer: Manufacturer,
+                    system_name: systemName,
+                    system_version: systemVersion,
+                    product: Product,
+                    model: Model,
+                    app_version: appVersion,
+                    time: Date.now(),
+                  })
+                  .catch(error => {
+                    console.error(error);
+                  });
+              }
 
               /**
                * Since we got everything except a girlfriend.

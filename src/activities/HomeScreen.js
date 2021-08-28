@@ -38,20 +38,13 @@ const HomeScreen = () => {
 
   async function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
-      console.log('async' + ' ' + _asyncJwt);
-      console.log('current' + ' ' + currentJwtKey);
       if (_asyncJwt !== currentJwtKey) {
-        console.log('jwt !available');
-        /*
-          auth()
-            ?.signOut()
-            .then(() => {
-              AsyncStorage.removeItem('currentUserJwtKey');
-              navigation.navigate('login');
-            });
-           */
-      } else {
-        console.log('everything is okay');
+        auth()
+          ?.signOut()
+          .then(() => {
+            AsyncStorage.removeItem('currentUserJwtKey');
+            navigation.navigate('login');
+          });
       }
     });
   }
