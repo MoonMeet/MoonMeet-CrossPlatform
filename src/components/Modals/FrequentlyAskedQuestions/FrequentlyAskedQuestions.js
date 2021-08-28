@@ -51,11 +51,11 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           <Text style={styles.subText}>Q&A 2: Who it is for ?</Text>
           <Text style={styles.subText}>
             Moon Meet is allowed for everyone who wanna chat and make
-            Relationships / Friends and care about privacy.
+            Relationships, Friends and care about privacy.
           </Text>
           <Text style={styles.subText}>Q&A 3: Why Moon Meet?</Text>
           <Text style={styles.subText}>
-            Use Moon Meet to chat & communicate assured that all your data / infos are completly secret.
+            Use Moon Meet to chat and communicate assured that all your data and infos are completly secret.
           </Text>
           <Text style={styles.subText}>Q&A: How i can get Moon Meet ?</Text>
           <Text style={styles.subText}>
@@ -72,7 +72,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             Q&A 6: Is my information changeable ?
           </Text>
           <Text style={styles.subText}>
-            Sure, You can change your information at any time.
+            Sure, You can change your informations at any time.
           </Text>
           <Text style={styles.subText}>Q&A 7: Can i delete my account ?</Text>
           <Text style={styles.subText}>
@@ -84,11 +84,11 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 9: Who is Behind Moon Meet ?</Text>
           <Text style={styles.subText}>
-            Behind Moon Meet, There is Rayen Sbai & Aziz Becha and our GitHub Contributors.
+            Behind Moon Meet, There is Rayen Sbai, Aziz Becha and our GitHub Contributors.
           </Text>
           <Text style={styles.subText}>Q&A 10: Can i report a problem ?</Text>
           <Text style={styles.subText}>
-            Sure, Reporting bugs / problems is the duty of everyone on our
+            Sure, Reporting bugs or problems is the duty of everyone on our
             platform.
           </Text>
           <Text style={styles.subText}>
@@ -116,7 +116,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             Q&A 14: My phone has been stolen. Can support help me secure my account ?
           </Text>
           <Text style={styles.subText}>
-            Of course. If you encountr one of those problems like SIM/Phone lost. You can contact our support team who can help you solve your problem.
+            Of course. If you encounter one of those problems like SIM or Phone lost. You can contact our support team who can help you solve your problem.
           </Text>
         </ScrollView>
       </SafeAreaView>
