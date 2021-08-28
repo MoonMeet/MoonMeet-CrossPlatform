@@ -120,17 +120,19 @@ const HomeScreen = () => {
           <Text style={styles.top_text}>Chats</Text>
         </View>
         <View style={styles.right_side}>
-          <Avatar.Icon
-            icon={CreateImage}
-            size={37.5}
-            color={COLORS.black}
-            style={styles.right_icon}
-            theme={{
-              colors: {
-                primary: COLORS.rippleColor,
-              },
-            }}
-          />
+          <Pressable onPress={() => navigation.navigate('discover')}>
+            <Avatar.Icon
+              icon={CreateImage}
+              size={37.5}
+              color={COLORS.black}
+              style={styles.right_icon}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          </Pressable>
         </View>
       </Surface>
       <View

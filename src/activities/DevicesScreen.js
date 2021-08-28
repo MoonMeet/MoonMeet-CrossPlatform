@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, View} from 'react-native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {Avatar, TouchableRipple} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -104,16 +104,17 @@ const DevicesScreen = () => {
         <View style={{flex: 1, alignItems: 'flex-end'}}>
           <Text
             style={styles.underHeaderSmallText}
-            onPress={() => {
-              database()
-                .ref(`/users/${auth().currentUser.uid}`)
-                .update({
-                  jwtKey: newJwtKey,
-                })
-                .then(async () => {
-                  await AsyncStorage.setItem('currentUserJwtKey', newJwtKey);
-                })
-                .catch(error => console.log(error));
+            onPress={async () => {
+              await AsyncStorage.setItem('currentUserJwtKey', newJwtKey).then(
+                () => {
+                  database()
+                    .ref(`/users/${auth().currentUser.uid}`)
+                    .update({
+                      jwtKey: newJwtKey,
+                    })
+                    .catch(error => console.log(error));
+                },
+              );
             }}>
             Online
           </Text>

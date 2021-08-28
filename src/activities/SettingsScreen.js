@@ -9,9 +9,9 @@ import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
-const wait = (timeout) => {
+const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
-}
+};
 const SettingsScreen = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -19,7 +19,6 @@ const SettingsScreen = () => {
     setRefreshing(true);
     wait(1000).then(() => setRefreshing(false));
   }, []);
-
 
   const navigation = useNavigation();
 
@@ -93,15 +92,15 @@ const SettingsScreen = () => {
         </View>
       </View>
       <ScrollView
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={[COLORS.accentLight, COLORS.purple]}
-          tintColor={COLORS.accentLight}
-          title={"Swipe to refresh"}
-        />}
-      >
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[COLORS.accentLight, COLORS.purple]}
+            tintColor={COLORS.accentLight}
+            title={'Swipe to refresh'}
+          />
+        }>
         <View style={styles.under_header}>
           <Avatar.Image
             size={85}
