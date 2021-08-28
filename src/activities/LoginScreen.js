@@ -34,6 +34,8 @@ import ArrowForward from '../assets/images/arrow-forward.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import AsyncStorage from '@react-native-community/async-storage';
+import {initialWindowSafeAreaInsets} from 'react-native-safe-area-context';
 
 const LoginScreen = () => {
   /**
@@ -238,8 +240,16 @@ const LoginScreen = () => {
             .ref(`/users/${auth().currentUser.uid}`)
             .once('value')
             .then(snapshot => {
-              if (snapshot?.val()?.uid) {
-                navigation.navigate('home');
+              if (snapshot?.val()?.uid && snapshot?.val().jwtKey) {
+                AsyncStorage.setItem(
+                  'currentUserJwtKey',
+                  snapshot?.val().jwtKey,
+                ).then(() => {
+                  AsyncStorage.getItem('currentUserJwtKey').then(val => {
+                    console.log(val);
+                  });
+                  navigation.navigate('home');
+                });
               } else {
                 const _username = auth()
                   .currentUser.uid.substring(0, 4)
