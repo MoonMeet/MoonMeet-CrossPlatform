@@ -23,6 +23,7 @@ import AddBioActivity from '../activities/AddBioScreen';
 import EditProfileScreen from '../activities/EditProfileScreen';
 import DevicesScreen from '../activities/DevicesScreen';
 import DiscoverPeopleScreen from '../activities/DiscoverPeopleScreen';
+import StoryScreen from '../activities/StoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ const StackNavigator = () => {
         <Stack.Screen name={'editProfile'} component={EditProfileScreen} />
         <Stack.Screen name={'devices'} component={DevicesScreen} />
         <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />
+        <Stack.Screen name={'story'} component={StoryScreen} />
       </Stack.Navigator>
       <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>

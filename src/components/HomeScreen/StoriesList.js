@@ -3,8 +3,11 @@ import {Avatar} from 'react-native-paper';
 import AddImage from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
 
 const StoriesList = ({CurrentSection, ListData}) => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.storyHolder}>
       <View style={styles.storyHolderLeft}>
@@ -39,6 +42,9 @@ const StoriesList = ({CurrentSection, ListData}) => {
               data={ListData}
               renderItem={({item}) => (
                 <Pressable
+                onPress={() => {
+                  navigation.navigate("story")
+                } }
                   style={{
                     padding: '2%',
                     height: 85,
