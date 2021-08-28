@@ -15,15 +15,33 @@ const DiscoverPeopleScreen = () => {
   const [masterData, setMasterData] = React.useState([]);
 
   useEffect(() => {
-    database()
+    const onValueChange = database()
       .ref('/users/')
       .on('value', snapshot => {
-        masterData.push({
-          ...snapshot.val(),
+        const usersSnapshot = [];
+        snapshot?.forEach(childSnapshot => {
+          if (
+            childSnapshot?.val().avatar &&
+            childSnapshot?.val().first_name &&
+            childSnapshot?.val().last_name &&
+            childSnapshot?.val().active_status &&
+            childSnapshot?.val().active_time
+          ) {
+            usersSnapshot.push({
+              avatar: childSnapshot?.val().avatar,
+              first_name: childSnapshot?.val().first_name,
+              last_name: childSnapshot?.val().last_name,
+              active_status: childSnapshot?.val().active_status,
+              active_time: childSnapshot?.val().active_time,
+            });
+          }
         });
+        setMasterData(usersSnapshot);
         console.log(masterData);
       });
-    return () => {};
+    return () => {
+      database().ref('/users/').off('value', onValueChange);
+    };
   }, []);
   return (
     <MiniBaseView>
@@ -57,7 +75,11 @@ const DiscoverPeopleScreen = () => {
         </View>
       </View>
       <Spacer height={'1%'} />
-      <UserList ListData={masterData} />
+      <UserList
+        ListData={masterData}
+        onPressTrigger={null}
+        onLongPressTrigger={null}
+      />
     </MiniBaseView>
   );
 };
