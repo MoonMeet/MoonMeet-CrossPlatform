@@ -35,7 +35,6 @@ import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import AsyncStorage from '@react-native-community/async-storage';
-import {initialWindowSafeAreaInsets} from 'react-native-safe-area-context';
 
 const LoginScreen = () => {
   /**
