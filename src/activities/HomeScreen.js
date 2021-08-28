@@ -33,9 +33,6 @@ const HomeScreen = () => {
 
   const [showStoriesOrOnline, setShowStoriesOrOnline] = React.useState(false);
 
-  const [jwtKey, setJwtKey] = React.useState('');
-  const [asyncJwt, setAsyncJwt] = React.useState('');
-
   async function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
@@ -54,7 +51,6 @@ const HomeScreen = () => {
     .on('value', async snapshot => {
       if (snapshot?.val().avatar && snapshot?.val().jwtKey) {
         setAvatarURL(snapshot?.val().avatar);
-        setJwtKey(snapshot?.val().jwtKey);
         await checkJwtKey(snapshot?.val().jwtKey);
       }
     });

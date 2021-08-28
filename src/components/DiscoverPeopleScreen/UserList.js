@@ -1,7 +1,7 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Divider} from 'react-native-paper';
 import transformTime from '../../utils/TimeHandler/TimeHandler';
 
 interface UserListInterface {
@@ -68,16 +68,13 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 16,
-    paddingLeft: '2%',
-    paddingRight: '3%',
     textAlign: 'left',
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   subheading: {
     fontSize: 14,
-    paddingLeft: '1%',
-    paddingRight: '3%',
+    paddingTop: '1%',
     textAlign: 'left',
     color: COLORS.black,
     opacity: 0.4,
