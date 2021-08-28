@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, TouchableRipple} from 'react-native-paper';
 import database from '@react-native-firebase/database';
@@ -9,7 +9,18 @@ import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
+const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
 const SettingsScreen = () => {
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
+
   const navigation = useNavigation();
 
   const [avatarURL, setAvatarURL] = React.useState('');
@@ -81,7 +92,16 @@ const SettingsScreen = () => {
           <Text style={styles.toolbar_text}>Settings</Text>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[COLORS.accentLight, COLORS.purple]}
+          tintColor={COLORS.accentLight}
+          title={"Swipe to refresh"}
+        />}
+      >
         <View style={styles.under_header}>
           <Avatar.Image
             size={85}

@@ -34,7 +34,6 @@ import ArrowForward from '../assets/images/arrow-forward.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
-import AsyncStorage from '@react-native-community/async-storage';
 
 const LoginScreen = () => {
   /**
@@ -191,16 +190,16 @@ const LoginScreen = () => {
    * get Country code from internet API
    * @return {NaN, String} data to {CountryText}
    */
-  const getCountryCodeFromApi = () => {
+  const getCountryCodeFromApi = async () => {
     try {
       const ApiURL = 'https://ipapi.co/country_calling_code';
-      fetch(ApiURL)
+      await fetch(ApiURL)
         .then(function (_countryDialCode) {
           return _countryDialCode.text();
         })
         .then(function (data) {
-          let _regexCountryCode = /^[[0-9]+]+$/gm;
-          CountrySetText(data.replace(_regexCountryCode, ''));
+          CountrySetText(data);
+          console.log(data);
         });
     } catch (e) {
       console.error(e);
@@ -238,12 +237,8 @@ const LoginScreen = () => {
           database()
             .ref(`/users/${auth().currentUser.uid}`)
             .once('value')
-            .then(async snapshot => {
-              if (snapshot?.val()?.uid && snapshot?.val().jwtKey) {
-                await AsyncStorage.setItem(
-                  'currentUserJwtKey',
-                  snapshot?.val().jwtKey,
-                );
+            .then(snapshot => {
+              if (snapshot?.val()?.uid) {
                 navigation.navigate('home');
               } else {
                 const _username = auth()
