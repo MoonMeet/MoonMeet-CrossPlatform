@@ -13,6 +13,7 @@ import ChatsJson from '../assets/data/json/test/chats.json';
 import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {MessagesList, StoriesList} from '../components/HomeScreen';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -32,14 +33,41 @@ const HomeScreen = () => {
 
   const [showStoriesOrOnline, setShowStoriesOrOnline] = React.useState(false);
 
+  const [jwtKey, setJwtKey] = React.useState('');
+  const [asyncJwt, setAsyncJwt] = React.useState('');
+
+  async function checkJwtKey(currentJwtKey: string) {
+    AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
+      console.log('async' + ' ' + _asyncJwt);
+      console.log('current' + ' ' + currentJwtKey);
+      if (_asyncJwt !== currentJwtKey) {
+        console.log('jwt !available');
+        /*
+          auth()
+            ?.signOut()
+            .then(() => {
+              AsyncStorage.removeItem('currentUserJwtKey');
+              navigation.navigate('login');
+            });
+           */
+      } else {
+        console.log('everything is okay');
+      }
+    });
+  }
+
+  const onValueChange = database()
+    .ref(`/users/${auth()?.currentUser?.uid}`)
+    .on('value', async snapshot => {
+      if (snapshot?.val().avatar && snapshot?.val().jwtKey) {
+        setAvatarURL(snapshot?.val().avatar);
+        setJwtKey(snapshot?.val().jwtKey);
+        await checkJwtKey(snapshot?.val().jwtKey);
+      }
+    });
+
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().avatar) {
-          setAvatarURL(snapshot?.val().avatar);
-        }
-      });
+    onValueChange();
     return () => {
       database()
         .ref(`/users/${auth()?.currentUser.uid}`)

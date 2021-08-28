@@ -17,6 +17,9 @@ import {
   getSystemVersion,
   getVersion,
 } from 'react-native-device-info';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const SetupScreen = ({route}) => {
   /**
@@ -61,6 +64,13 @@ const SetupScreen = ({route}) => {
    */
 
   const navigation = useNavigation();
+
+  /**
+   * JwtKey used for terminate all active sessions in your Moon Meet account.
+   * @type {*|string}
+   */
+
+  let jwt_key = uuidv4();
 
   /**
    * Used for getting Device Information, useful for DeviceScreen.js
@@ -272,6 +282,7 @@ const SetupScreen = ({route}) => {
                   product: Product,
                   model: Model,
                   app_version: appVersion,
+                  time: Date.now(),
                 })
                 .catch(error => {
                   console.error(error);
@@ -282,20 +293,25 @@ const SetupScreen = ({route}) => {
                * we must push data to firebase.
                */
 
-              database()
-                .ref(`/users/${auth()?.currentUser?.uid}`)
-                .set({
-                  ...user,
-                  first_name: firstName,
-                  last_name: lastName,
-                  avatar: avatarUrl,
-                  active_status: 'normal',
-                  active_time: Date.now(),
-                  bio: '',
-                })
-                .then(() => {
-                  navigation.navigate('home');
-                });
+              await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
+                () => {
+                  database()
+                    .ref(`/users/${auth()?.currentUser?.uid}`)
+                    .set({
+                      ...user,
+                      first_name: firstName,
+                      last_name: lastName,
+                      avatar: avatarUrl,
+                      active_status: 'normal',
+                      active_time: Date.now(),
+                      bio: '',
+                      jwtKey: jwt_key,
+                    })
+                    .then(() => {
+                      navigation.navigate('home');
+                    });
+                },
+              );
             });
           } catch (e) {
             console.log(e.toString());

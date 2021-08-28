@@ -34,6 +34,7 @@ import ArrowForward from '../assets/images/arrow-forward.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const LoginScreen = () => {
   /**
@@ -198,7 +199,8 @@ const LoginScreen = () => {
           return _countryDialCode.text();
         })
         .then(function (data) {
-          CountrySetText(data);
+          let _regexCountryCode = /^[[0-9]+]+$/gm;
+          CountrySetText(data.replace(_regexCountryCode, ''));
         });
     } catch (e) {
       console.error(e);
@@ -236,8 +238,12 @@ const LoginScreen = () => {
           database()
             .ref(`/users/${auth().currentUser.uid}`)
             .once('value')
-            .then(snapshot => {
-              if (snapshot?.val()?.uid) {
+            .then(async snapshot => {
+              if (snapshot?.val()?.uid && snapshot?.val().jwtKey) {
+                await AsyncStorage.setItem(
+                  'currentUserJwtKey',
+                  snapshot?.val().jwtKey,
+                );
                 navigation.navigate('home');
               } else {
                 const _username = auth()
