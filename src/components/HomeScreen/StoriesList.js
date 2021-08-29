@@ -9,8 +9,12 @@ const StoriesList = ({CurrentSection, ListData}) => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.storyHolder}>
-      <View style={styles.storyHolderLeft}>
+    <Pressable style={styles.storyHolder}>
+      <Pressable
+        onPress={() => {
+          navigation.navigate(CurrentSection ? 'discover' : 'addStory');
+        }}
+        style={styles.storyHolderLeft}>
         <Avatar.Icon
           icon={AddImage}
           size={50}
@@ -25,7 +29,7 @@ const StoriesList = ({CurrentSection, ListData}) => {
         <Text style={styles.storyText}>
           {CurrentSection ? 'Discover people' : 'Post story'}
         </Text>
-      </View>
+      </Pressable>
       <View style={styles.activeStoriesRow}>
         {CurrentSection ? (
           <View style={styles.flatListHolder}>
@@ -42,9 +46,9 @@ const StoriesList = ({CurrentSection, ListData}) => {
               data={ListData}
               renderItem={({item}) => (
                 <Pressable
-                onPress={() => {
-                  navigation.navigate("story")
-                } }
+                  onPress={() => {
+                    navigation.navigate('story');
+                  }}
                   style={{
                     padding: '2%',
                     height: 85,
@@ -76,7 +80,7 @@ const StoriesList = ({CurrentSection, ListData}) => {
           </View>
         )}
       </View>
-    </View>
+    </Pressable>
   );
 };
 

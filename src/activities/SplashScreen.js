@@ -11,6 +11,8 @@ import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {firebase} from '@react-native-firebase/analytics';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -31,7 +33,13 @@ const SplashScreen = () => {
     });
   };
 
+  async function enableFirebaseTools() {
+    await crashlytics().setCrashlyticsCollectionEnabled(true);
+    await firebase.analytics().setAnalyticsCollectionEnabled(true);
+  }
+
   useEffect(() => {
+    enableFirebaseTools();
     getViewPagerCompleted();
     const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === 'true') {

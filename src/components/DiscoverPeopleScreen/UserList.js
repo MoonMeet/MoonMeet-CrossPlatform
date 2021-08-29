@@ -23,6 +23,7 @@ const UserList = (props: UserListInterface) => {
         disableVirtualization
         removeClippedSubviews={true}
         initialNumToRender={10}
+        keyExtractor={item => item.avatar}
         renderItem={({item}) => (
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}

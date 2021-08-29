@@ -1,5 +1,12 @@
-import React, {useEffect} from 'react';
-import {Platform, Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {
+  BackHandler,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -10,7 +17,7 @@ import TestJson from '../assets/data/json/test/stories.json';
 import SearchImage from '../assets/images/search.png';
 import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {MessagesList, StoriesList} from '../components/HomeScreen';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -54,6 +61,20 @@ const HomeScreen = () => {
         await checkJwtKey(snapshot?.val().jwtKey);
       }
     });
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   useEffect(() => {
     onValueChange();

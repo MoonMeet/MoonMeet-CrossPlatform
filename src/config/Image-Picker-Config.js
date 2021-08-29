@@ -1,8 +1,8 @@
 import ImagePicker from 'react-native-image-crop-picker';
 
 const picker = {
-  width: 500,
-  height: 600,
+  width: 550,
+  height: 650,
   cropping: true,
 };
 
