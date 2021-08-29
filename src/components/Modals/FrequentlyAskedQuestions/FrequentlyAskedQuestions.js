@@ -51,11 +51,12 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           <Text style={styles.subText}>Q&A 2: Who it is for ?</Text>
           <Text style={styles.subText}>
             Moon Meet is allowed for everyone who wanna chat and make
-            Relationships, Friends and care about privacy.
+            Relationships and new Friends and care about privacy.
           </Text>
           <Text style={styles.subText}>Q&A 3: Why Moon Meet?</Text>
           <Text style={styles.subText}>
-            Use Moon Meet to chat and communicate assured that all your data and infos are completly secret.
+            Use Moon Meet to chat and communicate assured that all your data and
+            info are completely secret.
           </Text>
           <Text style={styles.subText}>Q&A: How i can get Moon Meet ?</Text>
           <Text style={styles.subText}>
@@ -66,7 +67,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             Q&A 5: does Moon Meet has end-to-end Encryption ?
           </Text>
           <Text style={styles.subText}>
-            Future updates gonna include this feature.
+            Future updates going to include this feature.
           </Text>
           <Text style={styles.subText}>
             Q&A 6: Is my information changeable ?
@@ -80,11 +81,13 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 8: Who can see me online ?</Text>
           <Text style={styles.subText}>
-            By default, your active status is visible to everyone. You can hide your online status from the settings anytime you want.
+            By default, your active status is visible to everyone. You can hide
+            your online status from the settings anytime you want.
           </Text>
           <Text style={styles.subText}>Q&A 9: Who is Behind Moon Meet ?</Text>
           <Text style={styles.subText}>
-            Behind Moon Meet, There is Rayen Sbai, Aziz Becha and our GitHub Contributors.
+            Behind Moon Meet, There is Rayen Sbai, Aziz Becha and our GitHub
+            Contributors.
           </Text>
           <Text style={styles.subText}>Q&A 10: Can i report a problem ?</Text>
           <Text style={styles.subText}>
@@ -95,8 +98,8 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             Q&A 11: Can i help to improve this Platform ?
           </Text>
           <Text style={styles.subText}>
-            Sure, If you have some good ideas you can open a pull request in our GitHub repository and become one
-            of the contributors.
+            Sure, If you have some good ideas you can open a pull request in our
+            GitHub repository and become one of the contributors.
           </Text>
           <Text style={styles.subText}>Q&A 12 : Who can see my profile ? </Text>
           <Text style={styles.subText}>
@@ -113,10 +116,13 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             that you enter while and after doing the registration.
           </Text>
           <Text style={styles.subText}>
-            Q&A 14: My phone has been stolen. Can support help me secure my account ?
+            Q&A 14: My phone has been stolen. Can support help me secure my
+            account ?
           </Text>
           <Text style={styles.subText}>
-            Of course. If you encounter one of those problems like SIM or Phone lost. You can contact our support team who can help you solve your problem.
+            Of course. If you encounter one of those problems like SIM or Phone
+            lost. You can contact our support team who can help you solve your
+            problem.
           </Text>
         </ScrollView>
       </SafeAreaView>
