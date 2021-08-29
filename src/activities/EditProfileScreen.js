@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
+  ActivityIndicator,
   Avatar,
   FAB,
   HelperText,
@@ -24,6 +25,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import NetInfo from '@react-native-community/netinfo';
 import storage from '@react-native-firebase/storage';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -51,6 +53,8 @@ const EditProfileScreen = () => {
 
   const [isFABLoading, setIsFABLoading] = React.useState(false);
 
+  const [Loading, setLoading] = React.useState(true);
+
   useEffect(() => {
     const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
@@ -65,6 +69,7 @@ const EditProfileScreen = () => {
           setOldFirstname(snapshot?.val().first_name);
           setOldLastName(snapshot?.val().last_name);
         }
+        setLoading(false);
       });
     return () => {
       database()
@@ -150,6 +155,25 @@ const EditProfileScreen = () => {
           4000,
         );
       });
+  }
+
+  if (Loading) {
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
   }
 
   return (

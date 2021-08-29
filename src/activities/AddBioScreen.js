@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
+  ActivityIndicator,
   Avatar,
   FAB,
   HelperText,
@@ -20,6 +21,7 @@ import {
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 
 const AddBioScreen = () => {
   const navigation = useNavigation();
@@ -29,6 +31,8 @@ const AddBioScreen = () => {
   const onBioTextChange = _bioText => setBioText(_bioText);
 
   const [isFABLoading, setIsFABLoading] = React.useState(false);
+
+  const [Loading, setLoading] = React.useState(true);
 
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
@@ -45,6 +49,7 @@ const AddBioScreen = () => {
           setBioText(snapshot?.val().bio);
           setOldBioText(snapshot?.val().bio);
         }
+        setLoading(false);
       });
     return () => {
       database()
@@ -86,6 +91,25 @@ const AddBioScreen = () => {
         navigation.goBack();
         setIsFABLoading(!isFABLoading);
       });
+  }
+
+  if (Loading) {
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
   }
 
   return (

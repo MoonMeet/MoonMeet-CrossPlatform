@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {Avatar, TouchableRipple} from 'react-native-paper';
+import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
@@ -11,6 +11,8 @@ import database from '@react-native-firebase/database';
 
 const DiscoverPeopleScreen = () => {
   const navigation = useNavigation();
+
+  const [Loading, setLoading] = React.useState(true);
 
   const [masterData, setMasterData] = React.useState([]);
 
@@ -37,12 +39,30 @@ const DiscoverPeopleScreen = () => {
           }
         });
         setMasterData(usersSnapshot);
-        console.log(masterData);
+        setLoading(false);
       });
     return () => {
       database().ref('/users/').off('value', onValueChange);
     };
   }, []);
+  if (Loading) {
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
+  }
   return (
     <MiniBaseView>
       <View style={styles.toolbar}>

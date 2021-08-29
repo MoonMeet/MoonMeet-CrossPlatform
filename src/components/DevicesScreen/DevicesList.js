@@ -1,7 +1,6 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {Avatar} from 'react-native-paper';
 import transformTime from '../../utils/TimeHandler/TimeHandler';
 
 interface UserListInterface {
@@ -10,7 +9,7 @@ interface UserListInterface {
   onLongPressTrigger: Function;
 }
 
-const UserList = (props: UserListInterface) => {
+const DevicesList = (props: UserListInterface) => {
   return (
     <View style={{flex: 1}}>
       <FlatList
@@ -23,26 +22,21 @@ const UserList = (props: UserListInterface) => {
         disableVirtualization
         removeClippedSubviews={true}
         initialNumToRender={10}
-        keyExtractor={item => item.avatar}
+        keyExtractor={item => item.time}
         renderItem={({item}) => (
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             style={styles.container}>
             <View style={styles.left_side}>
-              <Avatar.Image
-                source={item.avatar ? {uri: item.avatar} : null}
-                size={55}
-              />
-            </View>
-            <View style={styles.mid_side}>
               <Text style={styles.heading}>
-                {item.first_name + ' ' + item.last_name}
+                {'Moon Meet' + ' ' + item.system_name + ' ' + item.app_version}
               </Text>
               <Text style={styles.subheading}>
-                {item.active_status === 'recently'
-                  ? 'Last seen recently'
-                  : transformTime(item.active_time)}
+                {item.manufacturer + ' ' + item.model}
               </Text>
+            </View>
+            <View style={styles.right_side}>
+              <Text style={styles.subheading}>{transformTime(item.time)}</Text>
             </View>
           </Pressable>
         )}
@@ -53,34 +47,32 @@ const UserList = (props: UserListInterface) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: '2%',
     flexDirection: 'row',
   },
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+  topView: {
     flexDirection: 'row',
   },
-  mid_side: {
+  left_side: {
     flexDirection: 'column',
+    flex: 1,
+  },
+  right_side: {
     justifyContent: 'center',
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
+    alignItems: 'center',
   },
   heading: {
     fontSize: 16,
-    textAlign: 'left',
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   subheading: {
     fontSize: 14,
     paddingTop: '1%',
-    textAlign: 'left',
     color: COLORS.black,
     opacity: 0.4,
-    fontFamily: FONTS.regular,
   },
 });
 
-export default React.memo(UserList);
+export default React.memo(DevicesList);
