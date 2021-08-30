@@ -21,7 +21,7 @@ import {
 import NetInfo from '@react-native-community/netinfo';
 
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {isAndroid, isIOS} from '../utils/device/DeviceInfo';
+import {isAndroid, isIOS, isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 import auth from '@react-native-firebase/auth';
 import CountriesList from '../components/Modals/LoginScreen/CountriesList';
@@ -35,6 +35,14 @@ import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import AsyncStorage from '@react-native-community/async-storage';
+import {
+  getManufacturer,
+  getModel,
+  getProduct,
+  getSystemName,
+  getSystemVersion,
+  getVersion,
+} from 'react-native-device-info';
 
 const LoginScreen = () => {
   /**
@@ -230,6 +238,25 @@ const LoginScreen = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
+  /**
+   * Used for getting Device Information, useful for DeviceScreen.js
+   */
+
+  const [systemName, setSystemName] = React.useState(getSystemName());
+  const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
+  const [Manufacturer, setManufacturer] = React.useState(
+    getManufacturer().then(manufacturer => {
+      setManufacturer(manufacturer);
+    }),
+  );
+  const [Product, setProduct] = React.useState(
+    getProduct().then(product => {
+      setProduct(product);
+    }),
+  );
+  const [Model, setModel] = React.useState(getModel());
+  const [appVersion, setAppVersion] = React.useState(getVersion());
+
   function addCodeObserver(text) {
     if (text.length > 5) {
       Keyboard.dismiss();
@@ -245,9 +272,33 @@ const LoginScreen = () => {
                   snapshot?.val().jwtKey,
                 ).then(() => {
                   AsyncStorage.getItem('currentUserJwtKey').then(val => {
-                    console.log(val);
+                    /**
+                     * pushing device information for later use in DeviceScreen.js
+                     */
+                    if (!isWindows && !isWeb) {
+                      const referenceKey = database()
+                        .ref(`/devices/${auth()?.currentUser.uid}`)
+                        .push().key;
+
+                      database()
+                        .ref(
+                          `/devices/${auth()?.currentUser.uid}/${referenceKey}`,
+                        )
+                        .set({
+                          manufacturer: Manufacturer,
+                          system_name: systemName,
+                          system_version: systemVersion,
+                          product: Product,
+                          model: Model,
+                          app_version: appVersion,
+                          time: Date.now(),
+                        })
+                        .catch(error => {
+                          console.error(error);
+                        });
+                    }
+                    navigation.navigate('home');
                   });
-                  navigation.navigate('home');
                 });
               } else {
                 const _username = auth()

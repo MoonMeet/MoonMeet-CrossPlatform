@@ -7,6 +7,7 @@
 
 import React from 'react';
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import IntroScreen from '../activities/IntroScreen';
 import SplashScreen from '../activities/SplashScreen';
@@ -25,8 +26,16 @@ import DevicesScreen from '../activities/DevicesScreen';
 import DiscoverPeopleScreen from '../activities/DiscoverPeopleScreen';
 import StoryScreen from '../activities/StoryScreen';
 import AddStoryScreen from '../activities/AddStoryScreen';
+import {Avatar} from 'react-native-paper';
+import {COLORS} from './Miscellaneous';
+
+import ChatIcon from '../assets/images/chat.png';
+
+import PeopleIcon from '../assets/images/two_people.png';
 
 const Stack = createNativeStackNavigator();
+
+const Tab = createMaterialBottomTabNavigator();
 
 const StackNavigator = () => {
   return (
@@ -55,6 +64,37 @@ const StackNavigator = () => {
         <Stack.Screen name={'story'} component={StoryScreen} />
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
       </Stack.Navigator>
+      {/*<Tab.Navigator
+        screenOptions={({route}) => ({
+          tabBarIcon: ({focused, color, size}) => {
+            let iconSource;
+
+            if (route.name === 'Chats') {
+              iconSource = ChatIcon;
+            } else if (route.name === 'People') {
+              iconSource = PeopleIcon;
+            }
+
+            // You can return any component that you like here!
+            return (
+              <Avatar.Icon
+                name={iconSource}
+                size={size}
+                color={color}
+                theme={{
+                  colors: {
+                    primary: COLORS.transparent,
+                  },
+                }}
+              />
+            );
+          },
+          tabBarActiveTintColor: COLORS.accentLight,
+          tabBarInactiveTintColor: COLORS.darkGrey,
+        })}>
+        <Tab.Screen name="Chats" component={HomeScreen} />
+        <Tab.Screen name="People" component={SettingsScreen} />
+      </Tab.Navigator> */}
       <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>
   );

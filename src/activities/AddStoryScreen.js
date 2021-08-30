@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
   Image,
@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {
+  ActivityIndicator,
   Avatar,
   HelperText,
   TextInput,
@@ -24,6 +25,15 @@ import PickImage from '../assets/images/pick-photo.png';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import BaseView from '../components/BaseView/BaseView';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import {
+  ErrorToast,
+  SuccessToast,
+} from '../components/ToastInitializer/ToastInitializer';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import storage from '@react-native-firebase/storage';
+import getRandomString from '../utils/StringGenerator/StringGenerator';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -52,6 +62,14 @@ const AddStoryScreen = () => {
   const textInputHasLessLength = () => {
     return StoryTextInput.length < 1;
   };
+
+  const [Firstname, setFirstname] = React.useState('');
+  const [Lastname, setLastname] = React.useState('');
+  const [avatarURL, setAvatarURL] = React.useState('');
+
+  const [Loading, setLoading] = React.useState(true);
+
+  const [LoaderModal, setLoaderModal] = React.useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -83,6 +101,7 @@ const AddStoryScreen = () => {
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [
+      SecondStoryTextInput,
       StoryTextInput,
       hideMainScreen,
       imageVisible,
@@ -91,11 +110,168 @@ const AddStoryScreen = () => {
     ]),
   );
 
+  function pushTextStory() {
+    if (StoryTextInput.length < 1) {
+      ErrorToast(
+        'bottom',
+        'Error sharing story',
+        'If this is a text story, then it has to contain some text!',
+        true,
+        4000,
+      );
+    } else if (StoryTextInput.length > 241) {
+      ErrorToast(
+        'bottom',
+        'Error sharing story',
+        'Your text must not be longer than 240 characters',
+        true,
+        4000,
+      );
+    } else {
+      setLoaderModal(!LoaderModal);
+      const referenceKey = database()
+        .ref(`/stories/${auth().currentUser.uid}/`)
+        .push().key;
+
+      database()
+        .ref(`/stories/${auth().currentUser.uid}/${referenceKey}`)
+        .set({
+          first_name: Firstname,
+          last_name: Lastname,
+          avatar: avatarURL,
+          time: Date.now(),
+          sid: referenceKey,
+          uid: auth().currentUser.uid,
+          text: StoryTextInput,
+        })
+        .then(() => {
+          setLoaderModal(!LoaderModal);
+          SuccessToast(
+            'bottom',
+            'Story shared',
+            'Your story has been shared successfully.',
+          );
+          navigation.goBack();
+        });
+    }
+  }
+
+  function pushImageStory() {
+    if (UserPhoto) {
+      setLoaderModal(!LoaderModal);
+      let _userStoryRef = `stories/${getRandomString(
+        28,
+      )}.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+
+      const storageRef = storage().ref(_userStoryRef);
+
+      const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+
+      /**
+       * Add observer to image uploading.
+       */
+
+      uploadImageTask.on('state_changed', taskSnapshot => {
+        console.log(
+          `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+        );
+      });
+
+      /**
+       * an async function to get {avatarUrl} and upload all user data.
+       */
+
+      uploadImageTask.then(async () => {
+        const storyImageURL = await storage()
+          .ref(_userStoryRef)
+          .getDownloadURL();
+        pushImageData(storyImageURL);
+      });
+
+      function pushImageData(storyImageURL) {
+        const referenceKey = database()
+          .ref(`/stories/${auth().currentUser.uid}/`)
+          .push().key;
+
+        database()
+          .ref(`/stories/${auth().currentUser.uid}/${referenceKey}`)
+          .set({
+            first_name: Firstname,
+            last_name: Lastname,
+            avatar: avatarURL,
+            time: Date.now(),
+            sid: referenceKey,
+            image: storyImageURL,
+            uid: auth().currentUser.uid,
+            text: SecondStoryTextInput ? SecondStoryTextInput : '',
+          })
+          .finally(() => {
+            setLoaderModal(!LoaderModal);
+            navigation.goBack();
+            SuccessToast(
+              'bottom',
+              'Story shared',
+              'Your story has been shared successfully.',
+              true,
+              4000,
+            );
+          });
+      }
+    } else {
+      ErrorToast(
+        'bottom',
+        'Error sharing story',
+        'If this is a image story, then it has to contain an image!',
+        true,
+        4000,
+      );
+    }
+  }
+
+  useEffect(() => {
+    const onValueChange = database()
+      .ref(`/users/${auth().currentUser.uid}`)
+      .on('value', snapshot => {
+        if (
+          snapshot?.val().first_name &&
+          snapshot?.val().last_name &&
+          snapshot?.val().avatar
+        ) {
+          setFirstname(snapshot?.val().first_name);
+          setLastname(snapshot?.val().last_name);
+          setAvatarURL(snapshot?.val().avatar);
+          setLoading(false);
+        }
+      });
+    return () => {
+      database()
+        .ref(`/users/${auth()?.currentUser.uid}`)
+        .off('value', onValueChange);
+    };
+  }, []);
+
   const [PickerActionSheet, setPickerActionSheet] = React.useState(false);
 
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
-  if (!hideMainScreen) {
+  if (Loading) {
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
+  } else if (!hideMainScreen) {
     return (
       <MiniBaseView>
         <View style={styles.toolbar}>
@@ -229,7 +405,7 @@ const AddStoryScreen = () => {
                 rippleColor={COLORS.rippleColor}
                 borderless={false}
                 onPress={() => {
-                  console.log('clicked');
+                  pushTextStory();
                 }}>
                 <Avatar.Icon
                   icon={DoneImage}
@@ -284,6 +460,10 @@ const AddStoryScreen = () => {
             </HelperText>
           ) : null}
         </View>
+        <LoadingIndicator
+          isVisible={LoaderModal}
+          loaderText={'Sharing Story'}
+        />
       </BaseView>
     );
   } else if (userSelection === 'image') {
@@ -332,7 +512,7 @@ const AddStoryScreen = () => {
                 rippleColor={COLORS.rippleColor}
                 borderless={false}
                 onPress={() => {
-                  console.log('clicked');
+                  pushImageStory();
                 }}>
                 <Avatar.Icon
                   icon={DoneImage}
@@ -413,6 +593,7 @@ const AddStoryScreen = () => {
             Story Text must be longer longer than 1 characters.
           </HelperText>
         ) : null}
+        <LoadingIndicator isVisible={LoaderModal} loaderText={''} />
         <ImagePickerActionSheet
           hideModal={() => {
             setPickerActionSheet(false);
@@ -522,8 +703,6 @@ const styles = StyleSheet.create({
   },
   enableText: {
     fontSize: 16,
-    paddingLeft: '2%',
-    paddingRight: '5%',
     textAlign: 'center',
     color: COLORS.accentLight,
     opacity: 1,
