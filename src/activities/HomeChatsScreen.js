@@ -13,14 +13,12 @@ import auth from '@react-native-firebase/auth';
 import {Avatar, Searchbar} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
-import TestJson from '../assets/data/json/test/stories.json';
 import SearchImage from '../assets/images/search.png';
 import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
-import StoriesList from '../components/HomeScreen/StoriesList';
 import AsyncStorage from '@react-native-community/async-storage';
 
 const HomeChatsScreen = () => {
@@ -81,7 +79,7 @@ const HomeChatsScreen = () => {
         <View style={styles.left_side}>
           {avatarURL ? (
             <Avatar.Image
-              size={40}
+              size={37.5}
               source={avatarURL ? {uri: avatarURL} : null}
               style={{
                 overflow: 'hidden',
@@ -178,7 +176,7 @@ const styles = StyleSheet.create({
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
-    color: COLORS.accentLight,
+    color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   left_side: {

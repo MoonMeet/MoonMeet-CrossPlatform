@@ -1,124 +1,55 @@
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import {Avatar} from 'react-native-paper';
-import AddImage from '../../assets/images/add.png';
-import {COLORS, FONTS} from '../../config/Miscellaneous';
+import {
+  Dimensions,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {FlatGrid} from 'react-native-super-grid';
+import {COLORS} from '../../config/Miscellaneous';
+import {Avatar, Surface} from 'react-native-paper';
+import {transformTime} from '../../utils/TimeHandler/TimeHandler';
 
-const StoriesList = ({CurrentSection, ListData}) => {
-  const navigation = useNavigation();
-
+const StoriesList = ({ListData}) => {
   return (
-    <Pressable style={styles.storyHolder}>
-      <Pressable
-        onPress={() => {
-          navigation.navigate(CurrentSection ? 'discover' : 'addStory');
-        }}
-        style={styles.storyHolderLeft}>
-        <Avatar.Icon
-          icon={AddImage}
-          size={50}
-          color={COLORS.black}
-          style={styles.right_icon}
-          theme={{
-            colors: {
-              primary: COLORS.rippleColor,
-            },
-          }}
-        />
-        <Text style={styles.storyText}>
-          {CurrentSection ? 'Discover people' : 'Post story'}
-        </Text>
-      </Pressable>
-      <View style={styles.activeStoriesRow}>
-        {CurrentSection ? (
-          <View style={styles.flatListHolder}>
-            <FlatList data={null} renderItem={null} />
-          </View>
-        ) : (
-          <View style={styles.flatListHolder}>
-            <FlatList
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingEnd: '13%',
-              }}
-              data={ListData}
-              renderItem={({item}) => (
-                <Pressable
-                  onPress={() => {
-                    navigation.navigate('story');
-                  }}
-                  style={{
-                    padding: '2%',
-                    height: 85,
-                    width: 70,
-                    backgroundColor: COLORS.primaryLight,
-                  }}>
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Avatar.Image
-                      style={styles.userHaveStory}
-                      size={50}
-                      source={{uri: item.avatar}}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      color: COLORS.black,
-                    }}>
-                    {item.name}
-                  </Text>
-                </Pressable>
-              )}
-              keyExtractor={item => item.name}
-            />
-          </View>
-        )}
-      </View>
-    </Pressable>
+    <FlatGrid
+      itemDimension={225}
+      data={ListData}
+      style={styles.gridView}
+      staticDimension={Dimensions.get('window').width}
+      spacing={10}
+      renderItem={({item}) => (
+        <Pressable
+          android_ripple={{color: COLORS.accentLight}}
+          style={styles.imageWrapper}>
+          <Pressable
+            android_ripple={{color: COLORS.rippleColor}}
+            style={styles.container}>
+            <View style={styles.left_side}>
+              <Avatar.Image
+                source={item.avatar ? {uri: item.avatar} : null}
+                size={55}
+              />
+            </View>
+            <View style={styles.mid_side}>
+              <Text style={styles.heading}>
+                {item.first_name + ' ' + item.last_name}
+              </Text>
+              <Text style={styles.subheading}>
+                {item.active_status === 'recently'
+                  ? 'Last seen recently'
+                  : transformTime(item.active_time)}
+              </Text>
+            </View>
+          </Pressable>
+        </Pressable>
+      )}
+    />
   );
 };
 
-const styles = StyleSheet.create({
-  storyHolder: {
-    flexDirection: 'row',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '3%',
-    paddingRight: '3%',
-  },
-  storyHolderLeft: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '17%',
-  },
-  storyText: {
-    position: 'relative',
-    fontSize: 16,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    paddingTop: '0.2%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
-  flatListHolder: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  activeStoriesRow: {
-    flexDirection: 'column',
-  },
-  userHaveStory: {
-    borderWidth: /*1.5*/ 0,
-    borderColor: COLORS.accentLight,
-    overflow: 'hidden',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default React.memo(StoriesList);

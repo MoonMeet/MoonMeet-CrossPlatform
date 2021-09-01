@@ -17,9 +17,13 @@ function transformTime(time: number) {
   } else if (difference < 24 * (60 * 60000)) {
     return 'Active ' + Math.floor(difference / 1000 / 60 / 60) + ' Hours ago';
   } else if (difference < 24 * (60 * 60 * 60000)) {
-    return (
-      'Active ' + Math.floor(difference / 1000 / 60 / 60 / 24) + ' Day ago'
-    );
+    if (
+      difference / 1000 / 60 / 60 / 24 > 86400000 &&
+      difference / 1000 / 60 / 60 / 24 < 172800000
+    ) {
+      return Math.floor(difference / 1000 / 60 / 60 / 24) + ' Day ago';
+    }
+    return Math.floor(difference / 1000 / 60 / 60 / 24) + ' Days ago';
   } else {
     return 'Long time ago';
   }
