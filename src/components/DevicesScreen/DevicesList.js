@@ -1,7 +1,7 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import transformTime from '../../utils/TimeHandler/TimeHandler';
+import {transformTimeDevices} from '../../utils/TimeHandler/TimeHandler';
 
 interface UserListInterface {
   ListData: any;
@@ -36,7 +36,9 @@ const DevicesList = (props: UserListInterface) => {
               </Text>
             </View>
             <View style={styles.right_side}>
-              <Text style={styles.subheading}>{transformTime(item.time)}</Text>
+              <Text style={styles.subheading}>
+                {transformTimeDevices(item.time)}
+              </Text>
             </View>
           </Pressable>
         )}

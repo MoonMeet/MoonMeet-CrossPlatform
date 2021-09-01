@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import database from '@react-native-firebase/database';
@@ -9,7 +9,7 @@ import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 
-const SettingsScreen = () => {
+const HomeSettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
 
   const navigation = useNavigation();
@@ -71,34 +71,9 @@ const SettingsScreen = () => {
       </MiniBaseView>
     );
   }
-
   return (
     <MiniBaseView>
       <View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Settings</Text>
         </View>
@@ -160,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: '2.5%',
+    marginLeft: '1%',
     marginRight: '2.5%',
   },
   toolbar: {
@@ -200,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(SettingsScreen);
+export default React.memo(HomeSettingsScreen);

@@ -10,7 +10,7 @@ import {
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {Avatar, Searchbar, Surface} from 'react-native-paper';
+import {Avatar, Searchbar} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
 import TestJson from '../assets/data/json/test/stories.json';
@@ -19,26 +19,16 @@ import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {MessagesList, StoriesList} from '../components/HomeScreen';
+import MessagesList from '../components/HomeScreen/MessagesList';
+import StoriesList from '../components/HomeScreen/StoriesList';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const HomeScreen = () => {
+const HomeChatsScreen = () => {
   const navigation = useNavigation();
-
-  const _testStories = TestJson;
 
   const _testChats = ChatsJson;
 
   const [avatarURL, setAvatarURL] = React.useState('');
-
-  const [activeStateColor, setActiveStateColor] = React.useState(
-    COLORS.accentLight,
-  );
-  const [disabledStateColor, setDisabledStateColor] = React.useState(
-    COLORS.black,
-  );
-
-  const [showStoriesOrOnline, setShowStoriesOrOnline] = React.useState(false);
 
   async function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
@@ -87,44 +77,39 @@ const HomeScreen = () => {
 
   return (
     <MiniBaseView>
-      <Surface style={styles.toolbar}>
+      <View style={styles.toolbar}>
         <View style={styles.left_side}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate('settings');
-            }}>
-            {avatarURL ? (
-              <Avatar.Image
-                size={37.5}
-                source={avatarURL ? {uri: avatarURL} : null}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
-            ) : (
-              <Avatar.Icon
-                icon={PersonImage}
-                size={37.5}
-                color={COLORS.black}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                  opacity: 0.4,
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
-            )}
-          </Pressable>
+          {avatarURL ? (
+            <Avatar.Image
+              size={40}
+              source={avatarURL ? {uri: avatarURL} : null}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          ) : (
+            <Avatar.Icon
+              icon={PersonImage}
+              size={40}
+              color={COLORS.black}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+                opacity: 0.4,
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          )}
         </View>
         <View style={styles.mid_side}>
           <Text style={styles.top_text}>Chats</Text>
@@ -144,7 +129,7 @@ const HomeScreen = () => {
             />
           </Pressable>
         </View>
-      </Surface>
+      </View>
       <View
         style={{
           padding: '2%',
@@ -168,34 +153,10 @@ const HomeScreen = () => {
           clearIcon={ClearImage}
         />
       </View>
-      <View style={styles.above_stories}>
-        <Pressable
-          style={styles.pressContainerTop}
-          onPress={() => {
-            if (showStoriesOrOnline === true) {
-              setActiveStateColor(COLORS.accentLight);
-              setDisabledStateColor(COLORS.black);
-              setShowStoriesOrOnline(false);
-            }
-          }}>
-          <Text style={styles.mini_text_left(activeStateColor)}>Stories</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            if (showStoriesOrOnline === false) {
-              setActiveStateColor(COLORS.black);
-              setDisabledStateColor(COLORS.accentLight);
-              setShowStoriesOrOnline(true);
-            }
-          }}
-          style={styles.pressContainerTopRight}>
-          <Text style={styles.mini_text_right(disabledStateColor)}>Online</Text>
-        </Pressable>
-      </View>
-      <StoriesList
+      {/*<StoriesList
         ListData={_testStories}
         CurrentSection={showStoriesOrOnline}
-      />
+      />*/}
       <MessagesList ListData={_testChats} />
     </MiniBaseView>
   );
@@ -284,4 +245,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(HomeScreen);
+export default React.memo(HomeChatsScreen);

@@ -28,7 +28,7 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
-import transformTime from '../../utils/TimeHandler/TimeHandler';
+import {transformTime} from '../../utils/TimeHandler/TimeHandler';
 
 interface ScrollViewContainerInterface {
   firstName: string;

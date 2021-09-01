@@ -69,8 +69,6 @@ const AddStoryScreen = () => {
 
   const [Loading, setLoading] = React.useState(true);
 
-  const [LoaderModal, setLoaderModal] = React.useState(false);
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -128,7 +126,7 @@ const AddStoryScreen = () => {
         4000,
       );
     } else {
-      setLoaderModal(!LoaderModal);
+      setLoading(!Loading);
       const referenceKey = database()
         .ref(`/stories/${auth().currentUser.uid}/`)
         .push().key;
@@ -145,7 +143,7 @@ const AddStoryScreen = () => {
           text: StoryTextInput,
         })
         .then(() => {
-          setLoaderModal(!LoaderModal);
+          setLoading(!Loading);
           SuccessToast(
             'bottom',
             'Story shared',
@@ -158,7 +156,7 @@ const AddStoryScreen = () => {
 
   function pushImageStory() {
     if (UserPhoto) {
-      setLoaderModal(!LoaderModal);
+      setLoading(!Loading);
       let _userStoryRef = `stories/${getRandomString(
         28,
       )}.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
@@ -206,7 +204,7 @@ const AddStoryScreen = () => {
             text: SecondStoryTextInput ? SecondStoryTextInput : '',
           })
           .finally(() => {
-            setLoaderModal(!LoaderModal);
+            setLoading(!Loading);
             navigation.goBack();
             SuccessToast(
               'bottom',
@@ -302,32 +300,6 @@ const AddStoryScreen = () => {
           <View style={styles.mid_side}>
             <Text style={styles.toolbar_text}>Add Story</Text>
           </View>
-          {userSelection && hideMainScreen ? (
-            <View style={styles.right_side}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  console.log('clicked');
-                }}>
-                <Avatar.Icon
-                  icon={DoneImage}
-                  size={36.5}
-                  color={COLORS.black}
-                  style={{
-                    marginRight: '-1%',
-                    opacity: 0.4,
-                    overflow: 'hidden',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
-          ) : null}
         </View>
         <Spacer height={'2%'} />
         <View style={styles.userChoice}>
@@ -460,10 +432,6 @@ const AddStoryScreen = () => {
             </HelperText>
           ) : null}
         </View>
-        <LoadingIndicator
-          isVisible={LoaderModal}
-          loaderText={'Sharing Story'}
-        />
       </BaseView>
     );
   } else if (userSelection === 'image') {
@@ -593,7 +561,6 @@ const AddStoryScreen = () => {
             Story Text must be longer longer than 1 characters.
           </HelperText>
         ) : null}
-        <LoadingIndicator isVisible={LoaderModal} loaderText={''} />
         <ImagePickerActionSheet
           hideModal={() => {
             setPickerActionSheet(false);

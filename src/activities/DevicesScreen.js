@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';

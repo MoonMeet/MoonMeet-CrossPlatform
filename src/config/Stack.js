@@ -6,15 +6,16 @@
  */
 
 import React from 'react';
+
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+
 import IntroScreen from '../activities/IntroScreen';
 import SplashScreen from '../activities/SplashScreen';
 import LoginScreen from '../activities/LoginScreen';
 import SetupScreen from '../activities/SetupScreen';
-import HomeScreen from '../activities/HomeScreen';
-import SettingsScreen from '../activities/SettingsScreen';
+import SettingsScreen from '../activities/HomeSettingsScreen';
 import SearchChatsScreen from '../activities/SearchChatsScreen';
 import ReportProblem from '../activities/ReportProblemScreen';
 import Toast from 'react-native-toast-message';
@@ -26,17 +27,85 @@ import DevicesScreen from '../activities/DevicesScreen';
 import DiscoverPeopleScreen from '../activities/DiscoverPeopleScreen';
 import StoryScreen from '../activities/StoryScreen';
 import AddStoryScreen from '../activities/AddStoryScreen';
+import HomeChats from '../activities/HomeChatsScreen.js';
+import HomePeople from '../activities/HomePeopleScreen';
+
 import {Avatar} from 'react-native-paper';
+
 import {COLORS} from './Miscellaneous';
 
 import ChatIcon from '../assets/images/chat.png';
-
 import PeopleIcon from '../assets/images/two_people.png';
+import SettingsIcon from '../assets/images/settings.png';
 
 const Stack = createNativeStackNavigator();
-
 const Tab = createMaterialBottomTabNavigator();
 
+function HomeScreen() {
+  return (
+    <Tab.Navigator
+      shifting={true}
+      initialRouteName={'Chats'}
+      activeColor={COLORS.accentLight}
+      inactiveColor={COLORS.darkGrey}
+      barStyle={{backgroundColor: COLORS.white}}>
+      <Tab.Screen
+        name="Chats"
+        component={HomeChats}
+        options={{
+          tabBarLabel: 'Chats',
+          tabBarIcon: ({color}) => (
+            <Avatar.Icon
+              icon={ChatIcon}
+              color={color}
+              size={36.5}
+              style={{
+                margin: '-25%',
+              }}
+              theme={{colors: {primary: COLORS.transparent}}}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="People"
+        component={HomePeople}
+        options={{
+          tabBarLabel: 'People',
+          tabBarIcon: ({color}) => (
+            <Avatar.Icon
+              icon={PeopleIcon}
+              color={color}
+              size={42.5}
+              style={{
+                margin: '-35%',
+              }}
+              theme={{colors: {primary: COLORS.transparent}}}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: ({color}) => (
+            <Avatar.Icon
+              icon={SettingsIcon}
+              color={color}
+              size={40}
+              style={{
+                margin: '-31%',
+              }}
+              theme={{colors: {primary: COLORS.transparent}}}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 const StackNavigator = () => {
   return (
     <NavigationContainer>
@@ -50,7 +119,6 @@ const StackNavigator = () => {
         <Stack.Screen name={'setup'} component={SetupScreen} />
         <Stack.Screen name={'home'} component={HomeScreen} />
         <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />
-        <Stack.Screen name={'settings'} component={SettingsScreen} />
         <Stack.Screen name={'bugreport'} component={ReportProblem} />
         <Stack.Screen name={'activeStatus'} component={ActiveStatusScreen} />
         <Stack.Screen
@@ -64,37 +132,6 @@ const StackNavigator = () => {
         <Stack.Screen name={'story'} component={StoryScreen} />
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
       </Stack.Navigator>
-      {/*<Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let iconSource;
-
-            if (route.name === 'Chats') {
-              iconSource = ChatIcon;
-            } else if (route.name === 'People') {
-              iconSource = PeopleIcon;
-            }
-
-            // You can return any component that you like here!
-            return (
-              <Avatar.Icon
-                name={iconSource}
-                size={size}
-                color={color}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            );
-          },
-          tabBarActiveTintColor: COLORS.accentLight,
-          tabBarInactiveTintColor: COLORS.darkGrey,
-        })}>
-        <Tab.Screen name="Chats" component={HomeScreen} />
-        <Tab.Screen name="People" component={SettingsScreen} />
-      </Tab.Navigator> */}
       <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>
   );

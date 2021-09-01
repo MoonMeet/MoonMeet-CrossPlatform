@@ -2,7 +2,7 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
-import transformTime from '../../utils/TimeHandler/TimeHandler';
+import {transformTime} from '../../utils/TimeHandler/TimeHandler';
 
 interface UserListInterface {
   ListData: any;

@@ -117,7 +117,6 @@ const ActiveStatusScreen = () => {
                       true,
                       4000,
                     );
-                    navigation.goBack();
                   })
                   .catch(() => {
                     ErrorToast(
