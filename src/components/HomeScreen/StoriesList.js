@@ -1,55 +1,109 @@
-import {
-  Dimensions,
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {FlatGrid} from 'react-native-super-grid';
-import {COLORS} from '../../config/Miscellaneous';
-import {Avatar, Surface} from 'react-native-paper';
-import {transformTime} from '../../utils/TimeHandler/TimeHandler';
+import {Avatar} from 'react-native-paper';
+import AddIcon from '../../assets/images/add.png';
+import {COLORS, FONTS} from '../../config/Miscellaneous';
+import {useNavigation} from '@react-navigation/native';
 
 const StoriesList = ({ListData}) => {
+  const navigation = useNavigation();
+
   return (
-    <FlatGrid
-      itemDimension={225}
-      data={ListData}
-      style={styles.gridView}
-      staticDimension={Dimensions.get('window').width}
-      spacing={10}
-      renderItem={({item}) => (
-        <Pressable
-          android_ripple={{color: COLORS.accentLight}}
-          style={styles.imageWrapper}>
-          <Pressable
-            android_ripple={{color: COLORS.rippleColor}}
-            style={styles.container}>
-            <View style={styles.left_side}>
-              <Avatar.Image
-                source={item.avatar ? {uri: item.avatar} : null}
-                size={55}
-              />
-            </View>
-            <View style={styles.mid_side}>
-              <Text style={styles.heading}>
-                {item.first_name + ' ' + item.last_name}
+    <View style={styles.container}>
+      <Pressable
+        onPress={() => navigation.navigate('addStory')}
+        style={styles.storyHolderLeft}>
+        <Avatar.Icon
+          icon={AddIcon}
+          size={50}
+          color={COLORS.black}
+          style={styles.right_icon}
+          theme={{
+            colors: {
+              primary: COLORS.rippleColor,
+            },
+          }}
+        />
+        <Text style={styles.storyText}>Add Story</Text>
+      </Pressable>
+      <View style={styles.flatListHolder}>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingEnd: '13%',
+          }}
+          disableVirtualization
+          removeClippedSubviews={true}
+          initialNumToRender={10}
+          data={ListData}
+          renderItem={({item}) => (
+            <Pressable
+              onPress={() => {
+                navigation.navigate('story');
+              }}
+              style={{
+                padding: '2%',
+                height: 85,
+                width: 70,
+                backgroundColor: COLORS.primaryLight,
+              }}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Avatar.Image
+                  style={styles.userHaveStory}
+                  size={50}
+                  source={{uri: item.avatar}}
+                />
+              </View>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: COLORS.black,
+                }}>
+                {item.name}
               </Text>
-              <Text style={styles.subheading}>
-                {item.active_status === 'recently'
-                  ? 'Last seen recently'
-                  : transformTime(item.active_time)}
-              </Text>
-            </View>
-          </Pressable>
-        </Pressable>
-      )}
-    />
+            </Pressable>
+          )}
+          keyExtractor={item => item.avatar}
+        />
+      </View>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    padding: '2%',
+  },
+  addStory: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  storyHolderLeft: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '17%',
+  },
+  storyText: {
+    position: 'relative',
+    fontSize: 16,
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    paddingTop: '0.2%',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  flatListHolder: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+});
 
 export default React.memo(StoriesList);

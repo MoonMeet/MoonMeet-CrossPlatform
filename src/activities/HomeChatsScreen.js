@@ -20,6 +20,8 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
 import AsyncStorage from '@react-native-community/async-storage';
+import StoriesList from '../components/HomeScreen/StoriesList';
+import _testStories from '../assets/data/json/test/stories.json';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -27,6 +29,10 @@ const HomeChatsScreen = () => {
   const _testChats = ChatsJson;
 
   const [avatarURL, setAvatarURL] = React.useState('');
+
+  const [newActiveTime, setNewActiveTime] = React.useState('');
+
+  const [activeStatusState, setActiveStatusState] = React.useState(null);
 
   async function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
@@ -41,12 +47,37 @@ const HomeChatsScreen = () => {
     });
   }
 
+  function updateUserActiveStatus() {
+    database()
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .update({
+        active_status: activeStatusState === true ? 'recently' : 'normal',
+        active_time:
+          newActiveTime === 'Last seen recently'
+            ? Date.now()
+            : 'Last seen recently',
+      })
+      .then(r => console.log(r));
+  }
+
   const onValueChange = database()
     .ref(`/users/${auth()?.currentUser?.uid}`)
     .on('value', async snapshot => {
-      if (snapshot?.val().avatar && snapshot?.val().jwtKey) {
+      if (
+        snapshot?.val().avatar &&
+        snapshot?.val().jwtKey &&
+        snapshot?.val().active_status &&
+        snapshot?.val().active_time
+      ) {
         setAvatarURL(snapshot?.val().avatar);
         await checkJwtKey(snapshot?.val().jwtKey);
+        if (snapshot?.val().active_status === 'normal') {
+          setActiveStatusState(true);
+        } else {
+          setActiveStatusState(false);
+        }
+        setNewActiveTime(snapshot?.val().active_time);
+        updateUserActiveStatus();
       }
     });
 
@@ -151,10 +182,7 @@ const HomeChatsScreen = () => {
           clearIcon={ClearImage}
         />
       </View>
-      {/*<StoriesList
-        ListData={_testStories}
-        CurrentSection={showStoriesOrOnline}
-      />*/}
+      <StoriesList ListData={_testStories} />
       <MessagesList ListData={_testChats} />
     </MiniBaseView>
   );

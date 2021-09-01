@@ -41,23 +41,15 @@ const ActiveStatusScreen = () => {
       });
   };
 
-  /**
-   * Dummy NetInfoObserver
-   */
-
-  const addNetInfoObserver = () => {
-    NetInfo.addEventListener(networkState => {
-      console.info(networkState.details);
-      console.info(networkState.type);
-    });
-  };
-
   const [switchState, setSwitchState] = React.useState(false);
 
   useEffect(() => {
-    addNetInfoObserver();
     getUserActiveStatus();
-    return () => {};
+    return () => {
+      database()
+        .ref(`/users/${auth().currentUser.uid}`)
+        .off('value', getUserActiveStatus);
+    };
   }, []);
   return (
     <MiniBaseView>

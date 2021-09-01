@@ -70,7 +70,10 @@ const HomePeopleScreen = () => {
       .on('value', snapshot => {
         const activeSnapshot = [];
         snapshot?.forEach(childSnapshot => {
-          if (childSnapshot?.val().active_status === 'normal') {
+          if (
+            childSnapshot?.val().active_status === 'normal' &&
+            Date.now() - childSnapshot?.val().active_time < 60000
+          ) {
             if (
               childSnapshot?.val().avatar &&
               childSnapshot?.val().first_name &&
