@@ -1,4 +1,4 @@
-import { Dimensions, ScaledSize, Platform, StatusBar } from "react-native";
+import {Dimensions, ScaledSize, Platform, StatusBar} from 'react-native';
 // ? iPhone X Family
 // iPhone X Dimension
 const iPhoneX_HEIGHT = 812;
@@ -64,9 +64,9 @@ const isIPhone12ProMax = (dim: ScaledSize) =>
 const isIPhone12Mini = (dim: ScaledSize) => dim.height === iPhone12Mini_HEIGHT;
 
 const detection = () => {
-  const dim = Dimensions.get("window");
+  const dim = Dimensions.get('window');
   return (
-    Platform.OS === "ios" &&
+    Platform.OS === 'ios' &&
     !Platform.isPad &&
     !Platform.isTVOS &&
     (isIPhoneX(dim) ||

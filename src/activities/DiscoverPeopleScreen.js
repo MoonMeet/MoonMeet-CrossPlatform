@@ -97,7 +97,7 @@ const DiscoverPeopleScreen = () => {
       <Spacer height={'1%'} />
       <UserList
         ListData={masterData}
-        onPressTrigger={null}
+        onPressTrigger={() => navigation.navigate('chat')}
         onLongPressTrigger={null}
       />
     </MiniBaseView>

@@ -1,12 +1,4 @@
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Pressable,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-} from 'react-native';
-import {isIOS} from '../../utils/device/DeviceInfo';
+import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
 

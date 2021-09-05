@@ -9,7 +9,9 @@
     "pods": "cd ios && pod install",
     "clean": "cd android && gradlew clean",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lintfix": "eslint . --fix",
+    "assembleDebug": "cd android && gradlew assembleDebug"
   },
   "dependencies": {
     "@react-native-clipboard/clipboard": "^1.8.4",
@@ -34,6 +36,7 @@
     "react-native-device-info": "^8.3.1",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-get-random-values": "^1.7.0",
+    "react-native-gifted-chat": "^0.16.3",
     "react-native-image-crop-picker": "^0.36.2",
     "react-native-modal": "^13.0.0",
     "react-native-pager-view": "^5.4.0",

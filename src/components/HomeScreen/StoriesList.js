@@ -8,6 +8,17 @@ import {useNavigation} from '@react-navigation/native';
 const StoriesList = ({ListData}) => {
   const navigation = useNavigation();
 
+  const _listEmptyComponent = () => {
+    return (
+      <View style={styles.emptyView}>
+        <Text style={styles.heading}>No one active, yet.</Text>
+        <Text style={styles.subheading}>
+          there's no one active at the moment.
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Pressable
@@ -36,6 +47,7 @@ const StoriesList = ({ListData}) => {
           disableVirtualization
           removeClippedSubviews={true}
           initialNumToRender={10}
+          ListEmptyComponent={_listEmptyComponent}
           data={ListData}
           renderItem={({item}) => (
             <Pressable
@@ -110,6 +122,26 @@ const styles = StyleSheet.create({
   flatListHolder: {
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  emptyView: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    alignContent: 'center',
+  },
+  heading: {
+    fontSize: 16,
+    textAlign: 'left',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  subheading: {
+    fontSize: 14,
+    paddingTop: '1%',
+    textAlign: 'left',
+    color: COLORS.black,
+    opacity: 0.4,
+    fontFamily: FONTS.regular,
   },
 });
 

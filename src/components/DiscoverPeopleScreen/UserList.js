@@ -27,7 +27,8 @@ const UserList = (props: UserListInterface) => {
         renderItem={({item}) => (
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
-            style={styles.container}>
+            style={styles.container}
+            onPress={props.onPressTrigger}>
             <View style={styles.left_side}>
               <Avatar.Image
                 source={item.avatar ? {uri: item.avatar} : null}

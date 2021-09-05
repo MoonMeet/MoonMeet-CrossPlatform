@@ -20,7 +20,11 @@ const HomePeopleScreen = () => {
 
   const [masterData, setMasterData] = React.useState([]);
 
-  async function checkJwtKey(currentJwtKey: string) {
+  const [newActiveTime, setNewActiveTime] = React.useState('');
+
+  const [activeStatusState, setActiveStatusState] = React.useState(null);
+
+  function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         auth()
@@ -31,6 +35,18 @@ const HomePeopleScreen = () => {
           });
       }
     });
+  }
+
+  function updateUserActiveStatus() {
+    database()
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .update({
+        active_status: activeStatusState === true ? 'normal' : 'recently',
+        active_time:
+          newActiveTime === 'Last seen recently'
+            ? 'Last seen recently'
+            : Date.now(),
+      });
   }
 
   useFocusEffect(
@@ -51,9 +67,20 @@ const HomePeopleScreen = () => {
     const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
       .on('value', async snapshot => {
-        if (snapshot?.val().avatar && snapshot?.val().jwtKey) {
+        if (
+          snapshot?.val().avatar &&
+          snapshot?.val().jwtKey &&
+          snapshot?.val().active_status &&
+          snapshot?.val().active_time
+        ) {
           setAvatarURL(snapshot?.val().avatar);
-          await checkJwtKey(snapshot?.val().jwtKey);
+          checkJwtKey(snapshot?.val().jwtKey);
+          if (snapshot?.val().active_status === 'normal') {
+            setActiveStatusState(true);
+          } else {
+            setActiveStatusState(false);
+          }
+          setNewActiveTime(snapshot?.val().active_time);
           setLoading(false);
         }
       });
@@ -153,7 +180,11 @@ const HomePeopleScreen = () => {
             <Text style={styles.top_text}>People</Text>
           </View>
           <View style={styles.right_side}>
-            <Pressable onPress={() => navigation.navigate('discover')}>
+            <Pressable
+              onPress={() => {
+                navigation.navigate('discover');
+                updateUserActiveStatus();
+              }}>
               <Avatar.Icon
                 icon={CreateImage}
                 size={37.5}

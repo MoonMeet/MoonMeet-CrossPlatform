@@ -2,10 +2,9 @@ import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
+import {ActivityIndicator, Avatar} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 

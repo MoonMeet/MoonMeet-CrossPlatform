@@ -21,7 +21,6 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
 import AsyncStorage from '@react-native-community/async-storage';
 import StoriesList from '../components/HomeScreen/StoriesList';
-import _testStories from '../assets/data/json/test/stories.json';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -75,6 +74,10 @@ const HomeChatsScreen = () => {
     }, []),
   );
 
+  async function deleteCurrentStory(uid, sid) {
+    return await database().ref(`/stories/${uid}/${sid}`).remove();
+  }
+
   useEffect(() => {
     const onValueChange = database()
       .ref(`/users/${auth()?.currentUser?.uid}`)
@@ -106,17 +109,26 @@ const HomeChatsScreen = () => {
               threeYearsOldSnapshot?.val().first_name &&
               threeYearsOldSnapshot?.val().last_name &&
               threeYearsOldSnapshot?.val().sid &&
-              threeYearsOldSnapshot?.val().uid
+              threeYearsOldSnapshot?.val().uid &&
+              threeYearsOldSnapshot?.val().time
             ) {
-              storiesSnapshot.push({
-                avatar: threeYearsOldSnapshot?.val().avatar,
-                first_name: threeYearsOldSnapshot?.val().first_name,
-                last_name: threeYearsOldSnapshot?.val().last_name,
-                sid: threeYearsOldSnapshot?.val().sid,
-                uid: threeYearsOldSnapshot?.val().uid,
-                text: threeYearsOldSnapshot?.val().text,
-                image: threeYearsOldSnapshot.val().image,
-              });
+              if (Date.now() - threeYearsOldSnapshot.time > 86400000) {
+                deleteCurrentStory(
+                  auth().currentUser.uid,
+                  threeYearsOldSnapshot?.val().sid,
+                );
+              } else {
+                storiesSnapshot.push({
+                  avatar: threeYearsOldSnapshot?.val().avatar,
+                  first_name: threeYearsOldSnapshot?.val().first_name,
+                  last_name: threeYearsOldSnapshot?.val().last_name,
+                  sid: threeYearsOldSnapshot?.val().sid,
+                  uid: threeYearsOldSnapshot?.val().uid,
+                  text: threeYearsOldSnapshot?.val().text,
+                  image: threeYearsOldSnapshot.val().image,
+                  time: threeYearsOldSnapshot?.val().time,
+                });
+              }
             }
             setStoriesData(storiesSnapshot);
           });
@@ -172,11 +184,11 @@ const HomeChatsScreen = () => {
         <View style={styles.right_side}>
           <Pressable
             onPress={() => {
-              navigation.navigate('discover');
+              navigation.navigate('searchChats');
               updateUserActiveStatus();
             }}>
             <Avatar.Icon
-              icon={CreateImage}
+              icon={SearchImage}
               size={37.5}
               color={COLORS.black}
               style={styles.right_icon}
@@ -188,29 +200,6 @@ const HomeChatsScreen = () => {
             />
           </Pressable>
         </View>
-      </View>
-      <View
-        style={{
-          padding: '2%',
-        }}>
-        <Searchbar
-          onChangeText={null}
-          value={null}
-          placeholder={'Search'}
-          icon={SearchImage}
-          selectionColor={COLORS.controlNormal}
-          platform={Platform.OS}
-          style={{
-            borderRadius: 150 / 2,
-            borderWidth: 1,
-            elevation: 0,
-            borderColor: COLORS.rippleColor,
-          }}
-          inputStyle={{
-            color: COLORS.accentLight,
-          }}
-          clearIcon={ClearImage}
-        />
       </View>
       <StoriesList ListData={storiesData} />
       <MessagesList ListData={_testChats} />
@@ -280,24 +269,6 @@ const styles = StyleSheet.create({
     paddingTop: '2%',
     paddingBottom: '2%',
     paddingLeft: '1.5%',
-  },
-  mini_text_left: activeStateColor => {
-    return {
-      fontSize: 16,
-      textAlign: 'center',
-      color: activeStateColor,
-      opacity: activeStateColor === COLORS.accentLight ? 1 : 0.4,
-      fontFamily: FONTS.regular,
-    };
-  },
-  mini_text_right: disabledStateColor => {
-    return {
-      fontSize: 16,
-      textAlign: 'center',
-      color: disabledStateColor,
-      opacity: disabledStateColor === COLORS.accentLight ? 1 : 0.4,
-      fontFamily: FONTS.regular,
-    };
   },
 });
 

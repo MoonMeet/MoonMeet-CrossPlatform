@@ -37,6 +37,7 @@ import {COLORS} from './Miscellaneous';
 import ChatIcon from '../assets/images/chat.png';
 import PeopleIcon from '../assets/images/two_people.png';
 import SettingsIcon from '../assets/images/settings.png';
+import ChatScreen from '../activities/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -106,6 +107,7 @@ function HomeScreen() {
     </Tab.Navigator>
   );
 }
+
 const StackNavigator = () => {
   return (
     <NavigationContainer>
@@ -131,6 +133,7 @@ const StackNavigator = () => {
         <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />
         <Stack.Screen name={'story'} component={StoryScreen} />
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
+        <Stack.Screen name={'chat'} component={ChatScreen} />
       </Stack.Navigator>
       <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>

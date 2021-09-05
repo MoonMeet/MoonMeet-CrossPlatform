@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import {Linking, Platform, View} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -173,7 +173,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={NotificationsIcon}
         leftIconColor={COLORS.yellowDarkWarning}
         titleTextContainer={'Notifications Settings'}
-        onPressTrigger={null}
+        onPressTrigger={() => Linking.openSettings()}
       />
       <DataItem
         leftIcon={MessageIcon}

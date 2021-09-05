@@ -21,7 +21,8 @@ const BaseView = ({children}) => {
         <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
         <KeyboardAvoidingView
           style={styles.container}
-          behavior={isIOS === 'ios' ? 'padding' : 'height'}>
+          behavior={isIOS === 'ios' ? 'padding' : 'height'}
+          enabled={true}>
           {children}
         </KeyboardAvoidingView>
       </Pressable>
