@@ -34,7 +34,9 @@ const HomeChatsScreen = () => {
 
   const [activeStatusState, setActiveStatusState] = React.useState(null);
 
-  async function checkJwtKey(currentJwtKey: string) {
+  const [storiesData, setStoriesData] = React.useState([]);
+
+  function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         auth()
@@ -51,35 +53,13 @@ const HomeChatsScreen = () => {
     database()
       .ref(`/users/${auth()?.currentUser.uid}`)
       .update({
-        active_status: activeStatusState === true ? 'recently' : 'normal',
+        active_status: activeStatusState === true ? 'normal' : 'recently',
         active_time:
           newActiveTime === 'Last seen recently'
-            ? Date.now()
-            : 'Last seen recently',
-      })
-      .then(r => console.log(r));
+            ? 'Last seen recently'
+            : Date.now(),
+      });
   }
-
-  const onValueChange = database()
-    .ref(`/users/${auth()?.currentUser?.uid}`)
-    .on('value', async snapshot => {
-      if (
-        snapshot?.val().avatar &&
-        snapshot?.val().jwtKey &&
-        snapshot?.val().active_status &&
-        snapshot?.val().active_time
-      ) {
-        setAvatarURL(snapshot?.val().avatar);
-        await checkJwtKey(snapshot?.val().jwtKey);
-        if (snapshot?.val().active_status === 'normal') {
-          setActiveStatusState(true);
-        } else {
-          setActiveStatusState(false);
-        }
-        setNewActiveTime(snapshot?.val().active_time);
-        updateUserActiveStatus();
-      }
-    });
 
   useFocusEffect(
     useCallback(() => {
@@ -96,11 +76,57 @@ const HomeChatsScreen = () => {
   );
 
   useEffect(() => {
-    onValueChange();
+    const onValueChange = database()
+      .ref(`/users/${auth()?.currentUser?.uid}`)
+      .on('value', snapshot => {
+        if (
+          snapshot?.val().avatar &&
+          snapshot?.val().jwtKey &&
+          snapshot?.val().active_status &&
+          snapshot?.val().active_time
+        ) {
+          setAvatarURL(snapshot?.val().avatar);
+          checkJwtKey(snapshot?.val().jwtKey);
+          if (snapshot?.val().active_status === 'normal') {
+            setActiveStatusState(true);
+          } else {
+            setActiveStatusState(false);
+          }
+          setNewActiveTime(snapshot?.val().active_time);
+        }
+      });
+    const secondOnValueChange = database()
+      .ref('/stories/')
+      .on('value', snapshot => {
+        const storiesSnapshot = [];
+        snapshot?.forEach(childSnapshot => {
+          childSnapshot?.forEach(threeYearsOldSnapshot => {
+            if (
+              threeYearsOldSnapshot?.val().avatar &&
+              threeYearsOldSnapshot?.val().first_name &&
+              threeYearsOldSnapshot?.val().last_name &&
+              threeYearsOldSnapshot?.val().sid &&
+              threeYearsOldSnapshot?.val().uid
+            ) {
+              storiesSnapshot.push({
+                avatar: threeYearsOldSnapshot?.val().avatar,
+                first_name: threeYearsOldSnapshot?.val().first_name,
+                last_name: threeYearsOldSnapshot?.val().last_name,
+                sid: threeYearsOldSnapshot?.val().sid,
+                uid: threeYearsOldSnapshot?.val().uid,
+                text: threeYearsOldSnapshot?.val().text,
+                image: threeYearsOldSnapshot.val().image,
+              });
+            }
+            setStoriesData(storiesSnapshot);
+          });
+        });
+      });
     return () => {
       database()
         .ref(`/users/${auth()?.currentUser.uid}`)
         .off('value', onValueChange);
+      database().ref('/stories/').off('value', secondOnValueChange);
     };
   }, []);
 
@@ -144,7 +170,11 @@ const HomeChatsScreen = () => {
           <Text style={styles.top_text}>Chats</Text>
         </View>
         <View style={styles.right_side}>
-          <Pressable onPress={() => navigation.navigate('discover')}>
+          <Pressable
+            onPress={() => {
+              navigation.navigate('discover');
+              updateUserActiveStatus();
+            }}>
             <Avatar.Icon
               icon={CreateImage}
               size={37.5}
@@ -182,7 +212,7 @@ const HomeChatsScreen = () => {
           clearIcon={ClearImage}
         />
       </View>
-      <StoriesList ListData={_testStories} />
+      <StoriesList ListData={storiesData} />
       <MessagesList ListData={_testChats} />
     </MiniBaseView>
   );

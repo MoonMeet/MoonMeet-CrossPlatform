@@ -56,7 +56,7 @@ const StoriesList = ({ListData}) => {
                 <Avatar.Image
                   style={styles.userHaveStory}
                   size={50}
-                  source={{uri: item.avatar}}
+                  source={{uri: item.image ? item.image : item.avatar}}
                 />
               </View>
               <Text
@@ -64,11 +64,18 @@ const StoriesList = ({ListData}) => {
                   textAlign: 'center',
                   color: COLORS.black,
                 }}>
-                {item.name}
+                {item.first_name}
+              </Text>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: COLORS.black,
+                }}>
+                {item.last_name}
               </Text>
             </Pressable>
           )}
-          keyExtractor={item => item.avatar}
+          keyExtractor={item => item.time}
         />
       </View>
     </View>

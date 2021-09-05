@@ -10,6 +10,17 @@ interface ActivePeopleListInterface {
   onLongPressTrigger: Function;
 }
 
+const _listEmptyComponent = () => {
+  return (
+    <View style={styles.emptyView}>
+      <Text style={styles.heading}>No one active, yet.</Text>
+      <Text style={styles.subheading}>
+        there's no one active at the moment.
+      </Text>
+    </View>
+  );
+};
+
 const ActivePeopleList = (props: ActivePeopleListInterface) => {
   return (
     <FlatList
@@ -22,6 +33,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       disableVirtualization
       removeClippedSubviews={true}
       initialNumToRender={10}
+      ListEmptyComponent={_listEmptyComponent}
       keyExtractor={item => item.avatar}
       renderItem={({item}) => (
         <Pressable
@@ -76,6 +88,12 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     opacity: 0.4,
     fontFamily: FONTS.regular,
+  },
+  emptyView: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    alignContent: 'center',
   },
 });
 

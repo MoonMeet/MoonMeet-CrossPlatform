@@ -1,12 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
-import {
-  BackHandler,
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
