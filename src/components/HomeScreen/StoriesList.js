@@ -1,4 +1,11 @@
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React from 'react';
 import {Avatar} from 'react-native-paper';
 import AddIcon from '../../assets/images/add.png';
@@ -19,6 +26,32 @@ const StoriesList = ({ListData}) => {
     );
   };
 
+  const _renderItem = ({item}) => (
+    <Pressable
+      onPress={() => {
+        navigation.navigate('story');
+      }}
+      style={{
+        padding: '2%',
+        height: 85,
+        width: 70,
+        backgroundColor: COLORS.primaryLight,
+      }}>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Avatar.Image
+          style={styles.userHaveStory}
+          size={50}
+          source={{uri: item.image ? item.image : item.avatar}}
+        />
+      </View>
+      <Text style={styles.nameAndLastname}>{item.first_name}</Text>
+      <Text style={styles.nameAndLastname}>{item.last_name}</Text>
+    </Pressable>
+  );
   return (
     <View style={styles.container}>
       <Pressable
@@ -43,50 +76,17 @@ const StoriesList = ({ListData}) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             paddingEnd: '13%',
+            alignSelf: 'center',
+            justifyContent: 'center',
+            minWidth:
+              Dimensions.get('window').width -
+              (13 / 100) * Dimensions.get('window').width,
           }}
-          disableVirtualization
           removeClippedSubviews={true}
           initialNumToRender={10}
           ListEmptyComponent={_listEmptyComponent}
           data={ListData}
-          renderItem={({item}) => (
-            <Pressable
-              onPress={() => {
-                navigation.navigate('story');
-              }}
-              style={{
-                padding: '2%',
-                height: 85,
-                width: 70,
-                backgroundColor: COLORS.primaryLight,
-              }}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Avatar.Image
-                  style={styles.userHaveStory}
-                  size={50}
-                  source={{uri: item.image ? item.image : item.avatar}}
-                />
-              </View>
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: COLORS.black,
-                }}>
-                {item.first_name}
-              </Text>
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: COLORS.black,
-                }}>
-                {item.last_name}
-              </Text>
-            </Pressable>
-          )}
+          renderItem={_renderItem}
           keyExtractor={item => item.time}
         />
       </View>
@@ -119,29 +119,33 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
-  flatListHolder: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
+  flatListHolder: {},
   emptyView: {
-    flex: 1,
     backgroundColor: COLORS.white,
+    height: 85,
     alignItems: 'center',
-    alignContent: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
   },
   heading: {
     fontSize: 16,
-    textAlign: 'left',
+    textAlign: 'center',
     color: COLORS.black,
     fontFamily: FONTS.regular,
+    width: '100%',
   },
   subheading: {
     fontSize: 14,
     paddingTop: '1%',
-    textAlign: 'left',
+    textAlign: 'center',
     color: COLORS.black,
     opacity: 0.4,
     fontFamily: FONTS.regular,
+    width: '100%',
+  },
+  nameAndLastname: {
+    textAlign: 'center',
+    color: COLORS.black,
   },
 });
 

@@ -2,6 +2,8 @@ import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -529,10 +531,10 @@ const AddStoryScreen = () => {
         {inputEnabledForImage ? (
           <TextInput
             style={{
-              width: '100%',
+              width: '95%',
+              alignSelf: 'center',
               paddingRight: '2%',
               paddingLeft: '2%',
-              paddingTop: '1%',
             }}
             mode="outlined"
             label="What's on your mind?"

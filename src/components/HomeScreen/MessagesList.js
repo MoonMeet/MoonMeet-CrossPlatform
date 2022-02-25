@@ -2,6 +2,7 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
+import {heightPercentageToDP} from '../../config/Dimensions';
 
 const MessagesList = ({ListData}) => {
   return (
@@ -11,10 +12,9 @@ const MessagesList = ({ListData}) => {
         contentContainerStyle={{
           paddingStart: '1%',
           paddingEnd: '2%',
+          paddingBottom: heightPercentageToDP(10),
         }}
-        itemHeight={65}
         showsVerticalScrollIndicator={false}
-        disableVirtualization
         removeClippedSubviews={true}
         initialNumToRender={10}
         renderItem={({item}) => (
@@ -31,7 +31,7 @@ const MessagesList = ({ListData}) => {
               <Avatar.Image
                 style={styles.userHaveStory}
                 size={50}
-                source={{uri: item?.avatar}}
+                source={{uri: 'https://i.pravatar.cc/300'}}
               />
             </View>
             <View

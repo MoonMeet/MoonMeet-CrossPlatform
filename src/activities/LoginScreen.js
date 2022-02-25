@@ -207,11 +207,15 @@ const LoginScreen = () => {
           return _countryDialCode.text();
         })
         .then(function (data) {
-          CountrySetText(data);
-          console.log(data);
+          if (data?.includes('error')) {
+            CountrySetText('+1');
+          } else {
+            CountrySetText(data);
+          }
         });
     } catch (e) {
       console.error(e);
+      CountrySetText(+1);
     }
   };
 
@@ -407,12 +411,11 @@ const LoginScreen = () => {
               style={{
                 padding: '2%',
                 flexDirection: 'row',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
               }}>
               <TextInput
                 style={{
-                  width: '37%',
-                  padding: '1%',
+                  width: '36%',
                 }}
                 mode="outlined"
                 keyboardType={isAndroid ? 'numeric' : 'number-pad'}
@@ -439,9 +442,8 @@ const LoginScreen = () => {
               />
               <TextInput
                 style={{
-                  width: '65%',
+                  width: '62%',
                   paddingRight: '2%',
-                  paddingTop: '1%',
                 }}
                 mode="outlined"
                 keyboardType={isAndroid ? 'numeric' : 'number-pad'}
@@ -549,7 +551,11 @@ const LoginScreen = () => {
                       setLoaderText('Loading');
                       setLoaderVisible(!LoaderVisible);
                       setFABLoading(!isFABLoading);
-                      signInWithPhoneNumber(CountryText + NumberText);
+                      signInWithPhoneNumber(CountryText + NumberText).catch(
+                        () => {
+                          setLoaderVisible(false);
+                        },
+                      );
                     } else {
                       setErrorSnackbarText(
                         'Please enter a valid Country Code and Phone Number',
