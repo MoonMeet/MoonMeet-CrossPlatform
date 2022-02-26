@@ -6,33 +6,61 @@ import {
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Avatar} from 'react-native-paper';
 import AddIcon from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
+import {fontValue} from '../../config/Dimensions';
+
+function removeDuplicates(arr, equals) {
+  let originalArr = arr.slice(0);
+  let i, len, val;
+  arr.length = 0;
+
+  for (i = 0, len = originalArr.length; i < len; ++i) {
+    val = originalArr[i];
+    if (
+      !arr.some(function (item) {
+        return equals(item, val);
+      })
+    ) {
+      arr.push(val);
+    }
+  }
+}
+
+function usersEqual(user1, user2) {
+  return user1.uid === user2.uid;
+}
 
 const StoriesList = ({ListData}) => {
   const navigation = useNavigation();
 
+  const getSameUidUser = () => {
+    removeDuplicates(ListData, usersEqual);
+  };
+
+  useEffect(() => {
+    getSameUidUser();
+  }, [ListData]);
+
   const _listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading}>No one active, yet.</Text>
+        <Text style={styles.heading}>No stories available, yet.</Text>
         <Text style={styles.subheading}>
-          there's no one active at the moment.
+          there's no story available at the moment.
         </Text>
       </View>
     );
   };
-
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
         navigation.navigate('story');
       }}
       style={{
-        padding: '2%',
         height: 85,
         width: 70,
         backgroundColor: COLORS.primaryLight,
@@ -68,7 +96,7 @@ const StoriesList = ({ListData}) => {
             },
           }}
         />
-        <Text style={styles.storyText}>Add Story</Text>
+        <Text style={styles.storyText}>Add{'\n'}Story</Text>
       </Pressable>
       <View style={styles.flatListHolder}>
         <FlatList
@@ -77,7 +105,7 @@ const StoriesList = ({ListData}) => {
           contentContainerStyle={{
             paddingEnd: '13%',
             alignSelf: 'center',
-            justifyContent: 'center',
+            justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
             minWidth:
               Dimensions.get('window').width -
               (13 / 100) * Dimensions.get('window').width,
@@ -111,7 +139,7 @@ const styles = StyleSheet.create({
   },
   storyText: {
     position: 'relative',
-    fontSize: 16,
+    fontSize: fontValue(13.5),
     paddingLeft: '3%',
     paddingRight: '3%',
     paddingTop: '0.2%',

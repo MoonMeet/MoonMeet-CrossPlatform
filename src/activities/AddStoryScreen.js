@@ -407,7 +407,6 @@ const AddStoryScreen = () => {
               width: '100%',
               paddingRight: '2%',
               paddingLeft: '2%',
-              paddingTop: '1%',
             }}
             mode="outlined"
             label="What's on your mind?"

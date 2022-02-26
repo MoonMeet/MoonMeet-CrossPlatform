@@ -1,4 +1,5 @@
 import Toast from 'react-native-toast-message';
+import {heightPercentageToDP} from '../../config/Dimensions';
 
 const SuccessToast = (
   position: string,
@@ -21,7 +22,7 @@ const SuccessToast = (
 };
 
 function InfoToast(
-  position: string,
+  position: 'top' | 'bottom',
   text1: string,
   text2: string,
   autoHide: boolean,
@@ -33,7 +34,7 @@ function InfoToast(
     text1: text1,
     text2: text2,
     autoHide: autoHide,
-    topOffset: 30,
+    topOffset: heightPercentageToDP(7),
     bottomOffset: 40,
     visibilityTime: time,
     activeOpacity: 1,
@@ -53,7 +54,7 @@ function ErrorToast(
     text1: text1,
     text2: text2,
     autoHide: autoHide,
-    topOffset: 30,
+    topOffset: heightPercentageToDP(7),
     bottomOffset: 40,
     visibilityTime: time,
     activeOpacity: 1,

@@ -1,20 +1,11 @@
 import React, {useCallback, useEffect} from 'react';
-import {
-  BackHandler,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {Avatar, Searchbar} from 'react-native-paper';
+import {Avatar} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
-import CreateImage from '../assets/images/create.png';
 import SearchImage from '../assets/images/search.png';
-import ClearImage from '../assets/images/clear.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -148,7 +139,7 @@ const HomeChatsScreen = () => {
         <View style={styles.left_side}>
           {avatarURL ? (
             <Avatar.Image
-              size={37.5}
+              size={40}
               source={avatarURL ? {uri: avatarURL} : null}
               style={{
                 overflow: 'hidden',
