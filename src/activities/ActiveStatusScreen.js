@@ -18,7 +18,7 @@ const ActiveStatusScreen = () => {
   const navigation = useNavigation();
 
   /**
-   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   * Checking if network is OK before sending SMS or catching a SnackBar Exception.
    */
   let isConnected = NetInfo.fetch().then(networkState => {
     isConnected = networkState?.isConnected;

@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'kotlin-android'
 
 import com.android.build.OutputFile
 
@@ -136,6 +137,7 @@ android {
         applicationId "org.moon.moonmeet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        compileSdkVersion rootProject.ext.compileSdkVersion
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 1
