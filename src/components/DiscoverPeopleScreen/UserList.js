@@ -3,6 +3,7 @@ import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import {transformTime} from '../../utils/TimeHandler/TimeHandler';
+import {useNavigation} from '@react-navigation/native';
 
 interface UserListInterface {
   ListData: any;
@@ -11,6 +12,8 @@ interface UserListInterface {
 }
 
 const UserList = (props: UserListInterface) => {
+  const navigation = useNavigation();
+
   return (
     <View style={{flex: 1}}>
       <FlatList
@@ -28,7 +31,7 @@ const UserList = (props: UserListInterface) => {
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             style={styles.container}
-            onPress={props.onPressTrigger}>
+            onPress={() => navigation.navigate('chat', {item})}>
             <View style={styles.left_side}>
               <Avatar.Image
                 source={item.avatar ? {uri: item.avatar} : null}

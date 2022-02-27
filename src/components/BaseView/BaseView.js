@@ -1,13 +1,11 @@
 import React from 'react';
 import {
   Keyboard,
-  KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import {isIOS} from '../../utils/device/DeviceInfo';
 import {COLORS} from '../../config/Miscellaneous';
 
 const BaseView = ({children}) => {
@@ -19,12 +17,7 @@ const BaseView = ({children}) => {
           Keyboard.dismiss();
         }}>
         <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
-        <KeyboardAvoidingView
-          style={styles.container}
-          behavior={isIOS === 'ios' ? 'padding' : 'height'}
-          enabled={true}>
-          {children}
-        </KeyboardAvoidingView>
+        {children}
       </Pressable>
     </SafeAreaView>
   );
