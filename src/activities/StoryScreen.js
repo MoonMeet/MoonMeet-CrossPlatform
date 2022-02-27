@@ -35,7 +35,7 @@ const StoryScreen = () => {
   const onViewableItemsChanged = useRef(({changed}) => {
     setCurrent(changed?.[0]?.index);
   });
-  const viewabilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
+  const viewAbilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
 
   useEffect(() => {
     const onValueChange = database()
@@ -77,6 +77,7 @@ const StoryScreen = () => {
         };
       });
   }, []);
+
   if (Loading) {
     return (
       <MiniBaseView>
@@ -141,7 +142,7 @@ const StoryScreen = () => {
             ref={storiesRef}
             pagingEnabled
             horizontal
-            viewabilityConfig={viewabilityConfig.current}
+            viewabilityConfig={viewAbilityConfig.current}
             onViewableItemsChanged={onViewableItemsChanged.current}
             showsHorizontalScrollIndicator={false}
             data={Object.values(allCurrentUserStories)}

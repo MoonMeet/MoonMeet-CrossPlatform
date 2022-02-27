@@ -13,6 +13,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import {fontValue} from '../config/Dimensions';
 
 const ActiveStatusScreen = () => {
   const navigation = useNavigation();
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   toolbar_text: {
-    fontSize: 22,
+    fontSize: fontValue(15.5),
     paddingLeft: '2%',
     paddingRight: '3%',
     textAlign: 'center',

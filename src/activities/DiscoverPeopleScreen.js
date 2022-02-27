@@ -8,6 +8,7 @@ import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import UserList from '../components/DiscoverPeopleScreen/UserList';
 import database from '@react-native-firebase/database';
+import {fontValue} from "../config/Dimensions";
 
 const DiscoverPeopleScreen = () => {
   const navigation = useNavigation();
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   toolbar_text: {
-    fontSize: 22,
+    fontSize: fontValue(16),
     paddingLeft: '2%',
     paddingRight: '3%',
     textAlign: 'center',

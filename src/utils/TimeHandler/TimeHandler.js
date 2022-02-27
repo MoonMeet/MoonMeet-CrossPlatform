@@ -1,3 +1,5 @@
+import {bool} from 'prop-types';
+
 function transformTime(time: number) {
   const passedTime = time;
   const newTime = Date.now();
@@ -28,12 +30,6 @@ function transformTimeDevices(time: number) {
   } else if (difference < 24 * (60 * 60000)) {
     return Math.floor(difference / 1000 / 60 / 60) + ' Hours ago';
   } else if (difference < 24 * (60 * 60 * 60000)) {
-    if (
-      difference / 1000 / 60 / 60 / 24 > 86400000 &&
-      difference / 1000 / 60 / 60 / 24 < 172800000
-    ) {
-      return Math.floor(difference / 1000 / 60 / 60 / 24) + ' Day ago';
-    }
     return Math.floor(difference / 1000 / 60 / 60 / 24) + ' Days ago';
   } else {
     return 'Long time ago';
@@ -42,14 +38,22 @@ function transformTimeDevices(time: number) {
 
 function transformTimeForStories(time: number) {
   const passedTime = time;
+  let returnCondition = bool;
   const newTime = Date.now();
   const difference = newTime - passedTime;
   if (difference < 60000) {
+    console.log(returnCondition);
     return 'Posted Now';
   } else if (difference < 60 * 60000) {
-    return Math.floor((difference / 1000 / 60) % 60) + ' Minutes ago';
+    returnCondition = Math.floor((difference / 1000 / 60) % 60) === 1;
+    return returnCondition
+      ? Math.floor((difference / 1000 / 60) % 60) + ' Minute ago'
+      : Math.floor((difference / 1000 / 60) % 60) + ' Minutes ago';
   } else if (difference < 24 * (60 * 60000)) {
-    return Math.floor(difference / 1000 / 60 / 60) + ' Hours ago';
+    returnCondition = Math.floor(difference / 1000 / 60 / 60) === 1;
+    return returnCondition
+      ? Math.floor(difference / 1000 / 60 / 60) + 'Hour ago'
+      : Math.floor(difference / 1000 / 60 / 60) + ' Hours ago';
   }
 }
 

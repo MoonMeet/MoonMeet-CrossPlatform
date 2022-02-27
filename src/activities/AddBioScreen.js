@@ -144,31 +144,30 @@ const AddBioScreen = () => {
         </View>
       </View>
       <Spacer height={'1%'} />
-      <TextInput
-        style={{
-          width: '100%',
-          paddingRight: '2%',
-          paddingLeft: '2%',
-          paddingTop: '1%',
-        }}
-        mode="outlined"
-        label="Add a bio"
-        multiline={false}
-        value={BioText}
-        placeholder={'Type your new bio here.'}
-        theme={{
-          colors: {
-            text: COLORS.black,
-            primary: COLORS.accentLight,
-            backgroundColor: COLORS.rippleColor,
-            placeholder: COLORS.darkGrey,
-            underlineColor: '#566193',
-            selectionColor: '#DADADA',
-            outlineColor: '#566193',
-          },
-        }}
-        onChangeText={onBioTextChange}
-      />
+      <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
+        <TextInput
+          style={{
+            width: '100%',
+          }}
+          mode="outlined"
+          label="Add a bio"
+          multiline={false}
+          value={BioText}
+          placeholder={'Type your new bio here.'}
+          theme={{
+            colors: {
+              text: COLORS.black,
+              primary: COLORS.accentLight,
+              backgroundColor: COLORS.rippleColor,
+              placeholder: COLORS.darkGrey,
+              underlineColor: '#566193',
+              selectionColor: '#DADADA',
+              outlineColor: '#566193',
+            },
+          }}
+          onChangeText={onBioTextChange}
+        />
+      </View>
       <HelperText type="info" visible={true}>
         You can add a few lines about yourself. Anyone who opens your profile
         will see this text.

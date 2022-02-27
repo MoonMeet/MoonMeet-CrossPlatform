@@ -243,7 +243,6 @@ const EditProfileScreen = () => {
             width: '100%',
             paddingRight: '2%',
             paddingLeft: '2%',
-            paddingTop: '1%',
           }}
           mode="outlined"
           label="First Name"
@@ -274,7 +273,6 @@ const EditProfileScreen = () => {
             width: '100%',
             paddingRight: '2%',
             paddingLeft: '2%',
-            paddingTop: '1%',
           }}
           mode="outlined"
           label="Last name"

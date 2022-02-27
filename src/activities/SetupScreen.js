@@ -96,7 +96,8 @@ const SetupScreen = ({route}) => {
     <BaseView>
       <View style={styles.top_bar}>
         <Text style={styles.top_text}>
-          Enter your name and select a profile picture
+          Enter your name and select
+          a profile picture
         </Text>
       </View>
       <View style={styles.large_box}>

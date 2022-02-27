@@ -145,31 +145,30 @@ const ReportProblemScreen = () => {
         We will need to help as soon as you describe the problem in the
         paragraphs bellow
       </Text>
-      <TextInput
-        style={{
-          width: '100%',
-          paddingRight: '2%',
-          paddingLeft: '2%',
-          paddingTop: '1%',
-        }}
-        mode="outlined"
-        label="Report a problem"
-        multiline={true}
-        value={ReportText}
-        placeholder={'Here you can describe the problem in more detail'}
-        theme={{
-          colors: {
-            text: COLORS.black,
-            primary: COLORS.accentLight,
-            backgroundColor: COLORS.rippleColor,
-            placeholder: COLORS.darkGrey,
-            underlineColor: '#566193',
-            selectionColor: '#DADADA',
-            outlineColor: '#566193',
-          },
-        }}
-        onChangeText={onReportTextChange}
-      />
+      <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
+        <TextInput
+          style={{
+            width: '100%',
+          }}
+          mode="outlined"
+          label="Report a problem"
+          multiline={true}
+          value={ReportText}
+          placeholder={'Here you can describe the problem in more detail'}
+          theme={{
+            colors: {
+              text: COLORS.black,
+              primary: COLORS.accentLight,
+              backgroundColor: COLORS.rippleColor,
+              placeholder: COLORS.darkGrey,
+              underlineColor: '#566193',
+              selectionColor: '#DADADA',
+              outlineColor: '#566193',
+            },
+          }}
+          onChangeText={onReportTextChange}
+        />
+      </View>
       {hasMoreLength() ? (
         <HelperText type="error" visible={hasMoreLength()}>
           Report message must be less than 240 characters.
