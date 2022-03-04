@@ -18,7 +18,6 @@ import SetupScreen from '../activities/SetupScreen';
 import SettingsScreen from '../activities/HomeSettingsScreen';
 import SearchChatsScreen from '../activities/SearchChatsScreen';
 import ReportProblem from '../activities/ReportProblemScreen';
-import Toast from 'react-native-toast-message';
 import ActiveStatusScreen from '../activities/ActiveStatusScreen';
 import ChangeUsernameScreen from '../activities/ChangeUsernameScreen';
 import AddBioActivity from '../activities/AddBioScreen';
@@ -29,6 +28,7 @@ import StoryScreen from '../activities/StoryScreen';
 import AddStoryScreen from '../activities/AddStoryScreen';
 import HomeChats from '../activities/HomeChatsScreen.js';
 import HomePeople from '../activities/HomePeopleScreen';
+import StoriesScreen from '../activities/StoryViewers';
 
 import {Avatar} from 'react-native-paper';
 
@@ -132,10 +132,10 @@ const StackNavigator = () => {
         <Stack.Screen name={'devices'} component={DevicesScreen} />
         <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />
         <Stack.Screen name={'story'} component={StoryScreen} />
+        <Stack.Screen name={'storyViewers'} component={StoriesScreen} />
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
         <Stack.Screen name={'chat'} component={ChatScreen} />
       </Stack.Navigator>
-      <Toast ref={ref => Toast.setRef(ref)} />
     </NavigationContainer>
   );
 };

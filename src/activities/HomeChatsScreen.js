@@ -94,6 +94,7 @@ const HomeChatsScreen = () => {
       .on('value', snapshot => {
         const storiesSnapshot = [];
         snapshot?.forEach(childSnapshot => {
+          console.log(childSnapshot);
           childSnapshot?.forEach(threeYearsOldSnapshot => {
             if (
               threeYearsOldSnapshot?.val().avatar &&
@@ -103,23 +104,22 @@ const HomeChatsScreen = () => {
               threeYearsOldSnapshot?.val().uid &&
               threeYearsOldSnapshot?.val().time
             ) {
-              if (Date.now() - threeYearsOldSnapshot.time > 86400000) {
+              if (Date.now() - threeYearsOldSnapshot?.val().time > 86400000) {
                 deleteCurrentStory(
                   auth().currentUser.uid,
                   threeYearsOldSnapshot?.val().sid,
                 );
-              } else {
-                storiesSnapshot.push({
-                  avatar: threeYearsOldSnapshot?.val().avatar,
-                  first_name: threeYearsOldSnapshot?.val().first_name,
-                  last_name: threeYearsOldSnapshot?.val().last_name,
-                  sid: threeYearsOldSnapshot?.val().sid,
-                  uid: threeYearsOldSnapshot?.val().uid,
-                  text: threeYearsOldSnapshot?.val().text,
-                  image: threeYearsOldSnapshot.val().image,
-                  time: threeYearsOldSnapshot?.val().time,
-                });
               }
+              storiesSnapshot.push({
+                avatar: threeYearsOldSnapshot?.val().avatar,
+                first_name: threeYearsOldSnapshot?.val().first_name,
+                last_name: threeYearsOldSnapshot?.val().last_name,
+                sid: threeYearsOldSnapshot?.val().sid,
+                uid: threeYearsOldSnapshot?.val().uid,
+                text: threeYearsOldSnapshot?.val().text,
+                image: threeYearsOldSnapshot.val().image,
+                time: threeYearsOldSnapshot?.val().time,
+              });
             }
             setStoriesData(storiesSnapshot);
           });

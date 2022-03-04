@@ -58,7 +58,7 @@ const StoriesList = ({ListData}) => {
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        navigation.navigate('story');
+        navigation.navigate('story', {uid: item.uid});
       }}
       style={{
         height: 85,

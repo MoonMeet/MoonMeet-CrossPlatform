@@ -4,7 +4,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import ArrowIcon from '../assets/images/back.png';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import ClearImage from '../assets/images/clear.png';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -13,7 +13,10 @@ import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
+  const userStoryUID = useRoute().params?.uid;
+
   const storiesRef = useRef(null);
+
   const [storyFirstName, setStoryFirstName] = React.useState('');
   const [storyLastName, setStoryLastName] = React.useState('');
   const [storyAvatar, setStoryAvatar] = React.useState('');
@@ -21,17 +24,20 @@ const StoryScreen = () => {
   const [storyTime, setStoryTime] = React.useState('');
   const [storyText, setStoryText] = React.useState('');
   const [storyImage, setStoryImage] = React.useState('');
-  const [storyUID, setStoryUID] = React.useState('');
+  // const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
 
   const [Loading, setLoading] = React.useState(true);
 
   async function deleteCurrentStory(uid, sid) {
-    return await database().ref(`/stories/${uid}/${sid}`).remove();
+    return await database().ref(`/stories/${userStoryUID}/${sid}`).remove();
   }
 
-  // VIEWABILITY
+  /**
+   * View Ability config for Stories FlatList.
+   * @type {React.MutableRefObject<(function({changed: *}): void)|*>}
+   */
   const onViewableItemsChanged = useRef(({changed}) => {
     setCurrent(changed?.[0]?.index);
   });
@@ -39,7 +45,7 @@ const StoryScreen = () => {
 
   useEffect(() => {
     const onValueChange = database()
-      .ref(`/stories/${auth().currentUser?.uid}/`)
+      .ref(`/stories/${userStoryUID}/`)
       .once('value', snapshot => {
         setAllCurrentUserStories(snapshot.val());
         snapshot?.forEach(childSnapshot => {
@@ -59,7 +65,7 @@ const StoryScreen = () => {
             setStoryImage(childSnapshot.val().image);
             setStoryTime(childSnapshot.val().time);
             setStoryText(childSnapshot.val().text);
-            setStoryUID(childSnapshot.val().uid);
+            // setStoryUID(childSnapshot.val().uid);
             const calender = Date.now();
             if (calender - storyTime > 86400000) {
               // TODO: Story Views Implementation.
