@@ -387,8 +387,7 @@ const LoginScreen = () => {
           <MiniBaseView>
             <View style={styles.top_bar}>
               <Text style={styles.top_text}>
-                Enter your phone number
-                to get started
+                Enter your phone number to get started
               </Text>
             </View>
             <View
@@ -607,8 +606,7 @@ const LoginScreen = () => {
           <SafeAreaView style={styles.container}>
             <View style={styles.top_bar}>
               <Text style={styles.top_text}>
-                Enter the code that we sent
-                to {CountryText + ' ' + NumberText}
+                Enter the code that we sent to {CountryText + ' ' + NumberText}
               </Text>
             </View>
             <View
