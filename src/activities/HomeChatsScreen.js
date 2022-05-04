@@ -3,7 +3,14 @@ import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {Avatar} from 'react-native-paper';
+import {
+  Avatar,
+  Button,
+  Dialog,
+  Paragraph,
+  Portal,
+  Provider,
+} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import SearchImage from '../assets/images/search.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
@@ -26,15 +33,16 @@ const HomeChatsScreen = () => {
 
   const [storiesData, setStoriesData] = React.useState([]);
 
+  const [mDialogVisible, setDialogVisible] = React.useState(false);
+
+  const showDialog = () => setDialogVisible(true);
+
+  const hideDialog = () => setDialogVisible(false);
+
   function checkJwtKey(currentJwtKey: string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
-        auth()
-          ?.signOut()
-          .then(() => {
-            AsyncStorage.removeItem('currentUserJwtKey');
-            navigation.navigate('login');
-          });
+        setDialogVisible(true);
       }
     });
   }
@@ -108,7 +116,7 @@ const HomeChatsScreen = () => {
                 deleteCurrentStory(
                   auth().currentUser.uid,
                   threeYearsOldSnapshot?.val().sid,
-                );
+                ).then(() => console.log('deleted'));
               }
               storiesSnapshot.push({
                 avatar: threeYearsOldSnapshot?.val().avatar,
@@ -134,67 +142,101 @@ const HomeChatsScreen = () => {
   }, []);
 
   return (
-    <MiniBaseView>
-      <View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          {avatarURL ? (
-            <Avatar.Image
-              size={40}
-              source={avatarURL ? {uri: avatarURL} : null}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.rippleColor,
-                },
-              }}
-            />
-          ) : (
-            <Avatar.Icon
-              icon={PersonImage}
-              size={40}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.rippleColor,
-                },
-              }}
-            />
-          )}
+    <Provider>
+      <Portal>
+        <Dialog
+          dismissable={false}
+          visible={mDialogVisible}
+          onDismiss={hideDialog}>
+          <Dialog.Title>Session Expired</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>
+              You're session has been expired in this account, Please Re-Login.
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              onPress={() => {
+                hideDialog();
+                AsyncStorage.removeItem('currentUserJwtKey');
+                if (auth()?.currentUser != null) {
+                  auth()
+                    ?.signOut()
+                    .then(() => {
+                      navigation.navigate('login');
+                    })
+                    .catch(() => {
+                      navigation.navigate('login');
+                    });
+                }
+              }}>
+              OK
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+      <MiniBaseView>
+        <View style={styles.toolbar}>
+          <View style={styles.left_side}>
+            {avatarURL ? (
+              <Avatar.Image
+                size={40}
+                source={avatarURL ? {uri: avatarURL} : null}
+                style={{
+                  overflow: 'hidden',
+                  marginRight: '-1%',
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            ) : (
+              <Avatar.Icon
+                icon={PersonImage}
+                size={40}
+                color={COLORS.black}
+                style={{
+                  overflow: 'hidden',
+                  marginRight: '-1%',
+                  opacity: 0.4,
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            )}
+          </View>
+          <View style={styles.mid_side}>
+            <Text style={styles.top_text}>Chats</Text>
+          </View>
+          <View style={styles.right_side}>
+            <Pressable
+              onPress={() => {
+                navigation.navigate('searchChats');
+                updateUserActiveStatus();
+              }}>
+              <Avatar.Icon
+                icon={SearchImage}
+                size={37.5}
+                color={COLORS.black}
+                style={styles.right_icon}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            </Pressable>
+          </View>
         </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.top_text}>Chats</Text>
-        </View>
-        <View style={styles.right_side}>
-          <Pressable
-            onPress={() => {
-              navigation.navigate('searchChats');
-              updateUserActiveStatus();
-            }}>
-            <Avatar.Icon
-              icon={SearchImage}
-              size={37.5}
-              color={COLORS.black}
-              style={styles.right_icon}
-              theme={{
-                colors: {
-                  primary: COLORS.rippleColor,
-                },
-              }}
-            />
-          </Pressable>
-        </View>
-      </View>
-      <StoriesList ListData={storiesData} />
-      <MessagesList ListData={_testChats} />
-    </MiniBaseView>
+        <StoriesList ListData={storiesData} />
+        <MessagesList ListData={_testChats} />
+      </MiniBaseView>
+    </Provider>
   );
 };
 

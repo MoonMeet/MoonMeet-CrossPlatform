@@ -19,6 +19,7 @@ import {
 import {v4 as uuidv4} from 'uuid';
 import AsyncStorage from '@react-native-community/async-storage';
 import DevicesList from '../components/DevicesScreen/DevicesList';
+import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 const DevicesScreen = () => {
   const navigation = useNavigation();
@@ -66,9 +67,9 @@ const DevicesScreen = () => {
   }, []);
 
   /**
-   * Used for getting Device Information.
+   * Copied from LoginScreen.js, needed to resend current logged in device
+   * after terminating all sessions from the user account.
    */
-
   const [systemName, setSystemName] = React.useState(getSystemName());
   const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
   const [Manufacturer, setManufacturer] = React.useState(
@@ -83,6 +84,34 @@ const DevicesScreen = () => {
   );
   const [Model, setModel] = React.useState(getModel());
   const [appVersion, setAppVersion] = React.useState(getVersion());
+
+  const resendCurrentDevice = async () => {
+    if (!isWindows && !isWeb) {
+      await database()
+        .ref(`/devices/${auth()?.currentUser.uid}`)
+        .remove()
+        .then(() => {
+          const referenceKey = database()
+            .ref(`/devices/${auth()?.currentUser.uid}`)
+            .push().key;
+
+          database()
+            .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
+            .set({
+              manufacturer: Manufacturer,
+              system_name: systemName,
+              system_version: systemVersion,
+              product: Product,
+              model: Model,
+              app_version: appVersion,
+              time: Date.now(),
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        });
+    }
+  };
 
   if (Loading) {
     return (
@@ -162,6 +191,7 @@ const DevicesScreen = () => {
                   .catch(error => console.log(error));
               },
             );
+            await resendCurrentDevice();
           }}
           style={styles.headingTerminate}>
           Terminate All Other Sessions

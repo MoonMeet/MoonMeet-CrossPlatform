@@ -1,14 +1,14 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef} from 'react';
-import {View, StyleSheet, Pressable} from 'react-native';
-import {Text} from 'react-native-paper';
+import {View, StyleSheet} from 'react-native';
+import {Snackbar, Text} from 'react-native-paper';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
 import {IconButton} from 'react-native-paper';
 
 import BackImage from '../assets/images/back.png';
-import {getCodename} from 'react-native-device-info';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
 const SetupPasscodeScreen = () => {
   const navigation = useNavigation();
@@ -19,9 +19,23 @@ const SetupPasscodeScreen = () => {
   const [mConfirmingCodeForSetup, setConfirmingCodeForSetup] =
     React.useState(false);
 
+  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
+
+  const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
+
+  const [mSettingRecoveryPassword, setSettingRecoveryPassword] =
+    React.useState(false);
+
+  const onToggleErrorSnackBar = () =>
+    setErrorSnackBarVisible(!ErrorSnackBarVisible);
+
+  const onDismissErrorSnackBar = () =>
+    setErrorSnackBarVisible(!ErrorSnackBarVisible);
+
   useEffect(() => {
     return () => {};
   });
+
   return (
     <MiniBaseView>
       <View
@@ -61,12 +75,10 @@ const SetupPasscodeScreen = () => {
               if (mConfirmingCodeForSetup) {
                 if (text != mPinCode) {
                   mPINRef.current.clear();
-                  console.log('wrong');
-                  console.log(text);
-                  // TODO
+                  setErrorSnackbarText('Wrong PIN, Try again');
+                  setErrorSnackBarVisible(true);
                 } else {
-                  // TODO
-                  console.log('correct');
+                  setSettingRecoveryPassword(true);
                 }
               } else {
                 setPINCode(text);
@@ -109,6 +121,27 @@ const SetupPasscodeScreen = () => {
           </View>
         </View>
       ) : null}
+      <Snackbar
+        visible={ErrorSnackBarVisible}
+        onDismiss={onDismissErrorSnackBar}
+        duration={5000}
+        action={{
+          label: 'OK',
+          onPress: () => {
+            onDismissErrorSnackBar();
+          },
+        }}
+        theme={{
+          colors: {
+            onSurface: COLORS.redLightError,
+            accent: COLORS.white,
+          },
+        }}
+        style={{
+          margin: '4%',
+        }}>
+        {ErrorSnackbarText}
+      </Snackbar>
     </MiniBaseView>
   );
 };
@@ -130,7 +163,7 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: 'relative',
-    fontSize: 28,
+    fontSize: fontValue(28),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
@@ -139,6 +172,8 @@ const styles = StyleSheet.create({
   },
   TextInputContainer: {
     marginBottom: 20,
+    marginRight: heightPercentageToDP(8),
+    marginLeft: heightPercentageToDP(8),
   },
   RoundedTextInput: {
     borderRadius: 10,

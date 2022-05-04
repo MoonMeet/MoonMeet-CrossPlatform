@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {StyleSheet, Text, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   fontValue,
@@ -9,21 +8,22 @@ import {
 } from '../config/Dimensions';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Avatar, TouchableRipple} from 'react-native-paper';
+import {Avatar, TextInput, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
-import auth from '@react-native-firebase/auth';
+import MoonChatList from '../components/ChatScreen/MoonChatList/MoonChatList';
+import SendImage from '../assets/images/send.png';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
   const [messages, setMessages] = React.useState([]);
 
+  const [mMessageText, setMessageText] = React.useState('');
+
   useEffect(() => {}, []);
 
   const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, messages),
-    );
+    setMessages(previousMessages => {});
   }, []);
 
   return (
@@ -56,27 +56,64 @@ const ChatScreen = () => {
           {destinedUser?.first_name} {destinedUser?.last_name}
         </Text>
       </View>
-      <GiftedChat
-        renderChatEmpty={() => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              transform: [{rotateX: '180deg'}],
-            }}>
-            <Text style={styles.emptyHolderHeaderText}>No Messages, yet.</Text>
-            <Text style={styles.emptyHolderSubText}>
-              There's no messages between you and {destinedUser.first_name}
-            </Text>
-          </View>
-        )}
-        messages={messages}
-        onSend={data => onSend(data)}
-        user={{
-          uid: auth().currentUser?.uid,
-        }}
+      <MoonChatList
+        ChatData={[
+          {
+            name: 'Houssin Eraged',
+            avatar:
+              'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
+            lastmessage: 'How are you doing ?',
+            time: '12:05',
+            uid: '3GbKpy5kmTPdZHMyd9X60of59k72',
+          },
+          {
+            name: 'Houssin Eraged',
+            avatar:
+              'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
+            lastmessage: 'How are you doing ?',
+            time: '12:05',
+            uid: 'TsYO3H0bbfgxnKuc72Z8VfjBhsk1',
+          },
+        ]}
       />
+      <View style={styles.messageInputBox}>
+        <TextInput
+          style={{flex: 1}}
+          mode="outlined"
+          value={mMessageText}
+          placeholder={'Type a message'}
+          theme={{
+            colors: {
+              text: COLORS.accentLight,
+              primary: COLORS.accentLight,
+              backgroundColor: COLORS.rippleColor,
+              placeholder: COLORS.darkGrey,
+              underlineColor: '#566193',
+              selectionColor: '#DADADA',
+              outlineColor: '#566193',
+            },
+            roundness: heightPercentageToDP(3),
+          }}
+          onChangeText={text => {
+            setMessageText(text);
+          }}
+        />
+        <Avatar.Icon
+          icon={SendImage}
+          size={64}
+          color={COLORS.black}
+          style={{
+            overflow: 'hidden',
+            marginRight: '-1%',
+            opacity: 0.4,
+          }}
+          theme={{
+            colors: {
+              primary: COLORS.transparent,
+            },
+          }}
+        />
+      </View>
     </BaseView>
   );
 };
@@ -105,6 +142,10 @@ const styles = StyleSheet.create({
     color: COLORS.black,
     opacity: 0.4,
     fontFamily: FONTS.regular,
+  },
+  messageInputBox: {
+    flexDirection: 'row',
+    padding: heightPercentageToDP(0.5),
   },
 });
 export default React.memo(ChatScreen);

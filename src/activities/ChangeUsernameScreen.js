@@ -137,30 +137,31 @@ const ChangeUsernameScreen = () => {
         </View>
       </View>
       <Spacer height={'1%'} />
-      <TextInput
-        style={{
-          width: '100%',
-          paddingRight: '2%',
-          paddingLeft: '2%',
-        }}
-        mode="outlined"
-        label="Change username"
-        multiline={false}
-        value={UsernameText}
-        placeholder={'Type your new username here.'}
-        theme={{
-          colors: {
-            text: COLORS.black,
-            primary: COLORS.accentLight,
-            backgroundColor: COLORS.rippleColor,
-            placeholder: COLORS.darkGrey,
-            underlineColor: '#566193',
-            selectionColor: '#DADADA',
-            outlineColor: '#566193',
-          },
-        }}
-        onChangeText={onUsernameTextChange}
-      />
+      <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
+        <TextInput
+          style={{
+            width: '100%',
+          }}
+          mode="outlined"
+          label="Change username"
+          multiline={false}
+          value={UsernameText}
+          placeholder={'Type your new username here.'}
+          theme={{
+            colors: {
+              text: COLORS.black,
+              primary: COLORS.accentLight,
+              backgroundColor: COLORS.rippleColor,
+              placeholder: COLORS.darkGrey,
+              underlineColor: '#566193',
+              selectionColor: '#DADADA',
+              outlineColor: '#566193',
+            },
+          }}
+          onChangeText={onUsernameTextChange}
+        />
+      </View>
+
       <HelperText type="info" visible={true}>
         You can choose a username on Moon Meet, if you do, people will be able
         to find you by this username and contact you without needing your phone

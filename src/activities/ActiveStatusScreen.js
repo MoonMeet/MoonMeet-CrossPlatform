@@ -30,20 +30,18 @@ const ActiveStatusScreen = () => {
   const [switchState, setSwitchState] = React.useState(false);
 
   useEffect(() => {
-    const getUserActiveStatus = () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .on('value', snapshot => {
-          if (snapshot?.val().active_status && snapshot?.val().active_time) {
-            if (snapshot?.val().active_status === 'normal') {
-              setSwitchState(true);
-            } else {
-              setSwitchState(false);
-            }
-            setNewActiveTime(snapshot?.val().active_time);
+    const getUserActiveStatus = database()
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .on('value', snapshot => {
+        if (snapshot?.val().active_status && snapshot?.val().active_time) {
+          if (snapshot?.val().active_status === 'normal') {
+            setSwitchState(true);
+          } else {
+            setSwitchState(false);
           }
-        });
-    };
+          setNewActiveTime(snapshot?.val().active_time);
+        }
+      });
     return () => {
       database()
         .ref(`/users/${auth().currentUser.uid}`)

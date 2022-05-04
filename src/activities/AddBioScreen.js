@@ -144,12 +144,14 @@ const AddBioScreen = () => {
         </View>
       </View>
       <Spacer height={'1%'} />
-      <View style={{}}>
+      <View
+        style={{
+          paddingRight: '2%',
+          paddingLeft: '2%',
+        }}>
         <TextInput
           style={{
             width: '100%',
-            paddingRight: '2%',
-            paddingLeft: '2%',
           }}
           mode="outlined"
           label="Add a bio"

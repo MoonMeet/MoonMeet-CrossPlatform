@@ -30,7 +30,7 @@ const StoryScreen = () => {
 
   const [Loading, setLoading] = React.useState(true);
 
-  async function deleteCurrentStory(uid, sid) {
+  async function deleteCurrentStory(sid) {
     return await database().ref(`/stories/${userStoryUID}/${sid}`).remove();
   }
 
@@ -69,19 +69,24 @@ const StoryScreen = () => {
             const calender = Date.now();
             if (calender - storyTime > 86400000) {
               // TODO: Story Views Implementation.
-              // deleteCurrentStory(storyUID, storyId);
+              deleteCurrentStory(storyId);
             } else {
               // TODO: Some Logic to implement.
             }
           }
           setLoading(false);
         });
-        return () => {
-          database()
-            .ref(`/users/${auth()?.currentUser.uid}`)
-            .off('value', onValueChange);
-        };
+      })
+      .catch(() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       });
+    return () => {
+      database()
+        .ref(`/users/${auth()?.currentUser.uid}`)
+        .off('value', onValueChange);
+    };
   }, []);
 
   if (Loading) {
