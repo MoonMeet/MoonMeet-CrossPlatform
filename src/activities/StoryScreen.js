@@ -50,43 +50,39 @@ const StoryScreen = () => {
         setAllCurrentUserStories(snapshot.val());
         snapshot?.forEach(childSnapshot => {
           if (
-            childSnapshot.val().first_name &&
-            childSnapshot.val().last_name &&
-            childSnapshot.val().sid &&
-            childSnapshot.val().time &&
-            childSnapshot.val().uid &&
-            childSnapshot.val().avatar &&
-            (childSnapshot.val().text || childSnapshot.val().image)
+            childSnapshot.val()?.first_name &&
+            childSnapshot.val()?.last_name &&
+            childSnapshot.val()?.sid &&
+            childSnapshot.val()?.time &&
+            childSnapshot.val()?.uid &&
+            childSnapshot.val()?.avatar &&
+            (childSnapshot.val()?.text || childSnapshot.val()?.image)
           ) {
-            setStoryAvatar(childSnapshot.val().avatar);
-            setStoryFirstName(childSnapshot.val().first_name);
-            setStoryLastName(childSnapshot.val().last_name);
-            setStoryId(childSnapshot.val().sid);
-            setStoryImage(childSnapshot.val().image);
-            setStoryTime(childSnapshot.val().time);
-            setStoryText(childSnapshot.val().text);
+            setStoryAvatar(childSnapshot.val()?.avatar);
+            setStoryFirstName(childSnapshot.val()?.first_name);
+            setStoryLastName(childSnapshot.val()?.last_name);
+            setStoryId(childSnapshot.val()?.sid);
+            setStoryImage(childSnapshot.val()?.image);
+            setStoryTime(childSnapshot.val()?.time);
+            setStoryText(childSnapshot.val()?.text);
             // setStoryUID(childSnapshot.val().uid);
-            const calender = Date.now();
-            if (calender - storyTime > 86400000) {
-              // TODO: Story Views Implementation.
-              deleteCurrentStory(storyId);
-            } else {
-              // TODO: Some Logic to implement.
+            if (storyTime != null) {
+              const calender = Date.now();
+              console.log(calender);
+              console.log(childSnapshot.val()?.time);
+              console.log(calender - storyTime > 86400000);
+              if (calender - childSnapshot.val()?.time > 86400000) {
+                // TODO: Story Views Implementation.
+                deleteCurrentStory(storyId);
+              } else {
+                // TODO: Some Logic to implement.
+              }
             }
           }
           setLoading(false);
         });
-      })
-      .catch(() => {
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
       });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
+    return () => {};
   }, []);
 
   if (Loading) {

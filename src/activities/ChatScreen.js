@@ -16,15 +16,28 @@ import SendImage from '../assets/images/send.png';
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  const [messages, setMessages] = React.useState([]);
+  const [messages, setMessages] = React.useState([
+    {
+      name: 'Houssin Eraged',
+      avatar:
+        'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
+      lastmessage: 'How are you doing ?',
+      time: '12:05',
+      uid: '3GbKpy5kmTPdZHMyd9X60of59k72',
+    },
+    {
+      name: 'Houssin Eraged',
+      avatar:
+        'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
+      lastmessage: 'How are you doing ?',
+      time: '12:05',
+      uid: 'TsYO3H0bbfgxnKuc72Z8VfjBhsk1',
+    },
+  ]);
 
   const [mMessageText, setMessageText] = React.useState('');
 
   useEffect(() => {}, []);
-
-  const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages => {});
-  }, []);
 
   return (
     <BaseView>
@@ -56,29 +69,10 @@ const ChatScreen = () => {
           {destinedUser?.first_name} {destinedUser?.last_name}
         </Text>
       </View>
-      <MoonChatList
-        ChatData={[
-          {
-            name: 'Houssin Eraged',
-            avatar:
-              'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
-            lastmessage: 'How are you doing ?',
-            time: '12:05',
-            uid: '3GbKpy5kmTPdZHMyd9X60of59k72',
-          },
-          {
-            name: 'Houssin Eraged',
-            avatar:
-              'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
-            lastmessage: 'How are you doing ?',
-            time: '12:05',
-            uid: 'TsYO3H0bbfgxnKuc72Z8VfjBhsk1',
-          },
-        ]}
-      />
+      <MoonChatList ChatData={messages} />
       <View style={styles.messageInputBox}>
         <TextInput
-          style={{flex: 1}}
+          style={{flexGrow: 1}}
           mode="outlined"
           value={mMessageText}
           placeholder={'Type a message'}

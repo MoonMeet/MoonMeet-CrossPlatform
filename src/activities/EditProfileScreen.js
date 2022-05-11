@@ -265,7 +265,7 @@ const EditProfileScreen = () => {
         />
         {firstnameHasLessLength() ? (
           <HelperText type="error" visible={firstnameHasLessLength()}>
-            First Name must be longer longer than 2 characters.
+            First Name must be longer than 2 characters.
           </HelperText>
         ) : null}
         <TextInput
@@ -295,7 +295,7 @@ const EditProfileScreen = () => {
         />
         {lastnameHasLessLength() ? (
           <HelperText type="error" visible={lastnameHasLessLength()}>
-            Last Name must be longer longer than 2 characters.
+            Last Name must be longer than 2 characters.
           </HelperText>
         ) : null}
       </View>
