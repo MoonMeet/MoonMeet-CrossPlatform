@@ -12,32 +12,68 @@ import {Avatar, TextInput, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import MoonChatList from '../components/ChatScreen/MoonChatList/MoonChatList';
 import SendImage from '../assets/images/send.png';
+import testChats from '../assets/data/json/test/testChats.json';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  const [messages, setMessages] = React.useState([
-    {
-      name: 'Houssin Eraged',
-      avatar:
-        'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
-      lastmessage: 'How are you doing ?',
-      time: '12:05',
-      uid: '3GbKpy5kmTPdZHMyd9X60of59k72',
-    },
-    {
-      name: 'Houssin Eraged',
-      avatar:
-        'https://firebasestorage.googleapis.com/v0/b/moonmeet1920.appspot.com/o/avatars%2FIYguIbTuMbUT2Lb2SMOvuLA06e03.jpg?alt=media&token=e020d7bf-f006-4ddf-8ede-b3cacebea78e',
-      lastmessage: 'How are you doing ?',
-      time: '12:05',
-      uid: 'TsYO3H0bbfgxnKuc72Z8VfjBhsk1',
-    },
-  ]);
+  const [messages, setMessages] = React.useState(testChats);
+  console.log('destinated' + destinedUser);
+
+  /**
+   * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
+   */
+
+  const [userUID, setUserUID] = React.useState('');
+  const [userFirstName, setUserFirstName] = React.useState('');
+  const [userLastName, setUserLastName] = React.useState('');
+  const [userAvatar, setUserAvatar] = React.useState('');
+
+  /**
+   * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
+   */
+
+  const [myUID, setMyUID] = React.useState('');
+  const [myFirstName, setMyFirstName] = React.useState('');
+  const [myLastName, setMyLastName] = React.useState('');
+  const [myAvatar, setMyAvatar] = React.useState('');
 
   const [mMessageText, setMessageText] = React.useState('');
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const userInformation = database()
+      .ref(`/users/${destinedUser?.uid}`)
+      .once('value', snapshot => {
+        console.log(snapshot);
+        if (
+          snapshot?.val().avatar &&
+          snapshot?.val().first_name &&
+          snapshot.val().last_name
+        ) {
+          setUserUID(snapshot?.val().uid);
+          setUserFirstName(snapshot?.val().first_name);
+          setUserLastName(snapshot?.val().last_name);
+          setUserAvatar(snapshot?.val().avatar);
+        }
+      });
+    const myInformation = database()
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .once('value', snapshot => {
+        if (
+          snapshot?.val().avatar &&
+          snapshot?.val().first_name &&
+          snapshot.val().last_name
+        ) {
+          setMyUID(snapshot?.val().uid);
+          setMyFirstName(snapshot?.val().first_name);
+          setMyLastName(snapshot?.val().last_name);
+          setMyAvatar(snapshot?.val().avatar);
+        }
+      });
+    return () => {};
+  }, []);
 
   return (
     <BaseView>
@@ -64,12 +100,15 @@ const ChatScreen = () => {
             }}
           />
         </TouchableRipple>
-        <Avatar.Image size={45} source={{uri: destinedUser?.avatar}} />
+        <Avatar.Image
+          size={45}
+          source={{uri: userAvatar === null ? destinedUser.avatar : userAvatar}}
+        />
         <Text style={styles.userFullName}>
-          {destinedUser?.first_name} {destinedUser?.last_name}
+          {userFirstName} {userLastName}
         </Text>
       </View>
-      <MoonChatList ChatData={messages} />
+      <MoonChatList ChatData={messages} userInfo={destinedUser} />
       <View style={styles.messageInputBox}>
         <TextInput
           style={{flexGrow: 1}}

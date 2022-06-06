@@ -8,7 +8,7 @@ import {Avatar} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import {COLORS} from '../../../config/Miscellaneous';
 
-const MoonChatList = ({ChatData}) => {
+const MoonChatList = ({ChatData, userInfo}) => {
   const mListEmptyComponent = () => {
     return (
       <View
@@ -20,7 +20,7 @@ const MoonChatList = ({ChatData}) => {
         }}>
         <Text style={styles.emptyHolderHeaderText}>No Messages, yet.</Text>
         <Text style={styles.emptyHolderSubText}>
-          There's no messages between you and {mUserUID.first_name}
+          There's no messages between you and {userInfo.first_name}
         </Text>
       </View>
     );
