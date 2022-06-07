@@ -86,7 +86,7 @@ const ChatScreen = () => {
           }}>
           <Avatar.Icon
             icon={BackImage}
-            size={50}
+            size={40}
             color={COLORS.black}
             style={{
               overflow: 'hidden',
@@ -100,10 +100,7 @@ const ChatScreen = () => {
             }}
           />
         </TouchableRipple>
-        <Avatar.Image
-          size={45}
-          source={{uri: userAvatar === null ? destinedUser.avatar : userAvatar}}
-        />
+        <Avatar.Image size={40} source={{uri: userAvatar}} />
         <Text style={styles.userFullName}>
           {userFirstName} {userLastName}
         </Text>

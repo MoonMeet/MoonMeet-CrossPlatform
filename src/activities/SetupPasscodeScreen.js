@@ -11,16 +11,25 @@ import BackImage from '../assets/images/back.png';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import ArrowForward from '../assets/images/arrow-forward.png';
 
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
+
 const SetupPasscodeScreen = () => {
   const navigation = useNavigation();
 
   const [mRecoveryPassword, setRecoveryPassword] = React.useState('');
   const [mRecoveryPasswordHint, setRecoveryPasswordHint] = React.useState('');
   const passwordHasLessLength = () => {
-    return mRecoveryPassword.length < 4;
+    if (mRecoveryPassword.length == 0) {
+      return false;
+    }
+    return mRecoveryPassword.length < 3;
   };
 
   const passwordHintHasLessLength = () => {
+    if (mRecoveryPasswordHint.length == 0) {
+      return false;
+    }
     return mRecoveryPasswordHint.length < 3;
   };
 
@@ -37,11 +46,14 @@ const SetupPasscodeScreen = () => {
   const [mSettingRecoveryPassword, setSettingRecoveryPassword] =
     React.useState(false);
 
+  const [mBottomMargin, setBottomMargin] = React.useState(0);
   const onToggleErrorSnackBar = () =>
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
 
-  const onDismissErrorSnackBar = () =>
+  const onDismissErrorSnackBar = () => {
+    setBottomMargin(0);
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
+  };
 
   useEffect(() => {
     return () => {};
@@ -96,11 +108,11 @@ const SetupPasscodeScreen = () => {
               },
             }}
             onChangeText={text => {
-              setSettingRecoveryPassword(text);
+              setRecoveryPassword(text);
             }}
           />
           {passwordHasLessLength() ? (
-            <HelperText type="info" visible={passwordHasLessLength()}>
+            <HelperText type="error" visible={passwordHasLessLength()}>
               Recovery Password must be longer than 2 characters.
             </HelperText>
           ) : null}
@@ -131,13 +143,13 @@ const SetupPasscodeScreen = () => {
             }}
           />
           {passwordHintHasLessLength() ? (
-            <HelperText type="info" visible={passwordHintHasLessLength()}>
+            <HelperText type="error" visible={passwordHintHasLessLength()}>
               Password Hint must be longer than 2 characters.
             </HelperText>
           ) : null}
         </View>
         <FAB
-          style={styles.fab}
+          style={styles.fab(mBottomMargin)}
           normal
           icon={ArrowForward}
           color={COLORS.primaryLight}
@@ -147,8 +159,49 @@ const SetupPasscodeScreen = () => {
               accent: COLORS.accentLight,
             },
           }}
-          onPress={() => {}}
+          onPress={() => {
+            if (mRecoveryPassword.length && mRecoveryPassword.length > 2) {
+              database()
+                .ref(`/users/${auth()?.currentUser.uid}/passcode/`)
+                .set({
+                  pin: mPinCode,
+                  recovery_password: mRecoveryPassword,
+                  password_hint: mRecoveryPasswordHint,
+                  time: Date.now(),
+                })
+                .then(() => {
+                  if (navigation.canGoBack()) {
+                    navigation.goBack();
+                  }
+                });
+            } else {
+              setBottomMargin(heightPercentageToDP(7));
+              setErrorSnackbarText('Please fill the requirments above.');
+              setErrorSnackBarVisible(!ErrorSnackBarVisible);
+            }
+          }}
         />
+        <Snackbar
+          visible={ErrorSnackBarVisible}
+          onDismiss={onDismissErrorSnackBar}
+          duration={3000}
+          action={{
+            label: 'OK',
+            onPress: () => {
+              onDismissErrorSnackBar();
+            },
+          }}
+          theme={{
+            colors: {
+              onSurface: COLORS.redLightError,
+              accent: COLORS.white,
+            },
+          }}
+          style={{
+            margin: '4%',
+          }}>
+          {ErrorSnackbarText}
+        </Snackbar>
       </BaseView>
     );
   } else {
@@ -298,11 +351,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
   },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
+  fab: bottomMargin => {
+    return {
+      position: 'absolute',
+      margin: 16,
+      right: 0,
+      bottom: bottomMargin,
+    };
   },
 });
 export default React.memo(SetupPasscodeScreen);

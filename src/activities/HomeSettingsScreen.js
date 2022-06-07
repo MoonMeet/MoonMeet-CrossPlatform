@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.black,
+    fontWeight: 'bold',
     fontFamily: FONTS.regular,
   },
   under_header_text: {

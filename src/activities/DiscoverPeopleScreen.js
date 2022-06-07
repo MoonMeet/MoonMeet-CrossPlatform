@@ -8,7 +8,7 @@ import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import UserList from '../components/DiscoverPeopleScreen/UserList';
 import database from '@react-native-firebase/database';
-import {fontValue} from "../config/Dimensions";
+import {fontValue} from '../config/Dimensions';
 
 const DiscoverPeopleScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +31,7 @@ const DiscoverPeopleScreen = () => {
             childSnapshot?.val().active_time
           ) {
             usersSnapshot.push({
+              uid: childSnapshot?.val().uid,
               avatar: childSnapshot?.val().avatar,
               first_name: childSnapshot?.val().first_name,
               last_name: childSnapshot?.val().last_name,

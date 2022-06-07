@@ -39,6 +39,7 @@ import PeopleIcon from '../assets/images/two_people.png';
 import SettingsIcon from '../assets/images/settings.png';
 import ChatScreen from '../activities/ChatScreen';
 import SetupPasscodeScreen from '../activities/SetupPasscodeScreen';
+import VerifyPasscodeScreen from '../activities/VerifyPasscodeScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -137,6 +138,10 @@ const StackNavigator = () => {
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
         <Stack.Screen name={'chat'} component={ChatScreen} />
         <Stack.Screen name={'passcodeSetup'} component={SetupPasscodeScreen} />
+        <Stack.Screen
+          name={'passcodeVerify'}
+          component={VerifyPasscodeScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -5,11 +5,15 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import ArrowIcon from '../assets/images/back.png';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import ClearImage from '../assets/images/clear.png';
+import BackImage from '../assets/images/back.png';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {transformTimeForStories} from '../utils/TimeHandler/TimeHandler';
-import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/Dimensions';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -108,28 +112,12 @@ const StoryScreen = () => {
         <View style={styles.container}>
           <View style={styles.toolbar}>
             <View style={styles.left_side}>
-              <Avatar.Image
-                size={40}
-                source={{
-                  uri: storyAvatar,
-                }}
-              />
-            </View>
-            <View style={styles.mid_side}>
-              <Text style={styles.toolbar_text}>
-                {storyFirstName + ' ' + storyLastName}
-              </Text>
-              <Text style={styles.timeText}>
-                {transformTimeForStories(storyTime)}
-              </Text>
-            </View>
-            <View style={styles.right_side}>
               <TouchableRipple
                 rippleColor={COLORS.rippleColor}
                 borderless={false}
                 onPress={() => navigation.goBack()}>
                 <Avatar.Icon
-                  icon={ClearImage}
+                  icon={BackImage}
                   size={36.5}
                   color={COLORS.black}
                   style={{
@@ -144,6 +132,28 @@ const StoryScreen = () => {
                 />
               </TouchableRipple>
             </View>
+            <View style={styles.mid_side}>
+              <Avatar.Image
+                size={40}
+                source={{
+                  uri: storyAvatar,
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  fontSize: fontValue(16),
+                }}>
+                <Text style={styles.toolbar_text}>
+                  {storyFirstName + ' ' + storyLastName}
+                </Text>
+                <Text style={styles.timeText}>
+                  {transformTimeForStories(storyTime)}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.right_side} />
           </View>
           <FlatList
             ref={storiesRef}
@@ -257,7 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   mid_side: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'flex-start',
     fontSize: 16,
     marginLeft: '2.5%',
@@ -270,7 +280,7 @@ const styles = StyleSheet.create({
   toolbar_text: {
     fontSize: 18,
     paddingLeft: '2%',
-    paddingRight: '3%',
+
     textAlign: 'left',
     color: COLORS.black,
     fontFamily: FONTS.regular,
@@ -278,7 +288,6 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     paddingLeft: '2%',
-    paddingRight: '3%',
     textAlign: 'left',
     color: COLORS.black,
     opacity: 0.4,

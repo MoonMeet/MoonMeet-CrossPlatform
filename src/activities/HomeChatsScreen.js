@@ -180,7 +180,7 @@ const HomeChatsScreen = () => {
           <View style={styles.left_side}>
             {avatarURL ? (
               <Avatar.Image
-                size={40}
+                size={35}
                 source={avatarURL ? {uri: avatarURL} : null}
                 style={{
                   overflow: 'hidden',
@@ -257,6 +257,7 @@ const styles = StyleSheet.create({
     paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.black,
+    fontWeight: 'bold',
     fontFamily: FONTS.regular,
   },
   left_side: {
