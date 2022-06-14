@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import React, {useCallback, useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   fontValue,
@@ -73,7 +74,38 @@ const ChatScreen = () => {
         }
       });
     return () => {};
-  }, []);
+  }, [destinedUser?.uid]);
+
+  const generateId = (length) => {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
+  const sendMessage = () => {
+    console.log('sending');
+    let messageID = generateId(20);
+    database()
+    .ref(`/messages/${messageID}/`)
+    .set({
+      id: messageID,
+      from: myUID,
+      to: userUID,
+      message: mMessageText,
+      timestamp: Date.now(),
+    })
+    .then(() => {
+      console.log(`message sent from ${myUID} to ${userUID}`);
+      setMessageText(''); // empty text field after sending the message
+    })
+    .catch((error) => {
+      console.log('an error has been occured during sending the message:', error);
+    });
+  };
 
   return (
     <BaseView>
@@ -128,21 +160,23 @@ const ChatScreen = () => {
             setMessageText(text);
           }}
         />
-        <Avatar.Icon
-          icon={SendImage}
-          size={64}
-          color={COLORS.black}
-          style={{
-            overflow: 'hidden',
-            marginRight: '-1%',
-            opacity: 0.4,
-          }}
-          theme={{
-            colors: {
-              primary: COLORS.transparent,
-            },
-          }}
-        />
+        <Pressable onPress={sendMessage}>
+          <Avatar.Icon
+            icon={SendImage}
+            size={64}
+            color={COLORS.black}
+            style={{
+              overflow: 'hidden',
+              marginRight: '-1%',
+              opacity: 0.4,
+            }}
+            theme={{
+              colors: {
+                primary: COLORS.transparent,
+              },
+            }}
+          />
+        </Pressable>
       </View>
     </BaseView>
   );
