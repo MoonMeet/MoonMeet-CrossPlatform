@@ -43,6 +43,7 @@ import {
   getSystemVersion,
   getVersion,
 } from 'react-native-device-info';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const LoginScreen = () => {
   /**
@@ -144,7 +145,6 @@ const LoginScreen = () => {
    * Loader stuff
    */
   const [LoaderVisible, setLoaderVisible] = React.useState(false);
-  const [isFABLoading, setFABLoading] = React.useState(false);
 
   /**
    * function to send code to specific phone number.
@@ -167,9 +167,6 @@ const LoginScreen = () => {
     try {
       await ConfirmCode.confirm(text);
     } catch (error) {
-      if (isFABLoading) {
-        setFABLoading(!isFABLoading);
-      }
       if (error !== null) {
         if (error.code === 'auth/invalid-verification-code') {
           console.log('Invalid code.');
@@ -185,6 +182,8 @@ const LoginScreen = () => {
    * SnackBar Stuff
    */
 
+  const [mBottomMargin, setBottomMargin] = React.useState(0);
+
   const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
 
   const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
@@ -192,8 +191,10 @@ const LoginScreen = () => {
   const onToggleErrorSnackBar = () =>
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
 
-  const onDismissErrorSnackBar = () =>
+  const onDismissErrorSnackBar = () => {
+    setBottomMargin(0);
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
+  };
 
   /**
    * get Country code from internet API
@@ -321,9 +322,6 @@ const LoginScreen = () => {
               }
             });
         } else {
-          if (isFABLoading) {
-            setFABLoading(!isFABLoading);
-          }
           console.log('our user is null');
         }
       });
@@ -513,7 +511,7 @@ const LoginScreen = () => {
             <Snackbar
               visible={ErrorSnackBarVisible}
               onDismiss={onDismissErrorSnackBar}
-              duration={5000}
+              duration={3000}
               action={{
                 label: 'OK',
                 onPress: () => {
@@ -532,12 +530,11 @@ const LoginScreen = () => {
               {ErrorSnackbarText}
             </Snackbar>
             <FAB
-              style={styles.fab}
+              style={styles.fab(mBottomMargin)}
               normal
               icon={ArrowForward}
               color={COLORS.primaryLight}
               animated={true}
-              loading={isFABLoading}
               theme={{
                 colors: {
                   accent: COLORS.accentLight,
@@ -550,19 +547,20 @@ const LoginScreen = () => {
                     if (isSMSSendingAcceptable()) {
                       setLoaderText('Loading');
                       setLoaderVisible(!LoaderVisible);
-                      setFABLoading(!isFABLoading);
                       signInWithPhoneNumber(CountryText + NumberText).catch(
                         () => {
                           setLoaderVisible(false);
                         },
                       );
                     } else {
+                      setBottomMargin(heightPercentageToDP(7.5));
                       setErrorSnackbarText(
                         'Please enter a valid Country Code and Phone Number',
                       );
                       onToggleErrorSnackBar();
                     }
                   } else {
+                    setBottomMargin(heightPercentageToDP(7.5));
                     setErrorSnackbarText(
                       'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
                     );
@@ -570,7 +568,6 @@ const LoginScreen = () => {
                   }
                 } catch (e) {
                   console.log(e.toString());
-                  setFABLoading(!isFABLoading);
                 }
               }}
             />
@@ -613,6 +610,7 @@ const LoginScreen = () => {
               style={{
                 paddingLeft: '2%',
                 paddingRight: '2%',
+                alignSelf: 'center',
               }}>
               <OTPTextView
                 inputCount={6}
@@ -708,17 +706,20 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   TextInputContainer: {
-    marginBottom: 20,
+    marginRight: heightPercentageToDP(8),
+    marginLeft: heightPercentageToDP(8),
   },
   RoundedTextInput: {
-    borderRadius: 10,
+    borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
   },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 0,
+  fab: bottomMargin => {
+    return {
+      position: 'absolute',
+      margin: 16,
+      right: 0,
+      bottom: bottomMargin,
+    };
   },
 });
 export default React.memo(LoginScreen);

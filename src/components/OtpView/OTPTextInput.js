@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   textInput: {
     height: 50,
     width: 50,
-    borderBottomWidth: 2,
+    borderBottomWidth: 3,
     margin: 5,
     textAlign: 'center',
     fontSize: 22,
@@ -61,6 +61,7 @@ class OTPTextView extends Component {
         let {otpText} = prevState;
 
         otpText[i] = text;
+
         return {
           otpText,
         };
@@ -90,7 +91,7 @@ class OTPTextView extends Component {
   onKeyPress = (e, i) => {
     const val = this.state.otpText[i] || '';
 
-    if (e.nativeEvent.key === 'Backspace' && i !== 0 && !val.length) {
+    if (e.nativeEvent.key === 'Backspace' && i !== 0 && val.length === 1) {
       this.inputs[i - 1].focus();
     }
   };
@@ -162,7 +163,7 @@ class OTPTextView extends Component {
           key={i}
           autoCorrect={false}
           keyboardType={keyboardType}
-          autoFocus={false}
+          autoFocus={i === 0}
           value={otpText[i] || ''}
           style={inputStyle}
           maxLength={this.props.inputCellLength}

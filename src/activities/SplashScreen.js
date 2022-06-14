@@ -12,13 +12,13 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
-import {firebase} from '@react-native-firebase/analytics';
+import analytics from '@react-native-firebase/analytics';
+import database from '@react-native-firebase/database';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
 
   const [getViewPagerStats, setViewPagerStats] = React.useState('');
-
   /**
    * Getting Data from AsyncStorage
    */
@@ -34,17 +34,32 @@ const SplashScreen = () => {
   };
 
   async function enableFirebaseTools() {
-    await crashlytics().setCrashlyticsCollectionEnabled(true);
-    await firebase.analytics().setAnalyticsCollectionEnabled(true);
+    await crashlytics().setCrashlyticsCollectionEnabled(false);
+    await analytics().setAnalyticsCollectionEnabled(false);
   }
+
+  const havePasscode = () => {
+    database()
+      .ref(`/users/${auth()?.currentUser.uid}/passcode`)
+      .once('value', snapshot => {
+        if (snapshot.val().password_enabled === true) {
+          return true;
+        }
+      });
+    return false;
+  };
 
   useEffect(() => {
     enableFirebaseTools();
     getViewPagerCompleted();
-    const SplashScreenTimerTask = setTimeout(() => {
+    const SplashScreenTimerTask = setTimeout(async () => {
       if (getViewPagerStats === 'true') {
         if (auth()?.currentUser !== null) {
-          navigation.navigate('home');
+          if (havePasscode) {
+            navigation.navigate('passcodeVerify');
+          } else {
+            navigation.navigate('home');
+          }
         } else {
           navigation.navigate('login');
         }

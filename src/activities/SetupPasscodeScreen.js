@@ -168,6 +168,7 @@ const SetupPasscodeScreen = () => {
                   recovery_password: mRecoveryPassword,
                   password_hint: mRecoveryPasswordHint,
                   time: Date.now(),
+                  password_enabled: true,
                 })
                 .then(() => {
                   if (navigation.canGoBack()) {
@@ -231,6 +232,7 @@ const SetupPasscodeScreen = () => {
           style={{
             paddingLeft: '2%',
             paddingRight: '2%',
+            alignSelf: 'center',
           }}>
           <OTPTextView
             inputCount={4}
@@ -295,7 +297,7 @@ const SetupPasscodeScreen = () => {
         <Snackbar
           visible={ErrorSnackBarVisible}
           onDismiss={onDismissErrorSnackBar}
-          duration={5000}
+          duration={3000}
           action={{
             label: 'OK',
             onPress: () => {
@@ -343,12 +345,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   TextInputContainer: {
-    marginBottom: 20,
     marginRight: heightPercentageToDP(8),
     marginLeft: heightPercentageToDP(8),
   },
   RoundedTextInput: {
-    borderRadius: 10,
+    borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
   },
   fab: bottomMargin => {
