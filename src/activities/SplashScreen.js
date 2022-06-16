@@ -19,6 +19,7 @@ const SplashScreen = () => {
   const navigation = useNavigation();
 
   const [getViewPagerStats, setViewPagerStats] = React.useState('');
+  const [havePasscode, setHavePasscode] = React.useState(false);
   /**
    * Getting Data from AsyncStorage
    */
@@ -38,28 +39,27 @@ const SplashScreen = () => {
     await analytics().setAnalyticsCollectionEnabled(false);
   }
 
-  const havePasscode = () => {
-    database()
-      .ref(`/users/${auth()?.currentUser.uid}/passcode`)
-      .once('value', snapshot => {
-        if (snapshot.val().password_enabled === true) {
-          return true;
-        }
-      });
-    return false;
-  };
-
   useEffect(() => {
     enableFirebaseTools();
     getViewPagerCompleted();
-    const SplashScreenTimerTask = setTimeout(async () => {
+    const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === 'true') {
         if (auth()?.currentUser !== null) {
-          if (havePasscode) {
-            navigation.navigate('passcodeVerify');
-          } else {
-            navigation.navigate('home');
-          }
+          let havePasscode = false;
+          database()
+            .ref(`/users/${auth()?.currentUser.uid}/passcode/`)
+            .once('value', snapshot => {
+              if (snapshot?.val().password_enabled) {
+                havePasscode = true;
+              }
+            })
+            .then(() => {
+              if (havePasscode) {
+                navigation.navigate('passcodeVerify');
+              } else {
+                navigation.navigate('home');
+              }
+            });
         } else {
           navigation.navigate('login');
         }

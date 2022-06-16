@@ -45,26 +45,27 @@ const MoonChatList = ({ChatData, userInfo}) => {
       inverted={true}
       initialNumToRender={10}
       renderItem={({item}) => (
-        <View style={styles.viewContainer(item.uid)}>
-          {auth().currentUser.uid != item.uid ? (
+        /**
+        <View style={styles.viewContainer(item.myUID)}>
+          {auth()?.currentUser.uid != item.myUID ? (
             <View style={styles.avatarContainer}>
-              <Avatar.Image size={35} source={{uri: item.avatar}} />
+              <Avatar.Image size={35} source={{uri: userInfo.avatar}} />
             </View>
           ) : null}
           <Pressable
-            style={styles.pressableContainer(item.uid)}
+            style={styles.pressableContainer(item.myUID)}
             onPress={() => {
               //TODO: Implement Modal / BottomSheet
-              console.log(item.uid);
+              console.log(item.myUID);
             }}>
-            <Text style={styles.messagetext(item.uid)}>
-              This is a simple fucking text.
-            </Text>
-            <View style={styles.messageSmallView(item.uid)}>
-              <Text style={styles.timeText(item.uid)}>{item.time}</Text>
+            <Text style={styles.messagetext(item.myUID)}>{item.message}</Text>
+            <View style={styles.messageSmallView(item.myUID)}>
+              <Text style={styles.timeText(item.myUID)}>{item.time}</Text>
             </View>
           </Pressable>
         </View>
+         */
+        <Text>{item}</Text>
       )}
     />
   );

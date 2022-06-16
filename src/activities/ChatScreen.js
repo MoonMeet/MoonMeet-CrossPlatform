@@ -9,7 +9,12 @@ import {
 } from '../config/Dimensions';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Avatar, TextInput, TouchableRipple} from 'react-native-paper';
+import {
+  ActivityIndicator,
+  Avatar,
+  TextInput,
+  TouchableRipple,
+} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import MoonChatList from '../components/ChatScreen/MoonChatList/MoonChatList';
 import SendImage from '../assets/images/send.png';
@@ -20,7 +25,6 @@ import auth from '@react-native-firebase/auth';
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  const [messages, setMessages] = React.useState(testChats);
   console.log('destinated' + destinedUser);
 
   /**
@@ -40,14 +44,17 @@ const ChatScreen = () => {
   const [myFirstName, setMyFirstName] = React.useState('');
   const [myLastName, setMyLastName] = React.useState('');
   const [myAvatar, setMyAvatar] = React.useState('');
-
+  /**
+   * Message Variables
+   */
   const [mMessageText, setMessageText] = React.useState('');
+  const [mChatData, setChataData] = React.useState([]);
+  const [isLoading, setLoading] = React.useState(true);
 
   useEffect(() => {
     const userInformation = database()
       .ref(`/users/${destinedUser?.uid}`)
       .once('value', snapshot => {
-        console.log(snapshot);
         if (
           snapshot?.val().avatar &&
           snapshot?.val().first_name &&
@@ -73,38 +80,58 @@ const ChatScreen = () => {
           setMyAvatar(snapshot?.val().avatar);
         }
       });
-    return () => {};
+    const MessagesBase = database()
+      .ref('/messages/')
+      .child(myUID)
+      .on('child_added', snapshot => {
+        setLoading(false);
+      });
+    return () => {
+      database()
+        .ref(`/messages/${myUID}/${userUID}`)
+        .off('child_added', MessagesBase);
+    };
   }, [destinedUser?.uid]);
 
-  const generateId = (length) => {
-    var result = '';
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  };
-
   const sendMessage = () => {
-    console.log('sending');
-    let messageID = generateId(20);
+    const myMID = database().ref(`/messages/${myUID}/${userUID}`).push().key;
     database()
-    .ref(`/messages/${messageID}/`)
-    .set({
-      id: messageID,
-      from: myUID,
-      to: userUID,
-      message: mMessageText,
-      timestamp: Date.now(),
-    })
-    .then(() => {
-      console.log(`message sent from ${myUID} to ${userUID}`);
-      setMessageText(''); // empty text field after sending the message
-    })
-    .catch((error) => {
-      console.log('an error has been occured during sending the message:', error);
-    });
+      .ref(`/messages/${myUID}/${userUID}/${myMID}`)
+      .set({
+        fromUID: myUID,
+        toUID: userUID,
+        mid: myMID,
+        message: mMessageText,
+        time: Date.now(),
+      })
+      .then(() => {
+        console.log(`message sent from ${myUID} to ${userUID}`);
+      })
+      .catch(error => {
+        console.log(
+          'an error has been occured during sending the message: ',
+          error,
+        );
+      });
+    const userMID = database().ref(`/messages/${userUID}/${myUID}`).push().key;
+    database()
+      .ref(`/messages/${userUID}/${myUID}/${userMID}`)
+      .set({
+        fromUID: myUID,
+        toUID: userUID,
+        mid: userMID,
+        message: mMessageText,
+        time: Date.now(),
+      })
+      .then(() => {
+        console.log(`message delivred also to ${myUID} from ${userUID}`);
+      })
+      .catch(error => {
+        console.log(
+          'an error has been occured during sending the message: ',
+          error,
+        );
+      });
   };
 
   return (
@@ -137,7 +164,17 @@ const ChatScreen = () => {
           {userFirstName} {userLastName}
         </Text>
       </View>
-      <MoonChatList ChatData={messages} userInfo={destinedUser} />
+      {isLoading ? (
+        <View style={{flex: 1}}>
+          <ActivityIndicator
+            animating={'true'}
+            size={'large'}
+            color={'#566193'}
+          />
+        </View>
+      ) : (
+        <MoonChatList ChatData={mChatData} userInfo={destinedUser} />
+      )}
       <View style={styles.messageInputBox}>
         <TextInput
           style={{flexGrow: 1}}

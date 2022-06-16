@@ -1,5 +1,12 @@
 import React, {useEffect, useRef, useCallback} from 'react';
-import {BackHandler, StyleSheet, View, Text} from 'react-native';
+import {
+  BackHandler,
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  Pressable,
+} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -8,6 +15,13 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import {Snackbar} from 'react-native-paper';
 import OTPTextView from '../components/OtpView/OTPTextInput';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {Avatar, TextInput, FAB, HelperText} from 'react-native-paper';
+
+import AuthenticationImage from '../assets/images/authentication.png';
+import RecoveryImage from '../assets/images/recovery.png';
+import BackImage from '../assets/images/back.png';
+import ArrowForward from '../assets/images/arrow-forward.png';
 
 const VerifyPasscodeScreen = () => {
   const navigation = useNavigation();
@@ -15,11 +29,20 @@ const VerifyPasscodeScreen = () => {
   const mPINRef = useRef();
 
   const [mIsForgetpassword, setIsForgetPassword] = React.useState(false);
-  const [mCodeTextInputDisabled, setCodeTextInputDisabled] =
-    React.useState(false);
   const [mPINCode, setPINCode] = React.useState('');
   const [mPasscodeHint, setPasscodeHint] = React.useState('');
   const [mPasscRecovery, setPassRecovery] = React.useState('');
+
+  const [mRecoveryTextInput, setRecoveryTextInput] = React.useState('');
+  const onRecoveryTextInputChange = RePass => {
+    setRecoveryTextInput(RePass);
+  };
+  const passwordHasLessLength = () => {
+    if (mRecoveryTextInput.length == 0) {
+      return false;
+    }
+    return mRecoveryTextInput.length < 3;
+  };
 
   const checkCode = code => {
     if (code === mPINCode) {
@@ -30,11 +53,14 @@ const VerifyPasscodeScreen = () => {
     }
   };
 
+  const [mBottomMargin, setBottomMargin] = React.useState(0);
+
   const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
 
   const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
 
   const onDismissErrorSnackBar = () => {
+    setBottomMargin(0);
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
   };
 
@@ -54,7 +80,7 @@ const VerifyPasscodeScreen = () => {
 
   useEffect(() => {
     const getCodeFromDatabase = database()
-      .ref(`/users/${auth().currentUser.uid}/passcode/`)
+      .ref(`/users/${auth().currentUser.uid}/passcode`)
       .once('value', snapshot => {
         if (
           snapshot?.val().pin &&
@@ -68,12 +94,166 @@ const VerifyPasscodeScreen = () => {
       });
   });
   if (mIsForgetpassword) {
-    return <BaseView />;
+    return (
+      <BaseView>
+        <View style={styles.toolbar}>
+          <View style={styles.left_side}>
+            <Pressable onPress={() => setIsForgetPassword(!mIsForgetpassword)}>
+              <Avatar.Icon
+                icon={BackImage}
+                size={37.5}
+                color={COLORS.black}
+                style={{
+                  marginRight: '-1%',
+                  opacity: 0.4,
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.transparent,
+                  },
+                }}
+              />
+            </Pressable>
+          </View>
+          <View style={{flex: 1}}>
+            <View style={styles.mid_side}>
+              <Text style={styles.top_text}>Recovery</Text>
+            </View>
+          </View>
+        </View>
+        <View>
+          <Image style={styles.illustration} source={RecoveryImage} />
+          <Text style={styles.sub_text}>
+            Please submit your Recovery Password {'\n'} to disable PIN code
+          </Text>
+        </View>
+        <View
+          style={{
+            paddingLeft: heightPercentageToDP(0.5),
+            paddingRight: heightPercentageToDP(0.5),
+          }}>
+          <TextInput
+            style={{
+              width: '100%',
+            }}
+            mode="outlined"
+            label="Recovery Password"
+            multiline={false}
+            value={mRecoveryTextInput}
+            maxLength={20}
+            theme={{
+              colors: {
+                text: COLORS.black,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
+              },
+            }}
+            onChangeText={onRecoveryTextInputChange}
+          />
+          {passwordHasLessLength() ? (
+            <HelperText type="error" visible={passwordHasLessLength()}>
+              Recovery Password must be longer than 2 characters.
+            </HelperText>
+          ) : null}
+          <HelperText
+            style={{
+              fontSize: fontValue(12),
+              color: COLORS.accentLight,
+              fontFamily: FONTS.regular,
+            }}
+            type="info"
+            visible={true}>
+            Password Hint:{' '}
+            <Text
+              style={{
+                fontSize: fontValue(12),
+                color: COLORS.darkGrey,
+                fontFamily: FONTS.regular,
+              }}>
+              {mPasscodeHint}
+            </Text>
+          </HelperText>
+        </View>
+        <FAB
+          style={styles.fab(mBottomMargin)}
+          normal
+          icon={ArrowForward}
+          color={COLORS.primaryLight}
+          animated={true}
+          theme={{
+            colors: {
+              accent: COLORS.accentLight,
+            },
+          }}
+          onPress={() => {
+            if (mRecoveryTextInput.length < 1) {
+              setBottomMargin(heightPercentageToDP(7));
+              setErrorSnackbarText('Please submit your recovery password');
+              setErrorSnackBarVisible(!ErrorSnackBarVisible);
+            } else if (mRecoveryTextInput !== mPasscRecovery) {
+              setBottomMargin(heightPercentageToDP(7));
+              setErrorSnackbarText('Wrong Password, Try again.');
+              setErrorSnackBarVisible(!ErrorSnackBarVisible);
+            } else {
+              database()
+                .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
+                .remove()
+                .then(() => {
+                  database()
+                    .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
+                    .set({
+                      password_enabled: false,
+                    })
+                    .then(() => {
+                      navigation.navigate('home');
+                      InfoToast(
+                        'bottom',
+                        'Passcode Removed',
+                        'You can set up a new one from settings.',
+                        true,
+                        3000,
+                      );
+                    });
+                });
+            }
+          }}
+        />
+        <Snackbar
+          visible={ErrorSnackBarVisible}
+          onDismiss={onDismissErrorSnackBar}
+          duration={3000}
+          action={{
+            label: 'OK',
+            onPress: () => {
+              onDismissErrorSnackBar();
+            },
+          }}
+          theme={{
+            colors: {
+              onSurface: COLORS.redLightError,
+              accent: COLORS.white,
+            },
+          }}
+          style={{
+            margin: '4%',
+          }}>
+          {ErrorSnackbarText}
+        </Snackbar>
+      </BaseView>
+    );
   } else {
     return (
       <BaseView>
         <View style={styles.top_bar}>
-          <Text style={styles.top_text}>Please Verify Your Passcode</Text>
+          <Text style={styles.top_text}>Authentication</Text>
+          <Image style={styles.illustration} source={AuthenticationImage} />
+          <Text style={styles.sub_text}>
+            Please verify your passcode to {'\n'} access your account
+          </Text>
         </View>
         <View
           style={{
@@ -96,6 +276,9 @@ const VerifyPasscodeScreen = () => {
             }}
             keyboardType={'numeric'}
           />
+          <Pressable onPress={() => setIsForgetPassword(!mIsForgetpassword)}>
+            <Text style={styles.forget_password}>Forget Password ?</Text>
+          </Pressable>
         </View>
         <Snackbar
           visible={ErrorSnackBarVisible}
@@ -123,8 +306,26 @@ const VerifyPasscodeScreen = () => {
   }
 };
 const styles = StyleSheet.create({
-  top_bar: {
+  toolbar: {
+    padding: heightPercentageToDP(0.5),
     flexDirection: 'row',
+  },
+  left_side: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    paddingLeft: heightPercentageToDP(0.5),
+    flexDirection: 'row',
+  },
+  mid_side: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    fontSize: 16,
+    justifyContent: 'center',
+    marginLeft: '2.5%',
+    marginRight: heightPercentageToDP(6),
+  },
+  top_bar: {
+    flexDirection: 'column',
     paddingTop: '3%',
     paddingBottom: '3%',
     paddingLeft: '2%',
@@ -133,7 +334,31 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: 'relative',
-    fontSize: fontValue(26),
+    fontSize: fontValue(24),
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    textAlign: 'center',
+    color: COLORS.accentLight,
+    fontFamily: FONTS.regular,
+  },
+  illustration: {
+    height: 125,
+    width: 125,
+    position: 'relative',
+    alignSelf: 'center',
+  },
+  sub_text: {
+    position: 'relative',
+    fontSize: fontValue(16),
+    paddingLeft: '3%',
+    paddingRight: '3%',
+    textAlign: 'center',
+    color: COLORS.darkGrey,
+    fontFamily: FONTS.regular,
+  },
+  forget_password: {
+    position: 'relative',
+    fontSize: fontValue(14),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
@@ -148,6 +373,14 @@ const styles = StyleSheet.create({
   RoundedTextInput: {
     borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
+  },
+  fab: bottomMargin => {
+    return {
+      position: 'absolute',
+      margin: 16,
+      right: 0,
+      bottom: bottomMargin,
+    };
   },
 });
 export default React.memo(VerifyPasscodeScreen);
