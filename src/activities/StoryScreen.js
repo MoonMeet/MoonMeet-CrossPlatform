@@ -14,6 +14,8 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
+import DotsImage from '../assets/images/dots.png';
+import StoryActionSheet from '../components/StoryScreen/StoryActionSheet';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -28,11 +30,12 @@ const StoryScreen = () => {
   const [storyTime, setStoryTime] = React.useState('');
   const [storyText, setStoryText] = React.useState('');
   const [storyImage, setStoryImage] = React.useState('');
-  // const [storyUID, setStoryUID] = React.useState('');
+  const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
 
   const [Loading, setLoading] = React.useState(true);
+  const [ActionSheetVisible, setActionSheetVisible] = React.useState(false);
 
   async function deleteCurrentStory(sid) {
     return await database().ref(`/stories/${userStoryUID}/${sid}`).remove();
@@ -69,7 +72,7 @@ const StoryScreen = () => {
             setStoryImage(childSnapshot.val()?.image);
             setStoryTime(childSnapshot.val()?.time);
             setStoryText(childSnapshot.val()?.text);
-            // setStoryUID(childSnapshot.val().uid);
+            setStoryUID(childSnapshot.val().uid);
             if (storyTime != null) {
               const calender = Date.now();
               console.log(calender);
@@ -153,7 +156,27 @@ const StoryScreen = () => {
                 </Text>
               </View>
             </View>
-            <View style={styles.right_side} />
+            <View style={styles.right_side}>
+              <TouchableRipple
+                rippleColor={COLORS.rippleColor}
+                borderless={false}
+                onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
+                <Avatar.Icon
+                  icon={DotsImage}
+                  size={36.5}
+                  color={COLORS.black}
+                  style={{
+                    marginRight: '-1%',
+                    opacity: 0.4,
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.transparent,
+                    },
+                  }}
+                />
+              </TouchableRipple>
+            </View>
           </View>
           <FlatList
             ref={storiesRef}
@@ -172,9 +195,11 @@ const StoryScreen = () => {
                       uri: item?.image,
                     }}
                   />
-                  <View style={styles.bandView}>
-                    <Text style={styles.bandText}>{item?.text}</Text>
-                  </View>
+                  {item?.text ? (
+                    <View style={styles.bandView}>
+                      <Text style={styles.bandText}>{item?.text}</Text>
+                    </View>
+                  ) : null}
                 </View>
               );
             }}
@@ -245,6 +270,15 @@ const StoryScreen = () => {
             </TouchableRipple>
           </View>
         </View>
+        <StoryActionSheet
+          hideModal={() => {
+            setActionSheetVisible(!ActionSheetVisible);
+          }}
+          onCopySelected={null}
+          onDeleteSelected={null}
+          currentStoryUID={storyUID}
+          isVisible={ActionSheetVisible}
+        />
       </MiniBaseView>
     );
   }
@@ -263,7 +297,6 @@ const styles = StyleSheet.create({
   left_side: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingLeft: '2%',
     flexDirection: 'row',
   },
   mid_side: {

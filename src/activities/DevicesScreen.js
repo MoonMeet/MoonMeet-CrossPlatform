@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 16,
     color: COLORS.black,
+    opacity: 0.4,
     fontFamily: FONTS.regular,
   },
   underHeaderSmallText: {

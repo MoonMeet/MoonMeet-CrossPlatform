@@ -25,12 +25,12 @@ import auth from '@react-native-firebase/auth';
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  console.log('destinated' + destinedUser);
+  console.log('destinated ' + destinedUser.uid);
 
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
-
+  const [userData, setUserData] = React.useState([]);
   const [userUID, setUserUID] = React.useState('');
   const [userFirstName, setUserFirstName] = React.useState('');
   const [userLastName, setUserLastName] = React.useState('');
@@ -60,6 +60,7 @@ const ChatScreen = () => {
           snapshot?.val().first_name &&
           snapshot.val().last_name
         ) {
+          setUserData(snapshot?.val());
           setUserUID(snapshot?.val().uid);
           setUserFirstName(snapshot?.val().first_name);
           setUserLastName(snapshot?.val().last_name);
@@ -86,9 +87,8 @@ const ChatScreen = () => {
       .child(userUID)
       .on('child_added', snapshot => {
         let messages = [];
-        messages.push(snapshot.val());
-        console.log(messages);
-        setChatData(messages);
+        //messages.push(snapshot.val());
+        //setChatData(messages);
         setLoading(false);
       });
     return () => {
@@ -96,49 +96,56 @@ const ChatScreen = () => {
         .ref('/messages/')
         .child(myUID)
         .child(userUID)
-        .off('child_added', MessagesBase);
+        .off('child_added', MessagesFetch);
     };
   }, [destinedUser?.uid]);
 
   const sendMessage = () => {
-    const myMID = database().ref(`/messages/${myUID}/${userUID}`).push().key;
-    database()
-      .ref(`/messages/${myUID}/${userUID}/${myMID}`)
-      .set({
-        fromUID: myUID,
-        toUID: userUID,
-        mid: myMID,
-        message: mMessageText,
-        time: Date.now(),
-      })
-      .then(() => {
-        console.log(`message sent from ${myUID} to ${userUID}`);
-      })
-      .catch(error => {
-        console.log(
-          'an error has been occured during sending the message: ',
-          error,
-        );
-      });
-    const userMID = database().ref(`/messages/${userUID}/${myUID}`).push().key;
-    database()
-      .ref(`/messages/${userUID}/${myUID}/${userMID}`)
-      .set({
-        fromUID: myUID,
-        toUID: userUID,
-        mid: userMID,
-        message: mMessageText,
-        time: Date.now(),
-      })
-      .then(() => {
-        console.log(`message delivred also to ${myUID} from ${userUID}`);
-      })
-      .catch(error => {
-        console.log(
-          'an error has been occured during sending the message: ',
-          error,
-        );
-      });
+    if (mMessageText.length < 1) {
+      // simply don't send an empty message to database, 'cause that's hows mafia works :sunglasses:
+    } else {
+      setMessageText(mMessageText.trim());
+      const myMID = database().ref(`/messages/${myUID}/${userUID}`).push().key;
+      database()
+        .ref(`/messages/${myUID}/${userUID}/${myMID}`)
+        .set({
+          fromUID: myUID,
+          toUID: userUID,
+          mid: myMID,
+          message: mMessageText,
+          time: Date.now(),
+        })
+        .then(() => {
+          console.log(`message sent from ${myUID} to ${userUID}`);
+        })
+        .catch(error => {
+          console.log(
+            'an error has been occured during sending the message: ',
+            error,
+          );
+        });
+      const userMID = database()
+        .ref(`/messages/${userUID}/${myUID}`)
+        .push().key;
+      database()
+        .ref(`/messages/${userUID}/${myUID}/${userMID}`)
+        .set({
+          fromUID: myUID,
+          toUID: userUID,
+          mid: userMID,
+          message: mMessageText,
+          time: Date.now(),
+        })
+        .then(() => {
+          console.log(`message delivred also to ${myUID} from ${userUID}`);
+        })
+        .catch(error => {
+          console.log(
+            'an error has been occured during sending the message: ',
+            error,
+          );
+        });
+    }
   };
 
   return (
@@ -180,7 +187,7 @@ const ChatScreen = () => {
           />
         </View>
       ) : (
-        <MoonChatList ChatData={mChatData} userInfo={destinedUser} />
+        <MoonChatList ChatData={mChatData} userInfo={userData} />
       )}
       <View style={styles.messageInputBox}>
         <TextInput

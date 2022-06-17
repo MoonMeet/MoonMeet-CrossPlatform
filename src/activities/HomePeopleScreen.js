@@ -41,9 +41,9 @@ const HomePeopleScreen = () => {
     database()
       .ref(`/users/${auth()?.currentUser.uid}`)
       .update({
-        active_status: activeStatusState === true ? 'normal' : 'recently',
+        active_status: activeStatusState == true ? 'normal' : 'recently',
         active_time:
-          newActiveTime === 'Last seen recently'
+          newActiveTime == 'Last seen recently'
             ? 'Last seen recently'
             : Date.now(),
       });
@@ -75,7 +75,7 @@ const HomePeopleScreen = () => {
         ) {
           setAvatarURL(snapshot?.val().avatar);
           checkJwtKey(snapshot?.val().jwtKey);
-          if (snapshot?.val().active_status === 'normal') {
+          if (snapshot?.val().active_status == 'normal') {
             setActiveStatusState(true);
           } else {
             setActiveStatusState(false);
@@ -91,7 +91,7 @@ const HomePeopleScreen = () => {
         const activeSnapshot = [];
         snapshot?.forEach(childSnapshot => {
           if (
-            childSnapshot?.val().active_status === 'normal' &&
+            childSnapshot?.val().active_status == 'normal' &&
             Date.now() - childSnapshot?.val().active_time < 60000
           ) {
             if (

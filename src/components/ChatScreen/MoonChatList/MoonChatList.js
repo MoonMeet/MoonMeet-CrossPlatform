@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {
   fontValue,
@@ -28,6 +28,7 @@ const MoonChatList = ({ChatData, userInfo}) => {
       </View>
     );
   };
+
   return (
     <FlatList
       data={ChatData}
@@ -55,7 +56,7 @@ const MoonChatList = ({ChatData, userInfo}) => {
             style={styles.pressableContainer(item.fromUID)}
             onPress={() => {
               //TODO: Implement Modal / BottomSheet
-              console.log(item.myUID);
+              console.log(item);
             }}>
             <Text style={styles.messagetext(item.fromUID)}>{item.message}</Text>
             <View style={styles.messageSmallView(item.fromUID)}>

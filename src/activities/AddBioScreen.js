@@ -22,6 +22,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import { heightPercentageToDP } from '../config/Dimensions';
 
 const AddBioScreen = () => {
   const navigation = useNavigation();
@@ -143,7 +144,7 @@ const AddBioScreen = () => {
           <Text style={styles.toolbar_text}>Add Bio</Text>
         </View>
       </View>
-      <Spacer height={'1%'} />
+      <Spacer height={heightPercentageToDP(0.5)} />
       <View
         style={{
           paddingRight: '2%',
