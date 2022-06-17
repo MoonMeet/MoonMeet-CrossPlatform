@@ -43,29 +43,26 @@ const MoonChatList = ({ChatData, userInfo}) => {
       showsVerticalScrollIndicator={false}
       removeClippedSubviews={true}
       inverted={true}
-      initialNumToRender={10}
+      initialNumToRender={5}
       renderItem={({item}) => (
-        /**
-        <View style={styles.viewContainer(item.myUID)}>
-          {auth()?.currentUser.uid != item.myUID ? (
+        <View style={styles.viewContainer(item.fromUID)}>
+          {auth()?.currentUser.uid != item.fromUID ? (
             <View style={styles.avatarContainer}>
               <Avatar.Image size={35} source={{uri: userInfo.avatar}} />
             </View>
           ) : null}
           <Pressable
-            style={styles.pressableContainer(item.myUID)}
+            style={styles.pressableContainer(item.fromUID)}
             onPress={() => {
               //TODO: Implement Modal / BottomSheet
               console.log(item.myUID);
             }}>
-            <Text style={styles.messagetext(item.myUID)}>{item.message}</Text>
-            <View style={styles.messageSmallView(item.myUID)}>
-              <Text style={styles.timeText(item.myUID)}>{item.time}</Text>
+            <Text style={styles.messagetext(item.fromUID)}>{item.message}</Text>
+            <View style={styles.messageSmallView(item.fromUID)}>
+              <Text style={styles.timeText(item.fromUID)}>{item.time}</Text>
             </View>
           </Pressable>
         </View>
-         */
-        <Text>{item}</Text>
       )}
     />
   );

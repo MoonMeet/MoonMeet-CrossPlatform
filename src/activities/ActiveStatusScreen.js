@@ -13,7 +13,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {fontValue} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
 const ActiveStatusScreen = () => {
   const navigation = useNavigation();
@@ -32,7 +32,7 @@ const ActiveStatusScreen = () => {
   useEffect(() => {
     const getUserActiveStatus = database()
       .ref(`/users/${auth()?.currentUser.uid}`)
-      .on('value', snapshot => {
+      .once('value', snapshot => {
         if (snapshot?.val().active_status && snapshot?.val().active_time) {
           if (snapshot?.val().active_status === 'normal') {
             setSwitchState(true);
@@ -42,11 +42,7 @@ const ActiveStatusScreen = () => {
           setNewActiveTime(snapshot?.val().active_time);
         }
       });
-    return () => {
-      database()
-        .ref(`/users/${auth().currentUser.uid}`)
-        .off('value', getUserActiveStatus);
-    };
+    return () => {};
   }, []);
   return (
     <MiniBaseView>
@@ -79,7 +75,7 @@ const ActiveStatusScreen = () => {
           <Text style={styles.toolbar_text}>Active Status</Text>
         </View>
       </View>
-      <Spacer height={'1%'} />
+      <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.switchRow}>
         <Text style={styles.activeText}>Show when you're active</Text>
         <View style={{flex: 1}}>
@@ -92,9 +88,9 @@ const ActiveStatusScreen = () => {
                 database()
                   .ref(`/users/${auth()?.currentUser.uid}`)
                   .update({
-                    active_status: switchState === true ? 'recently' : 'normal',
+                    active_status: switchState == true ? 'recently' : 'normal',
                     active_time:
-                      newActiveTime === 'Last seen recently'
+                      newActiveTime == 'Last seen recently'
                         ? Date.now()
                         : 'Last seen recently',
                   })

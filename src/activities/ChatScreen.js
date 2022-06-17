@@ -48,7 +48,7 @@ const ChatScreen = () => {
    * Message Variables
    */
   const [mMessageText, setMessageText] = React.useState('');
-  const [mChatData, setChataData] = React.useState([]);
+  const [mChatData, setChatData] = React.useState([]);
   const [isLoading, setLoading] = React.useState(true);
 
   useEffect(() => {
@@ -80,15 +80,22 @@ const ChatScreen = () => {
           setMyAvatar(snapshot?.val().avatar);
         }
       });
-    const MessagesBase = database()
+    const MessagesFetch = database()
       .ref('/messages/')
       .child(myUID)
+      .child(userUID)
       .on('child_added', snapshot => {
+        let messages = [];
+        messages.push(snapshot.val());
+        console.log(messages);
+        setChatData(messages);
         setLoading(false);
       });
     return () => {
       database()
-        .ref(`/messages/${myUID}/${userUID}`)
+        .ref('/messages/')
+        .child(myUID)
+        .child(userUID)
         .off('child_added', MessagesBase);
     };
   }, [destinedUser?.uid]);
