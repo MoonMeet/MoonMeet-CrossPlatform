@@ -39,6 +39,7 @@ import SettingsIcon from '../assets/images/settings.png';
 import ChatScreen from '../activities/ChatScreen';
 import SetupPasscodeScreen from '../activities/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../activities/VerifyPasscodeScreen';
+import {heightPercentageToDP, widthPercentageToDP} from './Dimensions';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -62,7 +63,7 @@ function HomeScreen() {
               color={color}
               size={36.5}
               style={{
-                margin: '-25%',
+                margin: heightPercentageToDP(-0.75),
               }}
               theme={{colors: {primary: COLORS.transparent}}}
             />
@@ -80,7 +81,7 @@ function HomeScreen() {
               color={color}
               size={42.5}
               style={{
-                margin: '-35%',
+                margin: heightPercentageToDP(-1),
               }}
               theme={{colors: {primary: COLORS.transparent}}}
             />
@@ -98,7 +99,7 @@ function HomeScreen() {
               color={color}
               size={40}
               style={{
-                margin: '-31%',
+                margin: heightPercentageToDP(-1),
               }}
               theme={{colors: {primary: COLORS.transparent}}}
             />
