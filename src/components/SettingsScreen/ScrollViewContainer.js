@@ -29,6 +29,7 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
 import {transformTime} from '../../utils/TimeHandler/TimeHandler';
+import LoadingIndicator from '../Modals/CustomLoader/LoadingIndicator';
 
 interface ScrollViewContainerInterface {
   firstName: string;
@@ -108,7 +109,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           try {
             auth()
               ?.signOut()
-              .then(() => {
+              .finally(() => {
                 navigation.navigate('login');
               });
           } catch (e) {

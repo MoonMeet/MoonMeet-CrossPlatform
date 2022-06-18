@@ -116,7 +116,7 @@ const HomeChatsScreen = () => {
                 deleteCurrentStory(
                   auth().currentUser.uid,
                   threeYearsOldSnapshot?.val().sid,
-                ).then(() => console.log('deleted'));
+                ).finally(() => console.log('deleted'));
               }
               storiesSnapshot.push({
                 avatar: threeYearsOldSnapshot?.val().avatar,

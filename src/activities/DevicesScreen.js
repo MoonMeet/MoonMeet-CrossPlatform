@@ -90,7 +90,7 @@ const DevicesScreen = () => {
       await database()
         .ref(`/devices/${auth()?.currentUser.uid}`)
         .remove()
-        .then(() => {
+        .finally(() => {
           const referenceKey = database()
             .ref(`/devices/${auth()?.currentUser.uid}`)
             .push().key;

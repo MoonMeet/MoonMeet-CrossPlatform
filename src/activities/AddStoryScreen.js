@@ -130,11 +130,11 @@ const AddStoryScreen = () => {
     } else {
       setLoading(!Loading);
       const referenceKey = database()
-        .ref(`/stories/${auth().currentUser.uid}/`)
+        .ref(`/stories/${auth()?.currentUser.uid}/`)
         .push().key;
 
       database()
-        .ref(`/stories/${auth().currentUser.uid}/${referenceKey}`)
+        .ref(`/stories/${auth()?.currentUser.uid}/${referenceKey}`)
         .set({
           first_name: Firstname,
           last_name: Lastname,
@@ -144,14 +144,16 @@ const AddStoryScreen = () => {
           uid: auth().currentUser.uid,
           text: StoryTextInput,
         })
-        .then(() => {
+        .finally(() => {
           setLoading(!Loading);
           SuccessToast(
             'bottom',
             'Story shared',
             'Your story has been shared successfully.',
           );
-          navigation.goBack();
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
         });
     }
   }
@@ -207,7 +209,9 @@ const AddStoryScreen = () => {
           })
           .finally(() => {
             setLoading(!Loading);
-            navigation.goBack();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
             SuccessToast(
               'bottom',
               'Story shared',
@@ -231,7 +235,7 @@ const AddStoryScreen = () => {
   useEffect(() => {
     const onValueChange = database()
       .ref(`/users/${auth().currentUser.uid}`)
-      .on('value', snapshot => {
+      .once('value', snapshot => {
         if (
           snapshot?.val().first_name &&
           snapshot?.val().last_name &&
@@ -243,11 +247,7 @@ const AddStoryScreen = () => {
           setLoading(false);
         }
       });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
+    return () => {};
   }, []);
 
   const [PickerActionSheet, setPickerActionSheet] = React.useState(false);

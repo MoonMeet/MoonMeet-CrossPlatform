@@ -16,6 +16,7 @@ import {
 } from '../config/Dimensions';
 import DotsImage from '../assets/images/dots.png';
 import StoryActionSheet from '../components/StoryScreen/StoryActionSheet';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -90,7 +91,7 @@ const StoryScreen = () => {
         });
       });
     return () => {};
-  }, []);
+  }, [current]);
 
   if (Loading) {
     return (
@@ -156,27 +157,29 @@ const StoryScreen = () => {
                 </Text>
               </View>
             </View>
-            <View style={styles.right_side}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
-                <Avatar.Icon
-                  icon={DotsImage}
-                  size={36.5}
-                  color={COLORS.black}
-                  style={{
-                    marginRight: '-1%',
-                    opacity: 0.4,
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
+            {!storyText !== null || auth?.currentUser.uid === userStoryUID ? (
+              <View style={styles.right_side}>
+                <TouchableRipple
+                  rippleColor={COLORS.rippleColor}
+                  borderless={false}
+                  onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
+                  <Avatar.Icon
+                    icon={DotsImage}
+                    size={36.5}
+                    color={COLORS.black}
+                    style={{
+                      marginRight: '-1%',
+                      opacity: 0.4,
+                    }}
+                    theme={{
+                      colors: {
+                        primary: COLORS.transparent,
+                      },
+                    }}
+                  />
+                </TouchableRipple>
+              </View>
+            ) : null}
           </View>
           <FlatList
             ref={storiesRef}
@@ -274,8 +277,16 @@ const StoryScreen = () => {
           hideModal={() => {
             setActionSheetVisible(!ActionSheetVisible);
           }}
-          onCopySelected={null}
-          onDeleteSelected={null}
+          onCopySelected={() => {
+            Clipboard.setString(storyText);
+          }}
+          onDeleteSelected={() => {
+            deleteCurrentStory(storyId).finally(() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            });
+          }}
           currentStoryUID={storyUID}
           isVisible={ActionSheetVisible}
         />

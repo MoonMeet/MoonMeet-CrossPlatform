@@ -22,7 +22,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import { heightPercentageToDP } from '../config/Dimensions';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const AddBioScreen = () => {
   const navigation = useNavigation();
@@ -30,8 +30,6 @@ const AddBioScreen = () => {
   const [BioText, setBioText] = React.useState('');
   const [oldBioText, setOldBioText] = React.useState('');
   const onBioTextChange = _bioText => setBioText(_bioText);
-
-  const [isFABLoading, setIsFABLoading] = React.useState(false);
 
   const [Loading, setLoading] = React.useState(true);
 
@@ -64,14 +62,12 @@ const AddBioScreen = () => {
   };
 
   function pushBio() {
-    setIsFABLoading(!isFABLoading);
     database()
-      .ref(`/users/${auth().currentUser.uid}`)
+      .ref(`/users/${auth()?.currentUser.uid}`)
       .update({
         bio: BioText,
       })
-      .then(() => {
-        setIsFABLoading(!isFABLoading);
+      .finally(() => {
         SuccessToast(
           'bottom',
           'Bio updated',
@@ -79,18 +75,21 @@ const AddBioScreen = () => {
           true,
           4000,
         );
-        navigation.goBack();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       })
       .catch(error => {
         ErrorToast(
           'bottom',
-          'Reporting Failed',
-          'An error occurred when sending your report.',
+          'Failed to update bio',
+          'An error occurred when updating your bio.',
           true,
           4000,
         );
-        navigation.goBack();
-        setIsFABLoading(!isFABLoading);
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       });
   }
 
@@ -155,7 +154,7 @@ const AddBioScreen = () => {
             width: '100%',
           }}
           mode="outlined"
-          label="Add a bio"
+          label="Bio"
           multiline={false}
           value={BioText}
           placeholder={'Type your new bio here.'}
@@ -186,7 +185,6 @@ const AddBioScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,

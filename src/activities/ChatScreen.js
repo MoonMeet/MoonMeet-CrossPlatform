@@ -115,7 +115,7 @@ const ChatScreen = () => {
           message: mMessageText,
           time: Date.now(),
         })
-        .then(() => {
+        .finally(() => {
           console.log(`message sent from ${myUID} to ${userUID}`);
         })
         .catch(error => {
@@ -136,7 +136,7 @@ const ChatScreen = () => {
           message: mMessageText,
           time: Date.now(),
         })
-        .then(() => {
+        .finally(() => {
           console.log(`message delivred also to ${myUID} from ${userUID}`);
         })
         .catch(error => {

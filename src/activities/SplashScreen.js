@@ -53,7 +53,7 @@ const SplashScreen = () => {
                 havePasscode = true;
               }
             })
-            .then(() => {
+            .finally(() => {
               if (havePasscode) {
                 navigation.navigate('passcodeVerify');
               } else {

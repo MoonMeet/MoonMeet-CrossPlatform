@@ -21,16 +21,13 @@ import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import AsyncStorage from '@react-native-community/async-storage';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
+import placeHolderPhoto from '../assets/images/pick-photo.png';
+import ArrowForward from '../assets/images/arrow-forward.png';
+import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 
 const SetupScreen = ({route}) => {
-  /**
-   * Importing needed images/icon from assets
-   */
-  const placeHolderPhoto = require('../assets/images/pick-photo.png');
-
   const [UserPhoto, setUserPhoto] = React.useState(null);
-
-  const ArrowForward = require('../assets/images/arrow-forward.png');
 
   /**
    * getting params from stack navigator
@@ -54,11 +51,7 @@ const SetupScreen = ({route}) => {
 
   const [isPickerVisible, setIsPickerVisible] = React.useState(false);
 
-  /**
-   * set whether the FAB Loading or not
-   */
-
-  const [isFABLoading, setFABLoading] = React.useState(false);
+  const [LoaderVisible, setLoaderVisible] = React.useState(false);
 
   /**
    * Using react navigation.
@@ -96,8 +89,7 @@ const SetupScreen = ({route}) => {
     <BaseView>
       <View style={styles.top_bar}>
         <Text style={styles.top_text}>
-          Enter your name and select
-          a profile picture
+          Enter your name and select a profile picture
         </Text>
       </View>
       <View style={styles.large_box}>
@@ -148,14 +140,12 @@ const SetupScreen = ({route}) => {
             </View>
           )}
         </Pressable>
-
         <View
           style={{
             height: '-1%',
             width: '3%',
           }}
         />
-
         <View
           style={{
             flexDirection: 'column',
@@ -216,110 +206,127 @@ const SetupScreen = ({route}) => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,
           },
         }}
         onPress={async () => {
-          /**
-           * Reference to users image path
-           * @type {FirebaseStorageTypes.Reference}
-           */
-          try {
-            setFABLoading(!isFABLoading);
-            let _userAvatarRef = `avatars/${
-              auth()?.currentUser?.uid
-            }.${UserPhoto.path?.substr(
-              UserPhoto.path?.lastIndexOf('.') + 1,
-              3,
-            )}`;
-
-            const storageRef = storage().ref(_userAvatarRef);
-
+          if (UserPhoto) {
+            setLoaderVisible(!LoaderVisible);
             /**
-             * Uploading image to Firebase Storage
-             * @type {FirebaseStorageTypes.Task}
+             * Reference to users image path
+             * @type {FirebaseStorageTypes.Reference}
              */
+            try {
+              let _userAvatarRef = `avatars/${
+                auth()?.currentUser?.uid
+              }.${UserPhoto.path?.substr(
+                UserPhoto.path?.lastIndexOf('.') + 1,
+                3,
+              )}`;
 
-            const uploadImageTask = storageRef.putFile(UserPhoto?.path);
-
-            /**
-             * Add observer to image uploading.
-             */
-
-            uploadImageTask.on('state_changed', taskSnapshot => {
-              console.log(
-                `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-              );
-            });
-
-            /**
-             * an async function to get {avatarUrl} and upload all user data.
-             */
-
-            uploadImageTask.then(async () => {
-              const avatarUrl = await storage()
-                .ref(_userAvatarRef)
-                .getDownloadURL();
-              console.log(avatarUrl);
-              const trimmedAvatar = avatarUrl.toString();
-              console.log(trimmedAvatar);
+              const storageRef = storage().ref(_userAvatarRef);
 
               /**
-               * pushing device information for later use in DeviceScreen.js
+               * Uploading image to Firebase Storage
+               * @type {FirebaseStorageTypes.Task}
                */
-              if (!isWindows && !isWeb) {
-                const referenceKey = database()
-                  .ref(`/devices/${auth()?.currentUser.uid}`)
-                  .push().key;
 
-                database()
-                  .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
-                  .set({
-                    manufacturer: Manufacturer,
-                    system_name: systemName,
-                    system_version: systemVersion,
-                    product: Product,
-                    model: Model,
-                    app_version: appVersion,
-                    time: Date.now(),
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
+              const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
               /**
-               * Since we got everything except a girlfriend.
-               * we must push data to firebase.
+               * Add observer to image uploading.
                */
 
-              await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
-                () => {
+              uploadImageTask.on('state_changed', taskSnapshot => {
+                console.log(
+                  `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+                );
+              });
+
+              /**
+               * an async function to get {avatarUrl} and upload all user data.
+               */
+
+              uploadImageTask.then(async () => {
+                const avatarUrl = await storage()
+                  .ref(_userAvatarRef)
+                  .getDownloadURL();
+                console.log(avatarUrl);
+                const trimmedAvatar = avatarUrl.toString();
+                console.log(trimmedAvatar);
+
+                /**
+                 * pushing device information for later use in DeviceScreen.js
+                 */
+                if (!isWindows && !isWeb) {
+                  const referenceKey = database()
+                    .ref(`/devices/${auth()?.currentUser.uid}`)
+                    .push().key;
+
                   database()
-                    .ref(`/users/${auth()?.currentUser?.uid}`)
+                    .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
                     .set({
-                      ...user,
-                      first_name: firstName,
-                      last_name: lastName,
-                      avatar: avatarUrl,
-                      active_status: 'normal',
-                      active_time: Date.now(),
-                      bio: '',
-                      jwtKey: jwt_key,
+                      manufacturer: Manufacturer,
+                      system_name: systemName,
+                      system_version: systemVersion,
+                      product: Product,
+                      model: Model,
+                      app_version: appVersion,
+                      time: Date.now(),
                     })
-                    .then(() => {
-                      navigation.navigate('home');
+                    .catch(error => {
+                      console.error(error);
+                      setLoaderVisible(!LoaderVisible);
                     });
-                },
-              );
-            });
-          } catch (e) {
-            console.log(e.toString());
-            setFABLoading(!isFABLoading);
+                }
+
+                /**
+                 * Since we got everything except a girlfriend.
+                 * we must push data to firebase.
+                 */
+
+                await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
+                  () => {
+                    database()
+                      .ref(`/users/${auth()?.currentUser?.uid}`)
+                      .set({
+                        ...user,
+                        first_name: firstName,
+                        last_name: lastName,
+                        avatar: avatarUrl,
+                        active_status: 'normal',
+                        active_time: Date.now(),
+                        bio: '',
+                        jwtKey: jwt_key,
+                      })
+                      .finally(() => {
+                        navigation.navigate('home');
+                        setLoaderVisible(!LoaderVisible);
+                      });
+                  },
+                );
+              });
+            } catch (e) {
+              console.log(e.toString());
+              setLoaderVisible(!LoaderVisible);
+            }
+          } else {
+            ErrorToast(
+              'bottom',
+              'Please select a photo',
+              'Select a photo and try again.',
+              true,
+              3000,
+            );
           }
+        }}
+      />
+      <LoadingIndicator
+        isVisible={LoaderVisible}
+        hideModal={() => {
+          setLoaderVisible(!LoaderVisible);
         }}
       />
       <ImagePickerActionSheet

@@ -135,7 +135,7 @@ const EditProfileScreen = () => {
         first_name: firstName,
         last_name: lastName,
       })
-      .then(() => {
+      .finally(() => {
         setIsFABLoading(!isFABLoading);
         SuccessToast(
           'bottom',

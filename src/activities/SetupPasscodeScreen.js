@@ -170,7 +170,7 @@ const SetupPasscodeScreen = () => {
                   time: Date.now(),
                   password_enabled: true,
                 })
-                .then(() => {
+                .finally(() => {
                   if (navigation.canGoBack()) {
                     navigation.goBack();
                   }

@@ -94,7 +94,7 @@ const ActiveStatusScreen = () => {
                         ? Date.now()
                         : 'Last seen recently',
                   })
-                  .then(() => {
+                  .finally(() => {
                     SuccessToast(
                       'bottom',
                       'Active status changed',
@@ -102,6 +102,9 @@ const ActiveStatusScreen = () => {
                       true,
                       4000,
                     );
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    }
                   })
                   .catch(() => {
                     ErrorToast(
@@ -109,6 +112,9 @@ const ActiveStatusScreen = () => {
                       'Changing active status failed',
                       'An error occurred when changing your Active Status',
                     );
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    }
                   });
               } else {
                 ErrorToast(
@@ -118,6 +124,9 @@ const ActiveStatusScreen = () => {
                   true,
                   4000,
                 );
+                if (navigation.canGoBack()) {
+                  navigation.goBack();
+                }
               }
             }}
           />

@@ -61,7 +61,7 @@ const ReportProblemScreen = () => {
         report_message: ReportText,
         time: Date.now(),
       })
-      .then(() => {
+      .finally(() => {
         setIsFABLoading(!isFABLoading);
         SuccessToast(
           'bottom',

@@ -202,13 +202,13 @@ const VerifyPasscodeScreen = () => {
               database()
                 .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
                 .remove()
-                .then(() => {
+                .finally(() => {
                   database()
                     .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
                     .set({
                       password_enabled: false,
                     })
-                    .then(() => {
+                    .finally(() => {
                       navigation.navigate('home');
                       InfoToast(
                         'bottom',

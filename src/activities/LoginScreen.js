@@ -226,12 +226,6 @@ const LoginScreen = () => {
   };
 
   /**
-   * Loader stuff
-   */
-
-  const [LoaderText, setLoaderText] = React.useState('');
-
-  /**
    * this function is amazing, it gives you a drink
    * @param min
    * @param max
@@ -264,11 +258,12 @@ const LoginScreen = () => {
 
   function addCodeObserver(text) {
     if (text.length > 5) {
+      setLoaderVisible(!LoaderVisible);
       Keyboard.dismiss();
       confirmCode(text).then(() => {
         if (auth().currentUser != null) {
           database()
-            .ref(`/users/${auth().currentUser.uid}`)
+            .ref(`/users/${auth()?.currentUser.uid}`)
             .once('value')
             .then(snapshot => {
               if (snapshot?.val()?.uid && snapshot?.val().jwtKey) {
@@ -300,8 +295,10 @@ const LoginScreen = () => {
                         })
                         .catch(error => {
                           console.error(error);
+                          setLoaderVisible(!LoaderVisible);
                         });
                     }
+                    setLoaderVisible(!LoaderVisible);
                     navigation.navigate('home');
                   });
                 });
@@ -319,6 +316,7 @@ const LoginScreen = () => {
                     country_code: CountryText,
                   },
                 });
+                setLoaderVisible(!LoaderVisible);
               }
             });
         } else {
@@ -545,7 +543,6 @@ const LoginScreen = () => {
                   Keyboard.dismiss();
                   if (isConnected) {
                     if (isSMSSendingAcceptable()) {
-                      setLoaderText('Loading');
                       setLoaderVisible(!LoaderVisible);
                       signInWithPhoneNumber(CountryText + NumberText).catch(
                         () => {
@@ -590,10 +587,7 @@ const LoginScreen = () => {
                 setLoginHelpVisible(!isLoginHelpVisible);
               }}
             />
-            <LoadingIndicator
-              isVisible={LoaderVisible}
-              loaderText={LoaderText}
-            />
+            <LoadingIndicator isVisible={LoaderVisible} />
           </MiniBaseView>
         ) : (
           //////////////////////////// SECOND PART ////////////////////////////
@@ -646,6 +640,13 @@ const LoginScreen = () => {
                     opacity: 0.4,
                     textAlign: 'left',
                     fontFamily: FONTS.regular,
+                  }}
+                  onPress={() => {
+                    setLoaderVisible(!LoaderVisible);
+                    phoneRef?.current.clear();
+                    setConfirmCode(false);
+                    NumberSetText('');
+                    setLoaderVisible(!LoaderVisible);
                   }}>
                   WRONG NUMBER
                 </Text>
@@ -660,7 +661,7 @@ const LoginScreen = () => {
                   fontFamily: FONTS.regular,
                 }}
                 onPress={() => {
-                  phoneRef.current.clear();
+                  phoneRef?.current.clear();
                 }}>
                 CLEAR CODE
               </Text>

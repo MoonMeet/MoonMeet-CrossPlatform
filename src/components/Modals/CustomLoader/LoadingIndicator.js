@@ -1,13 +1,12 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {ActivityIndicator, Text} from 'react-native-paper';
+import {StyleSheet, View, PlatformColor} from 'react-native';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
-// import {rgbaColor} from '../../../utils/device/DeviceInfo';
+import LottieView from 'lottie-react-native';
+import LoaderLottie from '../../../assets/lotties/loader_150.json';
 
 interface LoadingIndicatorInterface {
   isVisible: boolean;
-  loaderText: string;
 }
 
 const LoadingIndicator = (props: LoadingIndicatorInterface) => {
@@ -20,12 +19,16 @@ const LoadingIndicator = (props: LoadingIndicatorInterface) => {
       transpaerent={true}
       visible={props?.isVisible}>
       <View style={styles.container}>
-        <ActivityIndicator
-          animating={true}
-          size={'large'}
-          color={COLORS.accentLight}
+        <LottieView
+          autoPlay={true}
+          cacheStrategy="strong"
+          cacheComposition={true}
+          renderMode="AUTOMATIC"
+          resizeMode="center"
+          hardwareAccelerationAndroid={true}
+          loop={true}
+          source={LoaderLottie}
         />
-        <Text style={styles.loaderText}>{props?.loaderText}</Text>
       </View>
     </Modal>
   );
@@ -36,7 +39,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 20,
-    // backgroundColor: rgbaColor(220, 220, 220, 0.3),
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
   },
   loaderText: {
     fontSize: 22,

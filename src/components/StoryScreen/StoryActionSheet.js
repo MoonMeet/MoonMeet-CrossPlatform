@@ -5,6 +5,12 @@ import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import CopyImage from '../../assets/images/copy.png';
+import DeleteImage from '../../assets/images/delete.png';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/Dimensions';
 
 interface StoryActionSheetInterface {
   hideModal: Function;
@@ -13,8 +19,6 @@ interface StoryActionSheetInterface {
   currentStoryUID: String;
   isVisible: boolean;
 }
-
-const GalleryImage = require('../../assets/images/photo-library.png');
 
 const StoryActionSheet = (props: StoryActionSheetInterface) => {
   return (
@@ -53,9 +57,10 @@ const StoryActionSheet = (props: StoryActionSheetInterface) => {
             <Image source={CopyImage} style={styles.arrowStyle} />
             <Text
               style={{
-                fontSize: 20,
+                fontSize: fontValue(18),
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
+                opacity: 0.4,
               }}>
               Copy Text
             </Text>
@@ -68,12 +73,13 @@ const StoryActionSheet = (props: StoryActionSheetInterface) => {
                 props.hideModal();
               }}
               style={styles.optionContainer}>
-              <Image source={GalleryImage} style={styles.arrowStyle} />
+              <Image source={DeleteImage} style={styles.arrowStyle} />
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: fontValue(18),
                   fontFamily: FONTS.regular,
                   color: COLORS.black,
+                  opacity: 0.4,
                 }}>
                 Delete Story
               </Text>
@@ -89,20 +95,21 @@ const StoryActionSheet = (props: StoryActionSheetInterface) => {
 
 const styles = StyleSheet.create({
   greyPiece: {
-    height: '2.5%',
+    height: heightPercentageToDP(0.4),
     borderRadius: 2.5,
     alignSelf: 'center',
-    width: '15%',
+    width: widthPercentageToDP(12.5),
     backgroundColor: COLORS.controlNormal,
-    marginBottom: 30,
+    marginBottom: heightPercentageToDP(2.5),
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: '2%',
+    alignContent: 'center',
+    padding: heightPercentageToDP(0.5),
   },
   arrowStyle: {
-    marginRight: '2%',
+    marginRight: heightPercentageToDP(0.5),
     tintColor: COLORS.black,
     opacity: 0.4,
     height: 24,

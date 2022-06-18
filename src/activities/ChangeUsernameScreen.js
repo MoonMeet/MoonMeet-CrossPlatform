@@ -52,18 +52,14 @@ const ChangeUsernameScreen = () => {
 
   useEffect(() => {
     const onValueChange = database()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .on('value', snapshot => {
+      .ref(`/users/${auth()?.currentUser.uid}`)
+      .once('value', snapshot => {
         if (snapshot?.val().username) {
           setUsernameText(snapshot?.val().username);
           setOldUsernameText(snapshot?.val().username);
         }
       });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
+    return () => {};
   }, []);
 
   function pushUsername() {
@@ -73,8 +69,7 @@ const ChangeUsernameScreen = () => {
       .update({
         username: UsernameText,
       })
-      .then(() => {
-        setIsFABLoading(!isFABLoading);
+      .finally(() => {
         SuccessToast(
           'bottom',
           'Username updated',
@@ -82,7 +77,9 @@ const ChangeUsernameScreen = () => {
           true,
           4000,
         );
-        navigation.goBack();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
       })
       .catch(error => {
         ErrorToast(
@@ -92,7 +89,9 @@ const ChangeUsernameScreen = () => {
           true,
           4000,
         );
-        navigation.goBack();
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
         setIsFABLoading(!isFABLoading);
       });
   }
