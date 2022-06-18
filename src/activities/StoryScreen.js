@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,11 +11,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import ArrowIcon from '../assets/images/back.png';
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -26,6 +22,7 @@ import {
   widthPercentageToDP,
 } from '../config/Dimensions';
 import DotsImage from '../assets/images/dots.png';
+import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/StoryScreen/StoryActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -103,6 +100,9 @@ const StoryScreen = () => {
               .ref(`/storyviews/${storyId}`)
               .once('value', snapshot => {
                 setViewsData(snapshot?.val());
+              })
+              .finally(() => {
+                console.log(viewsData);
               });
           }
           if (!Loading) {
@@ -147,7 +147,7 @@ const StoryScreen = () => {
                 onPress={() => navigation.goBack()}>
                 <Avatar.Icon
                   icon={BackImage}
-                  size={36.5}
+                  size={37.5}
                   color={COLORS.black}
                   style={{
                     marginRight: '-1%',
@@ -185,12 +185,17 @@ const StoryScreen = () => {
             {!storyText !== null || auth?.currentUser.uid !== userStoryUID ? (
               <View style={styles.right_side}>
                 <Pressable
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    alignItems: 'flex-start',
+                  }}
                   onPress={() => {
-                    console.log('hello');
+                    // TODO: implement ActionSheet
                   }}>
                   <Avatar.Icon
-                    icon={DotsImage}
-                    size={36.5}
+                    icon={EyeImage}
+                    size={37.5}
                     color={COLORS.black}
                     style={{
                       marginRight: '-1%',
@@ -202,24 +207,34 @@ const StoryScreen = () => {
                       },
                     }}
                   />
-                  <Text>{Object.values(viewsData).length}</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
-                  <Avatar.Icon
-                    icon={DotsImage}
-                    size={36.5}
-                    color={COLORS.black}
+                  <Text style={styles.viewsNumber}>
+                    {viewsData.length > 0
+                      ? Object?.values(viewsData)?.length
+                      : '0'}
+                  </Text>
+                  <View style={{width: widthPercentageToDP(2.5)}} />
+                  <Pressable
                     style={{
-                      marginRight: '-1%',
-                      opacity: 0.4,
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'flex-start',
                     }}
-                    theme={{
-                      colors: {
-                        primary: COLORS.transparent,
-                      },
-                    }}
-                  />
+                    onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
+                    <Avatar.Icon
+                      icon={DotsImage}
+                      size={37.5}
+                      color={COLORS.black}
+                      style={{
+                        marginRight: '-1%',
+                        opacity: 0.4,
+                      }}
+                      theme={{
+                        colors: {
+                          primary: COLORS.transparent,
+                        },
+                      }}
+                    />
+                  </Pressable>
                 </Pressable>
               </View>
             ) : null}
@@ -397,7 +412,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   right_icon: {
     paddingBottom: '0.2%',
@@ -447,6 +462,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'center',
     color: COLORS.white,
+    fontFamily: FONTS.regular,
+  },
+  viewsNumber: {
+    fontSize: fontValue(15),
+    opacity: 0.4,
+    textAlign: 'center',
+    alignSelf: 'center',
+    color: COLORS.black,
     fontFamily: FONTS.regular,
   },
 });

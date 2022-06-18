@@ -52,7 +52,7 @@ function transformTimeForStories(time: number) {
   } else if (difference < 24 * (60 * 60000)) {
     returnCondition = Math.floor(difference / 1000 / 60 / 60) === 1;
     return returnCondition
-      ? Math.floor(difference / 1000 / 60 / 60) + 'Hour ago'
+      ? Math.floor(difference / 1000 / 60 / 60) + ' Hour ago'
       : Math.floor(difference / 1000 / 60 / 60) + ' Hours ago';
   }
 }
