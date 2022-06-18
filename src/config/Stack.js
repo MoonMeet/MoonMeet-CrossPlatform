@@ -28,7 +28,6 @@ import StoryScreen from '../activities/StoryScreen';
 import AddStoryScreen from '../activities/AddStoryScreen';
 import HomeChats from '../activities/HomeChatsScreen.js';
 import HomePeople from '../activities/HomePeopleScreen';
-import StoriesScreen from '../activities/StoryViewers';
 
 import {Avatar} from 'react-native-paper';
 
@@ -134,7 +133,6 @@ const StackNavigator = () => {
         <Stack.Screen name={'devices'} component={DevicesScreen} />
         <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />
         <Stack.Screen name={'story'} component={StoryScreen} />
-        <Stack.Screen name={'storyViewers'} component={StoriesScreen} />
         <Stack.Screen name={'addStory'} component={AddStoryScreen} />
         <Stack.Screen name={'chat'} component={ChatScreen} />
         <Stack.Screen name={'passcodeSetup'} component={SetupPasscodeScreen} />

@@ -18,6 +18,7 @@ import {
   TouchableRipple,
 } from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
+import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import BackImage from '../assets/images/back.png';
 import CameraImage from '../assets/images/photo-camera.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
@@ -33,9 +34,9 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import storage from '@react-native-firebase/storage';
 import getRandomString from '../utils/StringGenerator/StringGenerator';
+import {paddingRight} from 'styled-system';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -400,7 +401,7 @@ const AddStoryScreen = () => {
             </View>
           ) : null}
         </View>
-        <Spacer height={'2%'} />
+        <Spacer height={heightPercentageToDP(1)} />
         <View style={styles.textInputFlexedView}>
           <TextInput
             style={{
@@ -657,6 +658,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'flex-start',
+    paddingLeft: widthPercentageToDP(1),
+    paddingRight: widthPercentageToDP(1),
   },
   imageInputFlexedView: {
     flex: 1,

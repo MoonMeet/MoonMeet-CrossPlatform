@@ -34,7 +34,7 @@ function usersEqual(user1, user2) {
   return user1.uid === user2.uid;
 }
 
-const StoriesList = ({ListData}) => {
+const StoriesList = ({ListData, myUID}) => {
   const navigation = useNavigation();
 
   const getSameUidUser = () => {
@@ -58,7 +58,7 @@ const StoriesList = ({ListData}) => {
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        navigation.navigate('story', {uid: item.uid});
+        navigation.navigate('story', {uid: item.uid, myUID: myUID});
       }}
       style={{
         height: 85,

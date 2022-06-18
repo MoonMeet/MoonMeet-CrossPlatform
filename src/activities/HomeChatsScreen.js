@@ -35,6 +35,8 @@ const HomeChatsScreen = () => {
 
   const [mDialogVisible, setDialogVisible] = React.useState(false);
 
+  const [myUID, setMyUID] = React.useState('');
+
   const showDialog = () => setDialogVisible(true);
 
   const hideDialog = () => setDialogVisible(false);
@@ -87,6 +89,7 @@ const HomeChatsScreen = () => {
           snapshot?.val().active_status &&
           snapshot?.val().active_time
         ) {
+          setMyUID(snapshot?.val().uid);
           setAvatarURL(snapshot?.val().avatar);
           checkJwtKey(snapshot?.val().jwtKey);
           if (snapshot?.val().active_status === 'normal') {
@@ -233,7 +236,7 @@ const HomeChatsScreen = () => {
             </Pressable>
           </View>
         </View>
-        <StoriesList ListData={storiesData} />
+        <StoriesList ListData={storiesData} myUID={myUID} />
         <MessagesList ListData={_testChats} />
       </MiniBaseView>
     </Provider>

@@ -1,10 +1,21 @@
-import React, {useEffect, useRef} from 'react';
-import {StyleSheet, Text, View, ImageBackground, FlatList} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  FlatList,
+  Pressable,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import ArrowIcon from '../assets/images/back.png';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -21,6 +32,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 const StoryScreen = () => {
   const navigation = useNavigation();
   const userStoryUID = useRoute().params?.uid;
+  const myUID = useRoute().params?.myUID;
 
   const storiesRef = useRef(null);
 
@@ -34,6 +46,7 @@ const StoryScreen = () => {
   const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
+  const [viewsData, setViewsData] = React.useState([]);
 
   const [Loading, setLoading] = React.useState(true);
   const [ActionSheetVisible, setActionSheetVisible] = React.useState(false);
@@ -52,7 +65,7 @@ const StoryScreen = () => {
   const viewAbilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
 
   useEffect(() => {
-    const onValueChange = database()
+    database()
       .ref(`/stories/${userStoryUID}/`)
       .once('value', snapshot => {
         setAllCurrentUserStories(snapshot.val());
@@ -76,9 +89,6 @@ const StoryScreen = () => {
             setStoryUID(childSnapshot.val().uid);
             if (storyTime != null) {
               const calender = Date.now();
-              console.log(calender);
-              console.log(childSnapshot.val()?.time);
-              console.log(calender - storyTime > 86400000);
               if (calender - childSnapshot.val()?.time > 86400000) {
                 // TODO: Story Views Implementation.
                 deleteCurrentStory(storyId);
@@ -88,6 +98,21 @@ const StoryScreen = () => {
             }
           }
           setLoading(false);
+          if (auth()?.currentUser.uid != storyUID) {
+            database()
+              .ref(`/storyviews/${storyId}`)
+              .once('value', snapshot => {
+                setViewsData(snapshot?.val());
+              });
+          }
+          if (!Loading) {
+            if (auth()?.currentUser.uid !== storyUID) {
+              database().ref(`storyviews/${storyId}/${myUID}`).set({
+                uid: myUID,
+                sid: storyId,
+              });
+            }
+          }
         });
       });
     return () => {};
@@ -157,11 +182,29 @@ const StoryScreen = () => {
                 </Text>
               </View>
             </View>
-            {!storyText !== null || auth?.currentUser.uid === userStoryUID ? (
+            {!storyText !== null || auth?.currentUser.uid !== userStoryUID ? (
               <View style={styles.right_side}>
-                <TouchableRipple
-                  rippleColor={COLORS.rippleColor}
-                  borderless={false}
+                <Pressable
+                  onPress={() => {
+                    console.log('hello');
+                  }}>
+                  <Avatar.Icon
+                    icon={DotsImage}
+                    size={36.5}
+                    color={COLORS.black}
+                    style={{
+                      marginRight: '-1%',
+                      opacity: 0.4,
+                    }}
+                    theme={{
+                      colors: {
+                        primary: COLORS.transparent,
+                      },
+                    }}
+                  />
+                  <Text>{Object.values(viewsData).length}</Text>
+                </Pressable>
+                <Pressable
                   onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
                   <Avatar.Icon
                     icon={DotsImage}
@@ -177,7 +220,7 @@ const StoryScreen = () => {
                       },
                     }}
                   />
-                </TouchableRipple>
+                </Pressable>
               </View>
             ) : null}
           </View>
