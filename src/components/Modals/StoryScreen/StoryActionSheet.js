@@ -2,15 +2,15 @@ import React from 'react';
 
 import Modal from 'react-native-modal';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import {COLORS, FONTS} from '../../config/Miscellaneous';
+import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
-import CopyImage from '../../assets/images/copy.png';
-import DeleteImage from '../../assets/images/delete.png';
+import CopyImage from '../../../assets/images/copy.png';
+import DeleteImage from '../../../assets/images/delete.png';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
-} from '../../config/Dimensions';
+} from '../../../config/Dimensions';
 
 interface StoryActionSheetInterface {
   hideModal: Function;

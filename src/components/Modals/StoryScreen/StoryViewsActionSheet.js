@@ -1,16 +1,14 @@
 import React from 'react';
-import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
-import {COLORS, FONTS} from '../../../config/Miscellaneous';
+import {COLORS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
 import BackImage from '../../../assets/images/back.png';
+import ViewsList from './ViewsList';
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../../config/Dimensions';
 
 interface StoryViewsInterface {
   hideModal: Function;
@@ -18,11 +16,11 @@ interface StoryViewsInterface {
   ViewsData: Array;
 }
 
-const StoryViews = (props: StoryViewsInterface) => {
+const StoryViewsActionSheet = (props: StoryViewsInterface) => {
   return (
     <Modal
       style={{
-        margin: '3%',
+        margin: heightPercentageToDP(0.5),
       }}
       animationType={'slide'}
       transparent={false}
@@ -48,11 +46,10 @@ const StoryViews = (props: StoryViewsInterface) => {
             }}
           />
         </View>
-        <Text style={styles.headerText}>Privacy Policy :</Text>
-        <ViewList ViewsData={props.ViewsData} />
+        <ViewsList ViewData={props.ViewsData} />
       </SafeAreaView>
     </Modal>
   );
 };
 const styles = StyleSheet.create({});
-export default React.memo(StoryViews);
+export default React.memo(StoryViewsActionSheet);

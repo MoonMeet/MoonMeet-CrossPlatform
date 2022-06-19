@@ -23,7 +23,8 @@ import {
 } from '../config/Dimensions';
 import DotsImage from '../assets/images/dots.png';
 import EyeImage from '../assets/images/eye.png';
-import StoryActionSheet from '../components/StoryScreen/StoryActionSheet';
+import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
+import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 const StoryScreen = () => {
@@ -47,6 +48,7 @@ const StoryScreen = () => {
 
   const [Loading, setLoading] = React.useState(true);
   const [ActionSheetVisible, setActionSheetVisible] = React.useState(false);
+  const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
   async function deleteCurrentStory(sid) {
     return await database().ref(`/stories/${userStoryUID}/${sid}`).remove();
@@ -191,7 +193,7 @@ const StoryScreen = () => {
                     alignItems: 'flex-start',
                   }}
                   onPress={() => {
-                    // TODO: implement ActionSheet
+                    setStoryViewsVisible(!storyViewsVisible);
                   }}>
                   <Avatar.Icon
                     icon={EyeImage}
@@ -331,6 +333,13 @@ const StoryScreen = () => {
             </TouchableRipple>
           </View>
         </View>
+        <StoryViewsActionSheet
+          hideModal={() => {
+            setStoryViewsVisible(!storyViewsVisible);
+          }}
+          isVisible={storyViewsVisible}
+          ViewsData={viewsData}
+        />
         <StoryActionSheet
           hideModal={() => {
             setActionSheetVisible(!ActionSheetVisible);

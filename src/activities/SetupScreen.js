@@ -302,8 +302,15 @@ const SetupScreen = ({route}) => {
                         jwtKey: jwt_key,
                       })
                       .finally(() => {
-                        navigation.navigate('home');
-                        setLoaderVisible(!LoaderVisible);
+                        database()
+                          .ref(`/users/${auth()?.currentUser.uid}/passcode`)
+                          .set({
+                            password_enabled: false,
+                          })
+                          .finally(() => {
+                            navigation.navigate('home');
+                            setLoaderVisible(!LoaderVisible);
+                          });
                       });
                   },
                 );
