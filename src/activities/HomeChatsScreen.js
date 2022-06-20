@@ -19,6 +19,8 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
 import AsyncStorage from '@react-native-community/async-storage';
 import StoriesList from '../components/HomeScreen/StoriesList';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {fontValue} from '../config/Dimensions';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -222,16 +224,10 @@ const HomeChatsScreen = () => {
                 navigation.navigate('searchChats');
                 updateUserActiveStatus();
               }}>
-              <Avatar.Icon
-                icon={SearchImage}
-                size={37.5}
-                color={COLORS.black}
-                style={styles.right_icon}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
+              <MaterialIcons
+                name={'search'}
+                size={fontValue(25)}
+                color={COLORS.darkGrey}
               />
             </Pressable>
           </View>

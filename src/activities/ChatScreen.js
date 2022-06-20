@@ -1,6 +1,13 @@
 /* eslint-disable prettier/prettier */
 import React, {useCallback, useEffect} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  TextInput,
+} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   fontValue,
@@ -9,23 +16,18 @@ import {
 } from '../config/Dimensions';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {
-  ActivityIndicator,
-  Avatar,
-  TextInput,
-  TouchableRipple,
-} from 'react-native-paper';
+import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import MoonChatList from '../components/ChatScreen/MoonChatList/MoonChatList';
 import SendImage from '../assets/images/send.png';
 import testChats from '../assets/data/json/test/testChats.json';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  console.log('destinated ' + destinedUser.uid);
 
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
@@ -87,8 +89,14 @@ const ChatScreen = () => {
       .child(userUID)
       .on('child_added', snapshot => {
         let messages = [];
-        //messages.push(snapshot.val());
-        //setChatData(messages);
+        messages.push({
+          message: snapshot.val().message,
+          fromUID: snapshot.val().fromUID,
+          toUID: snapshot.val().toUID,
+          mid: snapshot.val().mid,
+          time: snapshot.val().time,
+        });
+        setChatData(messages);
         setLoading(false);
       });
     return () => {
@@ -191,28 +199,32 @@ const ChatScreen = () => {
       )}
       <View style={styles.messageInputBox}>
         <TextInput
-          style={{flexGrow: 1}}
-          mode="outlined"
+          multiline={true}
+          numberOfLines={5}
+          style={{
+            height: (Dimensions.get('window').height / 100) * 6.55,
+            width: (Dimensions.get('window').width / 100) * 67.37,
+            maxWidth: (Dimensions.get('window').width / 100) * 67.37,
+            fontSize: 14,
+            alignSelf: 'flex-start',
+          }}
           value={mMessageText}
-          placeholder={'Type a message'}
-          theme={{
-            colors: {
-              text: COLORS.accentLight,
-              primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
-            },
-            roundness: heightPercentageToDP(3),
+          onChangeText={value => {
+            setMessageText(value);
           }}
-          onChangeText={text => {
-            setMessageText(text);
-          }}
+          placeholder={'write a message'}
+          placeholderTextColor={'#000'}
         />
-        <Pressable onPress={sendMessage}>
-          <Avatar.Icon
+        <Pressable
+          hitSlop={15}
+          style={{
+            backgroundColor: COLORS.accentLight,
+            borderRadius: 20,
+            alignItems: 'center',
+          }}
+          onPress={sendMessage}>
+          <FeatherIcon icon={'send'} size={24} color={COLORS.accentLight} />
+          {/*<Avatar.Icon
             icon={SendImage}
             size={64}
             color={COLORS.black}
@@ -226,7 +238,7 @@ const ChatScreen = () => {
                 primary: COLORS.transparent,
               },
             }}
-          />
+          />*/}
         </Pressable>
       </View>
     </BaseView>
@@ -260,7 +272,13 @@ const styles = StyleSheet.create({
   },
   messageInputBox: {
     flexDirection: 'row',
-    padding: heightPercentageToDP(0.5),
+    borderRadius: 20,
+    backgroundColor: COLORS.rippleColor,
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: (Dimensions.get('window').width / 100) * 93.37,
+    alignSelf: 'center',
+    marginBottom: 10,
   },
 });
 export default React.memo(ChatScreen);

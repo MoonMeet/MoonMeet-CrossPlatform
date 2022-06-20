@@ -210,7 +210,7 @@ const StoryScreen = () => {
                     }}
                   />
                   <Text style={styles.viewsNumber}>
-                    {viewsData.length > 0
+                    {viewsData?.length > 0
                       ? Object?.values(viewsData)?.length
                       : '0'}
                   </Text>

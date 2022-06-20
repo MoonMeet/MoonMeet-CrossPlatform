@@ -6,35 +6,35 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Avatar} from 'react-native-paper';
 import AddIcon from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {fontValue} from '../../config/Dimensions';
 
-function removeDuplicates(arr, equals) {
-  let originalArr = arr.slice(0);
-  let i, len, val;
-  arr.length = 0;
+const StoriesList = ({ListData, myUID}) => {
+  function removeDuplicates(arr, equals) {
+    let originalArr = arr.slice(0);
+    let i, len, val;
+    arr.length = 0;
 
-  for (i = 0, len = originalArr.length; i < len; ++i) {
-    val = originalArr[i];
-    if (
-      !arr.some(function (item) {
-        return equals(item, val);
-      })
-    ) {
-      arr.push(val);
+    for (i = 0, len = originalArr.length; i < len; ++i) {
+      val = originalArr[i];
+      if (
+        !arr.some(function (item) {
+          return equals(item, val);
+        })
+      ) {
+        arr.push(val);
+      }
     }
   }
-}
 
-function usersEqual(user1, user2) {
-  return user1.uid === user2.uid;
-}
+  function usersEqual(user1, user2) {
+    return user1.uid === user2.uid;
+  }
 
-const StoriesList = ({ListData, myUID}) => {
   const navigation = useNavigation();
 
   const getSameUidUser = () => {
