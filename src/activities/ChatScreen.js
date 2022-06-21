@@ -121,11 +121,11 @@ const ChatScreen = () => {
       database()
         .ref(`/messages/${myUID}/${userUID}/${myMID}`)
         .set({
-          _id: userUID,
+          _id: myUID,
           text: mMessageText,
           createdAt: Date.now(),
           user: {
-            _id: userUID,
+            _id: myUID,
             name: myFirstName + ' ' + myLastName,
             avatar: myAvatar,
           },
