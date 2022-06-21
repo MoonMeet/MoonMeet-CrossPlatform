@@ -16,14 +16,11 @@ import {
 } from '../config/Dimensions';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
+import {Avatar, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
-import MoonChatList from '../components/ChatScreen/MoonChatList/MoonChatList';
-import SendImage from '../assets/images/send.png';
-import testChats from '../assets/data/json/test/testChats.json';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import FeatherIcon from 'react-native-vector-icons/Feather';
+import {GiftedChat} from 'react-native-gifted-chat';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -37,6 +34,7 @@ const ChatScreen = () => {
   const [userFirstName, setUserFirstName] = React.useState('');
   const [userLastName, setUserLastName] = React.useState('');
   const [userAvatar, setUserAvatar] = React.useState('');
+  const [You, setYou] = React.useState('');
 
   /**
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
@@ -46,6 +44,7 @@ const ChatScreen = () => {
   const [myFirstName, setMyFirstName] = React.useState('');
   const [myLastName, setMyLastName] = React.useState('');
   const [myAvatar, setMyAvatar] = React.useState('');
+  const [Me, setMe] = React.useState('');
   /**
    * Message Variables
    */
@@ -90,13 +89,15 @@ const ChatScreen = () => {
       .on('child_added', snapshot => {
         let messages = [];
         messages.push({
-          message: snapshot.val().message,
-          fromUID: snapshot.val().fromUID,
-          toUID: snapshot.val().toUID,
-          mid: snapshot.val().mid,
-          time: snapshot.val().time,
+          _id: snapshot?.val()._id,
+          createdAt: snapshot?.val().createdAt,
+          user: snapshot?.val().user,
+          text: snapshot?.val().text,
         });
-        setChatData(messages);
+        console.log(messages);
+        setChatData(previousMessage =>
+          GiftedChat.append(previousMessage, messages),
+        );
         setLoading(false);
       });
     return () => {
@@ -108,20 +109,26 @@ const ChatScreen = () => {
     };
   }, [destinedUser?.uid]);
 
-  const sendMessage = () => {
+  const sendMessage = useCallback((mChatData = []) => {
     if (mMessageText.length < 1) {
       // simply don't send an empty message to database, 'cause that's hows mafia works :sunglasses:
     } else {
       setMessageText(mMessageText.trim());
+      setChatData(previousMessage =>
+        GiftedChat.append(previousMessage, mChatData),
+      );
       const myMID = database().ref(`/messages/${myUID}/${userUID}`).push().key;
       database()
         .ref(`/messages/${myUID}/${userUID}/${myMID}`)
         .set({
-          fromUID: myUID,
-          toUID: userUID,
-          mid: myMID,
-          message: mMessageText,
-          time: Date.now(),
+          _id: userUID,
+          text: mMessageText,
+          createdAt: Date.now(),
+          user: {
+            _id: userUID,
+            name: myFirstName + ' ' + myLastName,
+            avatar: myAvatar,
+          },
         })
         .finally(() => {
           console.log(`message sent from ${myUID} to ${userUID}`);
@@ -132,7 +139,7 @@ const ChatScreen = () => {
             error,
           );
         });
-      const userMID = database()
+      /**const userMID = database()
         .ref(`/messages/${userUID}/${myUID}`)
         .push().key;
       database()
@@ -153,8 +160,9 @@ const ChatScreen = () => {
             error,
           );
         });
+        */
     }
-  };
+  });
 
   return (
     <BaseView>
@@ -181,66 +189,35 @@ const ChatScreen = () => {
             }}
           />
         </TouchableRipple>
-        <Avatar.Image size={40} source={{uri: userAvatar}} />
+        <Avatar.Image
+          size={40}
+          source={{uri: userAvatar ? userAvatar : null}}
+        />
         <Text style={styles.userFullName}>
           {userFirstName} {userLastName}
         </Text>
       </View>
-      {isLoading ? (
-        <View style={{flex: 1}}>
-          <ActivityIndicator
-            animating={'true'}
-            size={'large'}
-            color={'#566193'}
-          />
-        </View>
-      ) : (
-        <MoonChatList ChatData={mChatData} userInfo={userData} />
-      )}
-      <View style={styles.messageInputBox}>
-        <TextInput
-          multiline={true}
-          numberOfLines={5}
-          style={{
-            height: (Dimensions.get('window').height / 100) * 6.55,
-            width: (Dimensions.get('window').width / 100) * 67.37,
-            maxWidth: (Dimensions.get('window').width / 100) * 67.37,
-            fontSize: 14,
-            alignSelf: 'flex-start',
-          }}
-          value={mMessageText}
-          onChangeText={value => {
-            setMessageText(value);
-          }}
-          placeholder={'write a message'}
-          placeholderTextColor={'#000'}
-        />
-        <Pressable
-          hitSlop={15}
-          style={{
-            backgroundColor: COLORS.accentLight,
-            borderRadius: 20,
-            alignItems: 'center',
-          }}
-          onPress={sendMessage}>
-          <FeatherIcon icon={'send'} size={24} color={COLORS.accentLight} />
-          {/*<Avatar.Icon
-            icon={SendImage}
-            size={64}
-            color={COLORS.black}
-            style={{
-              overflow: 'hidden',
-              marginRight: '-1%',
-              opacity: 0.4,
-            }}
-            theme={{
-              colors: {
-                primary: COLORS.transparent,
-              },
-            }}
-          />*/}
-        </Pressable>
-      </View>
+      <View
+        style={{
+          width: '100%',
+          height: heightPercentageToDP(0.125),
+          backgroundColor: COLORS.controlNormal,
+        }}
+      />
+      <GiftedChat
+        text={mMessageText}
+        isLoadingEarlier={isLoading}
+        onInputTextChanged={text => setMessageText(text)}
+        messages={mChatData}
+        onSend={messages => {
+          sendMessage(messages);
+          setMessageText('');
+        }}
+        user={{
+          _id: auth()?.currentUser.uid,
+        }}
+        scrollToBottom
+      />
     </BaseView>
   );
 };
