@@ -14,9 +14,13 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Avatar, TouchableRipple} from 'react-native-paper';
+import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -25,7 +29,6 @@ import {GiftedChat} from 'react-native-gifted-chat';
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
@@ -82,32 +85,42 @@ const ChatScreen = () => {
           setMyAvatar(snapshot?.val().avatar);
         }
       });
-    const MessagesFetch = database()
-      .ref('/messages/')
-      .child(myUID)
-      .child(userUID)
-      .on('child_added', snapshot => {
-        let messages = [];
-        messages.push({
-          _id: snapshot?.val()._id,
-          createdAt: snapshot?.val().createdAt,
-          user: snapshot?.val().user,
-          text: snapshot?.val().text,
-        });
-        console.log(messages);
-        setChatData(previousMessage =>
-          GiftedChat.append(previousMessage, messages),
-        );
-        setLoading(false);
-      });
-    return () => {
-      database()
-        .ref('/messages/')
-        .child(myUID)
-        .child(userUID)
-        .off('child_added', MessagesFetch);
-    };
+
+    return () => {};
   }, [destinedUser?.uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (destinedUser?.uid != null) {
+        const MessagesFetch = database()
+          .ref('/messages/')
+          .child(myUID)
+          .child(userUID)
+          .orderByKey('createdAt')
+          .on('child_added', snapshot => {
+            let messages = [];
+            messages.push({
+              _id: snapshot?.val()._id,
+              createdAt: snapshot?.val().createdAt,
+              user: snapshot?.val().user,
+              text: snapshot?.val().text,
+            });
+            console.log(messages);
+            setChatData(previousMessage =>
+              GiftedChat.append(previousMessage, messages),
+            );
+            setLoading(false);
+          });
+        return () => {
+          database()
+            .ref('/messages/')
+            .child(myUID)
+            .child(userUID)
+            .off('child_added', MessagesFetch);
+        };
+      }
+    }, [destinedUser?.uid]),
+  );
 
   const sendMessage = useCallback((mChatData = []) => {
     if (mMessageText.length < 1) {
@@ -121,7 +134,7 @@ const ChatScreen = () => {
       database()
         .ref(`/messages/${myUID}/${userUID}/${myMID}`)
         .set({
-          _id: myUID,
+          _id: myMID,
           text: mMessageText,
           createdAt: Date.now(),
           user: {
@@ -129,38 +142,22 @@ const ChatScreen = () => {
             name: myFirstName + ' ' + myLastName,
             avatar: myAvatar,
           },
-        })
-        .finally(() => {
-          console.log(`message sent from ${myUID} to ${userUID}`);
-        })
-        .catch(error => {
-          console.log(
-            'an error has been occured during sending the message: ',
-            error,
-          );
         });
-      /**const userMID = database()
+      const userMID = database()
         .ref(`/messages/${userUID}/${myUID}`)
         .push().key;
       database()
         .ref(`/messages/${userUID}/${myUID}/${userMID}`)
         .set({
-          fromUID: myUID,
-          toUID: userUID,
-          mid: userMID,
-          message: mMessageText,
-          time: Date.now(),
-        })
-        .finally(() => {
-          console.log(`message delivred also to ${myUID} from ${userUID}`);
-        })
-        .catch(error => {
-          console.log(
-            'an error has been occured during sending the message: ',
-            error,
-          );
+          _id: userMID,
+          createdAt: Date.now(),
+          text: mMessageText,
+          user: {
+            _id: userUID,
+            name: userFirstName + ' ' + userLastName,
+            avatar: userAvatar,
+          },
         });
-        */
     }
   });
 
@@ -207,6 +204,17 @@ const ChatScreen = () => {
       <GiftedChat
         text={mMessageText}
         isLoadingEarlier={isLoading}
+        renderLoading={() => (
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <ActivityIndicator
+              size={'large'}
+              color={COLORS.accentLight}
+              animating={true}
+            />
+          </View>
+        )}
+        showAvatarForEveryMessage={true}
+        showUserAvatar={true}
         onInputTextChanged={text => setMessageText(text)}
         messages={mChatData}
         onSend={messages => {
@@ -215,6 +223,8 @@ const ChatScreen = () => {
         }}
         user={{
           _id: auth()?.currentUser.uid,
+          avatar: myAvatar,
+          name: myFirstName + ' ' + myLastName,
         }}
         scrollToBottom
       />
@@ -258,4 +268,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-export default React.memo(ChatScreen);
+export default ChatScreen;
