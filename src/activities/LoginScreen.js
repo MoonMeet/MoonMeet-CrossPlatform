@@ -2,15 +2,12 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import {
   BackHandler,
   Keyboard,
-  KeyboardAvoidingView,
   SafeAreaView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import {
-  Button,
   FAB,
   IconButton,
   Menu,
@@ -28,7 +25,7 @@ import CountriesList from '../components/Modals/LoginScreen/CountriesList';
 import PrivacyPolicy from '../components/Modals/PrivacyPolicy/PrivacyPolicy';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import LoginHelp from '../components/Modals/LoginScreen/LoginHelp';
 import ArrowForward from '../assets/images/arrow-forward.png';
 import BaseView from '../components/BaseView/BaseView';
@@ -262,28 +259,25 @@ const LoginScreen = () => {
       Keyboard.dismiss();
       confirmCode(text).then(() => {
         if (auth().currentUser != null) {
-          database()
-            .ref(`/users/${auth()?.currentUser.uid}`)
-            .once('value')
-            .then(snapshot => {
-              if (snapshot?.val()?.uid && snapshot?.val().jwtKey) {
+          firestore()
+            .collection('users')
+            .doc(auth()?.currentUser.uid)
+            .get()
+            .then(documentSnapshot => {
+              if (documentSnapshot?.exists) {
                 AsyncStorage.setItem(
                   'currentUserJwtKey',
-                  snapshot?.val().jwtKey,
+                  documentSnapshot?.data().jwtKey,
                 ).then(() => {
                   AsyncStorage.getItem('currentUserJwtKey').then(val => {
                     /**
                      * pushing device information for later use in DeviceScreen.js
                      */
                     if (!isWindows && !isWeb) {
-                      const referenceKey = database()
-                        .ref(`/devices/${auth()?.currentUser.uid}`)
-                        .push().key;
-
-                      database()
-                        .ref(
-                          `/devices/${auth()?.currentUser.uid}/${referenceKey}`,
-                        )
+                      const referenceKey = firestore()
+                        .collection(`devices/${auth()?.currentUser.uid}`)
+                        .doc();
+                      const res = referenceKey
                         .set({
                           manufacturer: Manufacturer,
                           system_name: systemName,
@@ -293,7 +287,7 @@ const LoginScreen = () => {
                           app_version: appVersion,
                           time: Date.now(),
                         })
-                        .catch(error => {
+                        .catch(() => {
                           console.error(error);
                           setLoaderVisible(!LoaderVisible);
                         });
@@ -304,7 +298,7 @@ const LoginScreen = () => {
                 });
               } else {
                 const _username = auth()
-                  .currentUser.uid.substring(0, 4)
+                  ?.currentUser.uid.substring(0, 4)
                   .concat(getRandomInt(100000, 999999));
                 navigation.navigate('setup', {
                   user: {

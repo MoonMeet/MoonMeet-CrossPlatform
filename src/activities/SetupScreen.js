@@ -7,7 +7,7 @@ import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
 import {
   getManufacturer,
@@ -65,7 +65,6 @@ const SetupScreen = ({route}) => {
    */
 
   let jwt_key = uuidv4();
-
   /**
    * Used for getting Device Information, useful for DeviceScreen.js
    */
@@ -261,12 +260,11 @@ const SetupScreen = ({route}) => {
                  * pushing device information for later use in DeviceScreen.js
                  */
                 if (!isWindows && !isWeb) {
-                  const referenceKey = database()
-                    .ref(`/devices/${auth()?.currentUser.uid}`)
-                    .push().key;
-
-                  database()
-                    .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
+                  const referenceKey = firestore()
+                    .collection('devices')
+                    // here devices/uid/generatedkey and push data
+                    .doc();
+                  const res = referenceKey
                     .set({
                       manufacturer: Manufacturer,
                       system_name: systemName,
@@ -276,7 +274,7 @@ const SetupScreen = ({route}) => {
                       app_version: appVersion,
                       time: Date.now(),
                     })
-                    .catch(error => {
+                    .catch(() => {
                       console.error(error);
                       setLoaderVisible(!LoaderVisible);
                     });
@@ -289,8 +287,9 @@ const SetupScreen = ({route}) => {
 
                 await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
                   () => {
-                    database()
-                      .ref(`/users/${auth()?.currentUser?.uid}`)
+                    firestore()
+                      .collection('users')
+                      .doc(auth()?.currentUser.uid)
                       .set({
                         ...user,
                         first_name: firstName,
@@ -302,10 +301,14 @@ const SetupScreen = ({route}) => {
                         jwtKey: jwt_key,
                       })
                       .finally(() => {
-                        database()
-                          .ref(`/users/${auth()?.currentUser.uid}/passcode`)
+                        firestore()
+                          .collection('users')
+                          // here users/uid/passcode and push data
+                          .doc(auth()?.currentUser.uid)
                           .set({
-                            password_enabled: false,
+                            passcode: {
+                              password_enabled: false,
+                            },
                           })
                           .finally(() => {
                             navigation.navigate('home');
