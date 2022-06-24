@@ -274,11 +274,10 @@ const LoginScreen = () => {
                      * pushing device information for later use in DeviceScreen.js
                      */
                     if (!isWindows && !isWeb) {
-                      const referenceKey = firestore()
-                        .collection(`devices/${auth()?.currentUser.uid}`)
-                        .doc();
-                      const res = referenceKey
-                        .set({
+                      firestore()
+                        .collection('devices')
+                        .doc(auth()?.currentUser.uid)
+                        .add({
                           manufacturer: Manufacturer,
                           system_name: systemName,
                           system_version: systemVersion,

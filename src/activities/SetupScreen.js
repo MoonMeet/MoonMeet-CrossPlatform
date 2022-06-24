@@ -260,11 +260,14 @@ const SetupScreen = ({route}) => {
                  * pushing device information for later use in DeviceScreen.js
                  */
                 if (!isWindows && !isWeb) {
+                  console.log('waiting for devices');
                   const referenceKey = firestore()
                     .collection('devices')
-                    // here devices/uid/generatedkey and push data
-                    .doc();
-                  const res = referenceKey
+                    .doc(auth()?.currentUser.uid).id;
+                  firestore()
+                    .collection('devices')
+                    .doc(auth()?.currentUser.uid)
+                    .collection(`${referenceKey}`)
                     .set({
                       manufacturer: Manufacturer,
                       system_name: systemName,
@@ -279,6 +282,7 @@ const SetupScreen = ({route}) => {
                       setLoaderVisible(!LoaderVisible);
                     });
                 }
+                console.log('done for devices');
 
                 /**
                  * Since we got everything except a girlfriend.
@@ -287,6 +291,7 @@ const SetupScreen = ({route}) => {
 
                 await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
                   () => {
+                    console.log('waiting for users');
                     firestore()
                       .collection('users')
                       .doc(auth()?.currentUser.uid)
@@ -299,21 +304,14 @@ const SetupScreen = ({route}) => {
                         active_time: Date.now(),
                         bio: '',
                         jwtKey: jwt_key,
+                        passcode: {
+                          passcode_enabled: false,
+                        },
                       })
                       .finally(() => {
-                        firestore()
-                          .collection('users')
-                          // here users/uid/passcode and push data
-                          .doc(auth()?.currentUser.uid)
-                          .set({
-                            passcode: {
-                              password_enabled: false,
-                            },
-                          })
-                          .finally(() => {
-                            navigation.navigate('home');
-                            setLoaderVisible(!LoaderVisible);
-                          });
+                        navigation.navigate('home');
+                        setLoaderVisible(!LoaderVisible);
+                        console.log('done for devices');
                       });
                   },
                 );
