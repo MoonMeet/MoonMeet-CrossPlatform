@@ -261,7 +261,8 @@ const SetupScreen = ({route}) => {
                  */
                 if (!isWindows && !isWeb) {
                   console.log('waiting for devices');
-                  const referenceKey = firestore()
+                  /**
+                   const referenceKey = firestore()
                     .collection('devices')
                     .doc(auth()?.currentUser.uid).id;
                   firestore()
@@ -281,6 +282,7 @@ const SetupScreen = ({route}) => {
                       console.error(error);
                       setLoaderVisible(!LoaderVisible);
                     });
+                   */
                 }
                 console.log('done for devices');
 

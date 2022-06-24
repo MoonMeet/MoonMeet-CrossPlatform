@@ -3,7 +3,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
@@ -22,33 +22,32 @@ const HomeSettingsScreen = () => {
   const [activeTime, setActiveTime] = React.useState('');
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', snapshot => {
+    const usersSubsriber = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .onSnapshot(documentSnapshot => {
         if (
-          snapshot?.val().avatar &&
-          snapshot?.val().first_name &&
-          snapshot?.val().last_name &&
-          snapshot?.val().username &&
-          snapshot?.val().active_status &&
-          snapshot?.val().active_time
+          documentSnapshot?.data().avatar &&
+          documentSnapshot?.data().first_name &&
+          documentSnapshot?.data().last_name &&
+          documentSnapshot?.data().username &&
+          documentSnapshot?.data().active_status &&
+          documentSnapshot?.data().active_time
         ) {
-          setAvatarURL(snapshot?.val().avatar);
-          setFirstName(snapshot?.val().first_name);
-          setLastName(snapshot?.val().last_name);
-          setUserName(snapshot?.val().username);
-          setActiveStatus(snapshot?.val().active_status);
-          setActiveTime(snapshot?.val().active_time);
-          if (snapshot?.val().bio) {
-            setUserBio(snapshot?.val().bio);
+          setAvatarURL(documentSnapshot?.data().avatar);
+          setFirstName(documentSnapshot?.data().first_name);
+          setLastName(documentSnapshot?.data().last_name);
+          setUserName(documentSnapshot?.data().username);
+          setActiveStatus(documentSnapshot?.data().active_status);
+          setActiveTime(documentSnapshot?.data().active_time);
+          if (documentSnapshot?.data().bio) {
+            setUserBio(documentSnapshot?.data().bio);
           }
         }
         setLoading(false);
       });
     return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
+      usersSubsriber();
     };
   }, []);
 

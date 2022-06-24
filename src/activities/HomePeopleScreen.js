@@ -6,7 +6,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-community/async-storage';
 import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
@@ -64,27 +64,28 @@ const HomePeopleScreen = () => {
   );
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', async snapshot => {
+    const userSusbcribe = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .onSnapshot(documentSnapshot => {
         if (
-          snapshot?.val().avatar &&
-          snapshot?.val().jwtKey &&
-          snapshot?.val().active_status &&
-          snapshot?.val().active_time
+          documentSnapshot?.data()?.avatar &&
+          documentSnapshot?.data()?.jwtKey &&
+          documentSnapshot?.data()?.active_status &&
+          documentSnapshot?.data()?.active_time
         ) {
-          setAvatarURL(snapshot?.val().avatar);
-          checkJwtKey(snapshot?.val().jwtKey);
-          if (snapshot?.val().active_status == 'normal') {
+          setAvatarURL(documentSnapshot?.data()?.avatar);
+          checkJwtKey(documentSnapshot?.data()?.jwtKey);
+          if (documentSnapshot?.data()?.active_status === 'normal') {
             setActiveStatusState(true);
           } else {
             setActiveStatusState(false);
           }
-          setNewActiveTime(snapshot?.val().active_time);
+          setNewActiveTime(documentSnapshot?.data()?.active_time);
           setLoading(false);
         }
       });
-
+    /*
     const onSecondValueChange = database()
       .ref('/users/')
       .on('value', snapshot => {
@@ -114,11 +115,15 @@ const HomePeopleScreen = () => {
           console.log(masterData);
         });
       });
+      */
     return () => {
+      userSusbcribe();
+      /*
       database()
         .ref(`/users/${auth()?.currentUser.uid}`)
         .off('value', onValueChange);
       database().ref('/users/').off('value', onSecondValueChange);
+      */
     };
   }, []);
 

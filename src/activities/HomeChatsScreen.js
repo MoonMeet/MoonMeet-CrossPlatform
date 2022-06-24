@@ -19,6 +19,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
 import AsyncStorage from '@react-native-community/async-storage';
 import StoriesList from '../components/HomeScreen/StoriesList';
+import firestore from '@react-native-firebase/firestore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue} from '../config/Dimensions';
 
@@ -43,7 +44,7 @@ const HomeChatsScreen = () => {
 
   const hideDialog = () => setDialogVisible(false);
 
-  function checkJwtKey(currentJwtKey: string) {
+  function checkJwtKey(currentJwtKey = string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         setDialogVisible(true);
@@ -82,27 +83,32 @@ const HomeChatsScreen = () => {
   }
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', snapshot => {
+    const userSusbcribe = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .onSnapshot(documentSnapshot => {
         if (
-          snapshot?.val().avatar &&
-          snapshot?.val().jwtKey &&
-          snapshot?.val().active_status &&
-          snapshot?.val().active_time
+          documentSnapshot?.data()?.avatar &&
+          documentSnapshot?.data()?.jwtKey &&
+          documentSnapshot?.data()?.active_status &&
+          documentSnapshot?.data()?.active_time
         ) {
-          setMyUID(snapshot?.val().uid);
-          setAvatarURL(snapshot?.val().avatar);
-          checkJwtKey(snapshot?.val().jwtKey);
-          if (snapshot?.val().active_status === 'normal') {
+          setMyUID(documentSnapshot?.data()?.uid);
+          setAvatarURL(documentSnapshot?.data()?.avatar);
+          checkJwtKey(documentSnapshot?.data()?.jwtKey);
+          if (documentSnapshot?.data()?.active_status === 'normal') {
             setActiveStatusState(true);
           } else {
             setActiveStatusState(false);
           }
-          setNewActiveTime(snapshot?.val().active_time);
+          setNewActiveTime(documentSnapshot?.data()?.active_time);
         }
       });
-    const secondOnValueChange = database()
+    const storySubscriber = firestore()
+      .collection('stories')
+      .onSnapshot(documentSnapshot => {});
+    /**
+      const secondOnValueChange = database()
       .ref('/stories/')
       .on('value', snapshot => {
         const storiesSnapshot = [];
@@ -138,11 +144,17 @@ const HomeChatsScreen = () => {
           });
         });
       });
+       */
+
     return () => {
+      userSusbcribe();
+      storySubscriber();
+      /*
       database()
         .ref(`/users/${auth()?.currentUser.uid}`)
         .off('value', onValueChange);
       database().ref('/stories/').off('value', secondOnValueChange);
+    */
     };
   }, []);
 
