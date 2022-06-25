@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -46,11 +46,15 @@ const SplashScreen = () => {
       if (getViewPagerStats === 'true') {
         if (auth()?.currentUser !== null) {
           let havePasscode = false;
-          database()
-            .ref(`/users/${auth()?.currentUser.uid}/passcode/`)
-            .once('value', snapshot => {
-              if (snapshot?.val().password_enabled) {
-                havePasscode = true;
+          firestore()
+            .collection('users')
+            .doc(auth()?.currentUser?.uid)
+            .get()
+            .then(documentSnapshot => {
+              if (documentSnapshot?.exists) {
+                if (documentSnapshot?.data()?.passcode?.passcode_enabled) {
+                  havePasscode = true;
+                }
               }
             })
             .finally(() => {

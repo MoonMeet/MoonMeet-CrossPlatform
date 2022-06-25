@@ -13,7 +13,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CameraIcon from '../assets/images/photo-camera.png';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
@@ -26,6 +26,7 @@ import {
 import NetInfo from '@react-native-community/netinfo';
 import storage from '@react-native-firebase/storage';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -43,6 +44,7 @@ const EditProfileScreen = () => {
 
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
+  const [oldAvatar, setOldAvatar] = React.useState('');
 
   const [PickerActionSheet, setPickerActionSheet] = React.useState(false);
 
@@ -51,31 +53,31 @@ const EditProfileScreen = () => {
   const onFirstnameTextChange = _firstnameText => setFirstName(_firstnameText);
   const onLastnameTextChange = _lastnameText => setLastName(_lastnameText);
 
-  const [isFABLoading, setIsFABLoading] = React.useState(false);
-
   const [Loading, setLoading] = React.useState(true);
+  const [loaderVisible, setLoaderVisible] = React.useState(false);
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser?.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().first_name && snapshot?.val().last_name) {
-          if (snapshot?.val().avatar) {
-            setAvatarURL(snapshot?.val().avatar);
-          }
-          setFirstName(snapshot?.val().first_name);
-          setLastName(snapshot?.val().last_name);
-
-          setOldFirstname(snapshot?.val().first_name);
-          setOldLastName(snapshot?.val().last_name);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (
+          documentSnapshot?.data()?.first_name &&
+          documentSnapshot?.data().last_name &&
+          documentSnapshot?.data()?.avatar
+        ) {
+          setAvatarURL(documentSnapshot?.data()?.avatar);
+          setFirstName(documentSnapshot?.data()?.first_name);
+          setLastName(documentSnapshot?.data()?.last_name);
+          setOldAvatar(documentSnapshot?.data()?.avatar);
+          setOldFirstname(documentSnapshot?.data()?.first_name);
+          setOldLastName(documentSnapshot?.data()?.last_name);
+          setLoading(false);
         }
-        setLoading(false);
       });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
+
+    return () => {};
   }, []);
 
   const firstnameHasLessLength = () => {
@@ -87,7 +89,7 @@ const EditProfileScreen = () => {
   };
 
   async function pushUserData() {
-    setIsFABLoading(!isFABLoading);
+    console.log('push data 0');
     let _avatarRef = `avatars/${
       auth()?.currentUser?.uid
     }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
@@ -101,58 +103,74 @@ const EditProfileScreen = () => {
 
     const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
+    uploadImageTask.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+      );
+    });
+
     /**
      * an async function to get {avatarUrl} and upload all user data.
      */
     uploadImageTask.then(async () => {
       const _avatar = await storage().ref(_avatarRef).getDownloadURL();
-      pushImage(_avatar);
+      if (_avatar.length > 0) {
+        pushImage(_avatar);
+        console.log('push data 1');
+      }
     });
   }
 
   function pushImage(pureImageUrl) {
-    database()
-      .ref(`/users/${auth().currentUser.uid}`)
+    console.log('push image 0');
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
       .update({
         avatar: pureImageUrl,
       })
       .catch(error => {
-        setIsFABLoading(!isFABLoading);
+        setLoaderVisible(false);
+        console.warn(error);
         ErrorToast(
           'bottom',
           'Avatar update failed',
           'An error occurred when updating your avatar.',
           true,
-          4000,
+          3000,
         );
       });
+    console.log('push image 1');
   }
 
   function pushNames() {
-    database()
-      .ref(`/users/${auth().currentUser.uid}`)
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
       .update({
         first_name: firstName,
         last_name: lastName,
       })
       .finally(() => {
-        setIsFABLoading(!isFABLoading);
+        setLoaderVisible(false);
+        setOldFirstname(firstName);
+        setOldLastName(lastName);
         SuccessToast(
           'bottom',
           'Profile Updated',
           'Your profile was updated successfully.',
           true,
-          4000,
+          3000,
         );
       })
-      .catch(error => {
-        setIsFABLoading(!isFABLoading);
+      .catch(() => {
+        setLoaderVisible(!loaderVisible);
         ErrorToast(
           'bottom',
           'Profile updated failed',
           'An error occurred when updating your profile',
           true,
-          4000,
+          3000,
         );
       });
   }
@@ -331,7 +349,6 @@ const EditProfileScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -347,12 +364,18 @@ const EditProfileScreen = () => {
               ) {
                 navigation.goBack();
               } else {
+                setLoaderVisible(!loaderVisible);
                 if (UserPhoto) {
                   pushUserData();
-                  pushImage();
+                  if (loaderVisible) {
+                    setLoaderVisible(false);
+                  }
                 }
                 if (firstName !== oldFirstname || lastName !== oldLastname) {
                   pushNames();
+                  if (loaderVisible) {
+                    setLoaderVisible(false);
+                  }
                 }
               }
             } else {
@@ -361,7 +384,7 @@ const EditProfileScreen = () => {
                 'Invalid report message',
                 'Report message must be between 20 and 240 characters',
                 true,
-                4000,
+                3000,
               );
             }
           } else {
@@ -370,7 +393,7 @@ const EditProfileScreen = () => {
               'Network unavailable',
               'Network connection is needed to send bug reports',
               true,
-              4000,
+              3000,
             );
           }
         }}
@@ -386,21 +409,23 @@ const EditProfileScreen = () => {
               setUserPhoto(image);
             })
             .catch(e => {
-              console.log(e.toString());
+              setLoaderVisible(false);
+              console.warn(e.toString());
             });
         }}
         onFilePicker={() => {
           openImagePicker()
             .then(image => {
-              console.log(image);
               setUserPhoto(image);
             })
             .catch(e => {
-              console.log(e.toString());
+              setLoaderVisible(false);
+              console.warn(e.toString());
             });
         }}
         isVisible={PickerActionSheet}
       />
+      <LoadingIndicator isVisible={loaderVisible} />
     </BaseView>
   );
 };

@@ -260,16 +260,11 @@ const SetupScreen = ({route}) => {
                  * pushing device information for later use in DeviceScreen.js
                  */
                 if (!isWindows && !isWeb) {
-                  console.log('waiting for devices');
-                  /**
-                   const referenceKey = firestore()
-                    .collection('devices')
-                    .doc(auth()?.currentUser.uid).id;
                   firestore()
+                    .collection('users')
+                    .doc(auth()?.currentUser?.uid)
                     .collection('devices')
-                    .doc(auth()?.currentUser.uid)
-                    .collection(`${referenceKey}`)
-                    .set({
+                    .add({
                       manufacturer: Manufacturer,
                       system_name: systemName,
                       system_version: systemVersion,
@@ -282,9 +277,7 @@ const SetupScreen = ({route}) => {
                       console.error(error);
                       setLoaderVisible(!LoaderVisible);
                     });
-                   */
                 }
-                console.log('done for devices');
 
                 /**
                  * Since we got everything except a girlfriend.
@@ -293,7 +286,6 @@ const SetupScreen = ({route}) => {
 
                 await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
                   () => {
-                    console.log('waiting for users');
                     firestore()
                       .collection('users')
                       .doc(auth()?.currentUser.uid)
@@ -304,6 +296,7 @@ const SetupScreen = ({route}) => {
                         avatar: avatarUrl,
                         active_status: 'normal',
                         active_time: Date.now(),
+                        created_At: firestore.FieldValue.serverTimestamp(),
                         bio: '',
                         jwtKey: jwt_key,
                         passcode: {
@@ -313,7 +306,6 @@ const SetupScreen = ({route}) => {
                       .finally(() => {
                         navigation.navigate('home');
                         setLoaderVisible(!LoaderVisible);
-                        console.log('done for devices');
                       });
                   },
                 );

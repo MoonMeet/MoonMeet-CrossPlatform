@@ -24,7 +24,7 @@ const HomePeopleScreen = () => {
 
   const [activeStatusState, setActiveStatusState] = React.useState(null);
 
-  function checkJwtKey(currentJwtKey: string) {
+  function checkJwtKey(currentJwtKey = string) {
     AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         auth()
