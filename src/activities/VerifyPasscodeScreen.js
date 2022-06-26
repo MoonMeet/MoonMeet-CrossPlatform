@@ -11,7 +11,7 @@ import BaseView from '../components/BaseView/BaseView';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {Snackbar} from 'react-native-paper';
 import OTPTextView from '../components/OtpView/OTPTextInput';
@@ -64,6 +64,28 @@ const VerifyPasscodeScreen = () => {
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
   };
 
+  useEffect(() => {
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          if (
+            documentSnapshot?.data()?.passcode?.pin &&
+            documentSnapshot?.data()?.passcode?.recovery_password &&
+            documentSnapshot?.data()?.passcode?.password_hint
+          ) {
+            setPINCode(documentSnapshot?.data()?.passcode?.pin);
+            setPassRecovery(
+              documentSnapshot?.data()?.passcode?.recovery_password,
+            );
+            setPasscodeHint(documentSnapshot?.data()?.passcode?.password_hint);
+          }
+        }
+      });
+  });
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -78,21 +100,6 @@ const VerifyPasscodeScreen = () => {
     }, []),
   );
 
-  useEffect(() => {
-    const getCodeFromDatabase = database()
-      .ref(`/users/${auth().currentUser.uid}/passcode`)
-      .once('value', snapshot => {
-        if (
-          snapshot?.val().pin &&
-          snapshot?.val().recovery_password &&
-          snapshot?.val().password_hint
-        ) {
-          setPINCode(snapshot?.val().pin);
-          setPassRecovery(snapshot?.val().recovery_password);
-          setPasscodeHint(snapshot?.val().password_hint);
-        }
-      });
-  });
   if (mIsForgetpassword) {
     return (
       <BaseView>
@@ -199,14 +206,20 @@ const VerifyPasscodeScreen = () => {
               setErrorSnackbarText('Wrong Password, Try again.');
               setErrorSnackBarVisible(!ErrorSnackBarVisible);
             } else {
-              database()
-                .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
-                .remove()
+              firestore()
+                .collection('users')
+                .doc(auth()?.currentUser?.uid)
+                .update({
+                  passcode: firestore.FieldValue.delete(),
+                })
                 .finally(() => {
-                  database()
-                    .ref(`/users/${auth()?.currentUser?.uid}/passcode`)
-                    .set({
-                      password_enabled: false,
+                  firestore()
+                    .collection('users')
+                    .doc(auth()?.currentUser?.uid)
+                    .update({
+                      passcode: {
+                        passcode_enabled: false,
+                      },
                     })
                     .finally(() => {
                       navigation.navigate('home');

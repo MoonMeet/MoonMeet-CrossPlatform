@@ -7,7 +7,7 @@ import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import UserList from '../components/DiscoverPeopleScreen/UserList';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import {fontValue} from '../config/Dimensions';
 
 const DiscoverPeopleScreen = () => {
@@ -18,33 +18,26 @@ const DiscoverPeopleScreen = () => {
   const [masterData, setMasterData] = React.useState([]);
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref('/users/')
-      .on('value', snapshot => {
+    const discoverSubscribe = firestore()
+      .collection('users')
+      .onSnapshot(querySnapshot => {
         const usersSnapshot = [];
-        snapshot?.forEach(childSnapshot => {
+        querySnapshot?.forEach(documentSnapshot => {
           if (
-            childSnapshot?.val().avatar &&
-            childSnapshot?.val().first_name &&
-            childSnapshot?.val().last_name &&
-            childSnapshot?.val().active_status &&
-            childSnapshot?.val().active_time
+            documentSnapshot?.data()?.avatar &&
+            documentSnapshot?.data()?.first_name &&
+            documentSnapshot?.data()?.last_name &&
+            documentSnapshot?.data()?.active_status &&
+            documentSnapshot?.data()?.active_time
           ) {
-            usersSnapshot.push({
-              uid: childSnapshot?.val().uid,
-              avatar: childSnapshot?.val().avatar,
-              first_name: childSnapshot?.val().first_name,
-              last_name: childSnapshot?.val().last_name,
-              active_status: childSnapshot?.val().active_status,
-              active_time: childSnapshot?.val().active_time,
-            });
+            usersSnapshot.push(documentSnapshot?.data());
           }
         });
         setMasterData(usersSnapshot);
         setLoading(false);
       });
     return () => {
-      database().ref('/users/').off('value', onValueChange);
+      discoverSubscribe();
     };
   }, []);
   if (Loading) {

@@ -6,7 +6,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {
   getManufacturer,
@@ -31,38 +31,30 @@ const DevicesScreen = () => {
   let newJwtKey = uuidv4();
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/devices/${auth()?.currentUser.uid}/`)
-      .on('value', snapshot => {
+    const deviceSubscribe = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('devices')
+      .onSnapshot(collectionSnapshot => {
         const devicesSnapshot = [];
-        snapshot?.forEach(childSnapshot => {
+        collectionSnapshot?.forEach(childSnapshot => {
           if (
-            childSnapshot?.val().app_version &&
-            childSnapshot?.val().manufacturer &&
-            childSnapshot?.val().model &&
-            childSnapshot?.val().product &&
-            childSnapshot?.val().system_version &&
-            childSnapshot?.val().system_name &&
-            childSnapshot?.val().time
+            childSnapshot?.data()?.app_version &&
+            childSnapshot?.data()?.manufacturer &&
+            childSnapshot?.data()?.model &&
+            childSnapshot?.data()?.product &&
+            childSnapshot?.data()?.system_version &&
+            childSnapshot?.data()?.system_name &&
+            childSnapshot?.data()?.time
           ) {
-            devicesSnapshot.push({
-              app_version: childSnapshot?.val().app_version,
-              manufacturer: childSnapshot?.val().manufacturer,
-              model: childSnapshot?.val().model,
-              product: childSnapshot?.val().product,
-              system_version: childSnapshot?.val().system_version,
-              system_name: childSnapshot?.val().system_name,
-              time: childSnapshot?.val().time,
-            });
+            devicesSnapshot.push(childSnapshot?.data());
           }
         });
         setMasterData(devicesSnapshot);
         setLoading(false);
       });
     return () => {
-      database()
-        .ref(`/devices/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
+      deviceSubscribe();
     };
   }, []);
 

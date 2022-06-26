@@ -13,7 +13,7 @@ interface UserListInterface {
   onLongPressTrigger: Function;
 }
 
-const UserList = (props: UserListInterface) => {
+const UserList = (props = UserListInterface) => {
   const navigation = useNavigation();
 
   return (
@@ -31,25 +31,25 @@ const UserList = (props: UserListInterface) => {
         keyExtractor={item => item.avatar}
         renderItem={({item}) => (
           <MiniBaseView>
-            {auth()?.currentUser.uid !== item.uid ? (
+            {auth()?.currentUser?.uid !== item?.uid ? (
               <Pressable
                 android_ripple={{color: COLORS.rippleColor}}
                 style={styles.container}
                 onPress={() => navigation.navigate('chat', {item})}>
                 <View style={styles.left_side}>
                   <Avatar.Image
-                    source={item.avatar ? {uri: item.avatar} : null}
+                    source={item?.avatar ? {uri: item?.avatar} : null}
                     size={55}
                   />
                 </View>
                 <View style={styles.mid_side}>
                   <Text style={styles.heading}>
-                    {item.first_name + ' ' + item.last_name}
+                    {item?.first_name + ' ' + item?.last_name}
                   </Text>
                   <Text style={styles.subheading}>
-                    {item.active_status === 'recently'
+                    {item?.active_status === 'recently'
                       ? 'Last seen recently'
-                      : transformTime(item.active_time)}
+                      : transformTime(item?.active_time)}
                   </Text>
                 </View>
               </Pressable>

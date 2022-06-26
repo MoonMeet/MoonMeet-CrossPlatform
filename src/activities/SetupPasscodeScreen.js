@@ -12,7 +12,7 @@ import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import ArrowForward from '../assets/images/arrow-forward.png';
 
 import auth from '@react-native-firebase/auth';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 
 const SetupPasscodeScreen = () => {
   const navigation = useNavigation();
@@ -161,14 +161,17 @@ const SetupPasscodeScreen = () => {
           }}
           onPress={() => {
             if (mRecoveryPassword.length && mRecoveryPassword.length > 2) {
-              database()
-                .ref(`/users/${auth()?.currentUser.uid}/passcode/`)
-                .set({
-                  pin: mPinCode,
-                  recovery_password: mRecoveryPassword,
-                  password_hint: mRecoveryPasswordHint,
-                  time: Date.now(),
-                  password_enabled: true,
+              firestore()
+                .collection('users')
+                .doc(auth()?.currentUser?.uid)
+                .update({
+                  passcode: {
+                    pin: mPinCode,
+                    recovery_password: mRecoveryPassword,
+                    password_hint: mRecoveryPasswordHint,
+                    time: Date.now(),
+                    passcode_enabled: true,
+                  },
                 })
                 .finally(() => {
                   if (navigation.canGoBack()) {

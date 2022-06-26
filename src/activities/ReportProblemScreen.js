@@ -13,13 +13,14 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
 import ArrowForward from '../assets/images/arrow-forward.png';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import {
   SuccessToast,
   ErrorToast,
 } from '../components/ToastInitializer/ToastInitializer';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 
 const ReportProblemScreen = () => {
   const navigation = useNavigation();
@@ -43,33 +44,32 @@ const ReportProblemScreen = () => {
   };
 
   const [ReportText, setReportText] = React.useState('');
-  const [isFABLoading, setIsFABLoading] = React.useState(false);
 
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
+  const [loaderVisible, setLoaderVisible] = React.useState(false);
 
   const onReportTextChange = _reportText => setReportText(_reportText);
 
   function pushReport() {
-    setIsFABLoading(!isFABLoading);
-    database()
-      .ref(`/reports/${auth().currentUser.uid}`)
-      .set({
-        uid: auth().currentUser.uid,
-        first_name: firstName,
-        last_name: lastName,
+    setLoaderVisible(true);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('reports')
+      .add({
         report_message: ReportText,
         time: Date.now(),
       })
       .finally(() => {
-        setIsFABLoading(!isFABLoading);
         SuccessToast(
           'bottom',
           'Report Delivered',
-          'Thank you for reporting bugs to our server.',
+          'Thank you for reporting bugs to Moon Meet Team.',
           true,
-          4000,
+          3000,
         );
+        setLoaderVisible(false);
         navigation.goBack();
       })
       .catch(error => {
@@ -78,10 +78,10 @@ const ReportProblemScreen = () => {
           'Reporting Failed',
           'An error occurred while sending your report.',
           true,
-          4000,
+          3000,
         );
+        setLoaderVisible(false);
         navigation.goBack();
-        setIsFABLoading(!isFABLoading);
       });
   }
 
@@ -92,22 +92,6 @@ const ReportProblemScreen = () => {
   const hasLessLength = () => {
     return ReportText.length < 19;
   };
-
-  useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().first_name && snapshot?.val().last_name) {
-          setFirstName(snapshot?.val().first_name);
-          setLastName(snapshot?.val().last_name);
-        }
-      });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
-  }, []);
 
   return (
     <BaseView>
@@ -184,7 +168,6 @@ const ReportProblemScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -200,7 +183,7 @@ const ReportProblemScreen = () => {
                 'Invalid report message',
                 'Report message must be between 20 and 240 characters.',
                 true,
-                4000,
+                3000,
               );
             }
           } else {
@@ -209,11 +192,12 @@ const ReportProblemScreen = () => {
               'Network unavailable',
               'Network connection is needed to send bug reports.',
               true,
-              4000,
+              3000,
             );
           }
         }}
       />
+      <LoadingIndicator isVisible={loaderVisible} />
     </BaseView>
   );
 };

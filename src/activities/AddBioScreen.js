@@ -18,7 +18,7 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -31,6 +31,7 @@ const AddBioScreen = () => {
   const [oldBioText, setOldBioText] = React.useState('');
   const onBioTextChange = _bioText => setBioText(_bioText);
 
+  const [loaderVisible, setLoaderVisible] = React.useState(false);
   const [Loading, setLoading] = React.useState(true);
 
   /**
@@ -41,20 +42,22 @@ const AddBioScreen = () => {
   });
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
-      .on('value', snapshot => {
-        if (snapshot?.val().bio) {
-          setBioText(snapshot?.val().bio);
-          setOldBioText(snapshot?.val().bio);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          if (!documentSnapshot?.data()?.bio) {
+            setLoading(false);
+          } else {
+            setBioText(documentSnapshot?.data()?.bio);
+            setOldBioText(documentSnapshot?.data()?.bio);
+            setLoading(false);
+          }
         }
-        setLoading(false);
       });
-    return () => {
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-    };
+    return () => {};
   }, []);
 
   const hasMoreLength = () => {
@@ -62,8 +65,10 @@ const AddBioScreen = () => {
   };
 
   function pushBio() {
-    database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
+    setLoaderVisible(true);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
       .update({
         bio: BioText,
       })
@@ -73,11 +78,9 @@ const AddBioScreen = () => {
           'Bio updated',
           'You have successfully changed your Bio.',
           true,
-          4000,
+          3000,
         );
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
+        setLoaderVisible(false);
       })
       .catch(error => {
         ErrorToast(
@@ -85,10 +88,11 @@ const AddBioScreen = () => {
           'Failed to update bio',
           'An error occurred when updating your bio.',
           true,
-          4000,
+          3000,
         );
-        if (navigation.canGoBack()) {
-          navigation.goBack();
+        setLoaderVisible(false);
+        if (navigation?.canGoBack()) {
+          navigation?.goBack();
         }
       });
   }
@@ -201,10 +205,10 @@ const AddBioScreen = () => {
             } else {
               ErrorToast(
                 'bottom',
-                'Invalid report message',
-                'Report message must be between 20 and 240 characters',
+                'Invalid Bio',
+                'Bio text must not be more than 70 characters',
                 true,
-                4000,
+                3000,
               );
             }
           } else {
@@ -213,7 +217,7 @@ const AddBioScreen = () => {
               'Network unavailable',
               'Network connection is needed to send bug reports',
               true,
-              4000,
+              3000,
             );
           }
         }}

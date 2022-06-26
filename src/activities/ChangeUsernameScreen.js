@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import BaseView from '../components/BaseView/BaseView';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {
@@ -8,6 +9,7 @@ import {
   HelperText,
   TextInput,
   TouchableRipple,
+  ActivityIndicator,
 } from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
@@ -18,8 +20,9 @@ import {
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import NetInfo from '@react-native-community/netinfo';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 
 const ChangeUsernameScreen = () => {
   const navigation = useNavigation();
@@ -42,30 +45,36 @@ const ChangeUsernameScreen = () => {
     });
   };
 
-  const [isFABLoading, setIsFABLoading] = React.useState(false);
-
   const [UsernameText, setUsernameText] = React.useState('');
-
   const [oldUsernameText, setOldUsernameText] = React.useState('');
+
+  const [loaderVisible, setLoaderVisible] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const onUsernameTextChange = _usernameText => setUsernameText(_usernameText);
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
-      .once('value', snapshot => {
-        if (snapshot?.val().username) {
-          setUsernameText(snapshot?.val().username);
-          setOldUsernameText(snapshot?.val().username);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          if (documentSnapshot?.data()?.username) {
+            setUsernameText(documentSnapshot?.data().username);
+            setOldUsernameText(documentSnapshot?.data().username);
+            setLoading(false);
+          }
         }
       });
     return () => {};
   }, []);
 
   function pushUsername() {
-    setIsFABLoading(!isFABLoading);
-    database()
-      .ref(`/users/${auth().currentUser.uid}`)
+    setLoaderVisible(true);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
       .update({
         username: UsernameText,
       })
@@ -75,11 +84,10 @@ const ChangeUsernameScreen = () => {
           'Username updated',
           'You have successfully changed your username.',
           true,
-          4000,
+          3000,
         );
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        }
+        setOldUsernameText(UsernameText);
+        setLoaderVisible(false);
       })
       .catch(error => {
         ErrorToast(
@@ -87,12 +95,13 @@ const ChangeUsernameScreen = () => {
           'Updating Failed',
           'An error occurred while updating your username.',
           true,
-          4000,
+          3000,
         );
-        if (navigation.canGoBack()) {
-          navigation.goBack();
+        console.log(error);
+        setLoaderVisible(false);
+        if (navigation?.canGoBack()) {
+          navigation?.goBack();
         }
-        setIsFABLoading(!isFABLoading);
       });
   }
 
@@ -103,6 +112,25 @@ const ChangeUsernameScreen = () => {
   const hasLessLength = () => {
     return UsernameText.length < 6;
   };
+
+  if (loading) {
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
+  }
 
   return (
     <BaseView>
@@ -182,7 +210,6 @@ const ChangeUsernameScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        loading={isFABLoading}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -192,17 +219,19 @@ const ChangeUsernameScreen = () => {
           if (isConnected) {
             if (!hasMoreLength() && !hasLessLength()) {
               if (UsernameText === oldUsernameText) {
-                navigation.goBack();
+                if (navigation?.canGoBack) {
+                  navigation?.goBack();
+                }
               } else {
                 pushUsername();
               }
             } else {
               ErrorToast(
                 'bottom',
-                'Invalid report message',
-                'Report message must be between 20 and 240 characters',
+                'Invalid username',
+                'username must be between 6 and 30 characters',
                 true,
-                4000,
+                3000,
               );
             }
           } else {
@@ -211,11 +240,12 @@ const ChangeUsernameScreen = () => {
               'Network unavailable',
               'Network connection is needed to send bug reports',
               true,
-              4000,
+              3000,
             );
           }
         }}
       />
+      <LoadingIndicator isVisible={loaderVisible} />
     </BaseView>
   );
 };

@@ -11,7 +11,7 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
@@ -30,16 +30,23 @@ const ActiveStatusScreen = () => {
   const [switchState, setSwitchState] = React.useState(false);
 
   useEffect(() => {
-    const getUserActiveStatus = database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
-      .once('value', snapshot => {
-        if (snapshot?.val().active_status && snapshot?.val().active_time) {
-          if (snapshot?.val().active_status === 'normal') {
-            setSwitchState(true);
-          } else {
-            setSwitchState(false);
+    firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          if (
+            documentSnapshot?.data()?.active_status &&
+            documentSnapshot?.data()?.active_time
+          ) {
+            if (documentSnapshot?.data().active_status === 'normal') {
+              setSwitchState(true);
+            } else {
+              setSwitchState(false);
+            }
+            setNewActiveTime(documentSnapshot?.data()?.active_time);
           }
-          setNewActiveTime(snapshot?.val().active_time);
         }
       });
     return () => {};
@@ -85,8 +92,9 @@ const ActiveStatusScreen = () => {
             onValueChange={() => {
               if (isConnected) {
                 setSwitchState(!switchState);
-                database()
-                  .ref(`/users/${auth()?.currentUser.uid}`)
+                firestore()
+                  .collection('users')
+                  .doc(auth()?.currentUser?.uid)
                   .update({
                     active_status: switchState == true ? 'recently' : 'normal',
                     active_time:
@@ -98,12 +106,12 @@ const ActiveStatusScreen = () => {
                     SuccessToast(
                       'bottom',
                       'Active status changed',
-                      "You're active status has changed",
+                      'Your active status has changed',
                       true,
-                      4000,
+                      3000,
                     );
-                    if (navigation.canGoBack()) {
-                      navigation.goBack();
+                    if (navigation?.canGoBack()) {
+                      navigation?.goBack();
                     }
                   })
                   .catch(() => {
@@ -112,8 +120,8 @@ const ActiveStatusScreen = () => {
                       'Changing active status failed',
                       'An error occurred when changing your Active Status',
                     );
-                    if (navigation.canGoBack()) {
-                      navigation.goBack();
+                    if (navigation?.canGoBack()) {
+                      navigation?.goBack();
                     }
                   });
               } else {
@@ -122,10 +130,10 @@ const ActiveStatusScreen = () => {
                   'Network unavailable',
                   'Network connection is needed to change your active status',
                   true,
-                  4000,
+                  3000,
                 );
-                if (navigation.canGoBack()) {
-                  navigation.goBack();
+                if (navigation?.canGoBack()) {
+                  navigation?.goBack();
                 }
               }
             }}

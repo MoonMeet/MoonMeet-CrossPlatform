@@ -267,7 +267,7 @@ const LoginScreen = () => {
               if (documentSnapshot?.exists) {
                 AsyncStorage.setItem(
                   'currentUserJwtKey',
-                  documentSnapshot?.data().jwtKey,
+                  documentSnapshot?.data()?.jwtKey,
                 ).then(() => {
                   AsyncStorage.getItem('currentUserJwtKey').then(val => {
                     /**
@@ -276,7 +276,7 @@ const LoginScreen = () => {
                     if (!isWindows && !isWeb) {
                       firestore()
                         .collection('devices')
-                        .doc(auth()?.currentUser.uid)
+                        .doc(auth()?.currentUser?.uid)
                         .add({
                           manufacturer: Manufacturer,
                           system_name: systemName,
