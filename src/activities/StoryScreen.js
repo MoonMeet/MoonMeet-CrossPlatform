@@ -13,7 +13,7 @@ import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import ArrowIcon from '../assets/images/back.png';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {transformTimeForStories} from '../utils/TimeHandler/TimeHandler';
 import {
@@ -29,8 +29,8 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
-  const userStoryUID = useRoute().params?.uid;
-  const myUID = useRoute().params?.myUID;
+  const userStoryUID = useRoute()?.params?.userUID;
+  const myUID = useRoute()?.params?.myUID;
 
   const storiesRef = useRef(null);
 
@@ -40,7 +40,6 @@ const StoryScreen = () => {
   const [storyId, setStoryId] = React.useState('');
   const [storyTime, setStoryTime] = React.useState('');
   const [storyText, setStoryText] = React.useState('');
-  const [storyImage, setStoryImage] = React.useState('');
   const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
@@ -64,7 +63,33 @@ const StoryScreen = () => {
   const viewAbilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
 
   useEffect(() => {
-    database()
+    const firestoreSubscribe = firestore()
+      .collection('users')
+      .doc(userStoryUID)
+      .onSnapshot(documentSnapshot => {
+        setStoryAvatar(documentSnapshot?.data()?.avatar);
+        setStoryFirstName(documentSnapshot?.data()?.first_name);
+        setStoryLastName(documentSnapshot?.data()?.last_name);
+        setStoryUID(documentSnapshot?.data()?.uid);
+        firestore()
+          .collection('users')
+          .doc(userStoryUID)
+          .collection('stories')
+          .onSnapshot(collectionSnapshot => {
+            collectionSnapshot?.forEach(subDocumentSnapshot => {
+              setStoryId(subDocumentSnapshot?.data()?.sid);
+              setStoryTime(subDocumentSnapshot?.data()?.time);
+              setStoryText(subDocumentSnapshot?.data()?.text);
+              const storyData = [];
+              storyData.push(subDocumentSnapshot?.data());
+              setAllCurrentUserStories(storyData);
+              console.log(allCurrentUserStories);
+              setLoading(false);
+            });
+          });
+      });
+    /**
+     database()
       .ref(`/stories/${userStoryUID}/`)
       .once('value', snapshot => {
         setAllCurrentUserStories(snapshot.val());
@@ -117,7 +142,11 @@ const StoryScreen = () => {
           }
         });
       });
-    return () => {};
+     */
+
+    return () => {
+      firestoreSubscribe();
+    };
   }, [current]);
 
   if (Loading) {
@@ -248,6 +277,13 @@ const StoryScreen = () => {
             viewabilityConfig={viewAbilityConfig.current}
             onViewableItemsChanged={onViewableItemsChanged.current}
             showsHorizontalScrollIndicator={false}
+            ListEmptyComponent={
+              <ActivityIndicator
+                size={'large'}
+                color={COLORS.accentLight}
+                animating={true}
+              />
+            }
             data={Object.values(allCurrentUserStories)}
             renderItem={({item}) => {
               return (

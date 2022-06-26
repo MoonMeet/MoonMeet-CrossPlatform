@@ -2,8 +2,6 @@ import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -28,7 +26,7 @@ import PickImage from '../assets/images/pick-photo.png';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import BaseView from '../components/BaseView/BaseView';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {
   ErrorToast,
@@ -36,7 +34,6 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import storage from '@react-native-firebase/storage';
 import getRandomString from '../utils/StringGenerator/StringGenerator';
-import {paddingRight} from 'styled-system';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -65,10 +62,6 @@ const AddStoryScreen = () => {
   const textInputHasLessLength = () => {
     return StoryTextInput.length < 1;
   };
-
-  const [Firstname, setFirstname] = React.useState('');
-  const [Lastname, setLastname] = React.useState('');
-  const [avatarURL, setAvatarURL] = React.useState('');
 
   const [Loading, setLoading] = React.useState(true);
 
@@ -118,7 +111,7 @@ const AddStoryScreen = () => {
         'Error sharing story',
         'If this is a text story, then it has to contain some text!',
         true,
-        4000,
+        3000,
       );
     } else if (StoryTextInput.length > 241) {
       ErrorToast(
@@ -126,23 +119,16 @@ const AddStoryScreen = () => {
         'Error sharing story',
         'Your text must not be longer than 240 characters',
         true,
-        4000,
+        3000,
       );
     } else {
       setLoading(!Loading);
-      const referenceKey = database()
-        .ref(`/stories/${auth()?.currentUser.uid}/`)
-        .push().key;
-
-      database()
-        .ref(`/stories/${auth()?.currentUser.uid}/${referenceKey}`)
-        .set({
-          first_name: Firstname,
-          last_name: Lastname,
-          avatar: avatarURL,
+      firestore()
+        .collection('users')
+        .doc(auth()?.currentUser?.uid)
+        .collection('stories')
+        .add({
           time: Date.now(),
-          sid: referenceKey,
-          uid: auth().currentUser.uid,
           text: StoryTextInput,
         })
         .finally(() => {
@@ -152,8 +138,8 @@ const AddStoryScreen = () => {
             'Story shared',
             'Your story has been shared successfully.',
           );
-          if (navigation.canGoBack()) {
-            navigation.goBack();
+          if (navigation?.canGoBack()) {
+            navigation?.goBack();
           }
         });
     }
@@ -192,33 +178,26 @@ const AddStoryScreen = () => {
       });
 
       function pushImageData(storyImageURL) {
-        const referenceKey = database()
-          .ref(`/stories/${auth().currentUser.uid}/`)
-          .push().key;
-
-        database()
-          .ref(`/stories/${auth().currentUser.uid}/${referenceKey}`)
-          .set({
-            first_name: Firstname,
-            last_name: Lastname,
-            avatar: avatarURL,
+        firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .collection('stories')
+          .add({
             time: Date.now(),
-            sid: referenceKey,
             image: storyImageURL,
-            uid: auth().currentUser.uid,
             text: SecondStoryTextInput ? SecondStoryTextInput : '',
           })
           .finally(() => {
             setLoading(!Loading);
-            if (navigation.canGoBack()) {
-              navigation.goBack();
+            if (navigation?.canGoBack()) {
+              navigation?.goBack();
             }
             SuccessToast(
               'bottom',
               'Story shared',
               'Your story has been shared successfully.',
               true,
-              4000,
+              3000,
             );
           });
       }
@@ -228,27 +207,13 @@ const AddStoryScreen = () => {
         'Error sharing story',
         'If this is a image story, then it has to contain an image!',
         true,
-        4000,
+        3000,
       );
     }
   }
 
   useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${auth().currentUser.uid}`)
-      .once('value', snapshot => {
-        if (
-          snapshot?.val().first_name &&
-          snapshot?.val().last_name &&
-          snapshot?.val().avatar
-        ) {
-          setFirstname(snapshot?.val().first_name);
-          setLastname(snapshot?.val().last_name);
-          setAvatarURL(snapshot?.val().avatar);
-          setLoading(false);
-        }
-      });
-    return () => {};
+    setLoading(false);
   }, []);
 
   const [PickerActionSheet, setPickerActionSheet] = React.useState(false);

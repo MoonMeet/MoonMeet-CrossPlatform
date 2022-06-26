@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import firestore from '@react-native-firebase/firestore';
+import appCheck from '@react-native-firebase/app-check';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -35,8 +36,9 @@ const SplashScreen = () => {
   };
 
   async function enableFirebaseTools() {
-    await crashlytics().setCrashlyticsCollectionEnabled(false);
-    await analytics().setAnalyticsCollectionEnabled(false);
+    await crashlytics().setCrashlyticsCollectionEnabled(true);
+    await analytics().setAnalyticsCollectionEnabled(true);
+    await appCheck().activate('ignored', false);
   }
 
   useEffect(() => {

@@ -58,7 +58,7 @@ const StoriesList = ({ListData, myUID}) => {
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        navigation.navigate('story', {uid: item.uid, myUID: myUID});
+        navigation.navigate('story', {userUID: item?.uid, myUID: myUID});
       }}
       style={{
         height: 85,
@@ -80,6 +80,7 @@ const StoriesList = ({ListData, myUID}) => {
       <Text style={styles.nameAndLastname}>{item.last_name}</Text>
     </Pressable>
   );
+
   return (
     <View style={styles.container}>
       <Pressable
@@ -115,7 +116,7 @@ const StoriesList = ({ListData, myUID}) => {
           ListEmptyComponent={_listEmptyComponent}
           data={ListData}
           renderItem={_renderItem}
-          keyExtractor={item => item.time}
+          keyExtractor={item => item?.time}
         />
       </View>
     </View>

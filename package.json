@@ -20,6 +20,7 @@
     "@react-native-community/netinfo": "^8.0.0",
     "@react-native-firebase/analytics": "^14.11.1",
     "@react-native-firebase/app": "^14.11.1",
+    "@react-native-firebase/app-check": "^15.0.0",
     "@react-native-firebase/auth": "^14.11.1",
     "@react-native-firebase/crashlytics": "^14.11.1",
     "@react-native-firebase/database": "^14.11.1",

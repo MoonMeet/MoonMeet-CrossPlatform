@@ -12,7 +12,6 @@ import {
   Provider,
 } from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
-import SearchImage from '../assets/images/search.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -27,6 +26,9 @@ const HomeChatsScreen = () => {
   const navigation = useNavigation();
 
   const _testChats = ChatsJson;
+
+  const currentUserData = [];
+  const currentStoryData = [];
 
   const [avatarURL, setAvatarURL] = React.useState('');
 
@@ -79,7 +81,12 @@ const HomeChatsScreen = () => {
   );
 
   async function deleteCurrentStory(uid, sid) {
-    return await database().ref(`/stories/${uid}/${sid}`).remove();
+    return await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('stories')
+      .doc(sid)
+      .delete();
   }
 
   useEffect(() => {
@@ -105,56 +112,45 @@ const HomeChatsScreen = () => {
         }
       });
     const storySubscriber = firestore()
-      .collection('stories')
-      .onSnapshot(documentSnapshot => {});
-    /**
-      const secondOnValueChange = database()
-      .ref('/stories/')
-      .on('value', snapshot => {
-        const storiesSnapshot = [];
-        snapshot?.forEach(childSnapshot => {
-          console.log(childSnapshot);
-          childSnapshot?.forEach(threeYearsOldSnapshot => {
-            if (
-              threeYearsOldSnapshot?.val().avatar &&
-              threeYearsOldSnapshot?.val().first_name &&
-              threeYearsOldSnapshot?.val().last_name &&
-              threeYearsOldSnapshot?.val().sid &&
-              threeYearsOldSnapshot?.val().uid &&
-              threeYearsOldSnapshot?.val().time
-            ) {
-              if (Date.now() - threeYearsOldSnapshot?.val().time > 86400000) {
-                deleteCurrentStory(
-                  auth().currentUser.uid,
-                  threeYearsOldSnapshot?.val().sid,
-                ).finally(() => console.log('deleted'));
-              }
-              storiesSnapshot.push({
-                avatar: threeYearsOldSnapshot?.val().avatar,
-                first_name: threeYearsOldSnapshot?.val().first_name,
-                last_name: threeYearsOldSnapshot?.val().last_name,
-                sid: threeYearsOldSnapshot?.val().sid,
-                uid: threeYearsOldSnapshot?.val().uid,
-                text: threeYearsOldSnapshot?.val().text,
-                image: threeYearsOldSnapshot.val().image,
-                time: threeYearsOldSnapshot?.val().time,
+      .collection('users')
+      .onSnapshot(collectionSnapshot => {
+        collectionSnapshot?.forEach(documentSnapshot => {
+          if (documentSnapshot?.exists) {
+            firestore()
+              .collection('users')
+              .doc(documentSnapshot?.id)
+              .collection('stories')
+              .onSnapshot(subCollectionSnapshot => {
+                subCollectionSnapshot?.forEach(subDocument => {
+                  if (
+                    subDocument?.data()?.time &&
+                    (subDocument?.data()?.text || subDocument?.data()?.image)
+                  ) {
+                    if (Date.now() - subDocument?.data()?.time > 86400000) {
+                      deleteCurrentStory(
+                        documentSnapshot?.id,
+                        subDocument?.data()?.sid,
+                      );
+                    }
+                    currentStoryData.push({
+                      ...subDocument?.data(),
+                      avatar: documentSnapshot?.data()?.avatar,
+                      first_name: documentSnapshot?.data()?.first_name,
+                      last_name: documentSnapshot?.data()?.last_name,
+                      uid: documentSnapshot?.data()?.uid,
+                      sid: subDocument?.id,
+                    });
+                    console.log(currentStoryData);
+                  }
+                  setStoriesData(currentStoryData);
+                });
               });
-            }
-            setStoriesData(storiesSnapshot);
-          });
+          }
         });
       });
-       */
-
     return () => {
       userSusbcribe();
       storySubscriber();
-      /*
-      database()
-        .ref(`/users/${auth()?.currentUser.uid}`)
-        .off('value', onValueChange);
-      database().ref('/stories/').off('value', secondOnValueChange);
-    */
     };
   }, []);
 
