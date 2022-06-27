@@ -215,7 +215,7 @@ const AddBioScreen = () => {
             ErrorToast(
               'bottom',
               'Network unavailable',
-              'Network connection is needed to send bug reports',
+              'Network connection is needed to update your bio.',
               true,
               3000,
             );

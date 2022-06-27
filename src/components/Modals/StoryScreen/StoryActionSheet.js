@@ -6,6 +6,7 @@ import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import CopyImage from '../../../assets/images/copy.png';
 import DeleteImage from '../../../assets/images/delete.png';
+import Downloadimage from '../../../assets/images/download.png';
 import {
   fontValue,
   heightPercentageToDP,
@@ -16,6 +17,8 @@ interface StoryActionSheetInterface {
   hideModal: Function;
   onCopySelected: Function;
   onDeleteSelected: Function;
+  onSaveSelected: Function;
+  showSave: Boolean;
   currentStoryUID: String;
   isVisible: boolean;
 }
@@ -65,6 +68,28 @@ const StoryActionSheet = (props: StoryActionSheetInterface) => {
               Copy Text
             </Text>
           </Pressable>
+          {props.showSave ? (
+            <Pressable
+              android_ripple={{color: COLORS.rippleColor}}
+              onPress={() => {
+                props.onSaveSelected();
+                props.hideModal();
+              }}
+              style={styles.optionContainer}>
+              <Image source={Downloadimage} style={styles.arrowStyle} />
+              <Text
+                style={{
+                  fontSize: fontValue(18),
+                  fontFamily: FONTS.regular,
+                  color: COLORS.black,
+                  opacity: 0.4,
+                }}>
+                Save Image
+              </Text>
+            </Pressable>
+          ) : (
+            <View />
+          )}
           {auth()?.currentUser.uid == props.currentStoryUID ? (
             <Pressable
               android_ripple={{color: COLORS.rippleColor}}

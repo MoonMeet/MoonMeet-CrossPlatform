@@ -1,13 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, {useCallback, useEffect} from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  TextInput,
-} from 'react-native';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   fontValue,
@@ -22,9 +15,10 @@ import {
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import BackImage from '../assets/images/back.png';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {GiftedChat} from 'react-native-gifted-chat';
+import {v4 as uuidv4} from 'uuid';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -55,72 +49,67 @@ const ChatScreen = () => {
   const [mChatData, setChatData] = React.useState([]);
   const [isLoading, setLoading] = React.useState(true);
 
+  let _id = uuidv4();
+
   useEffect(() => {
-    const userInformation = database()
-      .ref(`/users/${destinedUser?.uid}`)
-      .once('value', snapshot => {
-        if (
-          snapshot?.val().avatar &&
-          snapshot?.val().first_name &&
-          snapshot.val().last_name
-        ) {
-          setUserData(snapshot?.val());
-          setUserUID(snapshot?.val().uid);
-          setUserFirstName(snapshot?.val().first_name);
-          setUserLastName(snapshot?.val().last_name);
-          setUserAvatar(snapshot?.val().avatar);
+    const userSubscribe = firestore()
+      .collection('users')
+      .doc(destinedUser?.uid)
+      .onSnapshot(userSnapshot => {
+        if (userSnapshot?.exists) {
+          if (
+            userSnapshot?.data()?.avatar &&
+            userSnapshot?.data().first_name &&
+            userSnapshot?.data()?.last_name
+          ) {
+            setUserData(userSnapshot?.data());
+            setUserUID(userSnapshot?.data()?.uid);
+            setUserFirstName(userSnapshot?.data()?.first_name);
+            setUserLastName(userSnapshot?.data()?.last_name);
+            setUserAvatar(userSnapshot?.data()?.avatar);
+          }
         }
       });
-    const myInformation = database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
-      .once('value', snapshot => {
-        if (
-          snapshot?.val().avatar &&
-          snapshot?.val().first_name &&
-          snapshot.val().last_name
-        ) {
-          setMyUID(snapshot?.val().uid);
-          setMyFirstName(snapshot?.val().first_name);
-          setMyLastName(snapshot?.val().last_name);
-          setMyAvatar(snapshot?.val().avatar);
+    const mySubscribe = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .onSnapshot(mySnapshot => {
+        if (mySnapshot?.exists) {
+          if (
+            mySnapshot?.data()?.avatar &&
+            mySnapshot?.data()?.first_name &&
+            mySnapshot?.data()?.last_name
+          ) {
+            setMyUID(mySnapshot?.data()?.uid);
+            setMyFirstName(mySnapshot?.data()?.first_name);
+            setMyLastName(mySnapshot?.data()?.last_name);
+            setMyAvatar(mySnapshot?.data()?.avatar);
+          }
         }
       });
-
-    return () => {};
+    const messagesSubscribe = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('messages')
+      .doc(destinedUser?.uid)
+      .collection('discussions')
+      .onSnapshot(collectionSnapshot => {
+        const messages = collectionSnapshot?.docs
+          .sort()
+          .reverse()
+          .map(subMap => ({
+            ...subMap?.data(),
+            id: subMap?.id,
+          }));
+        setChatData(messages);
+        setLoading(false);
+      });
+    return () => {
+      userSubscribe();
+      mySubscribe();
+      messagesSubscribe();
+    };
   }, [destinedUser?.uid]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (destinedUser?.uid != null) {
-        const MessagesFetch = database()
-          .ref('/messages/')
-          .child(myUID)
-          .child(userUID)
-          .orderByKey('createdAt')
-          .on('child_added', snapshot => {
-            let messages = [];
-            messages.push({
-              _id: snapshot?.val()._id,
-              createdAt: snapshot?.val().createdAt,
-              user: snapshot?.val().user,
-              text: snapshot?.val().text,
-            });
-            console.log(messages);
-            setChatData(previousMessage =>
-              GiftedChat.append(previousMessage, messages),
-            );
-            setLoading(false);
-          });
-        return () => {
-          database()
-            .ref('/messages/')
-            .child(myUID)
-            .child(userUID)
-            .off('child_added', MessagesFetch);
-        };
-      }
-    }, [destinedUser?.uid]),
-  );
 
   const sendMessage = useCallback((mChatData = []) => {
     if (mMessageText.length < 1) {
@@ -130,11 +119,14 @@ const ChatScreen = () => {
       setChatData(previousMessage =>
         GiftedChat.append(previousMessage, mChatData),
       );
-      const myMID = database().ref(`/messages/${myUID}/${userUID}`).push().key;
-      database()
-        .ref(`/messages/${myUID}/${userUID}/${myMID}`)
-        .set({
-          _id: myMID,
+      firestore()
+        .collection('users')
+        .doc(auth()?.currentUser?.uid)
+        .collection('messages')
+        .doc(userUID)
+        .collection('discussions')
+        .add({
+          _id: _id,
           text: mMessageText,
           createdAt: Date.now(),
           user: {
@@ -143,19 +135,20 @@ const ChatScreen = () => {
             avatar: myAvatar,
           },
         });
-      const userMID = database()
-        .ref(`/messages/${userUID}/${myUID}`)
-        .push().key;
-      database()
-        .ref(`/messages/${userUID}/${myUID}/${userMID}`)
-        .set({
-          _id: userMID,
+      firestore()
+        .collection('users')
+        .doc(userUID)
+        .collection('messages')
+        .doc(auth()?.currentUser?.uid)
+        .collection('discussions')
+        .add({
+          _id: _id,
           createdAt: Date.now(),
           text: mMessageText,
           user: {
-            _id: userUID,
-            name: userFirstName + ' ' + userLastName,
-            avatar: userAvatar,
+            _id: myUID,
+            name: myFirstName + ' ' + myLastName,
+            avatar: myAvatar,
           },
         });
     }

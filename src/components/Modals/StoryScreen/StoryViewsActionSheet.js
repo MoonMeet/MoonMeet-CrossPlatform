@@ -1,5 +1,5 @@
-import React from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 import {COLORS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
@@ -46,7 +46,7 @@ const StoryViewsActionSheet = (props: StoryViewsInterface) => {
             }}
           />
         </View>
-        <ViewsList ViewData={props.ViewsData} />
+        <ViewsList ViewsData={props.ViewsData} />
       </SafeAreaView>
     </Modal>
   );

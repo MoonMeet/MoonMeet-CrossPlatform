@@ -1,34 +1,15 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, View, Text, FlatList} from 'react-native';
-import database from '@react-native-firebase/database';
+import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 
 interface ViewListInterface {
-  ViewData: Array;
+  ViewsData: Array;
 }
 
 const ViewList = (props: ViewListInterface) => {
-  const [normalViewsData, setNormalViewsData] = React.useState(props.ViewData);
-  const [usersData, setUsers] = React.useState([]);
-  const fetchEveryUser = () => {
-    let data = [];
-    Object.values(normalViewsData).forEach(item => {
-      database()
-        .ref(`/users/${item?.uid}/`)
-        .once('value', snapshot => {
-          data.push({
-            uid: snapshot?.val().uid,
-            first_name: snapshot?.val().first_name,
-            last_name: snapshot?.val().last_name,
-            avatar: snapshot?.val().avatar,
-            bio: snapshot?.val().bio,
-            username: snapshot?.val().username,
-          });
-          setUsers(data);
-        });
-    });
-  };
-
+  console.log(props.ViewsData);
+  const [usersData, setUsersData] = React.useState([]);
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
@@ -41,26 +22,40 @@ const ViewList = (props: ViewListInterface) => {
   };
 
   useEffect(() => {
-    fetchEveryUser();
+    Object.values(props.ViewsData).map(value => {
+      console.log(value.uid);
+      firestore()
+        .collection('users')
+        .doc(value.uid)
+        .get()
+        .then(documentSnapshot => {
+          const data = [];
+          data.push({...documentSnapshot?.data()});
+          setUsersData(data);
+        });
+    });
   }, []);
+
   return (
     <View style={{flex: 1}}>
-      <FlatList
-        data={usersData}
-        contentContainerStyle={{
-          paddingStart: '1%',
-          paddingEnd: '2%',
-        }}
-        ListEmptyComponent={listEmptyComponent}
-        showsVerticalScrollIndicator={false}
-        disableVirtualization
-        nestedScrollEnabled={true}
-        removeClippedSubviews={true}
-        initialNumToRender={10}
-        renderItem={({item}) => (
-          <Text>{item.bio < 1 ? item.username : item.bio}</Text>
-        )}
-      />
+      {Object.values(usersData)?.length > 0 ? (
+        <FlatList
+          data={usersData}
+          contentContainerStyle={{
+            paddingStart: '1%',
+            paddingEnd: '2%',
+          }}
+          ListEmptyComponent={listEmptyComponent}
+          showsVerticalScrollIndicator={false}
+          disableVirtualization
+          nestedScrollEnabled={true}
+          removeClippedSubviews={true}
+          initialNumToRender={10}
+          renderItem={({item}) => (
+            <Text>{item?.first_name + ' ' + item?.last_name}</Text>
+          )}
+        />
+      ) : null}
     </View>
   );
 };

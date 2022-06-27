@@ -238,7 +238,7 @@ const ChangeUsernameScreen = () => {
             ErrorToast(
               'bottom',
               'Network unavailable',
-              'Network connection is needed to send bug reports',
+              'Network connection is needed to update your username',
               true,
               3000,
             );

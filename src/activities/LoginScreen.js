@@ -18,7 +18,7 @@ import {
 import NetInfo from '@react-native-community/netinfo';
 
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {isAndroid, isIOS, isWeb, isWindows} from '../utils/device/DeviceInfo';
+import {isAndroid, isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 import auth from '@react-native-firebase/auth';
 import CountriesList from '../components/Modals/LoginScreen/CountriesList';
@@ -261,7 +261,7 @@ const LoginScreen = () => {
         if (auth().currentUser != null) {
           firestore()
             .collection('users')
-            .doc(auth()?.currentUser.uid)
+            .doc(auth()?.currentUser?.uid)
             .get()
             .then(documentSnapshot => {
               if (documentSnapshot?.exists) {
@@ -275,8 +275,9 @@ const LoginScreen = () => {
                      */
                     if (!isWindows && !isWeb) {
                       firestore()
-                        .collection('devices')
+                        .collection('users')
                         .doc(auth()?.currentUser?.uid)
+                        .collection('devices')
                         .add({
                           manufacturer: Manufacturer,
                           system_name: systemName,

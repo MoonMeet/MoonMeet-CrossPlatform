@@ -391,7 +391,7 @@ const EditProfileScreen = () => {
             ErrorToast(
               'bottom',
               'Network unavailable',
-              'Network connection is needed to send bug reports',
+              'Network connection is needed to update your profile',
               true,
               3000,
             );

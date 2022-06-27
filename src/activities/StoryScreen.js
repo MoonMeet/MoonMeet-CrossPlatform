@@ -50,7 +50,12 @@ const StoryScreen = () => {
   const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
   async function deleteCurrentStory(sid) {
-    return await database().ref(`/stories/${userStoryUID}/${sid}`).remove();
+    return await firestore()
+      .collection('users')
+      .doc(userStoryUID)
+      .collection('stories')
+      .doc(allCurrentUserStories[current]?.sid)
+      .delete();
   }
 
   /**
@@ -77,73 +82,44 @@ const StoryScreen = () => {
           .collection('stories')
           .onSnapshot(collectionSnapshot => {
             collectionSnapshot?.forEach(subDocumentSnapshot => {
-              setStoryId(subDocumentSnapshot?.data()?.sid);
-              setStoryTime(subDocumentSnapshot?.data()?.time);
-              setStoryText(subDocumentSnapshot?.data()?.text);
-              const storyData = [];
-              storyData.push(subDocumentSnapshot?.data());
+              const storyData = collectionSnapshot?.docs.map(subMap => ({
+                ...subMap?.data(),
+                sid: subMap?.id,
+              }));
               setAllCurrentUserStories(storyData);
-              console.log(allCurrentUserStories);
               setLoading(false);
+              if (!Loading && storyId !== undefined) {
+                if (auth()?.currentUser?.uid == userStoryUID) {
+                  firestore()
+                    .collection('users')
+                    .doc(userStoryUID)
+                    .collection('story_views')
+                    .doc(myUID)
+                    .set({
+                      uid: myUID,
+                    });
+                  firestore()
+                    .collection('users')
+                    .doc(auth()?.currentUser.uid)
+                    .collection('story_views')
+                    .get()
+                    .then(collectionSnapshot => {
+                      if (!collectionSnapshot?.empty) {
+                        collectionSnapshot?.forEach(documentSnapshot => {
+                          const storyViewsData = collectionSnapshot?.docs?.map(
+                            subMap => ({
+                              ...subMap?.data(),
+                            }),
+                          );
+                          setViewsData(storyViewsData);
+                        });
+                      }
+                    });
+                }
+              }
             });
           });
       });
-    /**
-     database()
-      .ref(`/stories/${userStoryUID}/`)
-      .once('value', snapshot => {
-        setAllCurrentUserStories(snapshot.val());
-        snapshot?.forEach(childSnapshot => {
-          if (
-            childSnapshot.val()?.first_name &&
-            childSnapshot.val()?.last_name &&
-            childSnapshot.val()?.sid &&
-            childSnapshot.val()?.time &&
-            childSnapshot.val()?.uid &&
-            childSnapshot.val()?.avatar &&
-            (childSnapshot.val()?.text || childSnapshot.val()?.image)
-          ) {
-            setStoryAvatar(childSnapshot.val()?.avatar);
-            setStoryFirstName(childSnapshot.val()?.first_name);
-            setStoryLastName(childSnapshot.val()?.last_name);
-            setStoryId(childSnapshot.val()?.sid);
-            setStoryImage(childSnapshot.val()?.image);
-            setStoryTime(childSnapshot.val()?.time);
-            setStoryText(childSnapshot.val()?.text);
-            setStoryUID(childSnapshot.val().uid);
-            if (storyTime != null) {
-              const calender = Date.now();
-              if (calender - childSnapshot.val()?.time > 86400000) {
-                // TODO: Story Views Implementation.
-                deleteCurrentStory(storyId);
-              } else {
-                // TODO: Some Logic to implement.
-              }
-            }
-          }
-          setLoading(false);
-          if (auth()?.currentUser.uid != storyUID) {
-            database()
-              .ref(`/storyviews/${storyId}`)
-              .once('value', snapshot => {
-                setViewsData(snapshot?.val());
-              })
-              .finally(() => {
-                console.log(viewsData);
-              });
-          }
-          if (!Loading) {
-            if (auth()?.currentUser.uid !== storyUID) {
-              database().ref(`storyviews/${storyId}/${myUID}`).set({
-                uid: myUID,
-                sid: storyId,
-              });
-            }
-          }
-        });
-      });
-     */
-
     return () => {
       firestoreSubscribe();
     };
@@ -209,7 +185,11 @@ const StoryScreen = () => {
                   {storyFirstName + ' ' + storyLastName}
                 </Text>
                 <Text style={styles.timeText}>
-                  {transformTimeForStories(storyTime)}
+                  {transformTimeForStories(
+                    Object.values(allCurrentUserStories)?.length > 0
+                      ? allCurrentUserStories[current]?.time
+                      : Date.now(),
+                  )}
                 </Text>
               </View>
             </View>
@@ -381,16 +361,26 @@ const StoryScreen = () => {
             setActionSheetVisible(!ActionSheetVisible);
           }}
           onCopySelected={() => {
-            Clipboard.setString(storyText);
+            Clipboard.setString(allCurrentUserStories[current]?.text);
           }}
           onDeleteSelected={() => {
-            deleteCurrentStory(storyId).finally(() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              }
-            });
+            deleteCurrentStory(allCurrentUserStories[current]?.sid).finally(
+              () => {
+                if (navigation?.canGoBack()) {
+                  navigation?.goBack();
+                }
+              },
+            );
           }}
-          currentStoryUID={storyUID}
+          showSave={
+            allCurrentUserStories[current]?.image
+              ? allCurrentUserStories[current]?.image
+              : false
+          }
+          onSaveSelected={() => {
+            console.log(allCurrentUserStories[current]?.image);
+          }}
+          currentStoryUID={userStoryUID}
           isVisible={ActionSheetVisible}
         />
       </MiniBaseView>
