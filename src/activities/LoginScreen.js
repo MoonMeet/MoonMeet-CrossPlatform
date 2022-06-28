@@ -440,7 +440,7 @@ const LoginScreen = () => {
                 label="Phone Number"
                 value={NumberText}
                 onFocus={() => {}}
-                placeholder={'eg, +1 (566) 874 364'}
+                placeholder={'eg, (566) 874 364'}
                 multiline={false}
                 theme={{
                   colors: {

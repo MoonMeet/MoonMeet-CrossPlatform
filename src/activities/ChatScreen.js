@@ -23,6 +23,7 @@ import {v4 as uuidv4} from 'uuid';
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
+  console.log(destinedUser);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
@@ -54,7 +55,7 @@ const ChatScreen = () => {
   useEffect(() => {
     const userSubscribe = firestore()
       .collection('users')
-      .doc(destinedUser?.uid)
+      .doc(destinedUser)
       .onSnapshot(userSnapshot => {
         if (userSnapshot?.exists) {
           if (
@@ -91,16 +92,16 @@ const ChatScreen = () => {
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .collection('messages')
-      .doc(destinedUser?.uid)
+      .doc(destinedUser)
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
-        const messages = collectionSnapshot?.docs
-          .sort()
-          .reverse()
-          .map(subMap => ({
-            ...subMap?.data(),
-            id: subMap?.id,
-          }));
+        const collectionDocs = collectionSnapshot?.docs.map(subMap => ({
+          ...subMap?.data(),
+          id: subMap?.id,
+        }));
+        const messages = Object.values(
+          collectionDocs.sort((a, b) => a.createdAt - b.createdAt),
+        ).reverse();
         setChatData(messages);
         setLoading(false);
       });
@@ -109,12 +110,13 @@ const ChatScreen = () => {
       mySubscribe();
       messagesSubscribe();
     };
-  }, [destinedUser?.uid]);
+  }, [destinedUser]);
 
   const sendMessage = useCallback((mChatData = []) => {
     if (mMessageText.length < 1) {
       // simply don't send an empty message to database, 'cause that's hows mafia works :sunglasses:
     } else {
+      // Send message to user logic goes here.
       setMessageText(mMessageText.trim());
       setChatData(previousMessage =>
         GiftedChat.append(previousMessage, mChatData),
@@ -150,6 +152,35 @@ const ChatScreen = () => {
             name: myFirstName + ' ' + myLastName,
             avatar: myAvatar,
           },
+        });
+      // Chats messages on home screen goes here
+      firestore()
+        .collection('chats')
+        .doc(auth()?.currentUser?.uid)
+        .collection('discussions')
+        .doc(userUID)
+        .set({
+          last_message_first_name: userFirstName,
+          last_message_last_name: userLastName,
+          last_message_text: mMessageText,
+          last_message_avatar: userAvatar,
+          last_message_time: Date.now(),
+          last_message_type: 'message',
+          last_message_uid: userUID,
+        });
+      firestore()
+        .collection('chats')
+        .doc(userUID)
+        .collection('discussions')
+        .doc(auth()?.currentUser?.uid)
+        .set({
+          last_message_first_name: myFirstName,
+          last_message_last_name: myLastName,
+          last_message_text: mMessageText,
+          last_message_avatar: myAvatar,
+          last_message_time: Date.now(),
+          last_message_type: 'message',
+          last_message_uid: myUID,
         });
     }
   });
@@ -195,6 +226,7 @@ const ChatScreen = () => {
         }}
       />
       <GiftedChat
+        inverted={true}
         text={mMessageText}
         isLoadingEarlier={isLoading}
         renderLoading={() => (
@@ -206,8 +238,8 @@ const ChatScreen = () => {
             />
           </View>
         )}
-        showAvatarForEveryMessage={true}
-        showUserAvatar={true}
+        showAvatarForEveryMessage={false}
+        showUserAvatar={false}
         onInputTextChanged={text => setMessageText(text)}
         messages={mChatData}
         onSend={messages => {
@@ -215,7 +247,7 @@ const ChatScreen = () => {
           setMessageText('');
         }}
         user={{
-          _id: auth()?.currentUser.uid,
+          _id: auth()?.currentUser?.uid,
           avatar: myAvatar,
           name: myFirstName + ' ' + myLastName,
         }}

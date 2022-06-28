@@ -42,7 +42,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
           <View style={styles.left_side}>
             <Avatar.Image
               source={item.avatar ? {uri: item.avatar} : null}
-              size={55}
+              size={52.5}
             />
           </View>
           <View style={styles.mid_side}>

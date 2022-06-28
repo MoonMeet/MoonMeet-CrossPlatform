@@ -1,16 +1,8 @@
 import React, {useCallback, useEffect} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import {
-  Avatar,
-  Button,
-  Dialog,
-  Paragraph,
-  Portal,
-  Provider,
-} from 'react-native-paper';
+import {Avatar, Provider} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
 import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
@@ -21,11 +13,12 @@ import StoriesList from '../components/HomeScreen/StoriesList';
 import firestore from '@react-native-firebase/firestore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue} from '../config/Dimensions';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
 
-  const _testChats = ChatsJson;
+  const [chatsData, setChatsData] = React.useState([]);
 
   const currentUserData = [];
   const currentStoryData = [];
@@ -38,25 +31,37 @@ const HomeChatsScreen = () => {
 
   const [storiesData, setStoriesData] = React.useState([]);
 
-  const [mDialogVisible, setDialogVisible] = React.useState(false);
-
   const [myUID, setMyUID] = React.useState('');
 
-  const showDialog = () => setDialogVisible(true);
-
-  const hideDialog = () => setDialogVisible(false);
-
   function checkJwtKey(currentJwtKey = string) {
-    AsyncStorage.getItem('currentUserJwtKey').then(_asyncJwt => {
+    AsyncStorage?.getItem('currentUserJwtKey')?.then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
-        setDialogVisible(true);
+        AsyncStorage.removeItem('currentUserJwtKey');
+        if (auth()?.currentUser != null) {
+          auth()
+            ?.signOut()
+            .then(() => {
+              navigation.navigate('login');
+              InfoToast(
+                'bottom',
+                'Session Expired',
+                'Your session in this account has been expired, Please re-login',
+                true,
+                3500,
+              );
+            })
+            .catch(() => {
+              navigation.navigate('login');
+            });
+        }
       }
     });
   }
 
-  function updateUserActiveStatus() {
-    database()
-      .ref(`/users/${auth()?.currentUser.uid}`)
+  async function updateUserActiveStatus() {
+    await firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
       .update({
         active_status: activeStatusState === true ? 'normal' : 'recently',
         active_time:
@@ -111,9 +116,10 @@ const HomeChatsScreen = () => {
           setNewActiveTime(documentSnapshot?.data()?.active_time);
         }
       });
-    const storySubscriber = firestore()
+    firestore()
       .collection('users')
-      .onSnapshot(collectionSnapshot => {
+      .get()
+      .then(collectionSnapshot => {
         collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.exists) {
             firestore()
@@ -140,7 +146,6 @@ const HomeChatsScreen = () => {
                       uid: documentSnapshot?.data()?.uid,
                       sid: subDocument?.id,
                     });
-                    console.log(currentStoryData);
                   }
                   setStoriesData(currentStoryData);
                 });
@@ -148,46 +153,30 @@ const HomeChatsScreen = () => {
           }
         });
       });
+    const chatSubscribe = firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .onSnapshot(collectionSnapshot => {
+        if (!collectionSnapshot?.empty) {
+          const data = collectionSnapshot?.docs?.map(subMap => ({
+            ...subMap?.data(),
+          }));
+          const chatData = Object?.values(data)?.sort(
+            (a, b) => a?.last_message_time - b?.last_message_time,
+          );
+          setChatsData(chatData);
+        }
+      });
+
     return () => {
       userSusbcribe();
-      storySubscriber();
+      chatSubscribe();
     };
   }, []);
 
   return (
     <Provider>
-      <Portal>
-        <Dialog
-          dismissable={false}
-          visible={mDialogVisible}
-          onDismiss={hideDialog}>
-          <Dialog.Title>Session Expired</Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>
-              You're session has been expired in this account, Please Re-Login.
-            </Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              onPress={() => {
-                hideDialog();
-                AsyncStorage.removeItem('currentUserJwtKey');
-                if (auth()?.currentUser != null) {
-                  auth()
-                    ?.signOut()
-                    .then(() => {
-                      navigation.navigate('login');
-                    })
-                    .catch(() => {
-                      navigation.navigate('login');
-                    });
-                }
-              }}>
-              OK
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
       <MiniBaseView>
         <View style={styles.toolbar}>
           <View style={styles.left_side}>
@@ -241,7 +230,7 @@ const HomeChatsScreen = () => {
           </View>
         </View>
         <StoriesList ListData={storiesData} myUID={myUID} />
-        <MessagesList ListData={_testChats} />
+        <MessagesList ListData={chatsData} />
       </MiniBaseView>
     </Provider>
   );
@@ -313,4 +302,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(HomeChatsScreen);
+export default HomeChatsScreen;

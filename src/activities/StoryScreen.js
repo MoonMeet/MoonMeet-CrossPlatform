@@ -26,6 +26,7 @@ import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
+import {any} from 'prop-types';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -68,15 +69,16 @@ const StoryScreen = () => {
   const viewAbilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
 
   useEffect(() => {
-    const firestoreSubscribe = firestore()
+    firestore()
       .collection('users')
       .doc(userStoryUID)
-      .onSnapshot(documentSnapshot => {
+      .get()
+      .then(documentSnapshot => {
         setStoryAvatar(documentSnapshot?.data()?.avatar);
         setStoryFirstName(documentSnapshot?.data()?.first_name);
         setStoryLastName(documentSnapshot?.data()?.last_name);
         setStoryUID(documentSnapshot?.data()?.uid);
-        firestore()
+        storiesSubscribe = firestore()
           .collection('users')
           .doc(userStoryUID)
           .collection('stories')
@@ -90,14 +92,6 @@ const StoryScreen = () => {
               setLoading(false);
               if (!Loading && storyId !== undefined) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
-                  firestore()
-                    .collection('users')
-                    .doc(userStoryUID)
-                    .collection('story_views')
-                    .doc(myUID)
-                    .set({
-                      uid: myUID,
-                    });
                   firestore()
                     .collection('users')
                     .doc(auth()?.currentUser.uid)
@@ -115,14 +109,21 @@ const StoryScreen = () => {
                         });
                       }
                     });
+                } else {
+                  firestore()
+                    .collection('users')
+                    .doc(userStoryUID)
+                    .collection('story_views')
+                    .doc(myUID)
+                    .set({
+                      uid: myUID,
+                    });
                 }
               }
             });
           });
       });
-    return () => {
-      firestoreSubscribe();
-    };
+    return () => {};
   }, [current]);
 
   if (Loading) {
