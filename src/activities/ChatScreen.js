@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {GiftedChat} from 'react-native-gifted-chat';
 import {v4 as uuidv4} from 'uuid';
+import Spacer from '../components/Spacer/Spacer';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -71,6 +72,7 @@ const ChatScreen = () => {
           }
         }
       });
+
     const mySubscribe = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -88,6 +90,7 @@ const ChatScreen = () => {
           }
         }
       });
+
     const messagesSubscribe = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -95,14 +98,16 @@ const ChatScreen = () => {
       .doc(destinedUser)
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
-        const collectionDocs = collectionSnapshot?.docs.map(subMap => ({
-          ...subMap?.data(),
-          id: subMap?.id,
-        }));
-        const messages = Object.values(
-          collectionDocs.sort((a, b) => a.createdAt - b.createdAt),
-        ).reverse();
-        setChatData(messages);
+        if (!collectionSnapshot?.empty) {
+          const collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
+            ...subMap?.data(),
+            id: subMap?.id,
+          }));
+          const messages = Object.values(
+            collectionDocs?.sort((a, b) => a.createdAt - b.createdAt),
+          ).reverse();
+          setChatData(messages);
+        }
         setLoading(false);
       });
     return () => {
@@ -160,13 +165,17 @@ const ChatScreen = () => {
         .collection('discussions')
         .doc(userUID)
         .set({
-          last_message_first_name: userFirstName,
-          last_message_last_name: userLastName,
-          last_message_text: mMessageText,
-          last_message_avatar: userAvatar,
-          last_message_time: Date.now(),
-          last_message_type: 'message',
-          last_message_uid: userUID,
+          to_first_name: userFirstName,
+          to_last_name: userLastName,
+          to_message_text: mMessageText,
+          to_avatar: userAvatar,
+          time: Date.now(),
+          type: 'message',
+          to_uid: userUID,
+          from_uid: myUID,
+          from_first_name: myFirstName,
+          from_last_name: myLastName,
+          from_avatar: myAvatar,
         });
       firestore()
         .collection('chats')
@@ -174,49 +183,55 @@ const ChatScreen = () => {
         .collection('discussions')
         .doc(auth()?.currentUser?.uid)
         .set({
-          last_message_first_name: myFirstName,
-          last_message_last_name: myLastName,
-          last_message_text: mMessageText,
-          last_message_avatar: myAvatar,
-          last_message_time: Date.now(),
-          last_message_type: 'message',
-          last_message_uid: myUID,
+          to_first_name: myFirstName,
+          to_last_name: myLastName,
+          to_message_text: mMessageText,
+          to_avatar: myAvatar,
+          time: Date.now(),
+          type: 'message',
+          to_uid: myUID,
+          from_uid: userUID,
+          from_first_name: userFirstName,
+          from_last_name: userLastName,
+          from_avatar: userAvatar,
         });
     }
   });
 
   return (
     <BaseView>
-      <View style={styles.header}>
-        <TouchableRipple
-          rippleColor={COLORS.rippleColor}
-          borderless={false}
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          <Avatar.Icon
-            icon={BackImage}
+      <View style={styles.toolbar}>
+        <View style={styles.left_side}>
+          <TouchableRipple
+            rippleColor={COLORS.rippleColor}
+            borderless={false}
+            onPress={() => {
+              navigation?.goBack();
+            }}>
+            <Avatar.Icon
+              icon={BackImage}
+              size={37.5}
+              color={COLORS.black}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+                opacity: 0.4,
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.transparent,
+                },
+              }}
+            />
+          </TouchableRipple>
+          <Avatar.Image
             size={40}
-            color={COLORS.black}
-            style={{
-              overflow: 'hidden',
-              marginRight: '-1%',
-              opacity: 0.4,
-            }}
-            theme={{
-              colors: {
-                primary: COLORS.transparent,
-              },
-            }}
+            source={{uri: userAvatar ? userAvatar : null}}
           />
-        </TouchableRipple>
-        <Avatar.Image
-          size={40}
-          source={{uri: userAvatar ? userAvatar : null}}
-        />
-        <Text style={styles.userFullName}>
-          {userFirstName} {userLastName}
-        </Text>
+          <Text style={styles.userFullName}>
+            {userFirstName} {userLastName}
+          </Text>
+        </View>
       </View>
       <View
         style={{
@@ -226,11 +241,21 @@ const ChatScreen = () => {
         }}
       />
       <GiftedChat
-        inverted={true}
         text={mMessageText}
         isLoadingEarlier={isLoading}
         renderLoading={() => (
           <View style={{flex: 1, justifyContent: 'center'}}>
+            <Text
+              style={{
+                fontSize: fontValue(14),
+                textAlign: 'center',
+                color: COLORS.black,
+                opacity: 0.4,
+                fontFamily: FONTS.regular,
+              }}>
+              Getting Messages, Hang on
+            </Text>
+            <Spacer height={heightPercentageToDP(2)} />
             <ActivityIndicator
               size={'large'}
               color={COLORS.accentLight}
@@ -257,15 +282,31 @@ const ChatScreen = () => {
   );
 };
 const styles = StyleSheet.create({
-  header: {
-    height: heightPercentageToDP(8),
+  toolbar: {
+    padding: '2%',
+    flexDirection: 'row',
+  },
+  left_side: {
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  mid_side: {
+    flex: 2,
+    backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
+    fontSize: 18,
+    marginLeft: '2.5%',
+    marginRight: '2.5%',
   },
   userFullName: {
-    fontSize: fontValue(15),
-    paddingStart: widthPercentageToDP(2),
-    alignSelf: 'center',
+    fontSize: fontValue(16),
+    paddingLeft: heightPercentageToDP(1),
+    textAlign: 'left',
+    color: COLORS.black,
+    opacity: 0.4,
+    fontFamily: FONTS.regular,
   },
   emptyHolderHeaderText: {
     fontSize: fontValue(14),

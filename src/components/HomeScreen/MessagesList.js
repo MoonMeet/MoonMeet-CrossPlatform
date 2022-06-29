@@ -4,78 +4,84 @@ import React from 'react';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
 import {heightPercentageToDP} from '../../config/Dimensions';
 import {transformTimeChats} from '../../utils/TimeHandler/TimeHandler';
-import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
+  const listEmptyComponent = () => {
+    return (
+      <View style={styles.emptyView}>
+        <Text style={styles.heading('center')}>No one active, yet.</Text>
+        <Text style={styles.subheading('center')}>
+          there's no one active at the moment.
+        </Text>
+      </View>
+    );
+  };
   return (
-    <View style={{flex: 1}}>
-      <FlatList
-        data={ListData}
-        contentContainerStyle={{
-          paddingStart: '1%',
-          paddingEnd: '2%',
-          paddingBottom: heightPercentageToDP(10),
-        }}
-        showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
-        initialNumToRender={10}
-        renderItem={({item}) => (
-          <Pressable
-            onPress={() => {
-              navigation.navigate('chat', {item: item?.last_message_uid});
-            }}
+    <FlatList
+      style={{flex: 1}}
+      data={ListData}
+      ListEmptyComponent={listEmptyComponent}
+      contentContainerStyle={{
+        paddingStart: '1%',
+        paddingEnd: '2%',
+        paddingBottom: heightPercentageToDP(10),
+      }}
+      showsVerticalScrollIndicator={false}
+      removeClippedSubviews={true}
+      initialNumToRender={10}
+      renderItem={({item}) => (
+        <Pressable
+          android_ripple={COLORS.rippleColor}
+          onPress={() => {
+            navigation.navigate('chat', {item: item?.to_uid});
+          }}
+          style={{
+            flexDirection: 'row',
+            padding: '2%',
+          }}>
+          <View
             style={{
-              flexDirection: 'row',
-              padding: '2%',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
             }}>
-            <View
-              style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-              }}>
-              <Avatar.Image
-                style={styles.userHaveStory}
-                size={52.5}
-                source={{
-                  uri: item?.last_message_avatar
-                    ? item?.last_message_avatar
-                    : null,
-                }}
-              />
-            </View>
-            <View
-              style={{
-                padding: '2%',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-              }}>
-              <Text style={styles.heading}>
-                {item?.last_message_first_name +
-                  ' ' +
-                  item?.last_message_last_name}
-              </Text>
-              <Text style={styles.subheading}>
-                {auth()?.currentUser?.uid === item?.last_message_uid
-                  ? item?.last_message_text
-                  : 'You: ' + item?.last_message_text}
-              </Text>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-              }}>
-              <Text style={styles.subheading}>
-                {transformTimeChats(item?.last_message_time)}
-              </Text>
-            </View>
-          </Pressable>
-        )}
-      />
-    </View>
+            <Avatar.Image
+              style={styles.userHaveStory}
+              size={52.5}
+              source={{
+                uri: item?.to_avatar ? item?.to_avatar : null,
+              }}
+            />
+          </View>
+          <View
+            style={{
+              padding: '2%',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}>
+            <Text style={styles.heading('left')}>
+              {item?.to_first_name + ' ' + item?.to_last_name}
+            </Text>
+            <Text style={styles.subheading('left')}>
+              {item?.to_message_uid !== item?.to_message_uid
+                ? item?.to_message_text
+                : 'You: ' + item?.to_message_text}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}>
+            <Text style={styles.subheading}>
+              {transformTimeChats(item?.time)}
+            </Text>
+          </View>
+        </Pressable>
+      )}
+    />
   );
 };
 
@@ -85,19 +91,29 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accentLight,
     overflow: 'hidden',
   },
-  heading: {
-    fontSize: 16,
-    textAlign: 'left',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
+  heading: align => {
+    return {
+      fontSize: 16,
+      textAlign: align,
+      color: COLORS.black,
+      fontFamily: FONTS.regular,
+    };
   },
-  subheading: {
-    fontSize: 14,
-    paddingTop: '1%',
-    textAlign: 'left',
-    color: COLORS.black,
-    opacity: 0.4,
-    fontFamily: FONTS.regular,
+  subheading: align => {
+    return {
+      fontSize: 14,
+      paddingTop: '1%',
+      textAlign: align,
+      color: COLORS.black,
+      opacity: 0.4,
+      fontFamily: FONTS.regular,
+    };
+  },
+  emptyView: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    alignSelf: 'center',
+    alignContent: 'center',
   },
 });
 

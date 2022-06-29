@@ -4,7 +4,6 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {Avatar, Provider} from 'react-native-paper';
 import PersonImage from '../assets/images/person.png';
-import ChatsJson from '../assets/data/json/test/chats.json';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
@@ -20,7 +19,6 @@ const HomeChatsScreen = () => {
 
   const [chatsData, setChatsData] = React.useState([]);
 
-  const currentUserData = [];
   const currentStoryData = [];
 
   const [avatarURL, setAvatarURL] = React.useState('');
@@ -162,9 +160,12 @@ const HomeChatsScreen = () => {
           const data = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
           }));
-          const chatData = Object?.values(data)?.sort(
-            (a, b) => a?.last_message_time - b?.last_message_time,
-          );
+          let chatData = [];
+          if (data) {
+            chatData = Object?.values(data)?.sort(
+              (a, b) => a?.last_message_time - b?.last_message_time,
+            );
+          }
           setChatsData(chatData);
         }
       });

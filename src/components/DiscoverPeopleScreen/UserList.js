@@ -35,7 +35,9 @@ const UserList = (props = UserListInterface) => {
               <Pressable
                 android_ripple={{color: COLORS.rippleColor}}
                 style={styles.container}
-                onPress={() => navigation.navigate('chat', {item})}>
+                onPress={() => {
+                  navigation.navigate('chat', {item: item?.uid});
+                }}>
                 <View style={styles.left_side}>
                   <Avatar.Image
                     source={item?.avatar ? {uri: item?.avatar} : null}

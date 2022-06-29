@@ -257,8 +257,8 @@ const LoginScreen = () => {
     if (text.length > 5) {
       setLoaderVisible(!LoaderVisible);
       Keyboard.dismiss();
-      confirmCode(text).then(() => {
-        if (auth().currentUser != null) {
+      confirmCode(text)
+        .then(() => {
           firestore()
             .collection('users')
             .doc(auth()?.currentUser?.uid)
@@ -313,10 +313,10 @@ const LoginScreen = () => {
                 setLoaderVisible(!LoaderVisible);
               }
             });
-        } else {
-          console.log('our user is null');
-        }
-      });
+        })
+        .catch(e => {
+          console.error(e);
+        });
     }
   }
 
@@ -636,11 +636,11 @@ const LoginScreen = () => {
                     fontFamily: FONTS.regular,
                   }}
                   onPress={() => {
-                    setLoaderVisible(!LoaderVisible);
+                    setLoaderVisible(true);
                     phoneRef?.current.clear();
                     setConfirmCode(false);
                     NumberSetText('');
-                    setLoaderVisible(!LoaderVisible);
+                    setLoaderVisible(false);
                   }}>
                   WRONG NUMBER
                 </Text>
