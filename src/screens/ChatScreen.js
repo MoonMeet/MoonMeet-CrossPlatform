@@ -1,25 +1,23 @@
 /* eslint-disable prettier/prettier */
-import React, {useCallback, useEffect} from 'react';
-import {StyleSheet, Text, View, Dimensions} from 'react-native';
-import BaseView from '../components/BaseView/BaseView';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../config/Dimensions';
-import {
-  useFocusEffect,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import {COLORS, FONTS} from '../config/Miscellaneous';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
+import React, { useCallback, useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat';
+import { ActivityIndicator, Avatar, TouchableRipple } from 'react-native-paper';
+import { v4 as uuidv4 } from 'uuid';
 import BackImage from '../assets/images/back.png';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import {GiftedChat} from 'react-native-gifted-chat';
-import {v4 as uuidv4} from 'uuid';
+import BaseView from '../components/BaseView/BaseView';
 import Spacer from '../components/Spacer/Spacer';
+import {
+  fontValue,
+  heightPercentageToDP,
+} from '../config/Dimensions';
+import { COLORS, FONTS } from '../config/Miscellaneous';
 
 const ChatScreen = () => {
   const navigation = useNavigation();

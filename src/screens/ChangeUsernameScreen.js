@@ -1,28 +1,28 @@
+import NetInfo from '@react-native-community/netinfo';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import BaseView from '../components/BaseView/BaseView';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {StyleSheet, Text, View} from 'react-native';
-import {COLORS, FONTS} from '../config/Miscellaneous';
 import {
+  ActivityIndicator,
   Avatar,
   FAB,
   HelperText,
   TextInput,
   TouchableRipple,
-  ActivityIndicator,
 } from 'react-native-paper';
-import BackImage from '../assets/images/back.png';
-import Spacer from '../components/Spacer/Spacer';
-import {useNavigation} from '@react-navigation/native';
 import ArrowForward from '../assets/images/arrow-forward.png';
+import BackImage from '../assets/images/back.png';
+import BaseView from '../components/BaseView/BaseView';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import Spacer from '../components/Spacer/Spacer';
 import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import NetInfo from '@react-native-community/netinfo';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import {COLORS, FONTS} from '../config/Miscellaneous';
 
 const ChangeUsernameScreen = () => {
   const navigation = useNavigation();

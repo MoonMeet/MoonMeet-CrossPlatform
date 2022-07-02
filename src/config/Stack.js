@@ -7,39 +7,39 @@
 
 import React from 'react';
 
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
-import IntroScreen from '../activities/IntroScreen';
-import SplashScreen from '../activities/SplashScreen';
-import LoginScreen from '../activities/LoginScreen';
-import SetupScreen from '../activities/SetupScreen';
-import SettingsScreen from '../activities/HomeSettingsScreen';
-import SearchChatsScreen from '../activities/SearchChatsScreen';
-import ReportProblem from '../activities/ReportProblemScreen';
-import ActiveStatusScreen from '../activities/ActiveStatusScreen';
-import ChangeUsernameScreen from '../activities/ChangeUsernameScreen';
-import AddBioActivity from '../activities/AddBioScreen';
-import EditProfileScreen from '../activities/EditProfileScreen';
-import DevicesScreen from '../activities/DevicesScreen';
-import DiscoverPeopleScreen from '../activities/DiscoverPeopleScreen';
-import StoryScreen from '../activities/StoryScreen';
-import AddStoryScreen from '../activities/AddStoryScreen';
-import HomeChats from '../activities/HomeChatsScreen.js';
-import HomePeople from '../activities/HomePeopleScreen';
+import ActiveStatusScreen from '../screens/ActiveStatusScreen';
+import AddBioActivity from '../screens/AddBioScreen';
+import AddStoryScreen from '../screens/AddStoryScreen';
+import ChangeUsernameScreen from '../screens/ChangeUsernameScreen';
+import DevicesScreen from '../screens/DevicesScreen';
+import DiscoverPeopleScreen from '../screens/DiscoverPeopleScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import HomeChats from '../screens/HomeChatsScreen.js';
+import HomePeople from '../screens/HomePeopleScreen';
+import SettingsScreen from '../screens/HomeSettingsScreen';
+import IntroScreen from '../screens/IntroScreen';
+import LoginScreen from '../screens/LoginScreen';
+import ReportProblem from '../screens/ReportProblemScreen';
+import SearchChatsScreen from '../screens/SearchChatsScreen';
+import SetupScreen from '../screens/SetupScreen';
+import SplashScreen from '../screens/SplashScreen';
+import StoryScreen from '../screens/StoryScreen';
 
 import {Avatar} from 'react-native-paper';
 
 import {COLORS} from './Miscellaneous';
 
 import ChatIcon from '../assets/images/chat.png';
-import PeopleIcon from '../assets/images/two_people.png';
 import SettingsIcon from '../assets/images/settings.png';
-import ChatScreen from '../activities/ChatScreen';
-import SetupPasscodeScreen from '../activities/SetupPasscodeScreen';
-import VerifyPasscodeScreen from '../activities/VerifyPasscodeScreen';
-import {heightPercentageToDP, widthPercentageToDP} from './Dimensions';
+import PeopleIcon from '../assets/images/two_people.png';
+import ChatScreen from '../screens/ChatScreen';
+import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
+import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
+import {heightPercentageToDP} from './Dimensions';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();

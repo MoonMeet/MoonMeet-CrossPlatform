@@ -1,3 +1,7 @@
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
@@ -7,7 +11,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {
   ActivityIndicator,
   Avatar,
@@ -15,24 +18,21 @@ import {
   TextInput,
   TouchableRipple,
 } from 'react-native-paper';
-import {COLORS, FONTS} from '../config/Miscellaneous';
-import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import BackImage from '../assets/images/back.png';
-import CameraImage from '../assets/images/photo-camera.png';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import Spacer from '../components/Spacer/Spacer';
 import DoneImage from '../assets/images/done.png';
+import CameraImage from '../assets/images/photo-camera.png';
 import PickImage from '../assets/images/pick-photo.png';
-import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
-import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import BaseView from '../components/BaseView/BaseView';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
+import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import Spacer from '../components/Spacer/Spacer';
 import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import storage from '@react-native-firebase/storage';
+import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
+import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
+import {COLORS, FONTS} from '../config/Miscellaneous';
 import getRandomString from '../utils/StringGenerator/StringGenerator';
 
 const AddStoryScreen = () => {
