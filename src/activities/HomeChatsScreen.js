@@ -31,7 +31,7 @@ const HomeChatsScreen = () => {
 
   const [myUID, setMyUID] = React.useState('');
 
-  function checkJwtKey(currentJwtKey = string) {
+  function checkJwtKey(currentJwtKey: string) {
     AsyncStorage?.getItem('currentUserJwtKey')?.then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         AsyncStorage.removeItem('currentUserJwtKey');

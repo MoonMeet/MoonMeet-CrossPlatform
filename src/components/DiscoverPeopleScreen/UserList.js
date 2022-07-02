@@ -13,7 +13,7 @@ interface UserListInterface {
   onLongPressTrigger: Function;
 }
 
-const UserList = (props = UserListInterface) => {
+const UserList = (props: UserListInterface) => {
   const navigation = useNavigation();
 
   return (

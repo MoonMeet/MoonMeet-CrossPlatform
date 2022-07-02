@@ -273,7 +273,7 @@ const SetupScreen = ({route}) => {
                       app_version: appVersion,
                       time: Date.now(),
                     })
-                    .catch(() => {
+                    .catch(error => {
                       console.error(error);
                       setLoaderVisible(!LoaderVisible);
                     });

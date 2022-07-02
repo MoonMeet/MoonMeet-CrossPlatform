@@ -78,7 +78,7 @@ const StoryScreen = () => {
         setStoryFirstName(documentSnapshot?.data()?.first_name);
         setStoryLastName(documentSnapshot?.data()?.last_name);
         setStoryUID(documentSnapshot?.data()?.uid);
-        storiesSubscribe = firestore()
+        firestore()
           .collection('users')
           .doc(userStoryUID)
           .collection('stories')
@@ -124,7 +124,7 @@ const StoryScreen = () => {
           });
       });
     return () => {};
-  }, [current]);
+  }, []);
 
   if (Loading) {
     return (

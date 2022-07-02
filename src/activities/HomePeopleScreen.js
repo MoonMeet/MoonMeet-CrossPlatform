@@ -74,7 +74,7 @@ const HomePeopleScreen = () => {
     const activeSubscribe = firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
-        activeSnapshot = [];
+        const activeSnapshot = [];
         collectionSnapshot?.forEach(documentSnapshot => {
           if (
             documentSnapshot?.data()?.active_status == 'normal' &&

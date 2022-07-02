@@ -117,6 +117,7 @@ const ChatScreen = () => {
     };
   }, [destinedUser]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sendMessage = useCallback((mChatData = []) => {
     if (mMessageText.length < 1) {
       // simply don't send an empty message to database, 'cause that's hows mafia works :sunglasses:
