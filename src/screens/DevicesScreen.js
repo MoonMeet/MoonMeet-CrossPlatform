@@ -77,19 +77,25 @@ const DevicesScreen = () => {
   const [Model, setModel] = React.useState(getModel());
   const [appVersion, setAppVersion] = React.useState(getVersion());
 
-  const resendCurrentDevice = async () => {
+  async function resendCurrentDevice() {
     if (!isWindows && !isWeb) {
-      await database()
-        .ref(`/devices/${auth()?.currentUser.uid}`)
-        .remove()
-        .finally(() => {
-          const referenceKey = database()
-            .ref(`/devices/${auth()?.currentUser.uid}`)
-            .push().key;
-
-          database()
-            .ref(`/devices/${auth()?.currentUser.uid}/${referenceKey}`)
-            .set({
+      const allDevicesRef = firestore()
+        .collection('users')
+        .doc(auth()?.currentUser?.uid)
+        .collection('devices');
+      await allDevicesRef
+        .get()
+        .then(allDevicesDocs => {
+          Promise.all(
+            allDevicesDocs?.docs?.map(subMap => subMap?.ref?.delete()),
+          );
+        })
+        .finally(async () => {
+          await firestore()
+            .collection('users')
+            .doc(auth()?.currentUser?.uid)
+            .collection('devices')
+            .add({
               manufacturer: Manufacturer,
               system_name: systemName,
               system_version: systemVersion,
@@ -103,7 +109,7 @@ const DevicesScreen = () => {
             });
         });
     }
-  };
+  }
 
   if (Loading) {
     return (
@@ -173,17 +179,20 @@ const DevicesScreen = () => {
       <View style={styles.terminateView}>
         <Text
           onPress={async () => {
-            await AsyncStorage.setItem('currentUserJwtKey', newJwtKey).then(
+            await AsyncStorage.setItem('currentUserJwtKey', newJwtKey).finally(
               () => {
-                database()
-                  .ref(`/users/${auth().currentUser.uid}`)
+                firestore()
+                  .collection('users')
+                  .doc(auth()?.currentUser?.uid)
                   .update({
                     jwtKey: newJwtKey,
+                  })
+                  .finally(async () => {
+                    await resendCurrentDevice();
                   })
                   .catch(error => console.log(error));
               },
             );
-            await resendCurrentDevice();
           }}
           style={styles.headingTerminate}>
           Terminate All Other Sessions

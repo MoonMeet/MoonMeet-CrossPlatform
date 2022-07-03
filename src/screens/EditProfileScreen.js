@@ -89,7 +89,6 @@ const EditProfileScreen = () => {
   };
 
   async function pushUserData() {
-    console.log('push data 0');
     let _avatarRef = `avatars/${
       auth()?.currentUser?.uid
     }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
@@ -116,13 +115,11 @@ const EditProfileScreen = () => {
       const _avatar = await storage().ref(_avatarRef).getDownloadURL();
       if (_avatar.length > 0) {
         pushImage(_avatar);
-        console.log('push data 1');
       }
     });
   }
 
   function pushImage(pureImageUrl) {
-    console.log('push image 0');
     firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -140,11 +137,10 @@ const EditProfileScreen = () => {
           3000,
         );
       });
-    console.log('push image 1');
   }
 
-  function pushNames() {
-    firestore()
+  async function pushNames() {
+    await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
@@ -202,7 +198,7 @@ const EditProfileScreen = () => {
             rippleColor={COLORS.rippleColor}
             borderless={false}
             onPress={() => {
-              navigation.goBack();
+              navigation?.goBack();
             }}>
             <Avatar.Icon
               icon={BackImage}
@@ -366,16 +362,22 @@ const EditProfileScreen = () => {
               } else {
                 setLoaderVisible(!loaderVisible);
                 if (UserPhoto) {
-                  pushUserData();
-                  if (loaderVisible) {
+                  pushUserData().finally(() => {
                     setLoaderVisible(false);
-                  }
+                    if (
+                      firstName !== oldFirstname ||
+                      lastName !== oldLastname
+                    ) {
+                      // do nothing, easy
+                    } else {
+                      setLoaderVisible(false);
+                    }
+                  });
                 }
                 if (firstName !== oldFirstname || lastName !== oldLastname) {
-                  pushNames();
-                  if (loaderVisible) {
+                  pushNames().finally(() => {
                     setLoaderVisible(false);
-                  }
+                  });
                 }
               }
             } else {

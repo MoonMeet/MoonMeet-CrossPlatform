@@ -1,3 +1,11 @@
+import AsyncStorage from '@react-native-community/async-storage';
+import analytics from '@react-native-firebase/analytics';
+import appCheck from '@react-native-firebase/app-check';
+import auth from '@react-native-firebase/auth';
+import crashlytics from '@react-native-firebase/crashlytics';
+import firestore from '@react-native-firebase/firestore';
+import {useNavigation} from '@react-navigation/native';
+import {Center, HStack, VStack} from 'native-base';
 import React, {useEffect} from 'react';
 import {
   Image,
@@ -7,20 +15,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import LogoImage from '../assets/images/logo.png';
+import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import AsyncStorage from '@react-native-community/async-storage';
-import auth from '@react-native-firebase/auth';
-import crashlytics from '@react-native-firebase/crashlytics';
-import analytics from '@react-native-firebase/analytics';
-import firestore from '@react-native-firebase/firestore';
-import appCheck from '@react-native-firebase/app-check';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
 
   const [getViewPagerStats, setViewPagerStats] = React.useState('');
-  const [havePasscode, setHavePasscode] = React.useState(false);
   /**
    * Getting Data from AsyncStorage
    */
@@ -80,17 +82,14 @@ const SplashScreen = () => {
 
   return (
     <SafeAreaView style={styles.fill_screen}>
-      <View style={styles.container}>
+      <VStack style={styles.container}>
         <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
-        <Image
-          style={styles.logo}
-          source={require('../assets/images/logo.png')}
-        />
+        <Image style={styles.logo} source={LogoImage} />
         <Text style={styles.bottom_text}>Moon Meet</Text>
         <Text style={styles.slogan_text}>
           We give people the closest distances
         </Text>
-      </View>
+      </VStack>
     </SafeAreaView>
   );
 };
@@ -105,31 +104,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
-    padding: '2%',
   },
   logo: {
-    height: 230,
-    width: 230,
+    height: heightPercentageToDP(30),
+    width: widthPercentageToDP(55),
     position: 'relative',
-    bottom: '13%',
+    bottom: heightPercentageToDP(13.5),
   },
   bottom_text: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 20,
-    bottom: '6.5%',
+    bottom: heightPercentageToDP(6.25),
     color: COLORS.accentLight,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.bold,
   },
   slogan_text: {
     position: 'absolute',
     textAlign: 'center',
     fontSize: 16,
-    bottom: '2.5%',
+    bottom: heightPercentageToDP(2.75),
     color: COLORS.black,
     fontFamily: FONTS.regular,
     opacity: 0.4,
   },
 });
 
-export default React.memo(SplashScreen);
+export default SplashScreen;
