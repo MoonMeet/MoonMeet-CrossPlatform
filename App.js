@@ -4,6 +4,7 @@ import {UIManager, Platform} from 'react-native';
 import {Provider} from 'react-redux';
 import {store, persistor} from './src/state/store';
 import {PersistGate} from 'redux-persist/integration/react';
+import {NativeBaseProvider} from 'native-base';
 import Toast from 'react-native-toast-message';
 
 const App = () => {
@@ -16,8 +17,10 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <StackNavigator />
-        <Toast />
+        <NativeBaseProvider>
+          <StackNavigator />
+          <Toast />
+        </NativeBaseProvider>
       </PersistGate>
     </Provider>
   );

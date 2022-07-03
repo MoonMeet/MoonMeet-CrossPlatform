@@ -23,6 +23,7 @@ DerivedData
 ios/.xcode.env.local
 .cxx
 cxx/
+ios/.xcode.env.local
 
 # Android/IntelliJ
 #
@@ -54,10 +55,6 @@ buck-out/
 **/fastlane/Preview.html
 **/fastlane/screenshots
 **/fastlane/test_output
-
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
 
 # Bundle artifact
 *.jsbundle
