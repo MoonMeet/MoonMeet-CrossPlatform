@@ -28,8 +28,7 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
-import {transformTime} from '../../utils/TimeHandler/TimeHandler';
-import LoadingIndicator from '../Modals/CustomLoader/LoadingIndicator';
+import moment from 'moment';
 
 interface ScrollViewContainerInterface {
   firstName: string;
@@ -130,7 +129,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionText={
           props.activeStatus === 'recently'
             ? 'Last seen recently'
-            : transformTime(props?.activeTime)
+            : moment(props?.activeTime).fromNow()
         }
         descriptionColor={COLORS.black}
         onPressTrigger={() => navigation.navigate('activeStatus')}

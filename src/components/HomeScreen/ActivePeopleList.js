@@ -2,7 +2,7 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
-import {transformTime} from '../../utils/TimeHandler/TimeHandler';
+import moment from 'moment';
 
 interface ActivePeopleListInterface {
   ListData: any;
@@ -50,7 +50,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
               {item.first_name + ' ' + item.last_name}
             </Text>
             <Text style={styles.subheading}>
-              {transformTime(item.active_time)}
+              {moment(item.active_time).calendar()}
             </Text>
           </View>
         </Pressable>

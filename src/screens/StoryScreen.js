@@ -191,7 +191,7 @@ const StoryScreen = () => {
                     Object.values(allCurrentUserStories)?.length > 0
                       ? allCurrentUserStories[current]?.time
                       : Date.now(),
-                  ).calendar()}
+                  ).fromNow()}
                 </Text>
               </View>
             </View>

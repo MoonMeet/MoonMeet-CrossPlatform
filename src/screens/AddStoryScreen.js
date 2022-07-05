@@ -33,7 +33,7 @@ import {
 import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import getRandomString from '../utils/StringGenerator/StringGenerator';
+import getRandomString from '../utils/generators/getRandomString';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
