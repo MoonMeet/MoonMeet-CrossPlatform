@@ -2,9 +2,10 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
-import {heightPercentageToDP} from '../../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {transformTimeChats} from '../../utils/TimeHandler/TimeHandler';
 import {useNavigation} from '@react-navigation/native';
+import moment from 'moment';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -63,7 +64,7 @@ const MessagesList = ({ListData}) => {
             <Text style={styles.heading('left')}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
-            <Text style={styles.subheading('left')}>
+            <Text style={styles.subheading('left', true)}>
               {item?.to_message_uid !== item?.to_message_uid
                 ? item?.to_message_text
                 : 'You: ' + item?.to_message_text}
@@ -75,8 +76,8 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-end',
             }}>
-            <Text style={styles.subheading}>
-              {transformTimeChats(item?.time)}
+            <Text style={styles.subheading('right', false)}>
+              {moment(item?.time).calendar()}
             </Text>
           </View>
         </Pressable>
@@ -99,9 +100,9 @@ const styles = StyleSheet.create({
       fontFamily: FONTS.regular,
     };
   },
-  subheading: align => {
+  subheading: (align, isMessage) => {
     return {
-      fontSize: 14,
+      fontSize: isMessage ? fontValue(14) : fontValue(12),
       paddingTop: '1%',
       textAlign: align,
       color: COLORS.black,

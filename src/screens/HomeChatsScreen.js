@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import StoriesList from '../components/HomeScreen/StoriesList';
 import firestore from '@react-native-firebase/firestore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {fontValue} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 
 const HomeChatsScreen = () => {
@@ -183,7 +183,7 @@ const HomeChatsScreen = () => {
           <View style={styles.left_side}>
             {avatarURL ? (
               <Avatar.Image
-                size={35}
+                size={35.5}
                 source={avatarURL ? {uri: avatarURL} : null}
                 style={{
                   overflow: 'hidden',
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: 'relative',
-    fontSize: 22,
+    fontSize: fontValue(24),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
+    paddingRight: heightPercentageToDP(0.25),
   },
   mid_side: {
     flex: 2,

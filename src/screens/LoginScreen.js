@@ -325,9 +325,10 @@ const LoginScreen = () => {
    * @param {NaN, String} data
    */
 
-  const setData = data => {
+  const setCountryCodeData = data => {
     CountrySetText(data);
   };
+
   /**
    * Clean up NumberText
    * @param {NaN, String} text
@@ -573,7 +574,7 @@ const LoginScreen = () => {
               hideModal={() => {
                 setCountriesVisible(!CountriesVisible);
               }}
-              CountriesData={setData}
+              CountryCode={setCountryCodeData}
             />
             <LoginHelp
               isVisible={isLoginHelpVisible}

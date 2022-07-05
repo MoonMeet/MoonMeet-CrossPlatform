@@ -6,6 +6,7 @@ import {transformTime} from '../../utils/TimeHandler/TimeHandler';
 import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../MiniBaseView/MiniBaseView';
 import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 
 interface UserListInterface {
   ListData: any;
@@ -51,7 +52,7 @@ const UserList = (props: UserListInterface) => {
                   <Text style={styles.subheading}>
                     {item?.active_status === 'recently'
                       ? 'Last seen recently'
-                      : transformTime(item?.active_time)}
+                      : moment(item?.active_time).calendar()}
                   </Text>
                 </View>
               </Pressable>

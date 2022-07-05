@@ -12,7 +12,7 @@ const FONTS = {
 };
 
 const COLORS = {
-  primaryLight: '#FFFFFFFF',
+  primaryLight: '#fffefe',
   primaryDark: '#121212',
   accentLight: '#566193',
   accentDark: '#121212',
@@ -25,8 +25,8 @@ const COLORS = {
   redDarkError: '#CF6679',
   yellowLightWarning: '#ffff00',
   yellowDarkWarning: '#ffca28',
-  black: '#000000',
-  white: '#FFFFFFFF',
+  black: '#2f3042',
+  white: '#fffefe',
   transparent: '#00000000',
   purple: '#9B59B6',
   blue: '#2471A3',

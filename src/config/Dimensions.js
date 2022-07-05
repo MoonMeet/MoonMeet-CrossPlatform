@@ -10,7 +10,7 @@ export const screenWidth: number = Dimensions.get('window').width;
 
 export const fontValue = (
   fontSize: number,
-  standardScreenHeight: number = 814,
+  standardScreenHeight: number = screenHeight,
 ): number => {
   const heightPercent = (fontSize * screenHeight) / standardScreenHeight;
   return PixelRatio.roundToNearestPixel(heightPercent);

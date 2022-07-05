@@ -9,6 +9,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
+import {fontValue} from '../config/Dimensions';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
@@ -126,7 +127,7 @@ const HomePeopleScreen = () => {
             <View style={styles.left_side}>
               {avatarURL ? (
                 <Avatar.Image
-                  size={35}
+                  size={35.5}
                   source={avatarURL ? {uri: avatarURL} : null}
                   style={{
                     overflow: 'hidden',
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: 'relative',
-    fontSize: 22,
+    fontSize: fontValue(24),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',

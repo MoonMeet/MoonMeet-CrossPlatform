@@ -7,6 +7,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
+import {fontValue} from '../config/Dimensions';
 
 const HomeSettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   toolbar_text: {
-    fontSize: 22,
+    fontSize: fontValue(24),
     paddingLeft: '2%',
     paddingRight: '3%',
     textAlign: 'center',

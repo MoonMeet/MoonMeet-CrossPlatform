@@ -2,6 +2,7 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {transformTimeDevices} from '../../utils/TimeHandler/TimeHandler';
+import moment from 'moment';
 
 interface UserListInterface {
   ListData: any;
@@ -37,7 +38,7 @@ const DevicesList = (props: UserListInterface) => {
             </View>
             <View style={styles.right_side}>
               <Text style={styles.subheading}>
-                {transformTimeDevices(item.time)}
+                {moment(item?.time).calendar()}
               </Text>
             </View>
           </Pressable>

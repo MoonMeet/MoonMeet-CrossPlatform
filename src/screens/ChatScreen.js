@@ -18,11 +18,11 @@ import {
   heightPercentageToDP,
 } from '../config/Dimensions';
 import { COLORS, FONTS } from '../config/Miscellaneous';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
   const destinedUser = useRoute()?.params?.item;
-  console.log(destinedUser);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
@@ -122,41 +122,41 @@ const ChatScreen = () => {
     } else {
       // Send message to user logic goes here.
       setMessageText(mMessageText.trim());
-      setChatData(previousMessage =>
+      firestore()
+        .collection('users')
+        .doc(auth()?.currentUser?.uid)
+        .collection('messages')
+        .doc(userUID)
+        .collection('discussions')
+        .add({
+          _id: _id,
+          text: mMessageText,
+          createdAt: Date.now(),
+          user: {
+            _id: myUID,
+            name: myFirstName + ' ' + myLastName,
+            avatar: myAvatar,
+          },
+        });
+      firestore()
+        .collection('users')
+        .doc(userUID)
+        .collection('messages')
+        .doc(auth()?.currentUser?.uid)
+        .collection('discussions')
+        .add({
+          _id: _id,
+          createdAt: Date.now(),
+          text: mMessageText,
+          user: {
+            _id: myUID,
+            name: myFirstName + ' ' + myLastName,
+            avatar: myAvatar,
+          },
+        });
+        setChatData(previousMessage =>
         GiftedChat.append(previousMessage, mChatData),
       );
-      firestore()
-        .collection('users')
-        .doc(auth()?.currentUser?.uid)
-        .collection('messages')
-        .doc(userUID)
-        .collection('discussions')
-        .add({
-          _id: _id,
-          text: mMessageText,
-          createdAt: Date.now(),
-          user: {
-            _id: myUID,
-            name: myFirstName + ' ' + myLastName,
-            avatar: myAvatar,
-          },
-        });
-      firestore()
-        .collection('users')
-        .doc(userUID)
-        .collection('messages')
-        .doc(auth()?.currentUser?.uid)
-        .collection('discussions')
-        .add({
-          _id: _id,
-          createdAt: Date.now(),
-          text: mMessageText,
-          user: {
-            _id: myUID,
-            name: myFirstName + ' ' + myLastName,
-            avatar: myAvatar,
-          },
-        });
       // Chats messages on home screen goes here
       firestore()
         .collection('chats')
@@ -230,6 +230,30 @@ const ChatScreen = () => {
           <Text style={styles.userFullName}>
             {userFirstName} {userLastName}
           </Text>
+        </View>
+        <View style={styles.right_side}>
+        <TouchableRipple
+            rippleColor={COLORS.rippleColor}
+            borderless={false}
+            onPress={() => {
+              navigation?.navigate('userProfile', {uid: userUID});
+            }}>
+            <Avatar.Icon
+              icon={<AntDesign name="home" />}
+              size={37.5}
+              color={COLORS.black}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+                opacity: 0.4,
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.transparent,
+                },
+              }}
+            />
+          </TouchableRipple>
         </View>
       </View>
       <View
@@ -331,6 +355,12 @@ const styles = StyleSheet.create({
     width: (Dimensions.get('window').width / 100) * 93.37,
     alignSelf: 'center',
     marginBottom: 10,
+  },
+  right_side: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
 });
 export default ChatScreen;

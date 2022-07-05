@@ -27,6 +27,7 @@ import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet'
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {any} from 'prop-types';
+import moment from 'moment';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -186,11 +187,11 @@ const StoryScreen = () => {
                   {storyFirstName + ' ' + storyLastName}
                 </Text>
                 <Text style={styles.timeText}>
-                  {transformTimeForStories(
+                  {moment(
                     Object.values(allCurrentUserStories)?.length > 0
                       ? allCurrentUserStories[current]?.time
                       : Date.now(),
-                  )}
+                  ).calendar()}
                 </Text>
               </View>
             </View>

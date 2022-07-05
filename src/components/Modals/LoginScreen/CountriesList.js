@@ -13,11 +13,13 @@ import {ActivityIndicator, IconButton, Searchbar} from 'react-native-paper';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
 import BackImage from '../../../assets/images/back.png';
+import SearchImage from '../../../assets/images/search.png';
+import ClearImage from '../../../assets/images/clear.png';
 
 interface CountriesListInterface {
   isVisible: boolean;
   hideModal: Function;
-  CountriesData: String;
+  CountryCode: String;
 }
 
 const CountriesList = (props: CountriesListInterface) => {
@@ -42,10 +44,6 @@ const CountriesList = (props: CountriesListInterface) => {
   const [MasterData, setMasterData] = React.useState([]);
 
   const [DataLoading, setDadaLoading] = React.useState(true);
-
-  const SearchImage = require('../../../assets/images/search.png');
-
-  const ClearImage = require('../../../assets/images/clear.png');
 
   /**
    * set FlatList Data.
@@ -102,17 +100,10 @@ const CountriesList = (props: CountriesListInterface) => {
           style={styles.container}
           onPress={() => {
             props.hideModal();
-            props.CountriesData(item.dial_code);
+            props.CountryCode(item?.dial_code);
           }}>
-          <Text
-            style={styles.country_text}
-            onPress={() => {
-              props.hideModal();
-              props.CountriesData(item.dial_code);
-            }}>
-            {item.name}
-          </Text>
-          <Text style={styles.dial_text}>{item.dial_code}</Text>
+          <Text style={styles.country_text}>{item?.name}</Text>
+          <Text style={styles.dial_text}>{item?.dial_code}</Text>
         </Pressable>
       </View>
     );

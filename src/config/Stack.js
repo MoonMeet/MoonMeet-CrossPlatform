@@ -28,6 +28,8 @@ import SearchChatsScreen from '../screens/SearchChatsScreen';
 import SetupScreen from '../screens/SetupScreen';
 import SplashScreen from '../screens/SplashScreen';
 import StoryScreen from '../screens/StoryScreen';
+import ChatScreen from '../screens/ChatScreen';
+import UserProfileScreen from '../screens/UserProfileScreen';
 
 import {Avatar} from 'react-native-paper';
 
@@ -36,7 +38,6 @@ import {COLORS} from './Miscellaneous';
 import ChatIcon from '../assets/images/chat.png';
 import SettingsIcon from '../assets/images/settings.png';
 import PeopleIcon from '../assets/images/two_people.png';
-import ChatScreen from '../screens/ChatScreen';
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {heightPercentageToDP} from './Dimensions';
@@ -51,7 +52,7 @@ function HomeScreen() {
       initialRouteName={'Chats'}
       activeColor={COLORS.accentLight}
       inactiveColor={COLORS.darkGrey}
-      barStyle={{backgroundColor: COLORS.white}}>
+      barStyle={{backgroundColor: COLORS.primaryLight}}>
       <Tab.Screen
         name="Chats"
         component={HomeChats}
@@ -141,9 +142,10 @@ const StackNavigator = () => {
           name={'passcodeVerify'}
           component={VerifyPasscodeScreen}
         />
+        <Stack.Screen name={'userProfile'} component={UserProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-export default React.memo(StackNavigator);
+export default StackNavigator;

@@ -25,6 +25,7 @@ import placeHolderPhoto from '../assets/images/pick-photo.png';
 import ArrowForward from '../assets/images/arrow-forward.png';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const SetupScreen = ({route}) => {
   const [UserPhoto, setUserPhoto] = React.useState(null);
@@ -384,10 +385,7 @@ const styles = StyleSheet.create({
   },
   large_box: {
     flexDirection: 'row',
-    paddingTop: '3%',
-    paddingBottom: '3%',
-    paddingLeft: '2%',
-    paddingRight: '2%',
+    padding: heightPercentageToDP(1.5),
   },
   fab: {
     position: 'absolute',
