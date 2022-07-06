@@ -1,14 +1,8 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import BaseView from '../components/BaseView/BaseView';
 import {StyleSheet, Text, View} from 'react-native';
-import {
-  Avatar,
-  FAB,
-  HelperText,
-  TextInput,
-  TouchableRipple,
-} from 'react-native-paper';
-import BackImage from '../assets/images/back.png';
+import {FAB, HelperText, TextInput} from 'react-native-paper';
+// import BackImage from '../assets/images/back.png';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
@@ -21,6 +15,7 @@ import {
   ErrorToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const ReportProblemScreen = () => {
   const navigation = useNavigation();
@@ -31,22 +26,8 @@ const ReportProblemScreen = () => {
   let isConnected = NetInfo.fetch().then(networkState => {
     isConnected = networkState?.isConnected;
   });
-
-  /**
-   * Dummy NetInfoObserver
-   */
-
-  const addNetInfoObserver = () => {
-    NetInfo.addEventListener(networkState => {
-      console.info(networkState.details);
-      console.info(networkState.type);
-    });
-  };
-
   const [ReportText, setReportText] = React.useState('');
 
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
   const [loaderVisible, setLoaderVisible] = React.useState(false);
 
   const onReportTextChange = _reportText => setReportText(_reportText);
@@ -81,7 +62,7 @@ const ReportProblemScreen = () => {
           3000,
         );
         setLoaderVisible(false);
-        navigation.goBack();
+        navigation?.goBack();
       });
   }
 
@@ -95,7 +76,7 @@ const ReportProblemScreen = () => {
 
   return (
     <BaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             borderless={false}
@@ -123,8 +104,8 @@ const ReportProblemScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>What happened ?</Text>
         </View>
-      </View>
-      <Spacer height={'1%'} />
+      </View>*/}
+      <Spacer height={heightPercentageToDP(0.5)} />
       <Text style={styles.bugInfo}>
         We will need to help as soon as you describe the problem in the
         paragraphs bellow
@@ -247,4 +228,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ReportProblemScreen);
+export default ReportProblemScreen;

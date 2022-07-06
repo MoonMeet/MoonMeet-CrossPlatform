@@ -20,6 +20,7 @@ import {v4 as uuidv4} from 'uuid';
 import AsyncStorage from '@react-native-community/async-storage';
 import DevicesList from '../components/DevicesScreen/DevicesList';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const DevicesScreen = () => {
   const navigation = useNavigation();
@@ -50,7 +51,9 @@ const DevicesScreen = () => {
             devicesSnapshot.push(childSnapshot?.data());
           }
         });
-        setMasterData(devicesSnapshot);
+        setMasterData(
+          Object?.values(devicesSnapshot)?.sort((a, b) => b?.time - a?.time),
+        );
         setLoading(false);
       });
     return () => {
@@ -88,7 +91,9 @@ const DevicesScreen = () => {
         .then(allDevicesDocs => {
           Promise.all(
             allDevicesDocs?.docs?.map(subMap => subMap?.ref?.delete()),
-          );
+          ).catch(() => {
+            Promise.reject('cannot delete devices sessions!');
+          });
         })
         .finally(async () => {
           await firestore()
@@ -132,7 +137,7 @@ const DevicesScreen = () => {
 
   return (
     <MiniBaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             rippleColor={COLORS.rippleColor}
@@ -160,8 +165,8 @@ const DevicesScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Devices</Text>
         </View>
-      </View>
-      <Spacer height={'1%'} />
+      </View>*/}
+      <Spacer height={heightPercentageToDP(0.75)} />
       <Text style={styles.miniHeaderText}>This device</Text>
       <View style={styles.under_header}>
         <View style={{flexDirection: 'column'}}>
@@ -293,4 +298,4 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 });
-export default React.memo(DevicesScreen);
+export default DevicesScreen;

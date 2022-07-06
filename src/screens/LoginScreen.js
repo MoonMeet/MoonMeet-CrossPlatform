@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useRef} from 'react';
 import {
   BackHandler,
   Keyboard,
@@ -11,9 +11,9 @@ import {
   FAB,
   IconButton,
   Menu,
-  Provider,
   Snackbar,
   TextInput,
+  Provider,
 } from 'react-native-paper';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -28,6 +28,7 @@ import OTPTextView from '../components/OtpView/OTPTextInput';
 import firestore from '@react-native-firebase/firestore';
 import LoginHelp from '../components/Modals/LoginScreen/LoginHelp';
 import ArrowForward from '../assets/images/arrow-forward.png';
+import DotsImage from '../assets/images/dots.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
@@ -343,16 +344,11 @@ const LoginScreen = () => {
     NumberSetText(text.replace(_regexNumberOnly, ''));
   };
 
-  const DotsImage = require('../assets/images/dots.png');
-
   return (
     //////////////////////////// FIRST PART ////////////////////////////
     <BaseView>
       <Provider>
-        <View
-          style={{
-            alignItems: 'flex-end',
-          }}>
+        <View style={{alignItems: 'flex-end'}}>
           <Menu
             visible={MenuVisible}
             onDismiss={closeMenu}
@@ -395,7 +391,8 @@ const LoginScreen = () => {
                   opacity: 0.4,
                   fontFamily: FONTS.regular,
                 }}>
-                You will receive a verification code, Carrier rates may apply.
+                You will receive a verification code, Carrier rates {'\n'} may
+                apply.
               </Text>
             </View>
             <View
@@ -718,4 +715,4 @@ const styles = StyleSheet.create({
     };
   },
 });
-export default React.memo(LoginScreen);
+export default LoginScreen;

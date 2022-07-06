@@ -53,7 +53,7 @@ const ActiveStatusScreen = () => {
   }, []);
   return (
     <MiniBaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             borderless={false}
@@ -81,7 +81,7 @@ const ActiveStatusScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Active Status</Text>
         </View>
-      </View>
+      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.switchRow}>
         <Text style={styles.activeText}>Show when you're active</Text>
@@ -196,4 +196,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ActiveStatusScreen);
+export default ActiveStatusScreen;

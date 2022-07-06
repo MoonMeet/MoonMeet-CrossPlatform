@@ -1,5 +1,12 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
-import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {
+  BackHandler,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {Avatar, Provider} from 'react-native-paper';
@@ -69,6 +76,15 @@ const HomeChatsScreen = () => {
       });
   }
 
+  async function deleteCurrentStory(uid, sid) {
+    return await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('stories')
+      .doc(sid)
+      .delete();
+  }
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -82,16 +98,6 @@ const HomeChatsScreen = () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
-
-  async function deleteCurrentStory(uid, sid) {
-    return await firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('stories')
-      .doc(sid)
-      .delete();
-  }
-
   useEffect(() => {
     const userSusbcribe = firestore()
       .collection('users')

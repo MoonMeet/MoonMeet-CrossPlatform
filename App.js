@@ -6,8 +6,11 @@ import {store, persistor} from './src/state/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {NativeBaseProvider} from 'native-base';
 import Toast from 'react-native-toast-message';
+import {enableFreeze} from 'react-native-screens';
 
 const App = () => {
+  // Enabling the expremental freeze of react-native-screens
+  enableFreeze(true);
   // TODO: add application animation
   if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
