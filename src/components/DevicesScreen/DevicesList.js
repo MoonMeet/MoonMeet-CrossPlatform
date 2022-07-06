@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(DevicesList);
+export default DevicesList;

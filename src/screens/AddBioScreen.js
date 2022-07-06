@@ -118,7 +118,7 @@ const AddBioScreen = () => {
 
   return (
     <BaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             borderless={false}
@@ -146,7 +146,7 @@ const AddBioScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Add Bio</Text>
         </View>
-      </View>
+      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View
         style={{
@@ -259,4 +259,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default React.memo(AddBioScreen);
+export default AddBioScreen;

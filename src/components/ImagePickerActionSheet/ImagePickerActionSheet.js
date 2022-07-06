@@ -113,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ImagePickerActionSheet);
+export default ImagePickerActionSheet;

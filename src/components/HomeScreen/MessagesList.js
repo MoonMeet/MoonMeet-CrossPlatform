@@ -118,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(MessagesList);
+export default MessagesList;

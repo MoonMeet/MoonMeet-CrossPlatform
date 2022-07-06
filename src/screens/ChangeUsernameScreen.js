@@ -22,6 +22,7 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
+import {heightPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 
 const ChangeUsernameScreen = () => {
@@ -61,8 +62,8 @@ const ChangeUsernameScreen = () => {
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
           if (documentSnapshot?.data()?.username) {
-            setUsernameText(documentSnapshot?.data().username);
-            setOldUsernameText(documentSnapshot?.data().username);
+            setUsernameText(documentSnapshot?.data()?.username);
+            setOldUsernameText(documentSnapshot?.data()?.username);
             setLoading(false);
           }
         }
@@ -134,7 +135,7 @@ const ChangeUsernameScreen = () => {
 
   return (
     <BaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             borderless={false}
@@ -162,8 +163,8 @@ const ChangeUsernameScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Change Username</Text>
         </View>
-      </View>
-      <Spacer height={'1%'} />
+      </View>*/}
+      <Spacer height={heightPercentageToDP(0.5)} />
       <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
         <TextInput
           style={{
@@ -283,4 +284,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default React.memo(ChangeUsernameScreen);
+export default ChangeUsernameScreen;

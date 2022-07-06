@@ -97,4 +97,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(ActivePeopleList);
+export default ActivePeopleList;

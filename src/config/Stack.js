@@ -164,6 +164,7 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen
@@ -178,14 +179,54 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen
           name={'changeUsername'}
           component={ChangeUsernameScreen}
+          options={{
+            headerTitle: 'Change Username',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
         />
-        <Stack.Screen name={'addBio'} component={AddBioActivity} />
-        <Stack.Screen name={'editProfile'} component={EditProfileScreen} />
+        <Stack.Screen
+          name={'addBio'}
+          component={AddBioActivity}
+          options={{
+            headerTitle: 'Add Bio',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
+        <Stack.Screen
+          name={'editProfile'}
+          component={EditProfileScreen}
+          options={{
+            headerTitle: 'Edit Profile',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
         <Stack.Screen
           name={'devices'}
           component={DevicesScreen}
@@ -198,6 +239,7 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />

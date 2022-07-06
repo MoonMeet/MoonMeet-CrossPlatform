@@ -52,4 +52,4 @@ const StoryViewsActionSheet = (props: StoryViewsInterface) => {
   );
 };
 const styles = StyleSheet.create({});
-export default React.memo(StoryViewsActionSheet);
+export default StoryViewsActionSheet;

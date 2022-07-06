@@ -511,4 +511,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(StoryScreen);
+export default StoryScreen;

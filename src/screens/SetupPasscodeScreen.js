@@ -364,4 +364,4 @@ const styles = StyleSheet.create({
     };
   },
 });
-export default React.memo(SetupPasscodeScreen);
+export default SetupPasscodeScreen;

@@ -27,6 +27,7 @@ import NetInfo from '@react-native-community/netinfo';
 import storage from '@react-native-firebase/storage';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -192,7 +193,7 @@ const EditProfileScreen = () => {
 
   return (
     <BaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             rippleColor={COLORS.rippleColor}
@@ -220,8 +221,8 @@ const EditProfileScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Edit Profile</Text>
         </View>
-      </View>
-      <Spacer height={'1%'} />
+      </View>*/}
+      <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.avatarHolder}>
         <Avatar.Image
           size={85}
@@ -494,4 +495,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-export default React.memo(EditProfileScreen);
+export default EditProfileScreen;

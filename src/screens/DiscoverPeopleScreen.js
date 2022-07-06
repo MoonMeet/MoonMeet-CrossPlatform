@@ -126,4 +126,4 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 });
-export default React.memo(DiscoverPeopleScreen);
+export default DiscoverPeopleScreen;

@@ -218,4 +218,4 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
 });
-export default React.memo(LoginHelp);
+export default LoginHelp;
