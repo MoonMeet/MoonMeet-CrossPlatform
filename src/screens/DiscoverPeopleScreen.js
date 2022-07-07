@@ -8,7 +8,7 @@ import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import UserList from '../components/DiscoverPeopleScreen/UserList';
 import firestore from '@react-native-firebase/firestore';
-import {fontValue} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
 const DiscoverPeopleScreen = () => {
   const navigation = useNavigation();
@@ -60,7 +60,7 @@ const DiscoverPeopleScreen = () => {
   }
   return (
     <MiniBaseView>
-      <View style={styles.toolbar}>
+      {/**<View style={styles.toolbar}>
         <View style={styles.left_side}>
           <TouchableRipple
             rippleColor={COLORS.rippleColor}
@@ -88,8 +88,8 @@ const DiscoverPeopleScreen = () => {
         <View style={styles.mid_side}>
           <Text style={styles.toolbar_text}>Discover People</Text>
         </View>
-      </View>
-      <Spacer height={'1%'} />
+      </View>*/}
+      <Spacer height={heightPercentageToDP(0.5)} />
       <UserList ListData={masterData} onLongPressTrigger={null} />
     </MiniBaseView>
   );

@@ -8,6 +8,8 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
 import {Box, HStack} from 'native-base';
 import {heightPercentageToDP} from '../config/Dimensions';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import {AvatarHeaderScrollView} from 'react-native-sticky-parallax-header';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
@@ -43,61 +45,27 @@ const UserProfileScreen = () => {
       });
     return () => {};
   }, [userUID]);
+
   return (
-    <BaseView>
-      <View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation?.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-      </View>
-      <HStack flexDirection={'row'} padding={heightPercentageToDP(1.5)}>
-        <Box flexDirection={'row'} alignItems={'center'}>
-          <Avatar.Image
-            size={60}
-            source={avatarURL ? {uri: avatarURL} : null}
-          />
-          <View
-            style={{
-              height: '-1%',
-              width: '3%',
-            }}
-          />
-          <Box flexDirection={'column'} alignItems={'flex-start'}>
-            <Text style={styles.under_header_text}>
-              {firstName + ' ' + lastName}
-            </Text>
-            <Text
-              onPress={() => navigation?.navigate('addBio')}
-              style={styles.bioText(bioText)}>
-              {bioText}
-            </Text>
-          </Box>
-        </Box>
-      </HStack>
-    </BaseView>
+    <MiniBaseView>
+      <AvatarHeaderScrollView
+        leftTopIcon={iconCloseWhite}
+        leftTopIconOnPress={() => navigation?.goBack()}
+        rightTopIcon={IconMenu}
+        contentContainerStyle={[COLORS.primaryLight]}
+        containerStyle={screenStyles.stretchContainer}
+        backgroundColor={COLORS.accentLight}
+        hasBorderRadius
+        image={Brandon.image}
+        subtitle={Brandon.about}
+        title={Brandon.author}
+        titleStyle={screenStyles.text}
+        showsVerticalScrollIndicator={false}
+      />
+    </MiniBaseView>
   );
 };
+
 const styles = StyleSheet.create({
   left_side: {
     justifyContent: 'flex-start',
