@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(BaseView);
+export default BaseView;

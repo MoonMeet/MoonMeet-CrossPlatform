@@ -8,7 +8,11 @@ import OTPTextView from '../components/OtpView/OTPTextInput';
 import {IconButton} from 'react-native-paper';
 
 import BackImage from '../assets/images/back.png';
-import {fontValue, heightPercentageToDP} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/Dimensions';
 import ArrowForward from '../assets/images/arrow-forward.png';
 
 import auth from '@react-native-firebase/auth';
@@ -62,7 +66,7 @@ const SetupPasscodeScreen = () => {
   if (mSettingRecoveryPassword) {
     return (
       <BaseView>
-        <View
+        {/**<View
           style={{
             alignItems: 'flex-start',
           }}>
@@ -74,7 +78,7 @@ const SetupPasscodeScreen = () => {
               navigation.goBack();
             }}
           />
-        </View>
+        </View>*/}
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             Please set a Recovery Password and Hint in case You forget your PIN
@@ -211,7 +215,7 @@ const SetupPasscodeScreen = () => {
   } else {
     return (
       <BaseView>
-        <View
+        {/**<View
           style={{
             alignItems: 'flex-start',
           }}>
@@ -223,7 +227,7 @@ const SetupPasscodeScreen = () => {
               navigation.goBack();
             }}
           />
-        </View>
+        </View>*/}
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             {mConfirmingCodeForSetup
@@ -332,17 +336,13 @@ const styles = StyleSheet.create({
   },
   top_bar: {
     flexDirection: 'row',
-    paddingTop: '3%',
-    paddingBottom: '3%',
-    paddingLeft: '2%',
-    paddingRight: '2%',
+    paddingTop: heightPercentageToDP(1),
+    paddingBottom: heightPercentageToDP(1),
     justifyContent: 'center',
   },
   top_text: {
     position: 'relative',
     fontSize: fontValue(28),
-    paddingLeft: '3%',
-    paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
@@ -364,4 +364,4 @@ const styles = StyleSheet.create({
     };
   },
 });
-export default React.memo(SetupPasscodeScreen);
+export default SetupPasscodeScreen;

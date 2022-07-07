@@ -645,4 +645,4 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 });
-export default React.memo(AddStoryScreen);
+export default AddStoryScreen;

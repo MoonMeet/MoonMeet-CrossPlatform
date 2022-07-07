@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
     };
   },
 });
-export default React.memo(MoonChatList);
+export default MoonChatList;

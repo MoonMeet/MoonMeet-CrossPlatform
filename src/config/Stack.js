@@ -164,6 +164,7 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen
@@ -178,14 +179,54 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen
           name={'changeUsername'}
           component={ChangeUsernameScreen}
+          options={{
+            headerTitle: 'Change Username',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
         />
-        <Stack.Screen name={'addBio'} component={AddBioActivity} />
-        <Stack.Screen name={'editProfile'} component={EditProfileScreen} />
+        <Stack.Screen
+          name={'addBio'}
+          component={AddBioActivity}
+          options={{
+            headerTitle: 'Add Bio',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
+        <Stack.Screen
+          name={'editProfile'}
+          component={EditProfileScreen}
+          options={{
+            headerTitle: 'Edit Profile',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
         <Stack.Screen
           name={'devices'}
           component={DevicesScreen}
@@ -198,17 +239,61 @@ const StackNavigator = () => {
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
-        <Stack.Screen name={'discover'} component={DiscoverPeopleScreen} />
+        <Stack.Screen
+          name={'discover'}
+          component={DiscoverPeopleScreen}
+          options={{
+            headerTitle: 'Discover People',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
         <Stack.Screen name={'story'} component={StoryScreen} />
-        <Stack.Screen name={'addStory'} component={AddStoryScreen} />
+        <Stack.Screen
+          name={'addStory'}
+          component={AddStoryScreen}
+          options={{
+            headerShown: false,
+            headerTitle: 'Add Story',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
         <Stack.Screen name={'chat'} component={ChatScreen} />
-        <Stack.Screen name={'passcodeSetup'} component={SetupPasscodeScreen} />
+        <Stack.Screen
+          name={'passcodeSetup'}
+          component={SetupPasscodeScreen}
+          options={{
+            headerTitle: '',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
+        />
         <Stack.Screen
           name={'passcodeVerify'}
           component={VerifyPasscodeScreen}
-          options={{gestureEnabled: false}}
+          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen name={'userProfile'} component={UserProfileScreen} />
       </Stack.Navigator>

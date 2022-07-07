@@ -213,4 +213,4 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   );
 };
 
-export default React.memo(ScrollViewContainer);
+export default ScrollViewContainer;

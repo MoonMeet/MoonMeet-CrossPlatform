@@ -27,4 +27,4 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 });
-export default React.memo(DataItemTitle);
+export default DataItemTitle;

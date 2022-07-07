@@ -135,4 +135,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(IntroScreen);
+export default IntroScreen;

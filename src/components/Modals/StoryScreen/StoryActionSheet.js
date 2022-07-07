@@ -142,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(StoryActionSheet);
+export default StoryActionSheet;

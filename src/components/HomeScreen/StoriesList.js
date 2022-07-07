@@ -6,12 +6,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {Avatar} from 'react-native-paper';
 import AddIcon from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {fontValue} from '../../config/Dimensions';
+import {useNavigation} from '@react-navigation/native';
+import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 
 const StoriesList = ({ListData, myUID}) => {
   function removeDuplicates(arr, equals) {
@@ -99,26 +99,25 @@ const StoriesList = ({ListData, myUID}) => {
         />
         <Text style={styles.storyText}>Add{'\n'}Story</Text>
       </Pressable>
-      <View style={styles.flatListHolder}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingEnd: '13%',
-            alignSelf: 'center',
-            justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
-            minWidth:
-              Dimensions.get('window').width -
-              (13 / 100) * Dimensions.get('window').width,
-          }}
-          removeClippedSubviews={true}
-          initialNumToRender={10}
-          ListEmptyComponent={_listEmptyComponent}
-          data={ListData}
-          renderItem={_renderItem}
-          keyExtractor={item => item?.time}
-        />
-      </View>
+
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingEnd: '13%',
+          alignSelf: 'center',
+          justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
+          minWidth:
+            Dimensions.get('window').width -
+            (13 / 100) * Dimensions.get('window').width,
+        }}
+        removeClippedSubviews={true}
+        initialNumToRender={10}
+        ListEmptyComponent={_listEmptyComponent}
+        data={ListData}
+        renderItem={_renderItem}
+        keyExtractor={item => item?.time}
+      />
     </View>
   );
 };
@@ -140,15 +139,11 @@ const styles = StyleSheet.create({
   },
   storyText: {
     position: 'relative',
-    fontSize: fontValue(12.5),
-    paddingLeft: '2%',
-    paddingRight: '2%',
-    paddingTop: '0.5%',
+    fontSize: fontValue(13),
+    padding: heightPercentageToDP(-0.5),
     textAlign: 'center',
     color: COLORS.black,
-    fontFamily: FONTS.regular,
   },
-  flatListHolder: {},
   emptyView: {
     backgroundColor: COLORS.white,
     height: 85,
@@ -175,7 +170,9 @@ const styles = StyleSheet.create({
   nameAndLastname: {
     textAlign: 'center',
     color: COLORS.black,
+    padding: heightPercentageToDP(-0.5),
+    fontSize: fontValue(13),
   },
 });
 
-export default React.memo(StoriesList);
+export default StoriesList;

@@ -49,4 +49,4 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
 });
-export default React.memo(LoadingIndicator);
+export default LoadingIndicator;

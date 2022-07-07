@@ -155,4 +155,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(FrequentlyAskedQuestions);
+export default FrequentlyAskedQuestions;

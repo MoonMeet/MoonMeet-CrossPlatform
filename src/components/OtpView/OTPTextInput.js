@@ -205,4 +205,4 @@ OTPTextView.defaultProps = {
   keyboardType: 'numeric',
 };
 
-export default React.memo(OTPTextView);
+export default OTPTextView;

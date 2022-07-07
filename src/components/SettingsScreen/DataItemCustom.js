@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(DataItemCustom);
+export default DataItemCustom;

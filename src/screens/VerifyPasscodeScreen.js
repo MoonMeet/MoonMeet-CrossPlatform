@@ -396,4 +396,4 @@ const styles = StyleSheet.create({
     };
   },
 });
-export default React.memo(VerifyPasscodeScreen);
+export default VerifyPasscodeScreen;
