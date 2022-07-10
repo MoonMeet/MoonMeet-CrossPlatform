@@ -16,7 +16,6 @@ import {
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {ActionsProps} from 'react-native-gifted-chat';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
