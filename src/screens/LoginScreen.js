@@ -182,7 +182,7 @@ const LoginScreen = () => {
 
   const [mBottomMargin, setBottomMargin] = React.useState(0);
 
-  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
+  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState('');
 
   const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
 

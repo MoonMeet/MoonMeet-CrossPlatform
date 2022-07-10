@@ -1,6 +1,6 @@
 import ImagePicker from 'react-native-image-crop-picker';
 
-const picker = {
+const AvatarPicker = {
   width: 550,
   height: 650,
   cropping: true,
@@ -8,7 +8,7 @@ const picker = {
 
 export const openImagePicker = () => {
   return new Promise((resolve, reject) => {
-    ImagePicker.openPicker(picker)
+    ImagePicker.openPicker(AvatarPicker, {mediaType: 'photo'})
       .then(image => {
         resolve(image);
       })
@@ -20,7 +20,7 @@ export const openImagePicker = () => {
 
 export const openCamera = () => {
   return new Promise((resolve, reject) => {
-    ImagePicker.openCamera(picker)
+    ImagePicker.openCamera(AvatarPicker)
       .then(image => {
         resolve(image);
       })

@@ -274,7 +274,11 @@ const StackNavigator = () => {
             headerTintColor: COLORS.black,
           }}
         />
-        <Stack.Screen name={'chat'} component={ChatScreen} />
+        <Stack.Screen
+          name={'chat'}
+          component={ChatScreen}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
         <Stack.Screen
           name={'passcodeSetup'}
           component={SetupPasscodeScreen}
