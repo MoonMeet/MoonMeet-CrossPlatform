@@ -1,8 +1,8 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {Dimensions, Keyboard, StyleSheet, Text, View} from 'react-native';
 import {
   Actions,
   GiftedChat,

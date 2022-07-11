@@ -5,21 +5,28 @@ import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import {VStack} from 'native-base';
-import React, {useEffect} from 'react';
-import {
-  Image,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useCallback, useEffect, useLayoutEffect} from 'react';
+import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 const SplashScreen = () => {
+  /**
+   * Splash Screen animations.
+   */
+  const scaleX = useSharedValue(0.1);
+  const scaleY = useSharedValue(0.1);
+  const translateY = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
   const navigation = useNavigation();
 
   const [getViewPagerStats, setViewPagerStats] = React.useState('');
@@ -46,6 +53,20 @@ const SplashScreen = () => {
   useEffect(() => {
     enableFirebaseTools();
     getViewPagerCompleted();
+    const AnimateScene = setTimeout(() => {
+      scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
+      scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
+      opacity.value = withTiming(0, {duration: 275});
+      translateY.value = withDelay(0, withTiming(375, {duration: 500}));
+      translateY.value = withDelay(300, withTiming(0, {duration: 750}));
+      scaleX.value = withSpring(0.09);
+      scaleY.value = withSpring(0.09);
+      scaleX.value = withSpring(0);
+      scaleY.value = withSpring(0);
+      opacity.value = withSpring(1);
+      scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
+      scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
+    }, 750);
     const SplashScreenTimerTask = setTimeout(() => {
       if (getViewPagerStats === 'true') {
         if (auth()?.currentUser !== null) {
@@ -77,19 +98,36 @@ const SplashScreen = () => {
     }, 2000);
     return () => {
       clearTimeout(SplashScreenTimerTask);
+      clearTimeout(AnimateScene);
     };
-  });
+  }, [getViewPagerStats, navigation, opacity, scaleX, scaleY, translateY]);
+
+  const viewAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: translateY.value}],
+    };
+  }, []);
+
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{scaleX: scaleX.value}, {scaleY: scaleY.value}],
+      opacity: opacity.value,
+    };
+  }, []);
 
   return (
     <SafeAreaView style={styles.fill_screen}>
-      <VStack style={styles.container}>
+      <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
-        <Image style={styles.logo} source={LogoImage} />
+        <Animated.Image
+          style={[styles.logo, imageAnimatedStyle]}
+          source={LogoImage}
+        />
         <Text style={styles.bottom_text}>Moon Meet</Text>
         <Text style={styles.slogan_text}>
           We give people the closest distances
         </Text>
-      </VStack>
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -106,8 +144,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    height: heightPercentageToDP(30),
-    width: widthPercentageToDP(55),
+    height: heightPercentageToDP(300),
+    width: widthPercentageToDP(800),
     position: 'relative',
     bottom: heightPercentageToDP(13.5),
   },
