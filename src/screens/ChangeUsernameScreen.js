@@ -45,8 +45,6 @@ const ChangeUsernameScreen = () => {
       console.info(networkState.type);
     });
   };
-  
-  co
 
   const [UsernameText, setUsernameText] = React.useState('');
   const [oldUsernameText, setOldUsernameText] = React.useState('');

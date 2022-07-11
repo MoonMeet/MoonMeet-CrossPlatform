@@ -3,7 +3,14 @@ import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect} from 'react';
 import {Dimensions, StyleSheet, Text, View} from 'react-native';
-import {Actions, GiftedChat} from 'react-native-gifted-chat';
+import {
+  Actions,
+  GiftedChat,
+  InputToolbar,
+  MessageImage,
+  Send,
+  Bubble,
+} from 'react-native-gifted-chat';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
 import BackImage from '../assets/images/back.png';
@@ -12,13 +19,18 @@ import Spacer from '../components/Spacer/Spacer';
 import {
   fontValue,
   heightPercentageToDP,
+  screenHeight,
+  screenWidth,
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import getRandomString from '../utils/generators/getRandomString';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {bytesToSize} from '../utils/converters/ByetToSize';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Image} from 'react-native-compressor';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -49,7 +61,7 @@ const ChatScreen = () => {
   const [mChatData, setChatData] = React.useState([]);
   const [isLoading, setLoading] = React.useState(true);
 
-  let _id = uuidv4();
+  let _id = uuidv4() + getRandomString(3);
 
   useEffect(() => {
     const userSubscribe = firestore()
@@ -116,7 +128,7 @@ const ChatScreen = () => {
   }, [destinedUser]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sendMessage = useCallback((mChatData = [], image?: string) => {
+  const sendMessage = useCallback((mChatData = [], image) => {
     if (!image) {
       if (mMessageText.length < 1) {
         // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
@@ -171,7 +183,7 @@ const ChatScreen = () => {
               to_message_text: mMessageText,
               to_avatar: userAvatar,
               time: Date.now(),
-              type: image ? 'image' : 'message',
+              type: 'message',
               to_uid: userUID,
               from_uid: myUID,
               from_first_name: myFirstName,
@@ -189,7 +201,7 @@ const ChatScreen = () => {
               to_message_text: mMessageText,
               to_avatar: myAvatar,
               time: Date.now(),
-              type: image ? 'image' : 'message',
+              type: 'message',
               to_uid: myUID,
               from_uid: userUID,
               from_first_name: userFirstName,
@@ -201,7 +213,7 @@ const ChatScreen = () => {
         }
       }
     } else {
-      let pickedImage = `chats/${auth()?.currentUser?.uid}.${image?.substring(
+      let pickedImage = `chats/${getRandomString(18)}.${image?.substring(
         image?.lastIndexOf('.') + 1,
         3,
       )}`;
@@ -220,8 +232,16 @@ const ChatScreen = () => {
        */
 
       uploadImageTask.on('state_changed', taskSnapshot => {
-        console.log(
-          `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+        InfoToast(
+          'bottom',
+          'Sending Image',
+          `${
+            bytesToSize(taskSnapshot?.bytesTransferred) === 'N/A'
+              ? 0
+              : bytesToSize(taskSnapshot?.bytesTransferred)
+          } transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
+          true,
+          1000,
         );
       });
 
@@ -352,7 +372,7 @@ const ChatScreen = () => {
               navigation?.navigate('userProfile', {uid: userUID});
             }}>
             <Avatar.Icon
-              icon={<AntDesign name="home" />}
+              icon={<MaterialIcons name="home" />}
               size={37.5}
               color={COLORS.black}
               style={{
@@ -401,8 +421,42 @@ const ChatScreen = () => {
         )}
         showAvatarForEveryMessage={false}
         showUserAvatar={false}
+        renderMessageImage={props => {
+          <MessageImage {...props} />;
+        }}
         onInputTextChanged={text => setMessageText(text)}
         messages={mChatData}
+        renderBubble={props => {
+          return (
+            <Bubble
+              {...props}
+              wrapperStyle={{
+                right: {
+                  backgroundColor: COLORS.accentLight,
+                },
+                left: {
+                  backgroundColor: COLORS.darkGrey,
+                },
+              }}
+            />
+          );
+        }}
+        renderInputToolbar={props => <InputToolbar {...props} />}
+        renderSend={props => {
+          return (
+            <Send {...props}>
+              <MaterialIcons
+                name="send"
+                color={COLORS.darkGrey}
+                size={26}
+                style={{
+                  right: widthPercentageToDP(0.125),
+                  bottom: heightPercentageToDP(1),
+                }}
+              />
+            </Send>
+          );
+        }}
         onSend={messages => {
           sendMessage(messages, '');
           setMessageText('');
@@ -418,7 +472,13 @@ const ChatScreen = () => {
                     width: 1024,
                     cropper: false,
                   })
-                    .then((image: any) => {
+                    .then(async image => {
+                      /*const compressingResult = await Image.compress(
+                        image?.path,
+                        {
+                          compressionMethod: 'auto',
+                        },
+                      );*/
                       sendMessage([], image?.path);
                     })
                     .catch(() => {});
@@ -428,13 +488,14 @@ const ChatScreen = () => {
                 },
               }}
               icon={() => (
-                <Ionicons
+                <MaterialIcons
                   name={'add'}
                   size={28}
-                  color={COLORS.accentLight}
+                  color={COLORS.black}
                   style={{
                     left: widthPercentageToDP(0.125),
                     bottom: heightPercentageToDP(0.125),
+                    opacity: 0.4,
                   }}
                 />
               )}

@@ -5,7 +5,7 @@ import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import {Center, HStack, VStack} from 'native-base';
+import {VStack} from 'native-base';
 import React, {useEffect} from 'react';
 import {
   Image,
@@ -63,16 +63,16 @@ const SplashScreen = () => {
             })
             .finally(() => {
               if (havePasscode) {
-                navigation.navigate('passcodeVerify');
+                navigation?.navigate('passcodeVerify');
               } else {
-                navigation.navigate('home');
+                navigation?.navigate('home');
               }
             });
         } else {
-          navigation.navigate('login');
+          navigation?.navigate('login');
         }
       } else {
-        navigation.navigate('onboarding');
+        navigation?.navigate('onboarding');
       }
     }, 2000);
     return () => {

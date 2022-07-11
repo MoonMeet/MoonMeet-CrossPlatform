@@ -8,7 +8,7 @@
 import React from 'react';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {NavigationContainer, TabRouter} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import ActiveStatusScreen from '../screens/ActiveStatusScreen';
@@ -30,7 +30,7 @@ import SplashScreen from '../screens/SplashScreen';
 import StoryScreen from '../screens/StoryScreen';
 import ChatScreen from '../screens/ChatScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
-import {Avatar, Text} from 'react-native-paper';
+import {Avatar, Text, withTheme} from 'react-native-paper';
 
 import {COLORS, FONTS} from './Miscellaneous';
 
@@ -40,6 +40,7 @@ import PeopleIcon from '../assets/images/two_people.png';
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {fontValue, heightPercentageToDP} from './Dimensions';
+import {CombinedDarkTheme, CombinedDefaultTheme} from './Theme/Theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -110,15 +111,9 @@ function HomeScreen() {
   );
 }
 
-function LogoTitle() {
-  return (
-    <Avatar.Image size={52.5} source={require('../assets/images/logo.png')} />
-  );
-}
-
 const StackNavigator = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={CombinedDefaultTheme}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}

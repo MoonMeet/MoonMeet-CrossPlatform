@@ -16,7 +16,6 @@ const BaseView = ({children}) => {
         onPress={() => {
           Keyboard.dismiss();
         }}>
-        <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
         {children}
       </Pressable>
     </SafeAreaView>
