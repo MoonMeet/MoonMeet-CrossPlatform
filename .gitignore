@@ -63,3 +63,6 @@ buck-out/
 /ios/Pods/
 *.hprof
 *.lock
+
+# Sensitive Information
+src/sensitive.js

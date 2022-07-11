@@ -16,8 +16,15 @@ import com.facebook.react.bridge.JSIModulePackage;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 
 import androidx.multidex.MultiDexApplication;
+import androidx.multidex.MultiDex;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
+
+   @Override
+  protected void attachBaseContext(Context base) {
+     super.attachBaseContext(base);
+     MultiDex.install(this);
+  }
 
   private final ReactNativeHost mReactNativeHost =
       new ReactNativeHost(this) {
@@ -41,7 +48,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
         }
         @Override
         protected JSIModulePackage getJSIModulePackage() {
-          return new ReanimatedJSIModulePackage(); // <- add
+          return new ReanimatedJSIModulePackage(); 
         }
       };
 
