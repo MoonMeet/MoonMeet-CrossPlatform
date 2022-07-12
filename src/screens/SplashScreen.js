@@ -118,7 +118,6 @@ const SplashScreen = () => {
   return (
     <SafeAreaView style={styles.fill_screen}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
-        <StatusBar backgroundColor="#FFFFFF" barStyle={'dark-content'} />
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
           source={LogoImage}

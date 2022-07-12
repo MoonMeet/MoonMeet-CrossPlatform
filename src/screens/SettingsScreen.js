@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {ActivityIndicator, Avatar, Provider} from 'react-native-paper';
+import {ActivityIndicator, Avatar} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
@@ -71,48 +71,46 @@ const SettingsScreen = () => {
     );
   }
   return (
-    <Provider>
-      <MiniBaseView>
-        {/**<View style={styles.toolbar}>
+    <MiniBaseView>
+      {/**<View style={styles.toolbar}>
           <View style={styles.mid_side}>
             <Text style={styles.toolbar_text}>Settings</Text>
           </View>
         </View>*/}
-        <ScrollView>
-          <View style={styles.under_header}>
-            <Avatar.Image
-              size={85}
-              source={avatarURL ? {uri: avatarURL} : null}
-            />
-            <Text style={styles.under_header_text}>
-              {firstName + ' ' + lastName}
-            </Text>
-            {userBio ? (
-              <Text
-                onPress={() => navigation.navigate('addBio')}
-                style={styles.bioText(userBio)}>
-                {userBio}
-              </Text>
-            ) : (
-              <Text
-                style={styles.bioText(userBio)}
-                onPress={() => navigation.navigate('addBio')}>
-                Tap to add a bio
-              </Text>
-            )}
-          </View>
-          <ScrollViewData
-            firstName={firstName}
-            lastName={lastName}
-            username={userName}
-            avatar={avatarURL}
-            userbio={userBio}
-            activeStatus={activeStatus}
-            activeTime={activeTime}
+      <ScrollView>
+        <View style={styles.under_header}>
+          <Avatar.Image
+            size={85}
+            source={avatarURL ? {uri: avatarURL} : null}
           />
-        </ScrollView>
-      </MiniBaseView>
-    </Provider>
+          <Text style={styles.under_header_text}>
+            {firstName + ' ' + lastName}
+          </Text>
+          {userBio ? (
+            <Text
+              onPress={() => navigation.navigate('addBio')}
+              style={styles.bioText(userBio)}>
+              {userBio}
+            </Text>
+          ) : (
+            <Text
+              style={styles.bioText(userBio)}
+              onPress={() => navigation.navigate('addBio')}>
+              Tap to add a bio
+            </Text>
+          )}
+        </View>
+        <ScrollViewData
+          firstName={firstName}
+          lastName={lastName}
+          username={userName}
+          avatar={avatarURL}
+          userbio={userBio}
+          activeStatus={activeStatus}
+          activeTime={activeTime}
+        />
+      </ScrollView>
+    </MiniBaseView>
   );
 };
 
