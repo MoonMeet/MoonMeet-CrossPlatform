@@ -8,7 +8,7 @@ const AvatarPicker = {
 
 export const openImagePicker = () => {
   return new Promise((resolve, reject) => {
-    ImagePicker.openPicker(AvatarPicker, {mediaType: 'photo'})
+    ImagePicker.openPicker(AvatarPicker)
       .then(image => {
         resolve(image);
       })

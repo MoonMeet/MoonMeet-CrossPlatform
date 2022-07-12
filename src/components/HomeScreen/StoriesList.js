@@ -12,6 +12,7 @@ import AddIcon from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
+import {uniqBy} from 'lodash';
 
 const StoriesList = ({ListData, myUID}) => {
   function removeDuplicates(arr, equals) {
@@ -42,7 +43,7 @@ const StoriesList = ({ListData, myUID}) => {
   };
 
   useEffect(() => {
-    getSameUidUser();
+    //getSameUidUser();
   }, [ListData]);
 
   const _listEmptyComponent = () => {
@@ -114,7 +115,7 @@ const StoriesList = ({ListData, myUID}) => {
         removeClippedSubviews={true}
         initialNumToRender={10}
         ListEmptyComponent={_listEmptyComponent}
-        data={ListData}
+        data={uniqBy(ListData, 'uid')}
         renderItem={_renderItem}
         keyExtractor={item => item?.time}
       />

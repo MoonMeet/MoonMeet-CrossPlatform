@@ -28,7 +28,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import getRandomString from '../utils/generators/getRandomString';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
-import {bytesToSize} from '../utils/converters/ByetToSize';
+import {bytesToSize} from '../utils/converters/bytesToSize';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Image} from 'react-native-compressor';
 
