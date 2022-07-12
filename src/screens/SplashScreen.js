@@ -17,7 +17,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {withTheme, useTheme} from 'react-native-paper';
+import {useTheme} from 'react-native-paper';
 
 const SplashScreen = () => {
   const theme = useTheme();
@@ -119,13 +119,13 @@ const SplashScreen = () => {
 
   return (
     <SafeAreaView
-      style={[styles.fill_screen, {backgroundColor: theme.colors.background}]}>
+      style={[styles.fill_screen, {backgroundColor: COLORS.primaryLight}]}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
           source={LogoImage}
         />
-        <Text style={[styles.bottom_text, {color: theme.accent}]}>
+        <Text style={[styles.bottom_text, {color: COLORS.accentLight}]}>
           Moon Meet
         </Text>
         <Text style={styles.slogan_text}>
@@ -170,4 +170,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withTheme(SplashScreen);
+export default SplashScreen;
