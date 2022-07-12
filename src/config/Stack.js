@@ -20,7 +20,8 @@ import DiscoverPeopleScreen from '../screens/DiscoverPeopleScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import HomeChats from '../screens/HomeChatsScreen.js';
 import HomePeople from '../screens/HomePeopleScreen';
-import SettingsScreen from '../screens/HomeSettingsScreen';
+import HomeStories from '../screens/HomeStoriesScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ReportProblem from '../screens/ReportProblemScreen';
@@ -30,13 +31,14 @@ import SplashScreen from '../screens/SplashScreen';
 import StoryScreen from '../screens/StoryScreen';
 import ChatScreen from '../screens/ChatScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
-import {Avatar, Text, withTheme} from 'react-native-paper';
+import {Avatar} from 'react-native-paper';
 
 import {COLORS, FONTS} from './Miscellaneous';
 
 import ChatIcon from '../assets/images/chat.png';
-import SettingsIcon from '../assets/images/settings.png';
+import StoriesIcon from '../assets/images/stories.png';
 import PeopleIcon from '../assets/images/two_people.png';
+
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {fontValue, heightPercentageToDP} from './Dimensions';
@@ -90,13 +92,13 @@ function HomeScreen() {
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
+        name="Stories"
+        component={HomeStories}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: 'Stories',
           tabBarIcon: ({color}) => (
             <Avatar.Icon
-              icon={SettingsIcon}
+              icon={StoriesIcon}
               color={color}
               size={40}
               style={{
@@ -144,6 +146,21 @@ const StackNavigator = () => {
           options={{
             gestureEnabled: false,
             headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={'settings'}
+          component={SettingsScreen}
+          options={{
+            headerTitle: 'Settings',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
           }}
         />
         <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />

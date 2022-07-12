@@ -9,7 +9,7 @@ import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 import {fontValue} from '../config/Dimensions';
 
-const HomeSettingsScreen = () => {
+const SettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
 
   const navigation = useNavigation();
@@ -73,11 +73,11 @@ const HomeSettingsScreen = () => {
   return (
     <Provider>
       <MiniBaseView>
-        <View style={styles.toolbar}>
+        {/**<View style={styles.toolbar}>
           <View style={styles.mid_side}>
             <Text style={styles.toolbar_text}>Settings</Text>
           </View>
-        </View>
+        </View>*/}
         <ScrollView>
           <View style={styles.under_header}>
             <Avatar.Image
@@ -177,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeSettingsScreen;
+export default SettingsScreen;

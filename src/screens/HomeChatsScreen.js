@@ -38,7 +38,7 @@ const HomeChatsScreen = () => {
 
   const [myUID, setMyUID] = React.useState('');
 
-  function checkJwtKey(currentJwtKey: string) {
+  function checkJwtKey(currentJwtKey) {
     AsyncStorage?.getItem('currentUserJwtKey')?.then(_asyncJwt => {
       if (_asyncJwt !== currentJwtKey) {
         AsyncStorage.removeItem('currentUserJwtKey');
@@ -188,19 +188,25 @@ const HomeChatsScreen = () => {
         <View style={styles.toolbar}>
           <View style={styles.left_side}>
             {avatarURL ? (
-              <Avatar.Image
-                size={35.5}
-                source={avatarURL ? {uri: avatarURL} : null}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
+              <Pressable
+                hitSlop={15}
+                onPress={() => {
+                  navigation.navigate('settings');
+                }}>
+                <Avatar.Image
+                  size={35.5}
+                  source={avatarURL ? {uri: avatarURL} : null}
+                  style={{
+                    overflow: 'hidden',
+                    marginRight: '-1%',
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.rippleColor,
+                    },
+                  }}
+                />
+              </Pressable>
             ) : (
               <Avatar.Icon
                 icon={PersonImage}

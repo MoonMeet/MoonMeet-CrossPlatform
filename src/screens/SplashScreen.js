@@ -45,9 +45,9 @@ const SplashScreen = () => {
   };
 
   async function enableFirebaseTools() {
-    await crashlytics().setCrashlyticsCollectionEnabled(true);
-    await analytics().setAnalyticsCollectionEnabled(true);
-    await appCheck().activate('ignored', false);
+    await crashlytics()?.setCrashlyticsCollectionEnabled(true);
+    await analytics()?.setAnalyticsCollectionEnabled(true);
+    await appCheck()?.activate('ignored', false);
   }
 
   useEffect(() => {
