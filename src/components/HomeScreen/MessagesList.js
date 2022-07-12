@@ -3,7 +3,6 @@ import {Avatar} from 'react-native-paper';
 import React from 'react';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
-import {transformTimeChats} from '../../utils/TimeHandler/TimeHandler';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 
@@ -12,9 +11,9 @@ const MessagesList = ({ListData}) => {
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading('center')}>No one active, yet.</Text>
+        <Text style={styles.heading('center')}>No Chats, yet.</Text>
         <Text style={styles.subheading('center')}>
-          there's no one active at the moment.
+          Discover new people to chat with them.
         </Text>
       </View>
     );

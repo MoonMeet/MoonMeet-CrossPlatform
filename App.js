@@ -7,15 +7,17 @@ import {enableFreeze} from 'react-native-screens';
 import {COLORS} from './src/config/Miscellaneous';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {
-  CombinedDarkTheme,
-  CombinedDefaultTheme,
-  PreferencesContext,
+  MoonPaperDarkTheme,
+  MoonPaperLightTheme,
 } from './src/config/Theme/Theme';
+
+// Enabling the experimental freeze of react-native-screens
+enableFreeze(true);
 
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
-  let theme = isThemeDark ? CombinedDarkTheme : CombinedDefaultTheme;
+  let theme = isThemeDark ? MoonPaperDarkTheme : MoonPaperLightTheme;
 
   const toggleTheme = React.useCallback(() => {
     return setIsThemeDark(!isThemeDark);
@@ -28,18 +30,6 @@ const App = () => {
     }),
     [toggleTheme, isThemeDark],
   );
-
-  const MoonPaperTheme = {
-    ...CombinedDarkTheme,
-    colors: {
-      ...CombinedDarkTheme.colors,
-      accent: COLORS.accentLight,
-    },
-    version: 3,
-  };
-
-  // Enabling the experimental freeze of react-native-screens
-  enableFreeze(true);
   // TODO: add application animation
   if (Platform.OS === 'android') {
     if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -47,12 +37,14 @@ const App = () => {
     }
   }
   return (
-    <PaperProvider theme={CombinedDefaultTheme}>
+    <PaperProvider>
       <NativeBaseProvider>
         <StatusBar
-          backgroundColor={COLORS.primaryLight}
+          backgroundColor={
+            isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
+          }
           animated={true}
-          barStyle={'dark-content'}
+          barStyle={isThemeDark ? 'light-content' : 'dark-content'}
         />
         <StackNavigator />
         <Toast />

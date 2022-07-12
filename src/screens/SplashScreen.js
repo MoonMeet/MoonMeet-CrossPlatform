@@ -5,8 +5,8 @@ import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useLayoutEffect} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, Text} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -17,8 +17,10 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {withTheme, useTheme} from 'react-native-paper';
 
 const SplashScreen = () => {
+  const theme = useTheme();
   /**
    * Splash Screen animations.
    */
@@ -116,13 +118,16 @@ const SplashScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.fill_screen}>
+    <SafeAreaView
+      style={[styles.fill_screen, {backgroundColor: theme.colors.background}]}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
           source={LogoImage}
         />
-        <Text style={styles.bottom_text}>Moon Meet</Text>
+        <Text style={[styles.bottom_text, {color: theme.accent}]}>
+          Moon Meet
+        </Text>
         <Text style={styles.slogan_text}>
           We give people the closest distances
         </Text>
@@ -134,7 +139,6 @@ const SplashScreen = () => {
 const styles = StyleSheet.create({
   fill_screen: {
     flex: 1,
-    backgroundColor: COLORS.primaryLight,
   },
   container: {
     flex: 1,
@@ -153,7 +157,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     bottom: heightPercentageToDP(6.25),
-    color: COLORS.accentLight,
     fontFamily: FONTS.bold,
   },
   slogan_text: {
@@ -167,4 +170,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SplashScreen;
+export default withTheme(SplashScreen);

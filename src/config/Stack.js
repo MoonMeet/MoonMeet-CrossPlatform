@@ -42,7 +42,7 @@ import PeopleIcon from '../assets/images/two_people.png';
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {fontValue, heightPercentageToDP} from './Dimensions';
-import {CombinedDarkTheme, CombinedDefaultTheme} from './Theme/Theme';
+import {MoonPaperDarkTheme, MoonPaperLightTheme} from './Theme/Theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -115,7 +115,7 @@ function HomeScreen() {
 
 const StackNavigator = () => {
   return (
-    <NavigationContainer theme={CombinedDefaultTheme}>
+    <NavigationContainer theme={MoonPaperLightTheme}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}

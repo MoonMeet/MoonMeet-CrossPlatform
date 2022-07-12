@@ -123,7 +123,6 @@ const HomeChatsScreen = () => {
     firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
-        console.log('users render');
         collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.exists) {
             firestore()
@@ -131,7 +130,6 @@ const HomeChatsScreen = () => {
               .doc(documentSnapshot?.id)
               .collection('stories')
               .onSnapshot(subCollectionSnapshot => {
-                console.log('stories render');
                 subCollectionSnapshot?.forEach(subDocument => {
                   if (
                     subDocument?.data()?.time &&
