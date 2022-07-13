@@ -15,7 +15,7 @@ const COLORS = {
   primaryLight: '#fffefe',
   primaryDark: '#121212',
   accentLight: '#566193',
-  accentDark: '#121212',
+  accentDark: '#193566',
   controlNormal: '#DADADA',
   controlHighlight: '#ADADAD',
   darkGrey: '#999999',

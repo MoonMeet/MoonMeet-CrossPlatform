@@ -8,7 +8,8 @@ import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 import {fontValue} from '../config/Dimensions';
-
+import {useTheme} from 'react-native-paper';
+import {ThemeContext} from '../config/Theme/Context';
 const SettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
 
@@ -21,6 +22,58 @@ const SettingsScreen = () => {
   const [userBio, setUserBio] = React.useState('');
   const [activeStatus, setActiveStatus] = React.useState('');
   const [activeTime, setActiveTime] = React.useState('');
+
+  const theme = useTheme();
+  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: COLORS.primaryLight,
+    },
+    under_header: {
+      padding: '2%',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    left_side: {
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      flexDirection: 'row',
+    },
+    mid_side: {
+      flex: 2,
+      backgroundColor: 'white',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginLeft: '1%',
+      marginRight: '2.5%',
+    },
+
+    under_header_text: {
+      position: 'relative',
+      fontSize: 24,
+      paddingLeft: '3%',
+      paddingRight: '3%',
+      paddingTop: '1%',
+      textAlign: 'center',
+      color: COLORS.black,
+      fontFamily: FONTS.regular,
+    },
+    bioText: userBio => {
+      return {
+        position: 'relative',
+        fontSize: 16,
+        paddingLeft: '2.5%',
+        paddingRight: '2.5%',
+        paddingTop: '1%',
+        textAlign: 'center',
+        color: COLORS.black,
+        opacity: userBio ? 0.6 : 0.4,
+        fontFamily: FONTS.regular,
+      };
+    },
+  });
 
   useEffect(() => {
     const usersSubsriber = firestore()
@@ -64,7 +117,7 @@ const SettingsScreen = () => {
           <ActivityIndicator
             animating={true}
             size={'large'}
-            color={COLORS.accentLight}
+            color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
           />
         </View>
       </MiniBaseView>
@@ -72,11 +125,6 @@ const SettingsScreen = () => {
   }
   return (
     <MiniBaseView>
-      {/**<View style={styles.toolbar}>
-          <View style={styles.mid_side}>
-            <Text style={styles.toolbar_text}>Settings</Text>
-          </View>
-        </View>*/}
       <ScrollView>
         <View style={styles.under_header}>
           <Avatar.Image
@@ -113,66 +161,5 @@ const SettingsScreen = () => {
     </MiniBaseView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-  },
-  under_header: {
-    padding: '2%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: '1%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: fontValue(24),
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontWeight: 'bold',
-    fontFamily: FONTS.regular,
-  },
-  under_header_text: {
-    position: 'relative',
-    fontSize: 24,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    paddingTop: '1%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
-  bioText: userBio => {
-    return {
-      position: 'relative',
-      fontSize: 16,
-      paddingLeft: '2.5%',
-      paddingRight: '2.5%',
-      paddingTop: '1%',
-      textAlign: 'center',
-      color: COLORS.black,
-      opacity: userBio ? 0.6 : 0.4,
-      fontFamily: FONTS.regular,
-    };
-  },
-});
 
 export default SettingsScreen;

@@ -15,6 +15,7 @@ interface DataItemCustomInterface {
   onLongPressTrigger: (() => void) | undefined;
   titleColor: string;
   enableDescription: boolean;
+  descriptionOpacity: number | undefined;
   descriptionText: string;
   descriptionColor: string;
 }
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
       fontFamily: FONTS.regular,
     };
   },
-  descriptionContainer: descriptionColor => {
+  descriptionContainer: (descriptionColor, descriptionOpacity) => {
     return {
       fontSize: 15,
       paddingLeft: '0.5%',
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
       textAlign: 'left',
       color: descriptionColor,
       fontFamily: FONTS.regular,
-      opacity: descriptionColor !== COLORS.black ? 1 : 0.4,
+      opacity: descriptionOpacity !== undefined ? descriptionOpacity : 0.6,
     };
   },
 });

@@ -42,6 +42,9 @@ import PeopleIcon from '../assets/images/two_people.png';
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {fontValue, heightPercentageToDP} from './Dimensions';
+import {MoonMeetDarkTheme, MoonMeetLightTheme} from './Theme/Theme';
+import {useTheme} from 'react-native-paper';
+import {ThemeContext} from './Theme/Context';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -113,8 +116,11 @@ function HomeScreen() {
 }
 
 const StackNavigator = () => {
+  const theme = useTheme();
+  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={isThemeDark ? MoonMeetDarkTheme : MoonMeetLightTheme}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}
@@ -155,11 +161,16 @@ const StackNavigator = () => {
             headerTitleStyle: {
               fontFamily: FONTS.regular,
               fontSize: fontValue(20.5),
-              color: COLORS.black,
+              color: isThemeDark ? COLORS.white : COLORS.black,
             },
             headerBackTitleVisible: true,
             headerShadowVisible: false,
-            headerTintColor: COLORS.black,
+            headerTintColor: isThemeDark ? COLORS.white : COLORS.black,
+            headerStyle: {
+              backgroundColor: isThemeDark
+                ? COLORS.primaryDark
+                : COLORS.primaryLight,
+            },
           }}
         />
         <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />

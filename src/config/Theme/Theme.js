@@ -1,31 +1,34 @@
 import {
   DarkTheme as NavigationDarkTheme,
+  DefaultTheme,
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import {
   DarkTheme as PaperDarkTheme,
   DefaultTheme as PaperDefaultTheme,
 } from 'react-native-paper';
-import merge from 'deepmerge';
 import {COLORS} from '../Miscellaneous';
 
-const CombinedDefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
-const CombinedDarkTheme = merge(PaperDarkTheme, NavigationDarkTheme);
-
-const MoonPaperDarkTheme = {
-  ...CombinedDarkTheme,
+const MoonMeetDarkTheme = {
+  ...PaperDarkTheme,
+  ...NavigationDarkTheme,
   colors: {
+    ...PaperDarkTheme.colors,
+    ...NavigationDarkTheme.colors,
     background: COLORS.black,
     primary: COLORS.primaryDark,
     accent: COLORS.accentDark,
-    ...CombinedDarkTheme,
+    text: COLORS.white,
   },
   version: 3,
 };
 
-const MoonPaperLightTheme = {
-  ...CombinedDefaultTheme,
+const MoonMeetLightTheme = {
+  ...PaperDefaultTheme,
+  ...NavigationDefaultTheme,
   colors: {
+    ...PaperDefaultTheme.colors,
+    ...NavigationDarkTheme.colors,
     background: COLORS.primaryLight,
     primary: COLORS.redLightError,
     accent: COLORS.redLightError,
@@ -35,9 +38,4 @@ const MoonPaperLightTheme = {
   version: 3,
 };
 
-export {
-  CombinedDefaultTheme,
-  CombinedDarkTheme,
-  MoonPaperLightTheme,
-  MoonPaperDarkTheme,
-};
+export {MoonMeetDarkTheme, MoonMeetLightTheme};

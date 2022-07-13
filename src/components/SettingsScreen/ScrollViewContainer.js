@@ -29,6 +29,8 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
 import moment from 'moment';
+import {useTheme} from 'react-native-paper';
+import {ThemeContext} from '../../config/Theme/Context';
 
 interface ScrollViewContainerInterface {
   firstName: string;
@@ -44,6 +46,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const navigation = useNavigation();
   const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
   const [FAQVisible, setFAQVisible] = React.useState(false);
+
+  const theme = useTheme();
+  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
 
   const DevicesScreen = Platform.select({
     ios: () => (
@@ -65,7 +70,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
     default: () => undefined | null,
   });
   return (
-    <View>
+    <View
+      style={{
+        backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
+      }}>
       <DataItemTitle titleItem={'Miscellaneous'} />
       <DataItemCustom
         leftIcon={DarkModeIcon}
@@ -74,11 +82,14 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         rippleColor={COLORS.rippleColor}
         imageSize={36.5}
         iconColor={COLORS.white}
-        titleColor={COLORS.black}
+        titleColor={isThemeDark ? COLORS.white : COLORS.black}
         enableDescription={true}
         descriptionText={'System'}
-        descriptionColor={COLORS.black}
-        onPressTrigger={null}
+        descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
+        descriptionOpacity={0.4}
+        onPressTrigger={() => {
+          toggleTheme();
+        }}
         onLongPressTrigger={null}
       />
       <DataItemTitle titleItem={'Account'} />
