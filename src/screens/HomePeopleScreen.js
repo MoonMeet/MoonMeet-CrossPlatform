@@ -126,19 +126,25 @@ const HomePeopleScreen = () => {
           <View style={styles.toolbar}>
             <View style={styles.left_side}>
               {avatarURL ? (
-                <Avatar.Image
-                  size={35.5}
-                  source={avatarURL ? {uri: avatarURL} : null}
-                  style={{
-                    overflow: 'hidden',
-                    marginRight: '-1%',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
+                <Pressable
+                  hitSlop={15}
+                  onPress={() => {
+                    navigation.navigate('settings');
+                  }}>
+                  <Avatar.Image
+                    size={35.5}
+                    source={avatarURL ? {uri: avatarURL} : null}
+                    style={{
+                      overflow: 'hidden',
+                      marginRight: '-1%',
+                    }}
+                    theme={{
+                      colors: {
+                        primary: COLORS.rippleColor,
+                      },
+                    }}
+                  />
+                </Pressable>
               ) : (
                 <Avatar.Icon
                   icon={PersonImage}

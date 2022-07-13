@@ -11,8 +11,11 @@ import {
   MoonPaperLightTheme,
 } from './src/config/Theme/Theme';
 
-// Enabling the experimental freeze of react-native-screens
-enableFreeze(true);
+/**
+ * Enabling the experimental freeze of react-native-screens
+ * enableFreeze(true);
+ * Will enable this soon
+ */
 
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);

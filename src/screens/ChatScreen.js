@@ -185,11 +185,8 @@ const ChatScreen = () => {
               to_avatar: userAvatar,
               time: Date.now(),
               type: 'message',
-              to_uid: userUID,
-              from_uid: myUID,
-              from_first_name: myFirstName,
-              from_last_name: myLastName,
-              from_avatar: myAvatar,
+              last_uid: myUID,
+              sent_to_uid: userUID,
             });
           firestore()
             .collection('chats')
@@ -203,11 +200,7 @@ const ChatScreen = () => {
               to_avatar: myAvatar,
               time: Date.now(),
               type: 'message',
-              to_uid: myUID,
-              from_uid: userUID,
-              from_first_name: userFirstName,
-              from_last_name: userLastName,
-              from_avatar: userAvatar,
+              last_uid: myUID,
             });
         } catch (e) {
           console.log(e);

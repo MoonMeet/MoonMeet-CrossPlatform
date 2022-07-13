@@ -1,10 +1,12 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import React from 'react';
+import auth from '@react-native-firebase/auth';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
+import {uniqBy} from 'lodash';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -21,7 +23,7 @@ const MessagesList = ({ListData}) => {
   return (
     <FlatList
       style={{flex: 1}}
-      data={ListData}
+      data={uniqBy(ListData, 'to_uid')}
       ListEmptyComponent={listEmptyComponent}
       contentContainerStyle={{
         paddingStart: '1%',
@@ -35,7 +37,12 @@ const MessagesList = ({ListData}) => {
         <Pressable
           android_ripple={{color: COLORS.rippleColor}}
           onPress={() => {
-            navigation?.navigate('chat', {item: item?.to_uid});
+            navigation?.navigate('chat', {
+              item:
+                item?.last_uid === auth()?.currentUser?.uid
+                  ? item?.sent_to_uid
+                  : item?.last_uid,
+            });
           }}
           style={{
             flexDirection: 'row',
@@ -60,13 +67,13 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}>
-            <Text numOfLines={1} style={styles.heading('left')}>
+            <Text numOfLines={1} style={styles.heading('left', false)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text numberOfLines={1} style={styles.subheading('left', true)}>
-              {item?.to_message_uid !== item?.to_message_uid
-                ? item?.to_message_text
-                : 'You: ' + item?.to_message_text}
+              {item?.last_uid === auth()?.currentUser?.uid
+                ? 'You: ' + item?.to_message_text
+                : item?.to_message_text}
             </Text>
           </View>
           <View
@@ -76,7 +83,7 @@ const MessagesList = ({ListData}) => {
               alignItems: 'flex-end',
             }}>
             <Text style={styles.subheading('right', false)}>
-              {moment(item?.time).calendar()}
+              {moment(item?.time)?.calendar()}
             </Text>
           </View>
         </Pressable>
@@ -106,7 +113,7 @@ const styles = StyleSheet.create({
       paddingTop: '1%',
       textAlign: align,
       color: COLORS.black,
-      opacity: 0.4,
+      opacity: 0.6,
       fontFamily: FONTS.regular,
     };
   },
