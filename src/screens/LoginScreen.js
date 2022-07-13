@@ -321,9 +321,6 @@ const LoginScreen = () => {
                     country_code: CountryText,
                   },
                 });
-                navigation?.dispatch(
-                  CommonActions?.reset({index: 0, routes: [{name: 'login'}]}),
-                );
                 setLoaderVisible(!LoaderVisible);
               }
             });

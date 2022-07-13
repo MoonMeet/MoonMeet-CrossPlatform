@@ -26,6 +26,7 @@ import ArrowForward from '../assets/images/arrow-forward.png';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
+import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 
 const SetupScreen = ({route}) => {
   const [UserPhoto, setUserPhoto] = React.useState(null);
@@ -292,8 +293,8 @@ const SetupScreen = ({route}) => {
                       .doc(auth()?.currentUser.uid)
                       .set({
                         ...user,
-                        first_name: firstName,
-                        last_name: lastName,
+                        first_name: lowerToUppercase(firstName),
+                        last_name: lowerToUppercase(lastName),
                         avatar: avatarUrl,
                         active_status: 'normal',
                         active_time: Date.now(),
@@ -312,7 +313,7 @@ const SetupScreen = ({route}) => {
                 );
               });
             } catch (e) {
-              console.log(e.toString());
+              console.log(e);
               setLoaderVisible(!LoaderVisible);
             }
           } else {

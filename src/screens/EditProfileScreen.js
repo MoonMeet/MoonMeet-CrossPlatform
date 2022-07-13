@@ -28,6 +28,7 @@ import storage from '@react-native-firebase/storage';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
+import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -161,8 +162,8 @@ const EditProfileScreen = () => {
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
-        first_name: firstName,
-        last_name: lastName,
+        first_name: lowerToUppercase(firstName),
+        last_name: lowerToUppercase(lastName),
       })
       .finally(() => {
         setLoaderVisible(false);

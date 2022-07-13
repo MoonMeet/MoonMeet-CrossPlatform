@@ -137,7 +137,7 @@ const StackNavigator = () => {
         <Stack.Screen
           name={'setup'}
           component={SetupScreen}
-          options={{gestureEnabled: false}}
+          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'home'}
