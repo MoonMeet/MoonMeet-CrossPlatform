@@ -539,7 +539,7 @@ const AddStoryScreen = () => {
                 setImageVisible(true);
               })
               .catch(e => {
-                console.log(e.toString());
+                console.log(e);
               });
           }}
           onFilePicker={() => {
@@ -550,7 +550,7 @@ const AddStoryScreen = () => {
                 setImageVisible(true);
               })
               .catch(e => {
-                console.log(e.toString());
+                console.log(e);
               });
           }}
           isVisible={PickerActionSheet}

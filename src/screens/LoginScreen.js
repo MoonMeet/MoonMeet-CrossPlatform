@@ -174,7 +174,7 @@ const LoginScreen = () => {
           console.log('Invalid code.');
         } else {
           console.log('Account linking error');
-          console.log(error.toString());
+          console.log(error);
         }
       }
     }
@@ -566,7 +566,7 @@ const LoginScreen = () => {
                     onToggleErrorSnackBar();
                   }
                 } catch (e) {
-                  console.log(e.toString());
+                  console.log(e);
                 }
               }}
             />

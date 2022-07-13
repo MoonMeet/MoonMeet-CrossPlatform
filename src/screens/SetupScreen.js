@@ -255,8 +255,6 @@ const SetupScreen = ({route}) => {
                   .ref(_userAvatarRef)
                   .getDownloadURL();
                 console.log(avatarUrl);
-                const trimmedAvatar = avatarUrl.toString();
-                console.log(trimmedAvatar);
 
                 /**
                  * pushing device information for later use in DeviceScreen.js
@@ -344,7 +342,7 @@ const SetupScreen = ({route}) => {
               setUserPhoto(image);
             })
             .catch(e => {
-              console.log(e.toString());
+              console.log(e);
             });
         }}
         onFilePicker={() => {
@@ -354,7 +352,7 @@ const SetupScreen = ({route}) => {
               setUserPhoto(image);
             })
             .catch(e => {
-              console.log(e.toString());
+              console.log(e);
             });
         }}
         isVisible={isPickerVisible}

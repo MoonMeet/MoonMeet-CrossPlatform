@@ -424,7 +424,7 @@ const EditProfileScreen = () => {
             })
             .catch(e => {
               setLoaderVisible(false);
-              console.warn(e.toString());
+              console.warn(e);
             });
         }}
         onFilePicker={() => {
@@ -434,7 +434,7 @@ const EditProfileScreen = () => {
             })
             .catch(e => {
               setLoaderVisible(false);
-              console.warn(e.toString());
+              console.warn(e);
             });
         }}
         isVisible={PickerActionSheet}
