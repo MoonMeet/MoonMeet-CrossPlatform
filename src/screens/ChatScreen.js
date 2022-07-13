@@ -31,6 +31,7 @@ import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Image} from 'react-native-compressor';
+import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -441,7 +442,7 @@ const ChatScreen = () => {
             />
           );
         }}
-        renderInputToolbar={props => <InputToolbar {...props} />}
+        renderInputToolbar={props => <MoonInputToolbar {...props} />}
         renderSend={props => {
           return (
             <Send {...props}>
