@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Keyboard,
-  Pressable,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-} from 'react-native';
+import {Keyboard, Pressable, SafeAreaView, StyleSheet} from 'react-native';
 import {COLORS} from '../../config/Miscellaneous';
 
 const BaseView = ({children}) => {

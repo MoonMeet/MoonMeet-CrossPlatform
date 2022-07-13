@@ -9,10 +9,10 @@ interface DataItemCustomInterface {
   leftIconColor: string;
   titleTextContainer: string;
   rippleColor: string;
-  imageSize: Number;
+  imageSize: number;
   iconColor: string;
-  onPressTrigger: Function;
-  onLongPressTrigger: Function;
+  onPressTrigger: (() => void) | undefined;
+  onLongPressTrigger: (() => void) | undefined;
   titleColor: string;
   enableDescription: boolean;
   descriptionText: string;
@@ -22,31 +22,31 @@ interface DataItemCustomInterface {
 const DataItemCustom = (props: DataItemCustomInterface) => {
   return (
     <Pressable
-      android_ripple={{color: props.rippleColor}}
-      onPress={props.onPressTrigger}
-      onLongPress={props.onLongPressTrigger}
+      android_ripple={{color: props?.rippleColor}}
+      onPress={props?.onPressTrigger}
+      onLongPress={props?.onLongPressTrigger}
       style={styles.titleViewContainer}>
       <Avatar.Icon
-        icon={props.leftIcon}
-        size={props.imageSize}
-        color={props.iconColor}
+        icon={props?.leftIcon}
+        size={props?.imageSize}
+        color={props?.iconColor}
         style={{
           overflow: 'hidden',
           marginRight: '-1%',
         }}
         theme={{
           colors: {
-            primary: props.leftIconColor,
+            primary: props?.leftIconColor,
           },
         }}
       />
       <View style={styles.customViewContainer}>
-        <Text style={styles.titleTextContainer(props.titleColor)}>
-          {props.titleTextContainer}
+        <Text style={styles.titleTextContainer(props?.titleColor)}>
+          {props?.titleTextContainer}
         </Text>
         {props.enableDescription ? (
-          <Text style={styles.descriptionContainer(props.descriptionColor)}>
-            {props.descriptionText}
+          <Text style={styles.descriptionContainer(props?.descriptionColor)}>
+            {props?.descriptionText}
           </Text>
         ) : null}
       </View>

@@ -3,6 +3,7 @@ import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import moment from 'moment';
+import {uniqBy} from 'lodash';
 
 interface ActivePeopleListInterface {
   ListData: any;
@@ -24,7 +25,7 @@ const _listEmptyComponent = () => {
 const ActivePeopleList = (props: ActivePeopleListInterface) => {
   return (
     <FlatList
-      data={props.ListData}
+      data={uniqBy(props.ListData, 'uid')}
       contentContainerStyle={{
         paddingStart: '1%',
         paddingEnd: '2%',
@@ -34,23 +35,23 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       removeClippedSubviews={true}
       initialNumToRender={10}
       ListEmptyComponent={_listEmptyComponent}
-      keyExtractor={item => item.avatar}
+      keyExtractor={item => item?.uid}
       renderItem={({item}) => (
         <Pressable
           android_ripple={{color: COLORS.rippleColor}}
           style={styles.container}>
           <View style={styles.left_side}>
             <Avatar.Image
-              source={item.avatar ? {uri: item.avatar} : null}
+              source={item?.avatar ? {uri: item?.avatar} : null}
               size={52.5}
             />
           </View>
           <View style={styles.mid_side}>
             <Text style={styles.heading}>
-              {item.first_name + ' ' + item.last_name}
+              {item?.first_name + ' ' + item?.last_name}
             </Text>
             <Text style={styles.subheading}>
-              {moment(item.active_time).calendar()}
+              {moment(item?.active_time)?.calendar()}
             </Text>
           </View>
         </Pressable>

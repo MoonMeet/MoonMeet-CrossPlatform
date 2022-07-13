@@ -4,6 +4,7 @@ import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import {IconButton} from 'react-native-paper';
 import {isAndroid} from '../../../utils/device/DeviceInfo';
 import Modal from 'react-native-modal';
+import BackImage from '../../../assets/images/back.png';
 
 interface LoginHelpInterface {
   isVisible: boolean;
@@ -11,8 +12,6 @@ interface LoginHelpInterface {
 }
 
 const LoginHelp = (props: LoginHelpInterface) => {
-  const BackImage = require('../../../assets/images/back.png');
-
   return (
     <Modal
       style={{
@@ -20,9 +19,9 @@ const LoginHelp = (props: LoginHelpInterface) => {
       }}
       animationType={'slide'}
       transparent={false}
-      visible={props.isVisible}
+      visible={props?.isVisible}
       onRequestClose={() => {
-        props.hideModal();
+        props?.hideModal();
       }}>
       <SafeAreaView style={styles.container}>
         <View
@@ -34,7 +33,7 @@ const LoginHelp = (props: LoginHelpInterface) => {
             color={'#999999'}
             size={24}
             onPress={() => {
-              props.hideModal();
+              props?.hideModal();
             }}
           />
         </View>
@@ -170,10 +169,7 @@ const LoginHelp = (props: LoginHelpInterface) => {
             <Text style={styles.instruction}>
               1. Uninstall Moon Meet from your iPhone.
             </Text>
-            <Text style={styles.instruction}>
-              2. Reboot your iPhone > turn your iPhone off and then turn it back
-              on.
-            </Text>
+            <Text style={styles.instruction}>2. Reboot your iPhone</Text>
             <Text style={styles.instruction}>
               3. Download the latest version of WhatsApp from the App Store.
             </Text>

@@ -7,7 +7,7 @@ import BackImage from '../../../assets/images/back.png';
 
 interface FAQInterface {
   isVisible: boolean;
-  hideModal: Function;
+  hideModal: (() => void) | undefined;
 }
 const FrequentlyAskedQuestions = (props: FAQInterface) => {
   return (
@@ -17,9 +17,9 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
       }}
       animationType={'slide'}
       transparent={false}
-      visible={props.isVisible}
+      visible={props?.isVisible}
       onRequestClose={() => {
-        props.hideModal();
+        props?.hideModal();
       }}>
       <SafeAreaView
         style={{
@@ -35,7 +35,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             color={'#999999'}
             size={24}
             onPress={() => {
-              props.hideModal();
+              props?.hideModal();
             }}
           />
         </View>

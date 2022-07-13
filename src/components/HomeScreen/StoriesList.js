@@ -15,36 +15,7 @@ import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {uniqBy} from 'lodash';
 
 const StoriesList = ({ListData, myUID}) => {
-  function removeDuplicates(arr, equals) {
-    let originalArr = arr.slice(0);
-    let i, len, val;
-    arr.length = 0;
-
-    for (i = 0, len = originalArr.length; i < len; ++i) {
-      val = originalArr[i];
-      if (
-        !arr.some(function (item) {
-          return equals(item, val);
-        })
-      ) {
-        arr.push(val);
-      }
-    }
-  }
-
-  function usersEqual(user1, user2) {
-    return user1.uid === user2.uid;
-  }
-
   const navigation = useNavigation();
-
-  const getSameUidUser = () => {
-    removeDuplicates(ListData, usersEqual);
-  };
-
-  useEffect(() => {
-    //getSameUidUser();
-  }, [ListData]);
 
   const _listEmptyComponent = () => {
     return (
@@ -59,7 +30,7 @@ const StoriesList = ({ListData, myUID}) => {
   const _renderItem = ({item}) => (
     <Pressable
       onPress={() => {
-        navigation.navigate('story', {userUID: item?.uid, myUID: myUID});
+        navigation?.navigate('story', {userUID: item?.uid, myUID: myUID});
       }}
       style={{
         height: 85,
@@ -74,18 +45,18 @@ const StoriesList = ({ListData, myUID}) => {
         <Avatar.Image
           style={styles.userHaveStory}
           size={50}
-          source={{uri: item.image ? item.image : item.avatar}}
+          source={{uri: item?.image ? item?.image : item?.avatar}}
         />
       </View>
-      <Text style={styles.nameAndLastname}>{item.first_name}</Text>
-      <Text style={styles.nameAndLastname}>{item.last_name}</Text>
+      <Text style={styles.nameAndLastname}>{item?.first_name}</Text>
+      <Text style={styles.nameAndLastname}>{item?.last_name}</Text>
     </Pressable>
   );
 
   return (
     <View style={styles.container}>
       <Pressable
-        onPress={() => navigation.navigate('addStory')}
+        onPress={() => navigation?.navigate('addStory')}
         style={styles.storyHolderLeft}>
         <Avatar.Icon
           icon={AddIcon}
@@ -109,15 +80,15 @@ const StoriesList = ({ListData, myUID}) => {
           alignSelf: 'center',
           justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
           minWidth:
-            Dimensions.get('window').width -
-            (13 / 100) * Dimensions.get('window').width,
+            Dimensions.get('window')?.width -
+            (13 / 100) * Dimensions.get('window')?.width,
         }}
         removeClippedSubviews={true}
         initialNumToRender={10}
         ListEmptyComponent={_listEmptyComponent}
         data={uniqBy(ListData, 'uid')}
         renderItem={_renderItem}
-        keyExtractor={item => item?.time}
+        keyExtractor={item => item?.uid}
       />
     </View>
   );

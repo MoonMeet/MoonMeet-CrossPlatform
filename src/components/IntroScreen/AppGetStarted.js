@@ -22,7 +22,7 @@ const AppGetStarted = (props: AppGetStartedInterface) => {
         uppercase={false}
         color="#566193"
         mode="contained"
-        onPress={props.onPressButton}>
+        onPress={props?.onPressButton}>
         Continue
       </Button>
     </View>

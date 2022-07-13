@@ -2,24 +2,22 @@ import React from 'react';
 import Modal from 'react-native-modal';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
+import CameraImage from '../../assets/images/photo-camera.png';
+import GalleryImage from '../../assets/images/photo-library.png';
 
 interface imagePickerInterface {
-  hideModal: Function;
-  onCameraPress: Function;
-  onFilePicker: Function;
+  hideModal: (() => void) | undefined;
+  onCameraPress: (() => void) | undefined;
+  onFilePicker: (() => void) | undefined;
   isVisible: boolean;
 }
-
-const CameraImage = require('../../assets/images/photo-camera.png');
-
-const GalleryImage = require('../../assets/images/photo-library.png');
 
 const ImagePickerActionSheet = (props: imagePickerInterface) => {
   return (
     <Modal
       swipeDirection={'down'}
-      onBackdropPress={props.hideModal}
-      onSwipeComplete={props.hideModal}
+      onBackdropPress={props?.hideModal}
+      onSwipeComplete={props?.hideModal}
       useNativeDriverForBackdrop
       style={{margin: 0}}
       animationOut={'slideOutDown'}
@@ -53,8 +51,8 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
-              props.onCameraPress();
-              props.hideModal();
+              props?.onCameraPress();
+              props?.hideModal();
             }}
             style={styles.optionContainer}>
             <Image source={CameraImage} style={styles.arrowStyle} />
@@ -70,8 +68,8 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
-              props.onFilePicker();
-              props.hideModal();
+              props?.onFilePicker();
+              props?.hideModal();
             }}
             style={styles.optionContainer}>
             <Image source={GalleryImage} style={styles.arrowStyle} />

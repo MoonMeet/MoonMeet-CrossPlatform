@@ -1,13 +1,13 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {transformTimeDevices} from '../../utils/TimeHandler/TimeHandler';
+
 import moment from 'moment';
 
 interface UserListInterface {
   ListData: any;
-  onPressTrigger: Function;
-  onLongPressTrigger: Function;
+  onPressTrigger: (() => void) | undefined;
+  onLongPressTrigger: (() => void) | undefined;
 }
 
 const DevicesList = (props: UserListInterface) => {
@@ -30,15 +30,19 @@ const DevicesList = (props: UserListInterface) => {
             style={styles.container}>
             <View style={styles.left_side}>
               <Text style={styles.heading}>
-                {'Moon Meet' + ' ' + item.system_name + ' ' + item.app_version}
+                {'Moon Meet' +
+                  ' ' +
+                  item?.system_name +
+                  ' ' +
+                  item?.app_version}
               </Text>
               <Text style={styles.subheading}>
-                {item.manufacturer + ' ' + item.model}
+                {item?.manufacturer + ' ' + item?.model}
               </Text>
             </View>
             <View style={styles.right_side}>
               <Text style={styles.subheading}>
-                {moment(item?.time).calendar()}
+                {moment(item?.time)?.calendar()}
               </Text>
             </View>
           </Pressable>

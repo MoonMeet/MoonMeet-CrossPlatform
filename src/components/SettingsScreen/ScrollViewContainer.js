@@ -20,12 +20,7 @@ import FAQIcon from '../../assets/images/quiz.png';
 import ReportIcon from '../../assets/images/bug.png';
 
 import {COLORS} from '../../config/Miscellaneous';
-import {
-  useNavigation,
-  StackActions,
-  NavigationAction,
-  CommonActions,
-} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
@@ -56,7 +51,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={DevicesIcon}
         leftIconColor={COLORS.amazingPurple}
         titleTextContainer={'Devices'}
-        onPressTrigger={() => navigation.navigate('devices')}
+        onPressTrigger={() => navigation?.navigate('devices')}
       />
     ),
     android: () => (
@@ -64,10 +59,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={DevicesIcon}
         leftIconColor={COLORS.amazingPurple}
         titleTextContainer={'Devices'}
-        onPressTrigger={() => navigation.navigate('devices')}
+        onPressTrigger={() => navigation?.navigate('devices')}
       />
     ),
-    default: () => null,
+    default: () => undefined | null,
   });
   return (
     <View>
@@ -114,7 +109,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
             auth()
               ?.signOut()
               .finally(() => {
-                navigation.navigate('login');
+                navigation?.navigate('login');
               });
           } catch (e) {
             console.error(e);
@@ -132,12 +127,12 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleColor={COLORS.black}
         enableDescription={true}
         descriptionText={
-          props.activeStatus === 'recently'
+          props?.activeStatus === 'recently'
             ? 'Last seen recently'
-            : moment(props?.activeTime).fromNow()
+            : moment(props?.activeTime)?.fromNow()
         }
         descriptionColor={COLORS.black}
-        onPressTrigger={() => navigation.navigate('activeStatus')}
+        onPressTrigger={() => navigation?.navigate('activeStatus')}
         onLongPressTrigger={null}
       />
       <DataItemCustom
@@ -149,18 +144,18 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         iconColor={COLORS.white}
         titleColor={COLORS.black}
         enableDescription={true}
-        descriptionText={props.username}
+        descriptionText={props?.username}
         descriptionColor={COLORS.black}
-        onPressTrigger={() => navigation.navigate('changeUsername')}
+        onPressTrigger={() => navigation?.navigate('changeUsername')}
         onLongPressTrigger={() => {
           try {
-            Clipboard.setString(props?.username);
+            Clipboard?.setString(props?.username);
             SuccessToast(
               'bottom',
               'Copied!',
               'Your username is copied successfully to Clipboard',
               true,
-              4000,
+              3000,
             );
           } catch (e) {
             ErrorToast(
@@ -168,7 +163,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
               'Error Copying!',
               'An error occurred when copying your username',
               true,
-              4000,
+              3000,
             );
           }
         }}
@@ -178,7 +173,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={NotificationsIcon}
         leftIconColor={COLORS.yellowDarkWarning}
         titleTextContainer={'Notifications Settings'}
-        onPressTrigger={() => Linking.openSettings()}
+        onPressTrigger={() => Linking?.openSettings()}
       />
       <DataItem
         leftIcon={MessageIcon}
@@ -204,7 +199,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={ReportIcon}
         leftIconColor={COLORS.accentLight}
         titleTextContainer={'Report technical problem'}
-        onPressTrigger={() => navigation.navigate('bugreport')}
+        onPressTrigger={() => navigation?.navigate('bugreport')}
       />
       <PrivacyPolicy
         hideModal={() => setPrivacyPolicyVisible(!privacyPolicyVisible)}

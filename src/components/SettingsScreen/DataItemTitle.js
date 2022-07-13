@@ -9,7 +9,7 @@ interface DataItemTitleInterface {
 const DataItemTitle = (props: DataItemTitleInterface) => {
   return (
     <View style={styles.titleView}>
-      <Text style={styles.titleTextView}>{props.titleItem}</Text>
+      <Text style={styles.titleTextView}>{props?.titleItem}</Text>
     </View>
   );
 };

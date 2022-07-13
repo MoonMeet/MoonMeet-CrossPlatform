@@ -8,17 +8,17 @@ interface DataItemInterface {
   leftIcon: IconSource;
   leftIconColor: string;
   titleTextContainer: string;
-  onPressTrigger: Function;
+  onPressTrigger: (() => void) | undefined;
 }
 
 const DataItem = (props: DataItemInterface) => {
   return (
     <Pressable
       android_ripple={{color: COLORS.rippleColor}}
-      onPress={props.onPressTrigger}
+      onPress={props?.onPressTrigger}
       style={styles.titleViewContainer}>
       <Avatar.Icon
-        icon={props.leftIcon}
+        icon={props?.leftIcon}
         size={36.5}
         color={COLORS.white}
         style={{
@@ -27,11 +27,11 @@ const DataItem = (props: DataItemInterface) => {
         }}
         theme={{
           colors: {
-            primary: props.leftIconColor,
+            primary: props?.leftIconColor,
           },
         }}
       />
-      <Text style={styles.titleTextContainer}>{props.titleTextContainer}</Text>
+      <Text style={styles.titleTextContainer}>{props?.titleTextContainer}</Text>
     </Pressable>
   );
 };

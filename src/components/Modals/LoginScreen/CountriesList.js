@@ -15,6 +15,7 @@ import Modal from 'react-native-modal';
 import BackImage from '../../../assets/images/back.png';
 import SearchImage from '../../../assets/images/search.png';
 import ClearImage from '../../../assets/images/clear.png';
+import {unionBy} from 'lodash';
 
 interface CountriesListInterface {
   isVisible: boolean;
@@ -59,8 +60,7 @@ const CountriesList = (props: CountriesListInterface) => {
    * @constructor
    */
   const ResetListData = text => {
-    const textLength = text.length;
-    if (textLength < 1) {
+    if (text?.length < 1) {
       setCountriesData();
       setSearchData('');
     }
@@ -74,10 +74,12 @@ const CountriesList = (props: CountriesListInterface) => {
 
   const SearchInData = text => {
     if (text) {
-      const newData = MasterData.filter(item => {
-        const itemData = item.name ? item.name.toUpperCase() : ''.toLowerCase();
-        const textData = text.toUpperCase();
-        return itemData.indexOf(textData) > -1;
+      const newData = MasterData?.filter(item => {
+        const itemData = item?.name
+          ? item?.name?.toUpperCase()
+          : ''?.toLowerCase();
+        const textData = text?.toUpperCase();
+        return itemData?.indexOf(textData) > -1;
       });
       setFilteredData(newData);
       setSearchData(text);
@@ -99,8 +101,8 @@ const CountriesList = (props: CountriesListInterface) => {
         <Pressable
           style={styles.container}
           onPress={() => {
-            props.hideModal();
-            props.CountryCode(item?.dial_code);
+            props?.hideModal();
+            props?.CountryCode(item?.dial_code);
           }}>
           <Text style={styles.country_text}>{item?.name}</Text>
           <Text style={styles.dial_text}>{item?.dial_code}</Text>
@@ -121,7 +123,7 @@ const CountriesList = (props: CountriesListInterface) => {
       transparent={false}
       visible={props.isVisible}
       onRequestClose={() => {
-        props.hideModal();
+        props?.hideModal();
       }}>
       <SafeAreaView
         style={{
@@ -157,7 +159,7 @@ const CountriesList = (props: CountriesListInterface) => {
                   color={'#999999'}
                   size={24}
                   onPress={() => {
-                    props.hideModal();
+                    props?.hideModal();
                   }}
                 />
               </View>
@@ -192,11 +194,11 @@ const CountriesList = (props: CountriesListInterface) => {
               ) : null}
               <FlatList
                 showsVerticalScrollIndicator={false}
-                data={FilteredData}
+                data={unionBy(FilteredData, 'name')}
                 disableVirtualization
                 removeClippedSubviews={true}
                 initialNumToRender={10}
-                keyExtractor={item => item.name}
+                keyExtractor={item => item?.name}
                 renderItem={({item}) => _renderItem(item)}
               />
             </View>

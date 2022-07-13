@@ -1,4 +1,4 @@
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
 

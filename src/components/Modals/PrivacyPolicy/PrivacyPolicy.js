@@ -18,8 +18,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
       }}
       animationType={'slide'}
       transparent={false}
-      visible={props.isVisible}
-      presentationStyle="pageSheet"
+      visible={props?.isVisible}
       onRequestClose={() => {
         props.hideModal();
       }}>

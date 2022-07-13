@@ -2,7 +2,6 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
-import {transformTime} from '../../utils/TimeHandler/TimeHandler';
 import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../MiniBaseView/MiniBaseView';
 import auth from '@react-native-firebase/auth';
@@ -10,8 +9,8 @@ import moment from 'moment';
 
 interface UserListInterface {
   ListData: any;
-  onPressTrigger: Function;
-  onLongPressTrigger: Function;
+  onPressTrigger: (() => void) | undefined;
+  onLongPressTrigger: (() => void) | undefined;
 }
 
 const UserList = (props: UserListInterface) => {
@@ -29,7 +28,7 @@ const UserList = (props: UserListInterface) => {
         disableVirtualization
         removeClippedSubviews={true}
         initialNumToRender={10}
-        keyExtractor={item => item.avatar}
+        keyExtractor={item => item?.uid}
         renderItem={({item}) => (
           <MiniBaseView>
             {auth()?.currentUser?.uid !== item?.uid ? (
@@ -37,7 +36,7 @@ const UserList = (props: UserListInterface) => {
                 android_ripple={{color: COLORS.rippleColor}}
                 style={styles.container}
                 onPress={() => {
-                  navigation.navigate('chat', {item: item?.uid});
+                  navigation?.navigate('chat', {item: item?.uid});
                 }}>
                 <View style={styles.left_side}>
                   <Avatar.Image
@@ -52,7 +51,7 @@ const UserList = (props: UserListInterface) => {
                   <Text style={styles.subheading}>
                     {item?.active_status === 'recently'
                       ? 'Last seen recently'
-                      : moment(item?.active_time).calendar()}
+                      : moment(item?.active_time)?.calendar()}
                   </Text>
                 </View>
               </Pressable>

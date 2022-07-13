@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, PlatformColor} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
