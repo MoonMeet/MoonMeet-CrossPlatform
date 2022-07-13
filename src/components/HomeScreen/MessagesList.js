@@ -33,9 +33,9 @@ const MessagesList = ({ListData}) => {
       initialNumToRender={10}
       renderItem={({item}) => (
         <Pressable
-          android_ripple={COLORS.rippleColor}
+          android_ripple={{color: COLORS.rippleColor}}
           onPress={() => {
-            navigation.navigate('chat', {item: item?.to_uid});
+            navigation?.navigate('chat', {item: item?.to_uid});
           }}
           style={{
             flexDirection: 'row',
@@ -60,10 +60,10 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}>
-            <Text style={styles.heading('left')}>
+            <Text numOfLines={1} style={styles.heading('left')}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
-            <Text style={styles.subheading('left', true)}>
+            <Text numberOfLines={1} style={styles.subheading('left', true)}>
               {item?.to_message_uid !== item?.to_message_uid
                 ? item?.to_message_text
                 : 'You: ' + item?.to_message_text}
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
       textAlign: align,
       color: COLORS.black,
+      opacity: 0.6,
       fontFamily: FONTS.regular,
     };
   },

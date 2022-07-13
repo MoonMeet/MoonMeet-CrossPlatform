@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Keyboard, StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import Color from './Color'
 import { Actions, ActionsProps, Composer, ComposerProps, IMessage, Send, SendProps, StylePropType } from 'react-native-gifted-chat'
-import { heightPercentageToDP } from '../../config/Dimensions'
 import { COLORS } from '../../config/Miscellaneous'
 
 const styles = StyleSheet.create({
@@ -11,7 +10,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Color.defaultColor,
     backgroundColor: COLORS.white,
-    bottom: heightPercentageToDP(1),
+    bottom: 0,
     left: 0,
     right: 0,
   },
