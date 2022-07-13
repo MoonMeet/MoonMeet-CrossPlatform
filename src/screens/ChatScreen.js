@@ -415,9 +415,6 @@ const ChatScreen = () => {
         )}
         showAvatarForEveryMessage={false}
         showUserAvatar={false}
-        renderMessageImage={props => {
-          <MessageImage {...props} />;
-        }}
         onInputTextChanged={text => setMessageText(text)}
         messages={mChatData}
         renderBubble={props => {
@@ -429,7 +426,7 @@ const ChatScreen = () => {
                   backgroundColor: COLORS.accentLight,
                 },
                 left: {
-                  backgroundColor: COLORS.darkGrey,
+                  backgroundColor: COLORS.chats.leftBubble,
                 },
               }}
             />

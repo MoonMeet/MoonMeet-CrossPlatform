@@ -37,6 +37,10 @@ const COLORS = {
   maroon: '#800000',
   orange: '#FF7F50',
   pink: '#DE3163',
+  chats: {
+    rightBubble: '#566193',
+    leftBubble: '#e4e6eb',
+  },
 };
 
 export {COLORS, FONTS};
