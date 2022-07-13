@@ -17,7 +17,11 @@ import {
 } from 'react-native-paper';
 import NetInfo from '@react-native-community/netinfo';
 
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  CommonActions,
+} from '@react-navigation/native';
 import {isAndroid, isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 import auth from '@react-native-firebase/auth';
@@ -294,16 +298,22 @@ const LoginScreen = () => {
                         });
                     }
                     setLoaderVisible(!LoaderVisible);
+                    navigation?.dispatch(
+                      CommonActions?.reset({
+                        index: 0,
+                        routes: [{name: 'login'}],
+                      }),
+                    );
                     navigation.navigate('home');
                   });
                 });
               } else {
                 const _username = auth()
-                  ?.currentUser.uid.substring(0, 4)
+                  ?.currentUser?.uid?.substring(0, 4)
                   .concat(getRandomInt(100000, 999999));
-                navigation.navigate('setup', {
+                navigation?.navigate('setup', {
                   user: {
-                    uid: auth().currentUser.uid,
+                    uid: auth().currentUser?.uid,
                     username: _username,
                     phone: NumberText,
                     phone_number: CountryText + ' ' + NumberText,
@@ -311,6 +321,9 @@ const LoginScreen = () => {
                     country_code: CountryText,
                   },
                 });
+                navigation?.dispatch(
+                  CommonActions?.reset({index: 0, routes: [{name: 'login'}]}),
+                );
                 setLoaderVisible(!LoaderVisible);
               }
             });
@@ -639,6 +652,12 @@ const LoginScreen = () => {
                     setConfirmCode(false);
                     NumberSetText('');
                     setLoaderVisible(false);
+                    navigation?.dispatch(
+                      CommonActions?.reset({
+                        index: 0,
+                        routes: [{name: 'login'}],
+                      }),
+                    );
                   }}>
                   WRONG NUMBER
                 </Text>

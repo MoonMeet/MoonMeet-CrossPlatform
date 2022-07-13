@@ -20,7 +20,12 @@ import FAQIcon from '../../assets/images/quiz.png';
 import ReportIcon from '../../assets/images/bug.png';
 
 import {COLORS} from '../../config/Miscellaneous';
-import {useNavigation} from '@react-navigation/native';
+import {
+  useNavigation,
+  StackActions,
+  NavigationAction,
+  CommonActions,
+} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
