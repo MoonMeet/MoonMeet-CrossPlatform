@@ -56,6 +56,7 @@ const EditProfileScreen = () => {
 
   const [Loading, setLoading] = React.useState(true);
   const [loaderVisible, setLoaderVisible] = React.useState(false);
+  const [sendingData, setSendingData] = React.useState(false);
 
   useEffect(() => {
     firestore()
@@ -127,6 +128,21 @@ const EditProfileScreen = () => {
       .update({
         avatar: pureImageUrl,
       })
+      .finally(() => {
+        if (firstName !== oldFirstname && lastName !== oldLastname) {
+          // Keep showing loader and FAB
+        } else {
+          setLoaderVisible(false);
+          setSendingData(false);
+          SuccessToast(
+            'bottom',
+            'Profile Updated',
+            'Your profile was updated successfully.',
+            true,
+            3000,
+          );
+        }
+      })
       .catch(error => {
         setLoaderVisible(false);
         console.warn(error);
@@ -152,6 +168,7 @@ const EditProfileScreen = () => {
         setLoaderVisible(false);
         setOldFirstname(firstName);
         setOldLastName(lastName);
+        setSendingData(false);
         SuccessToast(
           'bottom',
           'Profile Updated',
@@ -346,6 +363,7 @@ const EditProfileScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
+        visible={!sendingData}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -359,25 +377,17 @@ const EditProfileScreen = () => {
                 lastName === oldLastname &&
                 !UserPhoto
               ) {
-                navigation.goBack();
+                navigation?.goBack();
               } else {
-                setLoaderVisible(!loaderVisible);
+                setSendingData(true);
+                setLoaderVisible(true);
                 if (UserPhoto) {
-                  pushUserData().finally(() => {
-                    setLoaderVisible(false);
-                    if (
-                      firstName !== oldFirstname ||
-                      lastName !== oldLastname
-                    ) {
-                      // do nothing, easy
-                    } else {
-                      setLoaderVisible(false);
-                    }
-                  });
+                  pushUserData();
                 }
                 if (firstName !== oldFirstname || lastName !== oldLastname) {
-                  pushNames().finally(() => {
+                  pushNames()?.finally(() => {
                     setLoaderVisible(false);
+                    setSendingData(false);
                   });
                 }
               }
