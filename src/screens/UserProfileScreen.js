@@ -1,15 +1,12 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
-import {Avatar, TouchableRipple} from 'react-native-paper';
-import BaseView from '../components/BaseView/BaseView';
+import {StyleSheet} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
-import {Box, HStack} from 'native-base';
-import {heightPercentageToDP} from '../config/Dimensions';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {AvatarHeaderScrollView} from 'react-native-sticky-parallax-header';
+import {Text} from 'react-native';
+import AvatarHeaderScrollView from 'react-native-sticky-parallax-header';
+import ThreeDots from '../assets/images/dots.png';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
@@ -47,84 +44,32 @@ const UserProfileScreen = () => {
   }, [userUID]);
 
   return (
-    <MiniBaseView>
-      <AvatarHeaderScrollView
-        leftTopIcon={iconCloseWhite}
-        leftTopIconOnPress={() => navigation?.goBack()}
-        rightTopIcon={IconMenu}
-        contentContainerStyle={[COLORS.primaryLight]}
-        containerStyle={screenStyles.stretchContainer}
-        backgroundColor={COLORS.accentLight}
-        hasBorderRadius
-        image={Brandon.image}
-        subtitle={Brandon.about}
-        title={Brandon.author}
-        titleStyle={screenStyles.text}
-        showsVerticalScrollIndicator={false}
-      />
-    </MiniBaseView>
+    <AvatarHeaderScrollView
+      leftTopIcon={BackImage}
+      leftTopIconOnPress={() => {}}
+      contentContainerStyle={[COLORS.primaryLight]}
+      containerStyle={styles.stretchContainer}
+      backgroundColor={COLORS.accentLight}
+      hasBorderRadius
+      image={{uri: avatarURL}}
+      subtitle={bioText}
+      title={`${firstName}${' '}${lastName}`}
+      titleStyle={styles.titleStyle}
+      showsVerticalScrollIndicator={false}>
+      <Text>HHSHdoiahnf dnfoihehzjzef nzejnfnelkjaznf sfklzejnfnk </Text>
+    </AvatarHeaderScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  under_header_box: {
-    padding: heightPercentageToDP(1),
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: 22,
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontWeight: 'bold',
+  titleStyle: {
     fontFamily: FONTS.regular,
   },
-  under_header_text: {
-    position: 'relative',
-    fontSize: 24,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    paddingTop: '1%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
-  right_side: {
+  screenContainer: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  bioText: userBio => {
-    return {
-      position: 'relative',
-      fontSize: 16,
-      paddingLeft: '2.5%',
-      paddingRight: '2.5%',
-      paddingTop: '1%',
-      textAlign: 'center',
-      color: COLORS.black,
-      opacity: userBio ? 0.6 : 0.4,
-      fontFamily: FONTS.regular,
-    };
+    justifyContent: 'center',
   },
 });
 export default UserProfileScreen;

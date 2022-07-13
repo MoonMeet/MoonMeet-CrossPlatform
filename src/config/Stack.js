@@ -310,7 +310,11 @@ const StackNavigator = () => {
           component={VerifyPasscodeScreen}
           options={{gestureEnabled: false, headerShown: false}}
         />
-        <Stack.Screen name={'userProfile'} component={UserProfileScreen} />
+        <Stack.Screen
+          name={'userProfile'}
+          component={UserProfileScreen}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
