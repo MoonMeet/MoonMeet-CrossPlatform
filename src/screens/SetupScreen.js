@@ -290,7 +290,7 @@ const SetupScreen = ({route}) => {
                   () => {
                     firestore()
                       .collection('users')
-                      .doc(auth()?.currentUser.uid)
+                      .doc(auth()?.currentUser?.uid)
                       .set({
                         ...user,
                         first_name: lowerToUppercase(firstName),
