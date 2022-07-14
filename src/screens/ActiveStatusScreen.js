@@ -53,35 +53,6 @@ const ActiveStatusScreen = () => {
   }, []);
   return (
     <MiniBaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            borderless={false}
-            rippleColor={COLORS.rippleColor}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Active Status</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.switchRow}>
         <Text style={styles.activeText}>Show when you're active</Text>
@@ -166,18 +137,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: '2.5%',
     marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: fontValue(15.5),
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
   },
   switchRow: {
     padding: '2%',
