@@ -20,10 +20,21 @@ const MessagesList = ({ListData}) => {
       </View>
     );
   };
+
+  const messageText = item => {
+    let messageLength = item?.to_message_text.length;
+    let message =
+      item?.last_uid === auth()?.currentUser?.uid
+        ? `You: ${item?.to_message_text}`
+        : `${item?.to_message_text}`;
+    let modifiedtext =
+      messageLength < 35 ? message : message.substring(0, 35) + '...';
+    return modifiedtext;
+  };
   return (
     <FlatList
       style={{flex: 1}}
-      data={uniqBy(ListData, 'to_uid')}
+      data={uniqBy(ListData, 'to_avatar')}
       ListEmptyComponent={listEmptyComponent}
       contentContainerStyle={{
         paddingStart: '1%',
@@ -72,9 +83,7 @@ const MessagesList = ({ListData}) => {
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text numberOfLines={1} style={styles.subheading('left', true)}>
-              {item?.last_uid === auth()?.currentUser?.uid
-                ? 'You: ' + item?.to_message_text
-                : item?.to_message_text}
+              {messageText(item)}
             </Text>
           </View>
           <View
