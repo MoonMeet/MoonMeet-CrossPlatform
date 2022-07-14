@@ -18,6 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import {useTheme} from 'react-native-paper';
+import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 
 const SplashScreen = () => {
   const theme = useTheme();
@@ -31,19 +32,11 @@ const SplashScreen = () => {
 
   const navigation = useNavigation();
 
-  const [getViewPagerStats, setViewPagerStats] = React.useState('');
-  /**
-   * Getting Data from AsyncStorage
-   */
-
-  const getViewPagerCompleted = () => {
-    AsyncStorage.getItem('isViewPagerCompleted').then(stringValue => {
-      if (stringValue !== null) {
-        setViewPagerStats(stringValue);
-        return;
-      }
-      return false;
-    });
+  const isViewPagerCompleted = () => {
+    return (
+      OnboardingMMKV.contains('onboardingComplete') &&
+      OnboardingMMKV.getBoolean('onboardingComplete')
+    );
   };
 
   async function enableFirebaseTools() {
@@ -54,7 +47,6 @@ const SplashScreen = () => {
 
   useEffect(() => {
     enableFirebaseTools();
-    getViewPagerCompleted();
     const AnimateScene = setTimeout(() => {
       scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
       scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
@@ -70,7 +62,7 @@ const SplashScreen = () => {
       scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
     }, 750);
     const SplashScreenTimerTask = setTimeout(() => {
-      if (getViewPagerStats === 'true') {
+      if (isViewPagerCompleted()) {
         if (auth()?.currentUser !== null) {
           let havePasscode = false;
           firestore()
@@ -102,7 +94,7 @@ const SplashScreen = () => {
       clearTimeout(SplashScreenTimerTask);
       clearTimeout(AnimateScene);
     };
-  }, [getViewPagerStats, navigation, opacity, scaleX, scaleY, translateY]);
+  }, [navigation, opacity, scaleX, scaleY, translateY]);
 
   const viewAnimatedStyle = useAnimatedStyle(() => {
     return {

@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import AppOverview from '../components/IntroScreen/AppOverview';
 import AppDiscover from '../components/IntroScreen/AppDiscover';
 import AppGetStarted from '../components/IntroScreen/AppGetStarted';
+import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 
 const IntroScreen = () => {
   const navigation = useNavigation();
@@ -33,11 +34,8 @@ const IntroScreen = () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
-
-  const ViewPagerPassed = 'true';
-
-  const storeViewPagerCompleted = stringValue => {
-    AsyncStorage.setItem('isViewPagerCompleted', stringValue);
+  const setViewPagerCompleted = () => {
+    OnboardingMMKV.set('onboardingComplete', true);
   };
 
   return (
@@ -47,7 +45,7 @@ const IntroScreen = () => {
         <AppDiscover />
         <AppGetStarted
           onPressButton={() => {
-            storeViewPagerCompleted(ViewPagerPassed);
+            setViewPagerCompleted();
             navigation?.navigate('login');
           }}
         />
