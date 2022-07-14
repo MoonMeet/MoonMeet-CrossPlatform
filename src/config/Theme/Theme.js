@@ -13,12 +13,12 @@ const MoonMeetDarkTheme = {
   ...PaperDarkTheme,
   ...NavigationDarkTheme,
   colors: {
-    ...PaperDarkTheme.colors,
-    ...NavigationDarkTheme.colors,
-    background: COLORS.black,
+    background: COLORS.primaryDark,
     primary: COLORS.primaryDark,
     accent: COLORS.accentDark,
     text: COLORS.white,
+    ...PaperDarkTheme.colors,
+    ...NavigationDarkTheme.colors,
   },
   version: 3,
 };
@@ -27,13 +27,13 @@ const MoonMeetLightTheme = {
   ...PaperDefaultTheme,
   ...NavigationDefaultTheme,
   colors: {
-    ...PaperDefaultTheme.colors,
-    ...NavigationDarkTheme.colors,
     background: COLORS.primaryLight,
     primary: COLORS.redLightError,
     accent: COLORS.redLightError,
     surface: COLORS.accentDark,
     onSurface: COLORS.accentDark,
+    ...PaperDefaultTheme.colors,
+    ...NavigationDarkTheme.colors,
   },
   version: 3,
 };

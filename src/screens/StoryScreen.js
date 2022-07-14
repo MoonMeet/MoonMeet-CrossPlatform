@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useCallback, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,6 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {transformTimeForStories} from '../utils/TimeHandler/TimeHandler';
 import {
   fontValue,
   heightPercentageToDP,
@@ -26,8 +25,8 @@ import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {any} from 'prop-types';
 import moment from 'moment';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -51,14 +50,14 @@ const StoryScreen = () => {
   const [ActionSheetVisible, setActionSheetVisible] = React.useState(false);
   const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
-  async function deleteCurrentStory(sid) {
+  const deleteCurrentStory = useCallback(async sid => {
     return await firestore()
       .collection('users')
-      .doc(userStoryUID)
+      .doc(auth()?.currentUser?.uid)
       .collection('stories')
-      .doc(allCurrentUserStories[current]?.sid)
+      .doc(sid)
       .delete();
-  }
+  }, []);
 
   /**
    * View Ability config for Stories FlatList.
@@ -85,17 +84,20 @@ const StoryScreen = () => {
           .collection('stories')
           .onSnapshot(collectionSnapshot => {
             collectionSnapshot?.forEach(subDocumentSnapshot => {
-              const storyData = collectionSnapshot?.docs.map(subMap => ({
+              const data = collectionSnapshot?.docs?.map(subMap => ({
                 ...subMap?.data(),
                 sid: subMap?.id,
               }));
+              const storyData = Object?.values(data)?.sort(
+                (a, b) => a?.time - b?.time,
+              );
               setAllCurrentUserStories(storyData);
               setLoading(false);
               if (!Loading && storyId !== undefined) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
                   firestore()
                     .collection('users')
-                    .doc(auth()?.currentUser.uid)
+                    .doc(auth()?.currentUser?.uid)
                     .collection('story_views')
                     .get()
                     .then(collectionSnapshot => {
@@ -124,6 +126,20 @@ const StoryScreen = () => {
             });
           });
       });
+    const StoryAvailableTimerTask = setTimeout(() => {
+      if (Loading) {
+        if (navigation?.canGoBack()) {
+          InfoToast(
+            'bottom',
+            'Story Unavailable',
+            'Story have been deleted or expired',
+            true,
+            3000,
+          );
+          return navigation?.goBack();
+        }
+      }
+    }, 3000);
     return () => {};
   }, []);
 

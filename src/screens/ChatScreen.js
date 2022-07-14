@@ -10,6 +10,7 @@ import {
   MessageImage,
   Send,
   Bubble,
+  MessageText,
 } from 'react-native-gifted-chat';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
@@ -417,6 +418,34 @@ const ChatScreen = () => {
         showUserAvatar={false}
         onInputTextChanged={text => setMessageText(text)}
         messages={mChatData}
+        renderMessageImage={props => {
+          return (
+            <MessageImage
+              {...props}
+              containerStyle={{
+                ...props.containerStyle,
+              }}
+              imageStyle={{
+                width: widthPercentageToDP(50),
+                height: heightPercentageToDP(20),
+                borderRadius: 13,
+                margin: 3,
+                resizeMode: 'cover',
+              }}
+            />
+          );
+        }}
+        renderMessageText={props => {
+          return (
+            <MessageText
+              {...props}
+              textStyle={{
+                left: {color: COLORS.black},
+                right: {color: COLORS.white},
+              }}
+            />
+          );
+        }}
         renderBubble={props => {
           return (
             <Bubble

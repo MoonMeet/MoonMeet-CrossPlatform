@@ -4,8 +4,8 @@ import {StyleSheet} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
-import {Text} from 'react-native';
-import AvatarHeaderScrollView from 'react-native-sticky-parallax-header';
+import {Text, View} from 'react-native';
+import {AvatarHeaderScrollView} from 'react-native-sticky-parallax-header';
 import ThreeDots from '../assets/images/dots.png';
 
 const UserProfileScreen = () => {
@@ -16,6 +16,7 @@ const UserProfileScreen = () => {
   const [lastName, setLastName] = React.useState('');
   const [avatarURL, setAvatarURL] = React.useState('');
   const [bioText, setBioText] = React.useState('');
+  const [loading, setLoading] = React.useState(true);
 
   useEffect(() => {
     firestore()
@@ -29,6 +30,7 @@ const UserProfileScreen = () => {
             documentSnapshot?.data()?.first_name &&
             documentSnapshot?.data()?.last_name
           ) {
+            console.log(documentSnapshot?.data());
             setFirstName(documentSnapshot?.data()?.first_name);
             setLastName(documentSnapshot?.data()?.last_name);
             setAvatarURL(documentSnapshot?.data()?.avatar);
@@ -37,26 +39,36 @@ const UserProfileScreen = () => {
             } else if (documentSnapshot?.data()?.created_At) {
               setBioText(documentSnapshot?.data()?.country_code);
             }
+            setLoading(false);
           }
         }
       });
     return () => {};
   }, [userUID]);
 
+  if (loading) {
+    return <></>;
+  }
+
   return (
     <AvatarHeaderScrollView
       leftTopIcon={BackImage}
-      leftTopIconOnPress={() => {}}
-      contentContainerStyle={[COLORS.primaryLight]}
+      leftTopIconOnPress={() => {
+        navigation.goBack();
+      }}
+      rightTopIcon={ThreeDots}
+      contentContainerStyle={{backgroundColor: COLORS.white}}
       containerStyle={styles.stretchContainer}
-      backgroundColor={COLORS.accentLight}
+      backgroundColor={'green'}
       hasBorderRadius
       image={{uri: avatarURL}}
       subtitle={bioText}
-      title={`${firstName}${' '}${lastName}`}
+      title={firstName}
       titleStyle={styles.titleStyle}
       showsVerticalScrollIndicator={false}>
-      <Text>HHSHdoiahnf dnfoihehzjzef nzejnfnelkjaznf sfklzejnfnk </Text>
+      <View style={styles.content}>
+        <Text>Hello There</Text>
+      </View>
     </AvatarHeaderScrollView>
   );
 };

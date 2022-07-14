@@ -76,14 +76,14 @@ const HomeChatsScreen = () => {
       });
   }
 
-  async function deleteCurrentStory(uid, sid) {
+  const deleteCurrentStory = useCallback(async (uid, sid) => {
     return await firestore()
       .collection('users')
       .doc(uid)
       .collection('stories')
       .doc(sid)
       .delete();
-  }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -120,7 +120,7 @@ const HomeChatsScreen = () => {
           setNewActiveTime(documentSnapshot?.data()?.active_time);
         }
       });
-    firestore()
+    const storiesSubscribe = firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
         collectionSnapshot?.forEach(documentSnapshot => {
@@ -136,19 +136,17 @@ const HomeChatsScreen = () => {
                     (subDocument?.data()?.text || subDocument?.data()?.image)
                   ) {
                     if (Date.now() - subDocument?.data()?.time > 86400000) {
-                      deleteCurrentStory(
-                        documentSnapshot?.id,
-                        subDocument?.data()?.sid,
-                      );
+                      deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
+                    } else {
+                      currentStoryData.push({
+                        ...subDocument?.data(),
+                        avatar: documentSnapshot?.data()?.avatar,
+                        first_name: documentSnapshot?.data()?.first_name,
+                        last_name: documentSnapshot?.data()?.last_name,
+                        uid: documentSnapshot?.data()?.uid,
+                        sid: subDocument?.id,
+                      });
                     }
-                    currentStoryData.push({
-                      ...subDocument?.data(),
-                      avatar: documentSnapshot?.data()?.avatar,
-                      first_name: documentSnapshot?.data()?.first_name,
-                      last_name: documentSnapshot?.data()?.last_name,
-                      uid: documentSnapshot?.data()?.uid,
-                      sid: subDocument?.id,
-                    });
                   }
                   setStoriesData(currentStoryData);
                 });
@@ -174,9 +172,9 @@ const HomeChatsScreen = () => {
           setChatsData(chatData);
         }
       });
-
     return () => {
       userSusbcribe();
+      storiesSubscribe();
       chatSubscribe();
     };
   }, []);

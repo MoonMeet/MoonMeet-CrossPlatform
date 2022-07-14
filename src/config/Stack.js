@@ -8,7 +8,7 @@
 import React from 'react';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
+import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import ActiveStatusScreen from '../screens/ActiveStatusScreen';
@@ -120,7 +120,7 @@ const StackNavigator = () => {
   const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
   return (
-    <NavigationContainer theme={isThemeDark ? MoonMeetDarkTheme : undefined}>
+    <NavigationContainer theme={isThemeDark ? MoonMeetDarkTheme : DefaultTheme}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}

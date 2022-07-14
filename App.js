@@ -1,11 +1,10 @@
 import React from 'react';
 import StackNavigator from './src/config/Stack';
 import {StatusBar, UIManager, Platform} from 'react-native';
-import {NativeBaseProvider} from 'native-base';
 import Toast from 'react-native-toast-message';
 import {enableFreeze} from 'react-native-screens';
 import {COLORS} from './src/config/Miscellaneous';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {ThemeContext} from './src/config/Theme/Context';
 import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
 
@@ -18,7 +17,7 @@ import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
-  let theme = isThemeDark ? MoonMeetDarkTheme : undefined;
+  let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
 
   const toggleTheme = React.useCallback(() => {
     return setIsThemeDark(!isThemeDark);
