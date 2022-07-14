@@ -45,6 +45,7 @@ import {fontValue, heightPercentageToDP} from './Dimensions';
 import {MoonMeetDarkTheme, MoonMeetLightTheme} from './Theme/Theme';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from './Theme/Context';
+import DarkModeSettings from '../screens/DarkModeScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -119,8 +120,7 @@ const StackNavigator = () => {
   const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
   return (
-    <NavigationContainer
-      theme={isThemeDark ? MoonMeetDarkTheme : MoonMeetLightTheme}>
+    <NavigationContainer theme={isThemeDark ? MoonMeetDarkTheme : undefined}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}
@@ -325,6 +325,21 @@ const StackNavigator = () => {
           name={'userProfile'}
           component={UserProfileScreen}
           options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'darkMode'}
+          component={DarkModeSettings}
+          options={{
+            headerTitle: 'Dark Mode',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: isThemeDark ? COLORS.white : COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: isThemeDark ? COLORS.white : COLORS.black,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

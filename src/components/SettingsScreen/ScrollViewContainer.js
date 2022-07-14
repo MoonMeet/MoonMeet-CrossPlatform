@@ -88,7 +88,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         descriptionOpacity={0.4}
         onPressTrigger={() => {
-          toggleTheme();
+          navigation?.navigate('darkMode');
         }}
         onLongPressTrigger={null}
       />

@@ -18,7 +18,7 @@ import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
-  let theme = isThemeDark ? MoonMeetDarkTheme : MoonMeetLightTheme;
+  let theme = isThemeDark ? MoonMeetDarkTheme : undefined;
 
   const toggleTheme = React.useCallback(() => {
     return setIsThemeDark(!isThemeDark);
