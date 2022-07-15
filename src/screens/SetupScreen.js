@@ -23,7 +23,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 import placeHolderPhoto from '../assets/images/pick-photo.png';
 import ArrowForward from '../assets/images/arrow-forward.png';
-import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
+import {
+  ErrorToast,
+  InfoToast,
+} from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
@@ -97,6 +100,18 @@ const SetupScreen = ({route}) => {
         <Pressable
           onPress={() => {
             setIsPickerVisible(true);
+          }}
+          onLongPress={() => {
+            if (UserPhoto) {
+              setUserPhoto(null);
+              InfoToast(
+                'bottom',
+                'Photo Removed',
+                'Now select a new photo',
+                true,
+                2000,
+              );
+            }
           }}
           style={{
             justifyContent: 'center',
@@ -271,7 +286,7 @@ const SetupScreen = ({route}) => {
                       product: Product,
                       model: Model,
                       app_version: appVersion,
-                      time: Date.now(),
+                      time: firestore.Timestamp.fromDate(new Date()),
                     })
                     .catch(error => {
                       console.error(error);
@@ -295,10 +310,14 @@ const SetupScreen = ({route}) => {
                         last_name: lowerToUppercase(lastName),
                         avatar: avatarUrl,
                         active_status: 'normal',
-                        active_time: Date.now(),
-                        created_At: firestore.FieldValue.serverTimestamp(),
+                        active_time: firestore.Timestamp.fromDate(new Date()),
+                        created_At: firestore.Timestamp.fromDate(new Date()),
                         bio: '',
                         jwtKey: jwt_key,
+                        premuim: false,
+                        premuimUntil: 'none',
+                        banned: false,
+                        bannedUntil: '',
                         passcode: {
                           passcode_enabled: false,
                         },
