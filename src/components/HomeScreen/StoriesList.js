@@ -6,25 +6,28 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Avatar} from 'react-native-paper';
 import AddIcon from '../../assets/images/add.png';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {uniqBy} from 'lodash';
+import MiniBaseView from '../MiniBaseView/MiniBaseView';
 
 const StoriesList = ({ListData, myUID}) => {
   const navigation = useNavigation();
 
   const _listEmptyComponent = () => {
     return (
-      <View style={styles.emptyView}>
-        <Text style={styles.heading}>No stories available, yet.</Text>
-        <Text style={styles.subheading}>
-          there's no story available at the moment.
-        </Text>
-      </View>
+      <MiniBaseView>
+        <View style={styles.emptyView}>
+          <Text style={styles.heading}>No stories available, yet.</Text>
+          <Text style={styles.subheading}>
+            there's no story available at the moment.
+          </Text>
+        </View>
+      </MiniBaseView>
     );
   };
   const _renderItem = ({item}) => (
@@ -54,43 +57,45 @@ const StoriesList = ({ListData, myUID}) => {
   );
 
   return (
-    <View style={styles.container}>
-      <Pressable
-        onPress={() => navigation?.navigate('addStory')}
-        style={styles.storyHolderLeft}>
-        <Avatar.Icon
-          icon={AddIcon}
-          size={50}
-          color={COLORS.black}
-          style={styles.right_icon}
-          theme={{
-            colors: {
-              primary: COLORS.rippleColor,
-            },
-          }}
-        />
-        <Text style={styles.storyText}>Add{'\n'}Story</Text>
-      </Pressable>
+    <MiniBaseView>
+      <View style={styles.container}>
+        <Pressable
+          onPress={() => navigation?.navigate('addStory')}
+          style={styles.storyHolderLeft}>
+          <Avatar.Icon
+            icon={AddIcon}
+            size={50}
+            color={COLORS.black}
+            style={styles.right_icon}
+            theme={{
+              colors: {
+                primary: COLORS.rippleColor,
+              },
+            }}
+          />
+          <Text style={styles.storyText}>Add{'\n'}Story</Text>
+        </Pressable>
 
-      <FlatList
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingEnd: '13%',
-          alignSelf: 'center',
-          justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
-          minWidth:
-            Dimensions.get('window')?.width -
-            (13 / 100) * Dimensions.get('window')?.width,
-        }}
-        removeClippedSubviews={true}
-        initialNumToRender={10}
-        ListEmptyComponent={_listEmptyComponent}
-        data={uniqBy(ListData, 'uid')}
-        renderItem={_renderItem}
-        keyExtractor={item => item?.uid}
-      />
-    </View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingEnd: '13%',
+            alignSelf: 'center',
+            justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
+            minWidth:
+              Dimensions.get('window')?.width -
+              (13 / 100) * Dimensions.get('window')?.width,
+          }}
+          removeClippedSubviews={true}
+          initialNumToRender={10}
+          ListEmptyComponent={_listEmptyComponent}
+          data={uniqBy(ListData, 'uid')}
+          renderItem={_renderItem}
+          keyExtractor={item => item?.uid}
+        />
+      </View>
+    </MiniBaseView>
   );
 };
 
