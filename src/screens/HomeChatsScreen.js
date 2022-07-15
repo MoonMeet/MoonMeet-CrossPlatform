@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {forwardRef, useCallback, useEffect, useRef} from 'react';
 import {
   BackHandler,
   Pressable,
@@ -20,6 +20,7 @@ import firestore from '@react-native-firebase/firestore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {PurpleBackground} from '../index.d';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -172,7 +173,7 @@ const HomeChatsScreen = () => {
           if (data) {
             chatData = Object?.values(data)?.sort(
               (a, b) =>
-                a?.last_message_time.toDate() - b?.last_message_time.toDate(),
+                a?.last_message_time?.toDate() - b?.last_message_time?.toDate(),
             );
           }
           setChatsData(chatData);
@@ -190,35 +191,17 @@ const HomeChatsScreen = () => {
       <MiniBaseView>
         <View style={styles.toolbar}>
           <View style={styles.left_side}>
-            {avatarURL ? (
-              <Pressable
-                hitSlop={15}
-                onPress={() => {
-                  navigation.navigate('settings');
-                }}>
-                <Avatar.Image
-                  size={35.5}
-                  source={avatarURL ? {uri: avatarURL} : null}
-                  style={{
-                    overflow: 'hidden',
-                    marginRight: '-1%',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
-              </Pressable>
-            ) : (
-              <Avatar.Icon
-                icon={PersonImage}
-                size={40}
-                color={COLORS.black}
+            <Pressable
+              hitSlop={15}
+              onPress={() => {
+                navigation.navigate('settings');
+              }}>
+              <Avatar.Image
+                size={35.5}
+                source={avatarURL ? {uri: avatarURL} : PurpleBackground}
                 style={{
                   overflow: 'hidden',
                   marginRight: '-1%',
-                  opacity: 0.4,
                 }}
                 theme={{
                   colors: {
@@ -226,7 +209,7 @@ const HomeChatsScreen = () => {
                   },
                 }}
               />
-            )}
+            </Pressable>
           </View>
           <View style={styles.mid_side}>
             <Text style={styles.top_text}>Chats</Text>
@@ -234,7 +217,7 @@ const HomeChatsScreen = () => {
           <View style={styles.right_side}>
             <Pressable
               onPress={() => {
-                navigation.navigate('searchChats');
+                // navigation.navigate('searchChats');
                 updateUserActiveStatus();
               }}>
               <MaterialIcons

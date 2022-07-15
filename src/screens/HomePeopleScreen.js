@@ -10,6 +10,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
 import {fontValue} from '../config/Dimensions';
+import {PurpleBackground} from '../index.d';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
@@ -135,7 +136,7 @@ const HomePeopleScreen = () => {
                   }}>
                   <Avatar.Image
                     size={35.5}
-                    source={avatarURL ? {uri: avatarURL} : null}
+                    source={avatarURL ? {uri: avatarURL} : PurpleBackground}
                     style={{
                       overflow: 'hidden',
                       marginRight: '-1%',
@@ -171,7 +172,7 @@ const HomePeopleScreen = () => {
             <View style={styles.right_side}>
               <Pressable
                 onPress={() => {
-                  navigation.navigate('discover');
+                  navigation?.navigate('discover');
                   updateUserActiveStatus();
                 }}>
                 <Avatar.Icon

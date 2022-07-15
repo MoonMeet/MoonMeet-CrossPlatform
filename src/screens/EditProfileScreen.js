@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   ActivityIndicator,
@@ -7,10 +7,8 @@ import {
   FAB,
   HelperText,
   TextInput,
-  TouchableRipple,
 } from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import BackImage from '../assets/images/back.png';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
 import firestore from '@react-native-firebase/firestore';
@@ -29,6 +27,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
+import {PurpleBackground} from '../index.d';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -211,40 +210,17 @@ const EditProfileScreen = () => {
 
   return (
     <BaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation?.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Edit Profile</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.avatarHolder}>
         <Avatar.Image
           size={85}
-          source={UserPhoto ? {uri: UserPhoto?.path} : {uri: avatarURL}}
+          source={
+            UserPhoto
+              ? {uri: UserPhoto?.path}
+              : avatarURL
+              ? {uri: avatarURL}
+              : PurpleBackground
+          }
         />
         <Pressable
           style={{

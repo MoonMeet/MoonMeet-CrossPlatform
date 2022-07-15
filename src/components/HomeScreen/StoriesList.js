@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {uniqBy} from 'lodash';
 import MiniBaseView from '../MiniBaseView/MiniBaseView';
+import {PurpleBackground} from '../../index.d';
 
 const StoriesList = ({ListData, myUID}) => {
   const navigation = useNavigation();
@@ -49,7 +50,13 @@ const StoriesList = ({ListData, myUID}) => {
         <Avatar.Image
           style={styles.userHaveStory}
           size={50}
-          source={{uri: item?.image ? item?.image : item?.avatar}}
+          source={
+            item?.image
+              ? {uri: item?.image}
+              : item?.avatar
+              ? {uri: item?.avatar}
+              : PurpleBackground
+          }
         />
       </View>
       <Text style={styles.nameAndLastname}>{item?.first_name}</Text>

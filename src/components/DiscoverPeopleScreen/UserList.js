@@ -6,6 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../MiniBaseView/MiniBaseView';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
+import {PurpleBackground} from '../../index.d';
 
 interface UserListInterface {
   ListData: any;
@@ -40,7 +41,9 @@ const UserList = (props: UserListInterface) => {
                 }}>
                 <View style={styles.left_side}>
                   <Avatar.Image
-                    source={item?.avatar ? {uri: item?.avatar} : null}
+                    source={
+                      item?.avatar ? {uri: item?.avatar} : PurpleBackground
+                    }
                     size={55}
                   />
                 </View>

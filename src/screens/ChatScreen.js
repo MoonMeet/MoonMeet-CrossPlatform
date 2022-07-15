@@ -30,6 +30,7 @@ import {bytesToSize} from '../utils/converters/bytesToSize';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
+import {PurpleBackground} from '../index.d';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -343,7 +344,7 @@ const ChatScreen = () => {
           </TouchableRipple>
           <Avatar.Image
             size={40}
-            source={{uri: userAvatar ? userAvatar : null}}
+            source={userAvatar ? {uri: userAvatar} : PurpleBackground}
           />
           <Text style={styles.userFullName}>
             {userFirstName} {userLastName}

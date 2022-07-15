@@ -25,7 +25,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ReportProblem from '../screens/ReportProblemScreen';
-import SearchChatsScreen from '../screens/SearchChatsScreen';
 import SetupScreen from '../screens/SetupScreen';
 import SplashScreen from '../screens/SplashScreen';
 import StoryScreen from '../screens/StoryScreen';
@@ -173,7 +172,6 @@ const StackNavigator = () => {
             },
           }}
         />
-        <Stack.Screen name={'searchChats'} component={SearchChatsScreen} />
         <Stack.Screen
           name={'bugreport'}
           component={ReportProblem}

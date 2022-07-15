@@ -7,9 +7,10 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
-import {fontValue} from '../config/Dimensions';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../config/Theme/Context';
+import {PurpleBackground} from '../index.d';
+
 const SettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
 
@@ -131,21 +132,21 @@ const SettingsScreen = () => {
         <View style={styles.under_header}>
           <Avatar.Image
             size={85}
-            source={avatarURL ? {uri: avatarURL} : null}
+            source={avatarURL ? {uri: avatarURL} : PurpleBackground}
           />
           <Text style={styles.under_header_text}>
             {firstName + ' ' + lastName}
           </Text>
           {userBio ? (
             <Text
-              onPress={() => navigation.navigate('addBio')}
+              onPress={() => navigation?.navigate('addBio')}
               style={styles.bioText(userBio)}>
               {userBio}
             </Text>
           ) : (
             <Text
               style={styles.bioText(userBio)}
-              onPress={() => navigation.navigate('addBio')}>
+              onPress={() => navigation?.navigate('addBio')}>
               Tap to add a bio
             </Text>
           )}
