@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
 } from 'react-native';
 import React from 'react';
 import {Avatar} from 'react-native-paper';
@@ -57,45 +58,42 @@ const StoriesList = ({ListData, myUID}) => {
   );
 
   return (
-    <MiniBaseView>
-      <View style={styles.container}>
-        <Pressable
-          onPress={() => navigation?.navigate('addStory')}
-          style={styles.storyHolderLeft}>
-          <Avatar.Icon
-            icon={AddIcon}
-            size={50}
-            color={COLORS.black}
-            style={styles.right_icon}
-            theme={{
-              colors: {
-                primary: COLORS.rippleColor,
-              },
-            }}
-          />
-          <Text style={styles.storyText}>Add{'\n'}Story</Text>
-        </Pressable>
-
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingEnd: '13%',
-            alignSelf: 'center',
-            justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
-            minWidth:
-              Dimensions.get('window')?.width -
-              (13 / 100) * Dimensions.get('window')?.width,
+    <SafeAreaView style={styles.container}>
+      <Pressable
+        onPress={() => navigation?.navigate('addStory')}
+        style={styles.storyHolderLeft}>
+        <Avatar.Icon
+          icon={AddIcon}
+          size={50}
+          color={COLORS.black}
+          style={styles.right_icon}
+          theme={{
+            colors: {
+              primary: COLORS.rippleColor,
+            },
           }}
-          removeClippedSubviews={true}
-          initialNumToRender={10}
-          ListEmptyComponent={_listEmptyComponent}
-          data={uniqBy(ListData, 'uid')}
-          renderItem={_renderItem}
-          keyExtractor={item => item?.uid}
         />
-      </View>
-    </MiniBaseView>
+        <Text style={styles.storyText}>Add{'\n'}Story</Text>
+      </Pressable>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingEnd: '13%',
+          alignSelf: 'center',
+          justifyContent: ListData?.length > 0 ? 'flex-start' : 'center',
+          minWidth:
+            Dimensions.get('window')?.width -
+            (13 / 100) * Dimensions.get('window')?.width,
+        }}
+        removeClippedSubviews={true}
+        initialNumToRender={10}
+        ListEmptyComponent={_listEmptyComponent}
+        data={uniqBy(ListData, 'uid')}
+        renderItem={_renderItem}
+        keyExtractor={item => item?.uid}
+      />
+    </SafeAreaView>
   );
 };
 

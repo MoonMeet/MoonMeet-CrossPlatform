@@ -113,9 +113,7 @@ const ChatScreen = () => {
             id: subMap?.id,
           }));
           const messages = Object.values(
-            collectionDocs?.sort(
-              (a, b) => a.createdAt.toDate() - b.createdAt.toDate(),
-            ),
+            collectionDocs?.sort((a, b) => a.createdAt - b.createdAt),
           ).reverse();
           setChatData(messages);
         }
@@ -146,7 +144,7 @@ const ChatScreen = () => {
             .add({
               _id: _id,
               text: mMessageText,
-              createdAt: firestore.Timestamp.fromDate(new Date()),
+              createdAt: Date.now(),
               user: {
                 _id: myUID,
                 name: myFirstName + ' ' + myLastName,
@@ -161,7 +159,7 @@ const ChatScreen = () => {
             .collection('discussions')
             .add({
               _id: _id,
-              createdAt: firestore.Timestamp.fromDate(new Date()),
+              createdAt: Date.now(),
               text: mMessageText,
               user: {
                 _id: myUID,
@@ -257,7 +255,7 @@ const ChatScreen = () => {
           .add({
             _id: _id,
             image: uploadedImageURL,
-            createdAt: firestore.Timestamp.fromDate(new Date()),
+            createdAt: Date.now(),
             user: {
               _id: myUID,
               name: myFirstName + ' ' + myLastName,
@@ -272,7 +270,7 @@ const ChatScreen = () => {
           .collection('discussions')
           .add({
             _id: _id,
-            createdAt: firestore.Timestamp.fromDate(new Date()),
+            createdAt: Date.now(),
             image: uploadedImageURL,
             user: {
               _id: myUID,

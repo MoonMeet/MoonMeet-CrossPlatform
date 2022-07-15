@@ -79,8 +79,8 @@ const HomePeopleScreen = () => {
         collectionSnapshot?.forEach(documentSnapshot => {
           if (
             documentSnapshot?.data()?.active_status == 'normal' &&
-            firestore.Timestamp.fromDate(new Date()) -
-              documentSnapshot?.data()?.active_time.toDate() <
+            firestore?.Timestamp?.fromDate(new Date()) -
+              documentSnapshot?.data()?.active_time?.toDate() <
               180000
           ) {
             if (

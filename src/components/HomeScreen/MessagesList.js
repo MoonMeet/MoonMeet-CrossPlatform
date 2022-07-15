@@ -22,14 +22,22 @@ const MessagesList = ({ListData}) => {
   };
 
   const messageText = item => {
-    let messageLength = item?.to_message_text.length;
-    let message =
-      item?.last_uid === auth()?.currentUser?.uid
-        ? `You: ${item?.to_message_text}`
-        : `${item?.to_message_text}`;
-    let modifiedtext =
-      messageLength < 35 ? message : message.substring(0, 35) + '...';
-    return modifiedtext;
+    if (item?.type === 'message') {
+      let messageLength = item?.to_message_text.length;
+      let message =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? `You: ${item?.to_message_text}`
+          : `${item?.to_message_text}`;
+      let modifiedtext =
+        messageLength < 35 ? message : message.substring(0, 35) + '...';
+      return modifiedtext;
+    } else {
+      let message =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? 'You have sent an image'
+          : 'Sent an image';
+      return message;
+    }
   };
   return (
     <FlatList
@@ -93,7 +101,7 @@ const MessagesList = ({ListData}) => {
               alignItems: 'flex-end',
             }}>
             <Text style={styles.subheading('right', false)}>
-              {moment(item?.time)?.calendar()}
+              {moment(item?.time.toDate())?.calendar()}
             </Text>
           </View>
         </Pressable>

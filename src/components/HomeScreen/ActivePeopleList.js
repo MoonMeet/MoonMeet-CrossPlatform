@@ -51,7 +51,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
               {item?.first_name + ' ' + item?.last_name}
             </Text>
             <Text style={styles.subheading}>
-              {moment(item?.active_time)?.calendar()}
+              {moment(item?.active_time.toDate())?.calendar()}
             </Text>
           </View>
         </Pressable>
