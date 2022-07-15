@@ -34,11 +34,12 @@ const MessagesList = ({ListData}) => {
     } else {
       let message =
         item?.last_uid === auth()?.currentUser?.uid
-          ? 'You have sent an image'
+          ? 'You sent an image'
           : 'Sent an image';
       return message;
     }
   };
+
   return (
     <FlatList
       style={{flex: 1}}
@@ -87,7 +88,7 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}>
-            <Text numOfLines={1} style={styles.heading('left', false)}>
+            <Text numberOfLines={1} style={styles.heading('left', false)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text numberOfLines={1} style={styles.subheading('left', true)}>
