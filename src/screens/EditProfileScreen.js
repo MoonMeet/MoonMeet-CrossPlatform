@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
   },
   instruction: {
     flexDirection: 'row',
-    padding: '2%',
+    padding: '0.25%',
     justifyContent: 'center',
   },
   fab: {
