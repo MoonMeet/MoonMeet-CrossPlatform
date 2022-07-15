@@ -10,6 +10,7 @@ import {
   Send,
   Bubble,
   MessageText,
+  Composer,
 } from 'react-native-gifted-chat';
 import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
@@ -385,6 +386,7 @@ const ChatScreen = () => {
       <GiftedChat
         text={mMessageText}
         isLoadingEarlier={isLoading}
+        messageIdGenerator={() => uuidv4()}
         renderLoading={() => (
           <View style={{flex: 1, justifyContent: 'center'}}>
             <Text
@@ -453,6 +455,7 @@ const ChatScreen = () => {
           );
         }}
         renderInputToolbar={props => <MoonInputToolbar {...props} />}
+        renderComposer={props => <Composer {...props} />}
         renderSend={props => {
           return (
             <Send {...props}>
@@ -484,13 +487,13 @@ const ChatScreen = () => {
                     cropper: false,
                   })
                     .then(async image => {
-                      /*const compressingResult = await Image.compress(
+                      const compressingResult = await Image.compress(
                         image?.path,
                         {
                           compressionMethod: 'auto',
                         },
-                      );*/
-                      sendMessage([], image?.path);
+                      );
+                      sendMessage([], compressingResult);
                     })
                     .catch(() => {});
                 },
