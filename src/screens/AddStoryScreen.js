@@ -128,7 +128,7 @@ const AddStoryScreen = () => {
         .doc(auth()?.currentUser?.uid)
         .collection('stories')
         .add({
-          time: Date.now(),
+          time: firestore.Timestamp.fromDate(new Date()),
           text: StoryTextInput,
         })
         .finally(() => {
@@ -183,7 +183,7 @@ const AddStoryScreen = () => {
           .doc(auth()?.currentUser?.uid)
           .collection('stories')
           .add({
-            time: Date.now(),
+            time: firestore.Timestamp.fromDate(new Date()),
             image: storyImageURL,
             text: SecondStoryTextInput ? SecondStoryTextInput : '',
           })

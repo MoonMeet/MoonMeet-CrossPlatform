@@ -42,7 +42,7 @@ const DevicesList = (props: UserListInterface) => {
             </View>
             <View style={styles.right_side}>
               <Text style={styles.subheading}>
-                {moment(item?.time)?.calendar()}
+                {moment(item?.time.toDate())?.calendar()}
               </Text>
             </View>
           </Pressable>

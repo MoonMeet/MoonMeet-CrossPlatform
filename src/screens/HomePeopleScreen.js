@@ -33,7 +33,7 @@ const HomePeopleScreen = () => {
         active_time:
           newActiveTime === 'Last seen recently'
             ? 'Last seen recently'
-            : Date.now(),
+            : firestore?.Timestamp?.fromDate(new Date()),
       });
   }
 
@@ -79,7 +79,9 @@ const HomePeopleScreen = () => {
         collectionSnapshot?.forEach(documentSnapshot => {
           if (
             documentSnapshot?.data()?.active_status == 'normal' &&
-            Date.now() - documentSnapshot?.data()?.active_time < 180000
+            firestore.Timestamp.fromDate(new Date()) -
+              documentSnapshot?.data()?.active_time.toDate() <
+              180000
           ) {
             if (
               documentSnapshot?.data()?.avatar &&

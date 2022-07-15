@@ -52,7 +52,7 @@ const HomeChatsScreen = () => {
                 'Session Expired',
                 'Your session in this account has been expired, Please re-login',
                 true,
-                3500,
+                3000,
               );
             })
             .catch(() => {
@@ -72,7 +72,7 @@ const HomeChatsScreen = () => {
         active_time:
           newActiveTime === 'Last seen recently'
             ? 'Last seen recently'
-            : Date.now(),
+            : firestore.Timestamp.fromDate(new Date()),
       });
   }
 
@@ -135,8 +135,13 @@ const HomeChatsScreen = () => {
                     subDocument?.data()?.time &&
                     (subDocument?.data()?.text || subDocument?.data()?.image)
                   ) {
-                    if (Date.now() - subDocument?.data()?.time > 86400000) {
+                    if (
+                      firestore.Timestamp.fromDate(new Date()) -
+                        subDocument?.data()?.time.toDate() >
+                      86400000
+                    ) {
                       deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
+                      console.log('del');
                     } else {
                       currentStoryData.push({
                         ...subDocument?.data(),
@@ -166,7 +171,8 @@ const HomeChatsScreen = () => {
           let chatData = [];
           if (data) {
             chatData = Object?.values(data)?.sort(
-              (a, b) => a?.last_message_time - b?.last_message_time,
+              (a, b) =>
+                a?.last_message_time.toDate() - b?.last_message_time.toDate(),
             );
           }
           setChatsData(chatData);

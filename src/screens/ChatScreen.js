@@ -1,12 +1,11 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect, useRef} from 'react';
-import {Dimensions, Keyboard, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Dimensions, StyleSheet, Text, View} from 'react-native';
 import {
   Actions,
   GiftedChat,
-  InputToolbar,
   MessageImage,
   Send,
   Bubble,
@@ -20,8 +19,6 @@ import Spacer from '../components/Spacer/Spacer';
 import {
   fontValue,
   heightPercentageToDP,
-  screenHeight,
-  screenWidth,
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -116,7 +113,9 @@ const ChatScreen = () => {
             id: subMap?.id,
           }));
           const messages = Object.values(
-            collectionDocs?.sort((a, b) => a.createdAt - b.createdAt),
+            collectionDocs?.sort(
+              (a, b) => a.createdAt.toDate() - b.createdAt.toDate(),
+            ),
           ).reverse();
           setChatData(messages);
         }
@@ -147,7 +146,7 @@ const ChatScreen = () => {
             .add({
               _id: _id,
               text: mMessageText,
-              createdAt: Date.now(),
+              createdAt: firestore.Timestamp.fromDate(new Date()),
               user: {
                 _id: myUID,
                 name: myFirstName + ' ' + myLastName,
@@ -162,7 +161,7 @@ const ChatScreen = () => {
             .collection('discussions')
             .add({
               _id: _id,
-              createdAt: Date.now(),
+              createdAt: firestore.Timestamp.fromDate(new Date()),
               text: mMessageText,
               user: {
                 _id: myUID,
@@ -184,7 +183,7 @@ const ChatScreen = () => {
               to_last_name: userLastName,
               to_message_text: mMessageText,
               to_avatar: userAvatar,
-              time: Date.now(),
+              time: firestore.Timestamp.fromDate(new Date()),
               type: 'message',
               last_uid: myUID,
               sent_to_uid: userUID,
@@ -199,7 +198,7 @@ const ChatScreen = () => {
               to_last_name: myLastName,
               to_message_text: mMessageText,
               to_avatar: myAvatar,
-              time: Date.now(),
+              time: firestore.Timestamp.fromDate(new Date()),
               type: 'message',
               last_uid: myUID,
             });
@@ -258,7 +257,7 @@ const ChatScreen = () => {
           .add({
             _id: _id,
             image: uploadedImageURL,
-            createdAt: Date.now(),
+            createdAt: firestore.Timestamp.fromDate(new Date()),
             user: {
               _id: myUID,
               name: myFirstName + ' ' + myLastName,
@@ -273,7 +272,7 @@ const ChatScreen = () => {
           .collection('discussions')
           .add({
             _id: _id,
-            createdAt: Date.now(),
+            createdAt: firestore.Timestamp.fromDate(new Date()),
             image: uploadedImageURL,
             user: {
               _id: myUID,
@@ -285,42 +284,35 @@ const ChatScreen = () => {
           GiftedChat.append(previousMessage, mChatData),
         );
         // Chats messages on home screen goes here
-        /**await firestore()
-               .collection('chats')
-               .doc(auth()?.currentUser?.uid)
-               .collection('discussions')
-               .doc(userUID)
-               .set({
+        firestore()
+          .collection('chats')
+          .doc(auth()?.currentUser?.uid)
+          .collection('discussions')
+          .doc(userUID)
+          .set({
             to_first_name: userFirstName,
             to_last_name: userLastName,
-            to_message_text: mMessageText,
+            to_message_image: uploadedImageURL,
             to_avatar: userAvatar,
-            time: Date.now(),
-            type: image ? 'image' : 'message',
-            to_uid: userUID,
-            from_uid: myUID,
-            from_first_name: myFirstName,
-            from_last_name: myLastName,
-            from_avatar: myAvatar,
+            time: firestore.Timestamp.fromDate(new Date()),
+            type: 'image',
+            last_uid: myUID,
+            sent_to_uid: userUID,
           });
-               await firestore()
-               .collection('chats')
-               .doc(userUID)
-               .collection('discussions')
-               .doc(auth()?.currentUser?.uid)
-               .set({
+        firestore()
+          .collection('chats')
+          .doc(userUID)
+          .collection('discussions')
+          .doc(auth()?.currentUser?.uid)
+          .set({
             to_first_name: myFirstName,
             to_last_name: myLastName,
-            to_message_text: mMessageText,
+            to_message_image: uploadedImageURL,
             to_avatar: myAvatar,
-            time: Date.now(),
-            type: image ? 'image' : 'message',
-            to_uid: myUID,
-            from_uid: userUID,
-            from_first_name: userFirstName,
-            from_last_name: userLastName,
-            from_avatar: userAvatar,
-          });*/
+            time: firestore.Timestamp.fromDate(new Date()),
+            type: 'image',
+            last_uid: myUID,
+          });
       });
     }
   });

@@ -2,8 +2,7 @@ import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {Avatar, HelperText, Switch, TouchableRipple} from 'react-native-paper';
-import BackImage from '../assets/images/back.png';
+import {HelperText, Switch} from 'react-native-paper';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import NetInfo from '@react-native-community/netinfo';
@@ -13,7 +12,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {fontValue, heightPercentageToDP} from '../config/Dimensions';
+import {heightPercentageToDP} from '../config/Dimensions';
 
 const ActiveStatusScreen = () => {
   const navigation = useNavigation();
@@ -70,7 +69,7 @@ const ActiveStatusScreen = () => {
                     active_status: switchState == true ? 'recently' : 'normal',
                     active_time:
                       newActiveTime == 'Last seen recently'
-                        ? Date.now()
+                        ? firestore?.Timestamp?.fromDate(new Date())
                         : 'Last seen recently',
                   })
                   .finally(() => {

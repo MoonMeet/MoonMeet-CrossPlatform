@@ -51,7 +51,7 @@ const UserList = (props: UserListInterface) => {
                   <Text style={styles.subheading}>
                     {item?.active_status === 'recently'
                       ? 'Last seen recently'
-                      : moment(item?.active_time)?.calendar()}
+                      : moment(item?.active_time.toDate())?.calendar()}
                   </Text>
                 </View>
               </Pressable>

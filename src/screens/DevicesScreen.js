@@ -52,7 +52,9 @@ const DevicesScreen = () => {
           }
         });
         setMasterData(
-          Object?.values(devicesSnapshot)?.sort((a, b) => b?.time - a?.time),
+          Object?.values(devicesSnapshot)?.sort(
+            (a, b) => b?.time.toDate() - a?.time.toDate(),
+          ),
         );
         setLoading(false);
       });
@@ -107,7 +109,7 @@ const DevicesScreen = () => {
               product: Product,
               model: Model,
               app_version: appVersion,
-              time: Date.now(),
+              time: firestore?.Timestamp?.fromDate(new Date()),
             })
             .catch(error => {
               console.error(error);
@@ -195,7 +197,7 @@ const DevicesScreen = () => {
                   .finally(async () => {
                     await resendCurrentDevice();
                   })
-                  .catch(error => console.log(error));
+                  .catch(error => console.error(error));
               },
             );
           }}

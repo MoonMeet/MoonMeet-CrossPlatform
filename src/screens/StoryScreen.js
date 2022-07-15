@@ -82,14 +82,15 @@ const StoryScreen = () => {
           .collection('users')
           .doc(userStoryUID)
           .collection('stories')
-          .onSnapshot(collectionSnapshot => {
+          .get()
+          .then(collectionSnapshot => {
             collectionSnapshot?.forEach(subDocumentSnapshot => {
               const data = collectionSnapshot?.docs?.map(subMap => ({
                 ...subMap?.data(),
                 sid: subMap?.id,
               }));
               const storyData = Object?.values(data)?.sort(
-                (a, b) => a?.time - b?.time,
+                (a, b) => a?.time.toDate() - b?.time.toDate(),
               );
               setAllCurrentUserStories(storyData);
               setLoading(false);
@@ -126,20 +127,7 @@ const StoryScreen = () => {
             });
           });
       });
-    const StoryAvailableTimerTask = setTimeout(() => {
-      if (Loading) {
-        if (navigation?.canGoBack()) {
-          InfoToast(
-            'bottom',
-            'Story Unavailable',
-            'Story have been deleted or expired',
-            true,
-            3000,
-          );
-          return navigation?.goBack();
-        }
-      }
-    }, 3000);
+
     return () => {};
   }, []);
 
@@ -205,7 +193,7 @@ const StoryScreen = () => {
                 <Text style={styles.timeText}>
                   {moment(
                     Object.values(allCurrentUserStories)?.length > 0
-                      ? allCurrentUserStories[current]?.time
+                      ? allCurrentUserStories[current]?.time.toDate()
                       : Date.now(),
                   ).fromNow()}
                 </Text>
