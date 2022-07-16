@@ -1,46 +1,59 @@
-import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useMemo} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 
-import {IconButton} from 'react-native-paper';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
-import Modal from 'react-native-modal';
-import BackImage from '../../../assets/images/back.png';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetDynamicSnapPoints,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import {SharedValue} from 'react-native-reanimated';
+import {ScrollView} from 'react-native-gesture-handler';
+import {fontValue} from '../../../config/Dimensions';
 
 interface PrivacyPolicyInterface {
-  hideModal: Function;
-  isVisible: boolean;
+  sheetRef?: Ref | undefined;
+  snapPoints?:
+    | Array<string | number>
+    | SharedValue<Array<string | number>>
+    | undefined;
+  index?: number | undefined;
 }
 const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
+  const {animatedHandleHeight, handleContentLayout} =
+    useBottomSheetDynamicSnapPoints(props.snapPoints);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const sheetStyle = useMemo(
+    () => ({
+      ...styles.sheetContainer,
+      shadowColor: COLORS.black,
+      padding: '2.5%',
+    }),
+    [],
+  );
+
   return (
-    <Modal
-      style={{
-        margin: '3%',
-      }}
-      animationType={'slide'}
-      transparent={false}
-      visible={props?.isVisible}
-      onRequestClose={() => {
-        props.hideModal();
-      }}>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.primaryLight,
-        }}>
-        <View
-          style={{
-            alignItems: 'flex-start',
-          }}>
-          <IconButton
-            icon={BackImage}
-            color={'#999999'}
-            size={24}
-            onPress={() => {
-              props.hideModal();
-            }}
-          />
-        </View>
-        <Text style={styles.headerText}>Privacy Policy :</Text>
+    <BottomSheetModal
+      ref={props?.sheetRef}
+      index={props?.index}
+      snapPoints={props?.snapPoints}
+      handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
+      enablePanDownToClose={true}
+      handleHeight={animatedHandleHeight}
+      animationConfigs={animationConfigs}
+      animateOnMount={true}
+      style={sheetStyle}>
+      <BottomSheetView onLayout={handleContentLayout}>
+        <Text style={styles.headerText}>Privacy Policy</Text>
         <ScrollView
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}>
@@ -59,9 +72,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             otherwise defined in this Privacy Policy. Information Collection and
             Use:
           </Text>
-          <Text style={styles.lastUpdate}>
-            last updated: September 15, 2021
-          </Text>
+          <Text style={styles.lastUpdate}>last updated: August 1, 2022</Text>
           <Text style={styles.subText}>
             For a better experience, while using our Service, I may require you
             to provide us with certain personally identifiable information,
@@ -131,8 +142,8 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             Rayensbai2@gmail.com.
           </Text>
         </ScrollView>
-      </SafeAreaView>
-    </Modal>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 };
 
@@ -140,25 +151,37 @@ const styles = StyleSheet.create({
   headerText: {
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
-    fontSize: 20,
-    padding: 8,
-    textAlign: 'left',
+    fontSize: fontValue(20),
+    padding: '1%',
+    textAlign: 'center',
   },
   subText: {
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    fontSize: 18,
-    padding: 8,
+    fontSize: fontValue(18),
+    padding: '2%',
     opacity: 0.6,
     textAlign: 'left',
   },
   lastUpdate: {
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    fontSize: 18,
-    padding: 8,
+    fontSize: fontValue(18),
+    padding: '2%',
     opacity: 0.4,
     textAlign: 'left',
+  },
+  sheetContainer: {
+    backgroundColor: COLORS.white,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 16.0,
+    elevation: 25,
   },
 });
 export default PrivacyPolicy;

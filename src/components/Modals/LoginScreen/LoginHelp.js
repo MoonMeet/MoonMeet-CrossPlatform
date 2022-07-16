@@ -1,42 +1,59 @@
-import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {Ref, useMemo} from 'react';
+import {StyleSheet, Text} from 'react-native';
+import {SharedValue} from 'react-native-reanimated';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
-import {IconButton} from 'react-native-paper';
 import {isAndroid} from '../../../utils/device/DeviceInfo';
-import Modal from 'react-native-modal';
-import BackImage from '../../../assets/images/back.png';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetDynamicSnapPoints,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import {fontValue} from '../../../config/Dimensions';
+import {ScrollView} from 'react-native-gesture-handler';
 
 interface LoginHelpInterface {
-  isVisible: boolean;
-  hideModal: Function;
+  sheetRef?: Ref | undefined;
+  snapPoints?:
+    | Array<string | number>
+    | SharedValue<Array<string | number>>
+    | undefined;
+  index?: number | undefined;
 }
 
 const LoginHelp = (props: LoginHelpInterface) => {
+  const {animatedHandleHeight, handleContentLayout} =
+    useBottomSheetDynamicSnapPoints(props.snapPoints);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const sheetStyle = useMemo(
+    () => ({
+      ...styles.sheetContainer,
+      padding: '0.5%',
+      shadowColor: COLORS.black,
+    }),
+    [],
+  );
+
   return (
-    <Modal
-      style={{
-        margin: '3%',
-      }}
-      animationType={'slide'}
-      transparent={false}
-      visible={props?.isVisible}
-      onRequestClose={() => {
-        props?.hideModal();
-      }}>
-      <SafeAreaView style={styles.container}>
-        <View
-          style={{
-            alignItems: 'flex-start',
-          }}>
-          <IconButton
-            icon={BackImage}
-            color={'#999999'}
-            size={24}
-            onPress={() => {
-              props?.hideModal();
-            }}
-          />
-        </View>
+    <BottomSheetModal
+      ref={props?.sheetRef}
+      index={props?.index}
+      snapPoints={props?.snapPoints}
+      handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
+      enablePanDownToClose={true}
+      handleHeight={animatedHandleHeight}
+      animationConfigs={animationConfigs}
+      animateOnMount={true}
+      style={sheetStyle}>
+      <BottomSheetView style={{flex: 1}} onLayout={handleContentLayout}>
         {isAndroid ? (
           <ScrollView
             nestedScrollEnabled={true}
@@ -156,7 +173,7 @@ const LoginHelp = (props: LoginHelpInterface) => {
               style={{
                 color: COLORS.accentLight,
                 fontFamily: FONTS.regular,
-                fontSize: 18,
+                fontSize: fontValue(18),
                 paddingLeft: '4%',
                 paddingTop: '1%',
                 paddingBottom: '2%',
@@ -175,8 +192,8 @@ const LoginHelp = (props: LoginHelpInterface) => {
             </Text>
           </ScrollView>
         )}
-      </SafeAreaView>
-    </Modal>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 };
 const styles = StyleSheet.create({
@@ -187,7 +204,7 @@ const styles = StyleSheet.create({
   headerText: {
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
-    fontSize: 25,
+    fontSize: fontValue(25),
     paddingLeft: '4%',
     paddingTop: '2%',
     paddingBottom: '2%',
@@ -197,7 +214,7 @@ const styles = StyleSheet.create({
   subText: {
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    fontSize: 23,
+    fontSize: fontValue(23),
     paddingLeft: '4%',
     textAlign: 'left',
     opacity: 0.4,
@@ -205,13 +222,25 @@ const styles = StyleSheet.create({
   instruction: {
     color: COLORS.black,
     fontFamily: FONTS.regular,
-    fontSize: 18,
+    fontSize: fontValue(18),
     paddingLeft: '4%',
     paddingTop: '2%',
     paddingBottom: '2%',
     paddingRight: '1%',
     textAlign: 'left',
     opacity: 0.6,
+  },
+  sheetContainer: {
+    backgroundColor: COLORS.white,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 16.0,
+    elevation: 25,
   },
 });
 export default LoginHelp;

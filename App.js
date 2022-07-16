@@ -8,6 +8,7 @@ import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {ThemeContext} from './src/config/Theme/Context';
 import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
 import {ThemeMMKV} from './src/config/MMKV/ThemeMMKV';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 /**
  * Enabling the experimental freeze of react-native-screens
@@ -49,19 +50,21 @@ const App = () => {
     [toggleTheme, isThemeDark],
   );
   return (
-    <ThemeContext.Provider value={themePrefernces}>
-      <PaperProvider theme={theme}>
-        <StatusBar
-          backgroundColor={
-            isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
-          }
-          animated={true}
-          barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-        />
-        <StackNavigator />
-        <Toast />
-      </PaperProvider>
-    </ThemeContext.Provider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <ThemeContext.Provider value={themePrefernces}>
+        <PaperProvider theme={theme}>
+          <StatusBar
+            backgroundColor={
+              isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
+            }
+            animated={true}
+            barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+          />
+          <StackNavigator />
+          <Toast />
+        </PaperProvider>
+      </ThemeContext.Provider>
+    </GestureHandlerRootView>
   );
 };
 
