@@ -158,7 +158,6 @@ const LoginScreen = () => {
   async function signInWithPhoneNumber(phoneNumber) {
     const sendCodeTask = await auth()?.signInWithPhoneNumber(phoneNumber);
     setConfirmCode(sendCodeTask);
-    setLoaderVisible(true);
   }
 
   /**
@@ -531,6 +530,7 @@ const LoginScreen = () => {
                   Keyboard.dismiss();
                   if (isConnected) {
                     if (isSMSSendingAcceptable()) {
+                      setLoaderVisible(true);
                       signInWithPhoneNumber(CountryText + NumberText)?.catch(
                         () => {
                           setLoaderVisible(false);
