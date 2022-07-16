@@ -92,7 +92,7 @@ const StoryScreen = () => {
               collectionDocs = sortBy(collectionDocs, [
                 docs => docs?.time?.toDate(),
               ]);
-              collectionDocs = reverse(collectionDocs);
+
               setAllCurrentUserStories(collectionDocs);
               setLoading(false);
               if (!Loading && storyId !== undefined) {
