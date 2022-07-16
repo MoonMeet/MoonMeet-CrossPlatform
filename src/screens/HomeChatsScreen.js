@@ -21,6 +21,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
+import {reverse, sortBy} from 'lodash';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -166,17 +167,14 @@ const HomeChatsScreen = () => {
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
         if (!collectionSnapshot?.empty) {
-          const data = collectionSnapshot?.docs?.map(subMap => ({
+          let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
           }));
-          let chatData = [];
-          if (data) {
-            chatData = Object?.values(data)?.sort(
-              (a, b) =>
-                a?.last_message_time?.toDate() - b?.last_message_time?.toDate(),
-            );
-          }
-          setChatsData(chatData);
+          collectionDocs = sortBy(collectionDocs, [
+            data => data?.time?.toDate(),
+          ]);
+          collectionDocs = reverse(collectionDocs);
+          setChatsData(collectionDocs);
         }
       });
     return () => {

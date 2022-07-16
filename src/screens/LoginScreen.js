@@ -290,7 +290,7 @@ const LoginScreen = () => {
                           product: Product,
                           model: Model,
                           app_version: appVersion,
-                          time: Date.now(),
+                          time: firestore.Timestamp.fromDate(new Date()),
                         })
                         .catch(error => {
                           console.error(error);

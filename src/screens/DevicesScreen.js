@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import DevicesList from '../components/DevicesScreen/DevicesList';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 import {heightPercentageToDP} from '../config/Dimensions';
+import {reverse, sortBy} from 'lodash';
 
 const DevicesScreen = () => {
   const navigation = useNavigation();
@@ -52,9 +53,7 @@ const DevicesScreen = () => {
           }
         });
         setMasterData(
-          Object?.values(devicesSnapshot)?.sort(
-            (a, b) => b?.time.toDate() - a?.time.toDate(),
-          ),
+          reverse(sortBy(devicesSnapshot, [data => data?.time?.toDate()])),
         );
         setLoading(false);
       });

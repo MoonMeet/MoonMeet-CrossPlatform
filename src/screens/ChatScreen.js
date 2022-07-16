@@ -32,6 +32,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
+import {reverse, sortBy} from 'lodash';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -110,14 +111,13 @@ const ChatScreen = () => {
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
         if (!collectionSnapshot?.empty) {
-          const collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
+          let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
             id: subMap?.id,
           }));
-          const messages = Object.values(
-            collectionDocs?.sort((a, b) => a.createdAt - b.createdAt),
-          ).reverse();
-          setChatData(messages);
+          collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
+          collectionDocs = reverse(collectionDocs);
+          setChatData(collectionDocs);
         }
         setLoading(false);
       });

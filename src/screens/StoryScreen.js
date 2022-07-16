@@ -26,7 +26,7 @@ import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet'
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {sortBy, reverse} from 'lodash';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -85,14 +85,15 @@ const StoryScreen = () => {
           .get()
           .then(collectionSnapshot => {
             collectionSnapshot?.forEach(subDocumentSnapshot => {
-              const data = collectionSnapshot?.docs?.map(subMap => ({
+              let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
                 ...subMap?.data(),
                 sid: subMap?.id,
               }));
-              const storyData = Object?.values(data)?.sort(
-                (a, b) => a?.time.toDate() - b?.time.toDate(),
-              );
-              setAllCurrentUserStories(storyData);
+              collectionDocs = sortBy(collectionDocs, [
+                docs => docs?.time?.toDate(),
+              ]);
+              collectionDocs = reverse(collectionDocs);
+              setAllCurrentUserStories(collectionDocs);
               setLoading(false);
               if (!Loading && storyId !== undefined) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
@@ -320,7 +321,10 @@ const StoryScreen = () => {
           </View>
           <View style={styles.footer_mid}>
             <Text style={styles.footer_text}>
-              {current + 1} / {Object?.values?.(allCurrentUserStories)?.length}
+              {current + 1} /{' '}
+              {Object?.values?.(allCurrentUserStories)?.length > 1
+                ? Object?.values?.(allCurrentUserStories)?.length
+                : 1}
             </Text>
           </View>
           <View style={styles.footer_right}>
