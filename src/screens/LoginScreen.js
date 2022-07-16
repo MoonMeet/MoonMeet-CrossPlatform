@@ -625,11 +625,6 @@ const LoginScreen = () => {
                     fontFamily: FONTS.regular,
                   }}
                   onPress={() => {
-                    setLoaderVisible(true);
-                    phoneRef?.current?.clear();
-                    setConfirmCode(false);
-                    NumberSetText('');
-                    setLoaderVisible(false);
                     navigation?.dispatch(
                       CommonActions?.reset({
                         index: 0,
