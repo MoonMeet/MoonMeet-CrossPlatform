@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useLayoutEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   BackHandler,
   Keyboard,
@@ -45,7 +45,8 @@ import {
   getSystemVersion,
   getVersion,
 } from 'react-native-device-info';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
+import {getRandomInt} from '../utils/generators/getRandomNumber';
 
 const LoginScreen = () => {
   /**
@@ -83,7 +84,7 @@ const LoginScreen = () => {
 
   useEffect(() => {
     addNetInfoObserver();
-    const currentSubscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    const currentSubscriber = auth()?.onAuthStateChanged(onAuthStateChanged);
     const LoginScreenTimerTask = setTimeout(() => {
       if (isConnected) {
         getCountryCodeFromApi();
@@ -139,7 +140,7 @@ const LoginScreen = () => {
   const [ConfirmCode, setConfirmCode] = React.useState(null);
 
   /**
-   * LoginHelp stuff :PensiveFast:
+   * LoginHelp stuff
    */
   const [isLoginHelpVisible, setLoginHelpVisible] = React.useState(false);
 
@@ -155,9 +156,9 @@ const LoginScreen = () => {
    */
 
   async function signInWithPhoneNumber(phoneNumber) {
-    const _sendCode = await auth().signInWithPhoneNumber(phoneNumber);
-    setConfirmCode(_sendCode);
-    setLoaderVisible(!LoaderVisible);
+    const sendCodeTask = await auth()?.signInWithPhoneNumber(phoneNumber);
+    setConfirmCode(sendCodeTask);
+    setLoaderVisible(true);
   }
 
   /**
@@ -206,10 +207,8 @@ const LoginScreen = () => {
     try {
       const ApiURL = 'https://ipapi.co/country_calling_code';
       await fetch(ApiURL)
-        .then(function (_countryDialCode) {
-          return _countryDialCode.text();
-        })
-        .then(function (data) {
+        .then(dialCode => dialCode.text())
+        .then(data => {
           if (data?.includes('error')) {
             CountrySetText('+1');
           } else {
@@ -222,22 +221,10 @@ const LoginScreen = () => {
     }
   };
 
-  const _countryCodeOnFocus = () => {
+  const countryInputOnFocus = () => {
     Keyboard.dismiss();
     setCountriesVisible(!CountriesVisible);
   };
-
-  /**
-   * this function is amazing, it gives you a drink
-   * @param min
-   * @param max
-   * @return {*}
-   */
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   /**
    * Used for getting Device Information, useful for DeviceScreen.js
@@ -263,7 +250,7 @@ const LoginScreen = () => {
       setLoaderVisible(!LoaderVisible);
       Keyboard.dismiss();
       confirmCode(text)
-        .then(() => {
+        .finally(() => {
           firestore()
             .collection('users')
             .doc(auth()?.currentUser?.uid)
@@ -274,7 +261,7 @@ const LoginScreen = () => {
                   'currentUserJwtKey',
                   documentSnapshot?.data()?.jwtKey,
                 ).then(() => {
-                  AsyncStorage.getItem('currentUserJwtKey').then(val => {
+                  AsyncStorage.getItem('currentUserJwtKey').then(() => {
                     /**
                      * pushing device information for later use in DeviceScreen.js
                      */
@@ -290,7 +277,7 @@ const LoginScreen = () => {
                           product: Product,
                           model: Model,
                           app_version: appVersion,
-                          time: firestore.Timestamp.fromDate(new Date()),
+                          time: firestore?.Timestamp?.fromDate(new Date()),
                         })
                         .catch(error => {
                           console.error(error);
@@ -308,13 +295,13 @@ const LoginScreen = () => {
                   });
                 });
               } else {
-                const _username = auth()
+                const generatedUsername = auth()
                   ?.currentUser?.uid?.substring(0, 4)
                   .concat(getRandomInt(100000, 999999));
                 navigation?.navigate('setup', {
                   user: {
-                    uid: auth().currentUser?.uid,
-                    username: _username,
+                    uid: auth()?.currentUser?.uid,
+                    username: generatedUsername,
                     phone: NumberText,
                     phone_number: CountryText + ' ' + NumberText,
                     phone_status: 'none',
@@ -350,8 +337,8 @@ const LoginScreen = () => {
      * @type {RegExp}
      * @private
      */
-    let _regexNumberOnly = /[^0-9]/g;
-    NumberSetText(text.replace(_regexNumberOnly, ''));
+    let allowedCharactersRegex = /[^0-9]/g;
+    NumberSetText(text?.replace(allowedCharactersRegex, ''));
   };
 
   return (
@@ -395,7 +382,7 @@ const LoginScreen = () => {
               <Text
                 style={{
                   color: COLORS.black,
-                  fontSize: 16,
+                  fontSize: fontValue(16),
                   textAlign: 'center',
                   paddingBottom: '4%',
                   opacity: 0.4,
@@ -420,7 +407,7 @@ const LoginScreen = () => {
                 label="Country Code"
                 value={CountryText}
                 onFocus={() => {
-                  _countryCodeOnFocus();
+                  countryInputOnFocus();
                 }}
                 multiline={false}
                 theme={{
@@ -434,8 +421,8 @@ const LoginScreen = () => {
                     outlineColor: '#566193',
                   },
                 }}
-                onChangeText={_CountryText => {
-                  CountrySetText(_CountryText);
+                onChangeText={text => {
+                  CountrySetText(text);
                 }}
               />
               <TextInput
@@ -447,8 +434,7 @@ const LoginScreen = () => {
                 keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                 label="Phone Number"
                 value={NumberText}
-                onFocus={() => {}}
-                placeholder={'eg, (566) 874 364'}
+                placeholder={'eg, (123) 456 7890'}
                 multiline={false}
                 theme={{
                   colors: {
@@ -475,7 +461,7 @@ const LoginScreen = () => {
               <Text
                 style={{
                   color: COLORS.black,
-                  fontSize: 18,
+                  fontSize: fontValue(16),
                   opacity: 0.4,
                   fontFamily: FONTS.regular,
                 }}>
@@ -492,7 +478,7 @@ const LoginScreen = () => {
               <Text
                 style={{
                   color: COLORS.black,
-                  fontSize: 18,
+                  fontSize: fontValue(16),
                   opacity: 0.4,
                   fontFamily: FONTS.regular,
                 }}>
@@ -501,7 +487,7 @@ const LoginScreen = () => {
               <Text
                 style={{
                   color: COLORS.accentLight,
-                  fontSize: 18,
+                  fontSize: fontValue(16),
                   fontFamily: FONTS.regular,
                 }}
                 onPress={() => setPrivacyPolicyVisible(!PrivacyPolicyVisible)}>
@@ -545,8 +531,7 @@ const LoginScreen = () => {
                   Keyboard.dismiss();
                   if (isConnected) {
                     if (isSMSSendingAcceptable()) {
-                      setLoaderVisible(!LoaderVisible);
-                      signInWithPhoneNumber(CountryText + NumberText).catch(
+                      signInWithPhoneNumber(CountryText + NumberText)?.catch(
                         () => {
                           setLoaderVisible(false);
                         },
@@ -566,7 +551,7 @@ const LoginScreen = () => {
                     onToggleErrorSnackBar();
                   }
                 } catch (e) {
-                  console.log(e);
+                  console.error(e);
                 }
               }}
             />
@@ -599,15 +584,11 @@ const LoginScreen = () => {
           <SafeAreaView style={styles.container}>
             <View style={styles.top_bar}>
               <Text style={styles.top_text}>
-                Enter the code that we sent to {CountryText + ' ' + NumberText}
+                Enter the code that we sent {'\n'} to{' '}
+                {CountryText + ' ' + NumberText}
               </Text>
             </View>
-            <View
-              style={{
-                paddingLeft: '2%',
-                paddingRight: '2%',
-                alignSelf: 'center',
-              }}>
+            <View style={styles.centredView}>
               <OTPTextView
                 inputCount={6}
                 ref={phoneRef}
@@ -637,7 +618,7 @@ const LoginScreen = () => {
                 <Text
                   style={{
                     position: 'relative',
-                    fontSize: 16,
+                    fontSize: fontValue(16),
                     color: COLORS.black,
                     opacity: 0.4,
                     textAlign: 'left',
@@ -645,7 +626,7 @@ const LoginScreen = () => {
                   }}
                   onPress={() => {
                     setLoaderVisible(true);
-                    phoneRef?.current.clear();
+                    phoneRef?.current?.clear();
                     setConfirmCode(false);
                     NumberSetText('');
                     setLoaderVisible(false);
@@ -662,14 +643,14 @@ const LoginScreen = () => {
               <Text
                 style={{
                   position: 'relative',
-                  fontSize: 16,
+                  fontSize: fontValue(16),
                   color: COLORS.black,
                   opacity: 0.4,
                   textAlign: 'right',
                   fontFamily: FONTS.regular,
                 }}
                 onPress={() => {
-                  phoneRef?.current.clear();
+                  phoneRef?.current?.clear();
                 }}>
                 CLEAR CODE
               </Text>
@@ -694,24 +675,13 @@ const styles = StyleSheet.create({
     paddingRight: '2%',
     justifyContent: 'center',
   },
-  divider: {
-    width: '-1%',
-    height: '1%',
-    backgroundColor: COLORS.controlHighlight,
-  },
   top_text: {
     position: 'relative',
-    fontSize: 28,
+    fontSize: fontValue(28),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.accentLight,
-    fontFamily: FONTS.regular,
-  },
-  SendCode: {
-    position: 'relative',
-    textAlign: 'center',
-    fontSize: 22,
     fontFamily: FONTS.regular,
   },
   TextInputContainer: {
@@ -721,6 +691,11 @@ const styles = StyleSheet.create({
   RoundedTextInput: {
     borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
+  },
+  centredView: {
+    paddingLeft: '2%',
+    paddingRight: '2%',
+    alignSelf: 'center',
   },
   fab: bottomMargin => {
     return {
