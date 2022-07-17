@@ -3,7 +3,7 @@ import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import moment from 'moment';
-import {uniqBy, remove, filter} from 'lodash';
+import {uniqBy} from 'lodash';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
