@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {fontValue} from '../../config/Dimensions';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 
 export const IntroStyles = StyleSheet.create({
@@ -19,14 +20,14 @@ export const IntroStyles = StyleSheet.create({
   introduction_top_text: {
     position: 'relative',
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: fontValue(20),
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
   },
   introduction_bottom_text: {
     position: 'relative',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: fontValue(16),
     top: '2.5%',
     color: COLORS.black,
     opacity: 0.4,
@@ -35,7 +36,7 @@ export const IntroStyles = StyleSheet.create({
   introduction_button: {
     position: 'absolute',
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: fontValue(20),
     bottom: '2.5%',
     fontFamily: FONTS.regular,
   },
