@@ -5,7 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import BackImage from '../assets/images/back.png';
 import {Text, View} from 'react-native';
-import {AvatarHeaderScrollView} from 'react-native-sticky-parallax-header';
+import AvatarHeaderScrollView from 'react-native-sticky-parallax-header';
 import ThreeDots from '../assets/images/dots.png';
 
 const UserProfileScreen = () => {
@@ -54,7 +54,7 @@ const UserProfileScreen = () => {
     <AvatarHeaderScrollView
       leftTopIcon={BackImage}
       leftTopIconOnPress={() => {
-        navigation.goBack();
+        navigation?.goBack();
       }}
       rightTopIcon={ThreeDots}
       contentContainerStyle={{backgroundColor: COLORS.white}}
