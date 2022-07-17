@@ -73,7 +73,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       removeClippedSubviews={true}
       initialNumToRender={10}
       ListEmptyComponent={listEmptyComponent}
-      keyExtractor={item => item?.uid}
+      keyExtractor={item => item?.avatar}
       renderItem={({item, index}) => renderItem(item, index)}
     />
   );

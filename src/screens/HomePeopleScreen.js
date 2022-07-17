@@ -57,7 +57,7 @@ const HomePeopleScreen = () => {
       .collection('users')
       .onSnapshot(collectionSnapshot => {
         let activeSnapshot = [];
-        collectionSnapshot.forEach(documentSnapshot => {
+        collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.id === auth()?.currentUser?.uid) {
             if (
               documentSnapshot?.data()?.avatar &&
