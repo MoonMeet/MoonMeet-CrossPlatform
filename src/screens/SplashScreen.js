@@ -101,6 +101,7 @@ const SplashScreen = () => {
                     }
                   });
               } else {
+                console.log('found no data');
                 auth()
                   ?.signOut()
                   .finally(() => navigation?.navigate('login'));
