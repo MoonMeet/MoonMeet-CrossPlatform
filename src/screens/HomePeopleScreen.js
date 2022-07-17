@@ -72,7 +72,6 @@ const HomePeopleScreen = () => {
                 setActiveStatusState(false);
               }
               setNewActiveTime(documentSnapshot?.data()?.active_time);
-              setLoading(false);
             }
           }
           if (
@@ -94,6 +93,7 @@ const HomePeopleScreen = () => {
             }
           }
           setMasterData(activeSnapshot);
+          setLoading(false);
         });
       });
     return () => {

@@ -25,10 +25,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
     );
   };
 
-  const renderItem = (item, index) => {
-    if (item[index]?.uid === auth()?.currentUser?.uid) {
-      // TODO
-    }
+  const renderItem = item => {
     return (
       <Pressable
         android_ripple={{color: COLORS.rippleColor}}
@@ -74,7 +71,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       initialNumToRender={10}
       ListEmptyComponent={listEmptyComponent}
       keyExtractor={item => item?.avatar}
-      renderItem={({item, index}) => renderItem(item, index)}
+      renderItem={({item}) => renderItem(item)}
     />
   );
 };
