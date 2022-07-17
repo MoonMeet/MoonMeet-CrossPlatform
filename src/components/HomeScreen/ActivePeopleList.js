@@ -3,7 +3,9 @@ import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import moment from 'moment';
-import {uniqBy} from 'lodash';
+import {uniqBy, remove, filter} from 'lodash';
+import auth from '@react-native-firebase/auth';
+import {useNavigation} from '@react-navigation/native';
 
 interface ActivePeopleListInterface {
   ListData: any;
@@ -11,18 +13,56 @@ interface ActivePeopleListInterface {
   onLongPressTrigger: Function;
 }
 
-const _listEmptyComponent = () => {
-  return (
-    <View style={styles.emptyView}>
-      <Text style={styles.heading}>No one active, yet.</Text>
-      <Text style={styles.subheading}>
-        there's no one active at the moment.
-      </Text>
-    </View>
-  );
-};
-
 const ActivePeopleList = (props: ActivePeopleListInterface) => {
+  const navigation = useNavigation();
+
+  const listEmptyComponent = () => {
+    return (
+      <View style={styles.emptyView}>
+        <Text style={styles.heading}>No one active, yet.</Text>
+        <Text style={styles.subheading}>
+          there's no one active at the moment.
+        </Text>
+      </View>
+    );
+  };
+
+  const renderItem = (item, index) => {
+    if (item[index]?.uid === auth()?.currentUser?.uid) {
+      // TODO
+    }
+    return (
+      <Pressable
+        android_ripple={{color: COLORS.rippleColor}}
+        style={styles.container}
+        onPress={() => {
+          if (item?.uid !== auth()?.currentUser?.uid) {
+            navigation.navigate('userProfile', {uid: item?.uid});
+          }
+        }}
+        onLongPress={() => {
+          if (item?.uid !== auth()?.currentUser?.uid) {
+            navigation?.navigate('chat', {item: item?.uid});
+          }
+        }}>
+        <View style={styles.left_side}>
+          <Avatar.Image
+            source={item?.avatar ? {uri: item?.avatar} : null}
+            size={52.5}
+          />
+        </View>
+        <View style={styles.mid_side}>
+          <Text style={styles.heading}>
+            {item?.first_name + ' ' + item?.last_name}
+          </Text>
+          <Text style={styles.subheading}>
+            {moment(item?.active_time?.toDate())?.calendar()}
+          </Text>
+        </View>
+      </Pressable>
+    );
+  };
+
   return (
     <FlatList
       data={uniqBy(props.ListData, 'uid')}
@@ -34,28 +74,9 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       disableVirtualization
       removeClippedSubviews={true}
       initialNumToRender={10}
-      ListEmptyComponent={_listEmptyComponent}
+      ListEmptyComponent={listEmptyComponent}
       keyExtractor={item => item?.uid}
-      renderItem={({item}) => (
-        <Pressable
-          android_ripple={{color: COLORS.rippleColor}}
-          style={styles.container}>
-          <View style={styles.left_side}>
-            <Avatar.Image
-              source={item?.avatar ? {uri: item?.avatar} : null}
-              size={52.5}
-            />
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.heading}>
-              {item?.first_name + ' ' + item?.last_name}
-            </Text>
-            <Text style={styles.subheading}>
-              {moment(item?.active_time.toDate())?.calendar()}
-            </Text>
-          </View>
-        </Pressable>
-      )}
+      renderItem={({item, index}) => renderItem(item, index)}
     />
   );
 };
