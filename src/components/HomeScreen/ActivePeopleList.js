@@ -9,8 +9,6 @@ import {useNavigation} from '@react-navigation/native';
 
 interface ActivePeopleListInterface {
   ListData: any;
-  onPressTrigger: Function;
-  onLongPressTrigger: Function;
 }
 
 const ActivePeopleList = (props: ActivePeopleListInterface) => {

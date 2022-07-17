@@ -55,29 +55,26 @@ const HomePeopleScreen = () => {
   useEffect(() => {
     const userSusbcribe = firestore()
       .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .onSnapshot(documentSnapshot => {
-        if (
-          documentSnapshot?.data()?.avatar &&
-          documentSnapshot?.data()?.jwtKey &&
-          documentSnapshot?.data()?.active_status &&
-          documentSnapshot?.data()?.active_time
-        ) {
-          setAvatarURL(documentSnapshot?.data()?.avatar);
-          if (documentSnapshot?.data()?.active_status === 'normal') {
-            setActiveStatusState(true);
-          } else {
-            setActiveStatusState(false);
-          }
-          setNewActiveTime(documentSnapshot?.data()?.active_time);
-          setLoading(false);
-        }
-      });
-    const activeSubscribe = firestore()
-      .collection('users')
       .onSnapshot(collectionSnapshot => {
-        const activeSnapshot = [];
-        collectionSnapshot?.forEach(documentSnapshot => {
+        let activeSnapshot = [];
+        collectionSnapshot.forEach(documentSnapshot => {
+          if (documentSnapshot?.id === auth()?.currentUser?.uid) {
+            if (
+              documentSnapshot?.data()?.avatar &&
+              documentSnapshot?.data()?.jwtKey &&
+              documentSnapshot?.data()?.active_status &&
+              documentSnapshot?.data()?.active_time
+            ) {
+              setAvatarURL(documentSnapshot?.data()?.avatar);
+              if (documentSnapshot?.data()?.active_status === 'normal') {
+                setActiveStatusState(true);
+              } else {
+                setActiveStatusState(false);
+              }
+              setNewActiveTime(documentSnapshot?.data()?.active_time);
+              setLoading(false);
+            }
+          }
           if (
             documentSnapshot?.data()?.active_status == 'normal' &&
             firestore?.Timestamp?.fromDate(new Date()) -
@@ -101,7 +98,6 @@ const HomePeopleScreen = () => {
       });
     return () => {
       userSusbcribe();
-      activeSubscribe();
     };
   }, []);
 
@@ -189,11 +185,7 @@ const HomePeopleScreen = () => {
               </Pressable>
             </View>
           </View>
-          <ActivePeopleList
-            ListData={masterData}
-            onPressTrigger={null}
-            onLongPressTrigger={null}
-          />
+          <ActivePeopleList ListData={masterData} />
         </MiniBaseView>
       </Provider>
     );
