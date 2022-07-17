@@ -53,7 +53,9 @@ const LoginHelp = (props: LoginHelpInterface) => {
       animationConfigs={animationConfigs}
       animateOnMount={true}
       style={sheetStyle}>
-      <BottomSheetView style={{flex: 1}} onLayout={handleContentLayout}>
+      <BottomSheetView
+        style={{flex: 1, backgroundColor: COLORS.primaryLight, bottom: '0.25%'}}
+        onLayout={handleContentLayout}>
         {isAndroid ? (
           <ScrollView
             nestedScrollEnabled={true}

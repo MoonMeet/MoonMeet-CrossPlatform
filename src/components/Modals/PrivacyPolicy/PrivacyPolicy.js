@@ -52,7 +52,9 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
       animationConfigs={animationConfigs}
       animateOnMount={true}
       style={sheetStyle}>
-      <BottomSheetView onLayout={handleContentLayout}>
+      <BottomSheetView
+        style={{flex: 1, backgroundColor: COLORS.primaryLight, bottom: '0.25%'}}
+        onLayout={handleContentLayout}>
         <Text style={styles.headerText}>Privacy Policy</Text>
         <ScrollView
           nestedScrollEnabled={true}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useMemo, useCallback} from 'react';
 import {Linking, Platform, View} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
@@ -31,6 +31,7 @@ import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
 import moment from 'moment';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 interface ScrollViewContainerInterface {
   firstName: string;
@@ -43,9 +44,21 @@ interface ScrollViewContainerInterface {
 }
 
 const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
+  const privacyRef = useRef(null);
+  const faqRef = useRef(null);
+  const sheetSnapPoints = useMemo(() => ['80%', '100%'], []);
+
+  const handlePresentPrivacyModal = useCallback(() => {
+    faqRef?.current?.forceClose();
+    privacyRef?.current?.present();
+  }, []);
+
+  const handlePresentFaqModal = useCallback(() => {
+    privacyRef?.current?.forceClose();
+    faqRef?.current?.present();
+  }, []);
+
   const navigation = useNavigation();
-  const [privacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
-  const [FAQVisible, setFAQVisible] = React.useState(false);
 
   const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
@@ -198,13 +211,13 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={PriPoIcon}
         leftIconColor={COLORS.maroon}
         titleTextContainer={'Privacy Policy'}
-        onPressTrigger={() => setPrivacyPolicyVisible(!privacyPolicyVisible)}
+        onPressTrigger={() => handlePresentPrivacyModal()}
       />
       <DataItem
         leftIcon={FAQIcon}
         leftIconColor={COLORS.pink}
         titleTextContainer={'Frequently asked questions'}
-        onPressTrigger={() => setFAQVisible(!FAQVisible)}
+        onPressTrigger={() => handlePresentFaqModal()}
       />
       <DataItem
         leftIcon={ReportIcon}
@@ -213,12 +226,14 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         onPressTrigger={() => navigation?.navigate('bugreport')}
       />
       <PrivacyPolicy
-        hideModal={() => setPrivacyPolicyVisible(!privacyPolicyVisible)}
-        isVisible={privacyPolicyVisible}
+        sheetRef={privacyRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
       />
       <FrequentlyAskedQuestions
-        hideModal={() => setFAQVisible(!FAQVisible)}
-        isVisible={FAQVisible}
+        sheetRef={faqRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
       />
     </View>
   );

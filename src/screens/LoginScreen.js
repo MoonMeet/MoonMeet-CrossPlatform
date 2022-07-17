@@ -108,10 +108,6 @@ const LoginScreen = () => {
 
   const [NumberText, NumberSetText] = React.useState('');
 
-  const [PrivacyPolicyVisible, setPrivacyPolicyVisible] = React.useState(false);
-
-  const [CountriesVisible, setCountriesVisible] = React.useState(false);
-
   const [MenuVisible, setMenuVisible] = React.useState(false);
 
   const openMenu = () => setMenuVisible(true);
@@ -177,11 +173,6 @@ const LoginScreen = () => {
   const [ConfirmCode, setConfirmCode] = React.useState(null);
 
   /**
-   * LoginHelp stuff
-   */
-  const [isLoginHelpVisible, setLoginHelpVisible] = React.useState(false);
-
-  /**
    * Loader stuff
    */
   const [LoaderVisible, setLoaderVisible] = React.useState(false);
@@ -240,8 +231,8 @@ const LoginScreen = () => {
    * @return {NaN, String} data to {CountryText}
    */
   const getCountryCodeFromApi = async () => {
+    const ApiURL = 'https://ipapi.co/country_calling_code';
     try {
-      const ApiURL = 'https://ipapi.co/country_calling_code';
       await fetch(ApiURL)
         .then(dialCode => dialCode?.text())
         .then(data => {
@@ -328,7 +319,7 @@ const LoginScreen = () => {
                         routes: [{name: 'login'}],
                       }),
                     );
-                    navigation.navigate('home');
+                    navigation?.navigate('home');
                   });
                 });
               } else {
@@ -356,12 +347,14 @@ const LoginScreen = () => {
   }
 
   /**
-   *
+   * What a bottom sheet, you need to close it to times to dismiss lol
    * @param {NaN, String} data
    */
 
   const setCountryCodeData = data => {
+    countriesRef?.current?.close();
     CountrySetText(data);
+    countriesRef?.current?.forceClose();
   };
 
   /**
@@ -606,6 +599,7 @@ const LoginScreen = () => {
                 sheetRef={countriesRef}
                 index={0}
                 snapPoints={sheetSnapPoints}
+                sharedData={setCountryCodeData}
               />
               <LoginHelp
                 sheetRef={helpRef}

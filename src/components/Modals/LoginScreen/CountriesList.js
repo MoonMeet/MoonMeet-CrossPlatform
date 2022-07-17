@@ -1,5 +1,5 @@
-import React, {useEffect, useMemo} from 'react';
-import {Platform, Pressable, Text, View, StyleSheet, SafeAreaView} from 'react-native';
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {Pressable, Text, View, StyleSheet} from 'react-native';
 import CountriesJson from '../../../assets/data/json/country-codes.json';
 import {Searchbar} from 'react-native-paper';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
@@ -21,7 +21,7 @@ interface CountriesListInterface {
     | SharedValue<Array<string | number>>
     | undefined;
   index?: number | undefined;
-  sharedData: String | undefined;
+  sharedData: Function | undefined;
 }
 
 const CountriesList = (props: CountriesListInterface) => {
@@ -46,11 +46,9 @@ const CountriesList = (props: CountriesListInterface) => {
   );
 
   useEffect(() => {
-    setCountriesData();
+    ResetListData('');
     return () => {};
-  }, []);
-
-  const [SearchBarVisible, setSearchBarVisible] = React.useState(false);
+  }, [ResetListData]);
 
   const [SearchData, setSearchData] = React.useState('');
 
@@ -71,12 +69,12 @@ const CountriesList = (props: CountriesListInterface) => {
    * @param {String} text
    * @constructor
    */
-  const ResetListData = text => {
+  const ResetListData = useCallback(text => {
     if (text?.length < 1) {
       setCountriesData();
       setSearchData('');
     }
-  };
+  }, []);
 
   /**
    * Search in JSON Data.
@@ -113,7 +111,6 @@ const CountriesList = (props: CountriesListInterface) => {
         android_ripple={{color: COLORS.rippleColor}}
         style={styles.container}
         onPress={() => {
-          props?.sheetRef?.current?.forceClose();
           props?.sharedData(item?.dial_code);
         }}>
         <Text style={styles.country_text}>{item?.name}</Text>
@@ -124,9 +121,11 @@ const CountriesList = (props: CountriesListInterface) => {
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading}>No one active, yet.</Text>
-        <Text style={styles.subheading}>
-          there's no one active at the moment.
+        <Text numberOfLines={1} style={styles.heading}>
+          No countries found.
+        </Text>
+        <Text numberOfLines={1} style={styles.subheading}>
+          Hmm, Try checking your country name again.
         </Text>
       </View>
     );
@@ -144,12 +143,17 @@ const CountriesList = (props: CountriesListInterface) => {
       animateOnMount={true}
       onLayout={handleContentLayout}
       style={sheetStyle}>
-       <BottomSheetView
-        style={{flex: 1, backgroundColor: COLORS.primaryLight}}
+      <BottomSheetView
+        style={{
+          flex: 1,
+          backgroundColor: COLORS.primaryLight,
+          bottom: '0.25%',
+        }}
         onLayout={handleContentLayout}>
-        <SafeAreaView>
         <View style={styles.top_bar}>
-          <Text style={styles.title_text}>Select your country</Text>
+          <Text numberOfLines={1} style={styles.title_text}>
+            Select your country
+          </Text>
         </View>
         <Searchbar
           onChangeText={CharSequence => {
@@ -157,13 +161,13 @@ const CountriesList = (props: CountriesListInterface) => {
             ResetListData(CharSequence);
           }}
           value={SearchData}
-          placeholder={'E.g Canada'}
+          placeholder={'Search'}
           selectionColor={COLORS.controlNormal}
-          platform={Platform.OS}
           style={{margin: '0.5%'}}
           iconColor={COLORS.darkGrey}
           inputStyle={{
             color: COLORS.accentLight,
+            fontFamily: FONTS.regular,
           }}
           clearIcon={ClearImage}
           theme={{
@@ -173,17 +177,17 @@ const CountriesList = (props: CountriesListInterface) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={unionBy(sortBy(FilteredData, [data => data?.name]), 'code')}
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}
           disableVirtualization
           removeClippedSubviews={true}
-          initialNumToRender={25}
+          initialNumToRender={50}
           keyExtractor={item => item?.code}
+          contentContainerStyle={[
+            {flexGrow: 1},
+            FilteredData.length > 0 ? null : {justifyContent: 'center'},
+          ]}
           ListEmptyComponent={listEmptyComponent}
           renderItem={({item}) => renderItem(item)}
         />
-        </SafeAreaView>
       </BottomSheetView>
     </BottomSheetModal>
   );
@@ -199,8 +203,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryLight,
   },
   top_bar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   title_text: {
@@ -235,25 +237,21 @@ const styles = StyleSheet.create({
     elevation: 25,
   },
   heading: {
-    fontSize: 16,
-    textAlign: 'left',
+    fontSize: fontValue(20),
+    textAlign: 'center',
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   subheading: {
-    fontSize: 14,
+    fontSize: fontValue(18),
     paddingTop: '1%',
-    textAlign: 'left',
+    textAlign: 'center',
     color: COLORS.black,
     opacity: 0.4,
     fontFamily: FONTS.regular,
   },
   emptyView: {
-    flex: 1,
     backgroundColor: COLORS.white,
-    alignItems: 'center',
-    alignContent: 'center',
-    alignSelf: 'center',
   },
 });
 

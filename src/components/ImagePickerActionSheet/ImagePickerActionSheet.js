@@ -1,50 +1,71 @@
-import React from 'react';
-import Modal from 'react-native-modal';
+import React, {useMemo} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import CameraImage from '../../assets/images/photo-camera.png';
 import GalleryImage from '../../assets/images/photo-library.png';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetDynamicSnapPoints,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import {fontValue} from '../../config/Dimensions';
 
 interface imagePickerInterface {
-  hideModal: (() => void) | undefined;
+  sheetRef?: Ref | undefined;
+  snapPoints?:
+    | Array<string | number>
+    | SharedValue<Array<string | number>>
+    | undefined;
+  index?: number | undefined;
   onCameraPress: (() => void) | undefined;
   onFilePicker: (() => void) | undefined;
-  isVisible: boolean;
 }
 
 const ImagePickerActionSheet = (props: imagePickerInterface) => {
+  const {animatedHandleHeight, handleContentLayout} =
+    useBottomSheetDynamicSnapPoints(props.snapPoints);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const sheetStyle = useMemo(
+    () => ({
+      ...styles.sheetContainer,
+      padding: '0.5%',
+      shadowColor: COLORS.black,
+    }),
+    [],
+  );
   return (
-    <Modal
-      swipeDirection={'down'}
-      onBackdropPress={props?.hideModal}
-      onSwipeComplete={props?.hideModal}
-      useNativeDriverForBackdrop
-      style={{margin: 0}}
-      animationOut={'slideOutDown'}
-      animationIn={'slideInUp'}
-      backdropOpacity={0.5}
-      isVisible={props.isVisible}>
-      <View
+    <BottomSheetModal
+      ref={props?.sheetRef}
+      index={props?.index}
+      snapPoints={props?.snapPoints}
+      handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
+      enablePanDownToClose={true}
+      handleHeight={animatedHandleHeight}
+      animationConfigs={animationConfigs}
+      animateOnMount={true}
+      style={sheetStyle}>
+      <BottomSheetView
+        onLayout={handleContentLayout}
         style={{
-          backgroundColor: 'white',
+          backgroundColor: COLORS.primaryLight,
           flex: 1,
-          top: '70%',
-          padding: '3%',
-          borderTopLeftRadius: 25,
-          borderTopRightRadius: 25,
         }}>
-        <View
-          style={{
-            backgroundColor: COLORS.white,
-            marginTop: '1%',
-          }}>
-          <View style={styles.greyPiece} />
+        <View>
           <Text
             style={{
-              fontSize: 23,
+              fontSize: fontValue(22.5),
               fontFamily: FONTS.regular,
               color: COLORS.accentLight,
-              paddingBottom: '4%',
+              textAlign: 'center',
             }}>
             Choose Photo
           </Text>
@@ -52,62 +73,66 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
               props?.onCameraPress();
-              props?.hideModal();
             }}
             style={styles.optionContainer}>
             <Image source={CameraImage} style={styles.arrowStyle} />
             <Text
               style={{
-                fontSize: 20,
+                fontSize: fontValue(20),
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
+                opacity: 0.9,
               }}>
-              Take photo
+              Take Photo
             </Text>
           </Pressable>
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
               props?.onFilePicker();
-              props?.hideModal();
             }}
             style={styles.optionContainer}>
             <Image source={GalleryImage} style={styles.arrowStyle} />
             <Text
               style={{
-                fontSize: 20,
+                fontSize: fontValue(20),
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
+                opacity: 0.9,
               }}>
               Upload from Gallery
             </Text>
           </Pressable>
         </View>
-      </View>
-    </Modal>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  greyPiece: {
-    height: '2.5%',
-    borderRadius: 2.5,
-    alignSelf: 'center',
-    width: '15%',
-    backgroundColor: COLORS.controlNormal,
-    marginBottom: 30,
-  },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: '2%',
+    padding: '2.5%',
   },
   arrowStyle: {
     marginRight: '2%',
     tintColor: COLORS.black,
     opacity: 0.4,
-    height: 24,
-    width: 24,
+    height: 25,
+    width: 25,
+  },
+  sheetContainer: {
+    backgroundColor: COLORS.white,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 16.0,
+    elevation: 25,
   },
 });
 

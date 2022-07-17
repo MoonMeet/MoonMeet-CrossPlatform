@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import React, {useEffect, useRef, useMemo, useCallback} from 'react';
+import {Pressable, StyleSheet, View, Keyboard} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   ActivityIndicator,
@@ -28,8 +28,22 @@ import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator
 import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {PurpleBackground} from '../index.d';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 
 const EditProfileScreen = () => {
+  const pickerRef = useRef(null);
+  const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
+
+  const handlePresentModal = useCallback(() => {
+    Keyboard.dismiss();
+    pickerRef?.current?.present();
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    Keyboard.pickerRef?.current?.close();
+    pickerRef?.current?.forceClose();
+  }, []);
+
   const navigation = useNavigation();
 
   /**
@@ -211,7 +225,20 @@ const EditProfileScreen = () => {
   return (
     <BaseView>
       <Spacer height={heightPercentageToDP(0.5)} />
-      <View style={styles.avatarHolder}>
+      <Pressable
+        onLongPress={() => {
+          if (UserPhoto) {
+            setUserPhoto(null);
+            InfoToast(
+              'bottom',
+              'Photo Removed',
+              'Now select a new photo',
+              true,
+              2000,
+            );
+          }
+        }}
+        style={styles.avatarHolder}>
         <Avatar.Image
           size={85}
           source={
@@ -229,7 +256,7 @@ const EditProfileScreen = () => {
             marginLeft: '12.5%',
           }}
           onPress={() => {
-            setPickerActionSheet(true);
+            handlePresentModal();
           }}>
           <Avatar.Icon
             size={30}
@@ -245,7 +272,7 @@ const EditProfileScreen = () => {
             }}
           />
         </Pressable>
-      </View>
+      </Pressable>
       <View style={styles.inputHolder}>
         <TextInput
           style={{
@@ -257,6 +284,7 @@ const EditProfileScreen = () => {
           label="First Name"
           multiline={false}
           value={firstName}
+          onFocus={handleCloseModal}
           maxLength={20}
           right={<TextInput.Affix text={`${firstName.length}/20`} />}
           theme={{
@@ -286,6 +314,7 @@ const EditProfileScreen = () => {
           mode="outlined"
           label="Last name"
           multiline={false}
+          onFocus={handleCloseModal}
           value={lastName}
           maxLength={20}
           right={<TextInput.Affix text={`${lastName.length}/20`} />}
@@ -389,9 +418,9 @@ const EditProfileScreen = () => {
         }}
       />
       <ImagePickerActionSheet
-        hideModal={() => {
-          setPickerActionSheet(false);
-        }}
+        sheetRef={pickerRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
         onCameraPress={() => {
           openCamera()
             .then(image => {

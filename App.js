@@ -9,6 +9,7 @@ import {ThemeContext} from './src/config/Theme/Context';
 import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
 import {ThemeMMKV} from './src/config/MMKV/ThemeMMKV';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 /**
  * Enabling the experimental freeze of react-native-screens
@@ -51,19 +52,21 @@ const App = () => {
   );
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <ThemeContext.Provider value={themePrefernces}>
-        <PaperProvider theme={theme}>
-          <StatusBar
-            backgroundColor={
-              isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
-            }
-            animated={true}
-            barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-          />
-          <StackNavigator />
-          <Toast />
-        </PaperProvider>
-      </ThemeContext.Provider>
+      <BottomSheetModalProvider>
+        <ThemeContext.Provider value={themePrefernces}>
+          <PaperProvider theme={theme}>
+            <StatusBar
+              backgroundColor={
+                isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
+              }
+              animated={true}
+              barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+            />
+            <StackNavigator />
+            <Toast />
+          </PaperProvider>
+        </ThemeContext.Provider>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 };

@@ -52,7 +52,7 @@ const Tab = createMaterialBottomTabNavigator();
 function HomeScreen() {
   return (
     <Tab.Navigator
-      shifting={true}
+      shifting={false}
       initialRouteName={'Chats'}
       activeColor={COLORS.accentLight}
       inactiveColor={COLORS.darkGrey}
@@ -86,7 +86,7 @@ function HomeScreen() {
               color={color}
               size={42.5}
               style={{
-                margin: heightPercentageToDP(-1),
+                margin: heightPercentageToDP(-1.25),
               }}
               theme={{colors: {primary: COLORS.transparent}}}
             />

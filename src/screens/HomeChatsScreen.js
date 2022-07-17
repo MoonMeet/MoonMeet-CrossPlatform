@@ -1,16 +1,8 @@
-import React, {forwardRef, useCallback, useEffect, useRef} from 'react';
-import {
-  BackHandler,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {Avatar, Provider} from 'react-native-paper';
-import PersonImage from '../assets/images/person.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
@@ -21,7 +13,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
-import {reverse, sortBy} from 'lodash';
+import {map, remove, reverse, sortBy} from 'lodash';
 
 const HomeChatsScreen = () => {
   const navigation = useNavigation();
@@ -103,30 +95,27 @@ const HomeChatsScreen = () => {
   useEffect(() => {
     const userSusbcribe = firestore()
       .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .onSnapshot(documentSnapshot => {
-        if (
-          documentSnapshot?.data()?.avatar &&
-          documentSnapshot?.data()?.jwtKey &&
-          documentSnapshot?.data()?.active_status &&
-          documentSnapshot?.data()?.active_time
-        ) {
-          setMyUID(documentSnapshot?.data()?.uid);
-          setAvatarURL(documentSnapshot?.data()?.avatar);
-          checkJwtKey(documentSnapshot?.data()?.jwtKey);
-          if (documentSnapshot?.data()?.active_status === 'normal') {
-            setActiveStatusState(true);
-          } else {
-            setActiveStatusState(false);
-          }
-          setNewActiveTime(documentSnapshot?.data()?.active_time);
-        }
-      });
-    const storiesSubscribe = firestore()
-      .collection('users')
       .onSnapshot(collectionSnapshot => {
         collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.exists) {
+            if (documentSnapshot?.id === auth()?.currentUser?.uid) {
+              if (
+                documentSnapshot?.data()?.avatar &&
+                documentSnapshot?.data()?.jwtKey &&
+                documentSnapshot?.data()?.active_status &&
+                documentSnapshot?.data()?.active_time
+              ) {
+                setMyUID(documentSnapshot?.data()?.uid);
+                setAvatarURL(documentSnapshot?.data()?.avatar);
+                checkJwtKey(documentSnapshot?.data()?.jwtKey);
+                if (documentSnapshot?.data()?.active_status === 'normal') {
+                  setActiveStatusState(true);
+                } else {
+                  setActiveStatusState(false);
+                }
+                setNewActiveTime(documentSnapshot?.data()?.active_time);
+              }
+            }
             firestore()
               .collection('users')
               .doc(documentSnapshot?.id)
@@ -143,7 +132,6 @@ const HomeChatsScreen = () => {
                       86400000
                     ) {
                       deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
-                      console.log('del');
                     } else {
                       currentStoryData.push({
                         ...subDocument?.data(),
@@ -179,7 +167,6 @@ const HomeChatsScreen = () => {
       });
     return () => {
       userSusbcribe();
-      storiesSubscribe();
       chatSubscribe();
     };
   }, []);
