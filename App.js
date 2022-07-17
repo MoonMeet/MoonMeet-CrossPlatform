@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import StackNavigator from './src/config/Stack';
-import {StatusBar, UIManager, Platform} from 'react-native';
+import {StatusBar} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {enableFreeze} from 'react-native-screens';
 import {COLORS} from './src/config/Miscellaneous';

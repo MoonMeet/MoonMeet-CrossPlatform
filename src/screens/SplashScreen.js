@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import analytics from '@react-native-firebase/analytics';
 import appCheck from '@react-native-firebase/app-check';
 import auth from '@react-native-firebase/auth';
@@ -8,7 +7,11 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {SafeAreaView, StyleSheet, Text} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
-import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import Animated, {
   useAnimatedStyle,
@@ -64,23 +67,43 @@ const SplashScreen = () => {
     const SplashScreenTimerTask = setTimeout(() => {
       if (isViewPagerCompleted()) {
         if (auth()?.currentUser !== null) {
-          let havePasscode = false;
+          let userDataOk = false;
           firestore()
             .collection('users')
             .doc(auth()?.currentUser?.uid)
             .get()
             .then(documentSnapshot => {
-              if (documentSnapshot?.exists) {
-                if (documentSnapshot?.data()?.passcode?.passcode_enabled) {
-                  havePasscode = true;
-                }
+              if (documentSnapshot?.data()?.uid) {
+                return true;
               }
             })
             .finally(() => {
-              if (havePasscode) {
-                navigation?.navigate('passcodeVerify');
+              if (userDataOk) {
+                let havePasscode = false;
+                firestore()
+                  .collection('users')
+                  .doc(auth()?.currentUser?.uid)
+                  .get()
+                  .then(documentSnapshot => {
+                    if (documentSnapshot?.exists) {
+                      if (
+                        documentSnapshot?.data()?.passcode?.passcode_enabled
+                      ) {
+                        havePasscode = true;
+                      }
+                    }
+                  })
+                  .finally(() => {
+                    if (havePasscode) {
+                      navigation?.navigate('passcodeVerify');
+                    } else {
+                      navigation?.navigate('home');
+                    }
+                  });
               } else {
-                navigation?.navigate('home');
+                auth()
+                  ?.signOut()
+                  .finally(() => navigation?.navigate('login'));
               }
             });
         } else {
@@ -147,14 +170,14 @@ const styles = StyleSheet.create({
   bottom_text: {
     position: 'absolute',
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: fontValue(20),
     bottom: heightPercentageToDP(6.25),
     fontFamily: FONTS.bold,
   },
   slogan_text: {
     position: 'absolute',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: fontValue(16),
     bottom: heightPercentageToDP(2.75),
     color: COLORS.black,
     fontFamily: FONTS.regular,

@@ -41,7 +41,6 @@ const SetupScreen = ({route}) => {
   }, []);
 
   const handleCloseModal = useCallback(() => {
-    Keyboard.dismiss();
     pickerRef?.current?.close();
     pickerRef?.current?.forceClose();
   }, []);
@@ -67,8 +66,6 @@ const SetupScreen = ({route}) => {
   /**
    * Open a modal as BottomSheet
    */
-
-  const [isPickerVisible, setIsPickerVisible] = React.useState(false);
 
   const [LoaderVisible, setLoaderVisible] = React.useState(false);
 
@@ -114,7 +111,8 @@ const SetupScreen = ({route}) => {
         <View style={styles.large_box}>
           <Pressable
             onPress={() => {
-              setIsPickerVisible(true);
+              Keyboard.dismiss();
+              handlePresentModal();
             }}
             onLongPress={() => {
               if (UserPhoto) {
@@ -190,6 +188,7 @@ const SetupScreen = ({route}) => {
               mode="outlined"
               label="First Name"
               value={firstName}
+              onFocus={() => handleCloseModal()}
               multiline={false}
               theme={{
                 colors: {
@@ -214,6 +213,7 @@ const SetupScreen = ({route}) => {
               label="Last Name"
               value={lastName}
               multiline={false}
+              onFocus={() => handleCloseModal()}
               theme={{
                 colors: {
                   text: COLORS.accentLight,
@@ -325,14 +325,18 @@ const SetupScreen = ({route}) => {
                           last_name: lowerToUppercase(lastName),
                           avatar: avatarUrl,
                           active_status: 'normal',
+                          info: {
+                            created_At: firestore.Timestamp.fromDate(
+                              new Date(),
+                            ),
+                            premuim: false,
+                            premuimUntil: 'none',
+                            banned: false,
+                            bannedUntil: '',
+                          },
                           active_time: firestore.Timestamp.fromDate(new Date()),
-                          created_At: firestore.Timestamp.fromDate(new Date()),
                           bio: '',
                           jwtKey: jwt_key,
-                          premuim: false,
-                          premuimUntil: 'none',
-                          banned: false,
-                          bannedUntil: '',
                           passcode: {
                             passcode_enabled: false,
                           },
@@ -372,21 +376,19 @@ const SetupScreen = ({route}) => {
           onCameraPress={() => {
             openCamera()
               .then(image => {
-                console.log(image);
                 setUserPhoto(image);
               })
               .catch(e => {
-                console.log(e);
+                console.error(e);
               });
           }}
           onFilePicker={() => {
             openImagePicker()
               .then(image => {
-                console.log(image);
                 setUserPhoto(image);
               })
               .catch(e => {
-                console.log(e);
+                console.error(e);
               });
           }}
         />
