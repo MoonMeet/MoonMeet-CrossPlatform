@@ -225,226 +225,228 @@ const EditProfileScreen = () => {
   return (
     <BaseView>
       <Spacer height={heightPercentageToDP(0.5)} />
-      <Pressable
-        onLongPress={() => {
-          if (UserPhoto) {
-            setUserPhoto(null);
-            InfoToast(
-              'bottom',
-              'Photo Removed',
-              'Now select a new photo',
-              true,
-              2000,
-            );
-          }
-        }}
-        style={styles.avatarHolder}>
-        <Avatar.Image
-          size={85}
-          source={
-            UserPhoto
-              ? {uri: UserPhoto?.path}
-              : avatarURL
-              ? {uri: avatarURL}
-              : PurpleBackground
-          }
-        />
+      <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
         <Pressable
-          style={{
-            position: 'relative',
-            marginTop: '-6%',
-            marginLeft: '12.5%',
+          onLongPress={() => {
+            if (UserPhoto) {
+              setUserPhoto(null);
+              InfoToast(
+                'bottom',
+                'Photo Removed',
+                'Now select a new photo',
+                true,
+                2000,
+              );
+            }
           }}
-          onPress={() => {
-            handlePresentModal();
-          }}>
-          <Avatar.Icon
-            size={30}
-            icon={CameraIcon}
-            color={COLORS.black}
+          style={styles.avatarHolder}>
+          <Avatar.Image
+            size={85}
+            source={
+              UserPhoto
+                ? {uri: UserPhoto?.path}
+                : avatarURL
+                ? {uri: avatarURL}
+                : PurpleBackground
+            }
+          />
+          <Pressable
             style={{
-              overflow: 'hidden',
+              position: 'relative',
+              marginTop: '-6%',
+              marginLeft: '12.5%',
             }}
+            onPress={() => {
+              handlePresentModal();
+            }}>
+            <Avatar.Icon
+              size={30}
+              icon={CameraIcon}
+              color={COLORS.black}
+              style={{
+                overflow: 'hidden',
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          </Pressable>
+        </Pressable>
+        <View style={styles.inputHolder}>
+          <TextInput
+            style={{
+              width: '100%',
+              paddingRight: '2%',
+              paddingLeft: '2%',
+            }}
+            mode="outlined"
+            label="First Name"
+            multiline={false}
+            value={firstName}
+            onFocus={handleCloseModal}
+            maxLength={20}
+            right={<TextInput.Affix text={`${firstName.length}/20`} />}
             theme={{
               colors: {
-                primary: COLORS.rippleColor,
+                text: COLORS.black,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
               },
             }}
+            onChangeText={onFirstnameTextChange}
           />
-        </Pressable>
-      </Pressable>
-      <View style={styles.inputHolder}>
-        <TextInput
-          style={{
-            width: '100%',
-            paddingRight: '2%',
-            paddingLeft: '2%',
-          }}
-          mode="outlined"
-          label="First Name"
-          multiline={false}
-          value={firstName}
-          onFocus={handleCloseModal}
-          maxLength={20}
-          right={<TextInput.Affix text={`${firstName.length}/20`} />}
-          theme={{
-            colors: {
-              text: COLORS.black,
-              primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
-            },
-          }}
-          onChangeText={onFirstnameTextChange}
-        />
-        {firstnameHasLessLength() ? (
-          <HelperText type="error" visible={firstnameHasLessLength()}>
-            First Name must be longer than 2 characters.
-          </HelperText>
-        ) : null}
-        <TextInput
-          style={{
-            width: '100%',
-            paddingRight: '2%',
-            paddingLeft: '2%',
-          }}
-          mode="outlined"
-          label="Last name"
-          multiline={false}
-          onFocus={handleCloseModal}
-          value={lastName}
-          maxLength={20}
-          right={<TextInput.Affix text={`${lastName.length}/20`} />}
-          theme={{
-            colors: {
-              text: COLORS.black,
-              primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
-            },
-          }}
-          onChangeText={onLastnameTextChange}
-        />
-        {lastnameHasLessLength() ? (
-          <HelperText type="error" visible={lastnameHasLessLength()}>
-            Last Name must be longer than 2 characters.
-          </HelperText>
-        ) : null}
-      </View>
-      <View style={styles.instruction}>
-        <HelperText
-          style={{fontSize: 13}}
-          padding={'none'}
-          type="info"
-          visible={true}>
-          If you want to change your bio, We need to redirect you
-        </HelperText>
-        <View
-          style={{
-            padding: '0.5%',
-          }}
-        />
-        <Pressable onPress={() => navigation.navigate('addBio')}>
-          <HelperText
-            padding={'none'}
+          {firstnameHasLessLength() ? (
+            <HelperText type="error" visible={firstnameHasLessLength()}>
+              First Name must be longer than 2 characters.
+            </HelperText>
+          ) : null}
+          <TextInput
             style={{
-              color: COLORS.accentLight,
-              fontSize: 13,
+              width: '100%',
+              paddingRight: '2%',
+              paddingLeft: '2%',
             }}
+            mode="outlined"
+            label="Last name"
+            multiline={false}
+            onFocus={handleCloseModal}
+            value={lastName}
+            maxLength={20}
+            right={<TextInput.Affix text={`${lastName.length}/20`} />}
+            theme={{
+              colors: {
+                text: COLORS.black,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
+              },
+            }}
+            onChangeText={onLastnameTextChange}
+          />
+          {lastnameHasLessLength() ? (
+            <HelperText type="error" visible={lastnameHasLessLength()}>
+              Last Name must be longer than 2 characters.
+            </HelperText>
+          ) : null}
+        </View>
+        <View style={styles.instruction}>
+          <HelperText
+            style={{fontSize: 13}}
+            padding={'none'}
             type="info"
             visible={true}>
-            here
+            If you want to change your bio, We need to redirect you
           </HelperText>
-        </Pressable>
-      </View>
-      <FAB
-        style={styles.fab}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
-        animated={true}
-        visible={!sendingData}
-        theme={{
-          colors: {
-            accent: COLORS.accentLight,
-          },
-        }}
-        onPress={() => {
-          if (isConnected) {
-            if (!firstnameHasLessLength() && !firstnameHasLessLength()) {
-              if (
-                firstName === oldFirstname &&
-                lastName === oldLastname &&
-                !UserPhoto
-              ) {
-                navigation?.goBack();
+          <View
+            style={{
+              padding: '0.5%',
+            }}
+          />
+          <Pressable onPress={() => navigation.navigate('addBio')}>
+            <HelperText
+              padding={'none'}
+              style={{
+                color: COLORS.accentLight,
+                fontSize: 13,
+              }}
+              type="info"
+              visible={true}>
+              here
+            </HelperText>
+          </Pressable>
+        </View>
+        <FAB
+          style={styles.fab}
+          normal
+          icon={ArrowForward}
+          color={COLORS.primaryLight}
+          animated={true}
+          visible={!sendingData}
+          theme={{
+            colors: {
+              accent: COLORS.accentLight,
+            },
+          }}
+          onPress={() => {
+            if (isConnected) {
+              if (!firstnameHasLessLength() && !firstnameHasLessLength()) {
+                if (
+                  firstName === oldFirstname &&
+                  lastName === oldLastname &&
+                  !UserPhoto
+                ) {
+                  navigation?.goBack();
+                } else {
+                  setSendingData(true);
+                  setLoaderVisible(true);
+                  if (UserPhoto) {
+                    pushUserData();
+                  }
+                  if (firstName !== oldFirstname || lastName !== oldLastname) {
+                    pushNames()?.finally(() => {
+                      setLoaderVisible(false);
+                      setSendingData(false);
+                    });
+                  }
+                }
               } else {
-                setSendingData(true);
-                setLoaderVisible(true);
-                if (UserPhoto) {
-                  pushUserData();
-                }
-                if (firstName !== oldFirstname || lastName !== oldLastname) {
-                  pushNames()?.finally(() => {
-                    setLoaderVisible(false);
-                    setSendingData(false);
-                  });
-                }
+                ErrorToast(
+                  'bottom',
+                  'Invalid report message',
+                  'Report message must be between 20 and 240 characters',
+                  true,
+                  3000,
+                );
               }
             } else {
               ErrorToast(
                 'bottom',
-                'Invalid report message',
-                'Report message must be between 20 and 240 characters',
+                'Network unavailable',
+                'Network connection is needed to update your profile',
                 true,
                 3000,
               );
             }
-          } else {
-            ErrorToast(
-              'bottom',
-              'Network unavailable',
-              'Network connection is needed to update your profile',
-              true,
-              3000,
-            );
-          }
-        }}
-      />
-      <ImagePickerActionSheet
-        sheetRef={pickerRef}
-        index={0}
-        snapPoints={sheetSnapPoints}
-        onCameraPress={() => {
-          openCamera()
-            .then(image => {
-              console.log(image);
-              setUserPhoto(image);
-            })
-            .catch(e => {
-              setLoaderVisible(false);
-              console.warn(e);
-            });
-        }}
-        onFilePicker={() => {
-          openImagePicker()
-            .then(image => {
-              setUserPhoto(image);
-            })
-            .catch(e => {
-              setLoaderVisible(false);
-              console.warn(e);
-            });
-        }}
-        isVisible={PickerActionSheet}
-      />
-      <LoadingIndicator isVisible={loaderVisible} />
+          }}
+        />
+        <ImagePickerActionSheet
+          sheetRef={pickerRef}
+          index={0}
+          snapPoints={sheetSnapPoints}
+          onCameraPress={() => {
+            openCamera()
+              .then(image => {
+                console.log(image);
+                setUserPhoto(image);
+              })
+              .catch(e => {
+                setLoaderVisible(false);
+                console.warn(e);
+              });
+          }}
+          onFilePicker={() => {
+            openImagePicker()
+              .then(image => {
+                setUserPhoto(image);
+              })
+              .catch(e => {
+                setLoaderVisible(false);
+                console.warn(e);
+              });
+          }}
+          isVisible={PickerActionSheet}
+        />
+        <LoadingIndicator isVisible={loaderVisible} />
+      </Pressable>
     </BaseView>
   );
 };

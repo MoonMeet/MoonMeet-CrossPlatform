@@ -130,9 +130,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 12,
     },
-    shadowOpacity: 0.75,
+    shadowOpacity: 0.58,
     shadowRadius: 16.0,
-    elevation: 25,
+    elevation: 24,
   },
 });
 
