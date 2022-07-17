@@ -72,9 +72,9 @@ const SplashScreen = () => {
             .collection('users')
             .doc(auth()?.currentUser?.uid)
             .get()
-            .then(documentSnapshot => {
+            .finally(documentSnapshot => {
               if (documentSnapshot?.data()?.uid) {
-                return true;
+                userDataOk = true;
               }
             })
             .finally(() => {
