@@ -1,12 +1,14 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import {StyleSheet} from 'react-native';
+import {Avatar} from 'react-native-paper';
+import {StatusBar, StyleSheet} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import BackImage from '../assets/images/back.png';
+import BackImage from '../assets/images/back_48.png';
 import {Text, View} from 'react-native';
-import AvatarHeaderScrollView from 'react-native-sticky-parallax-header';
-import ThreeDots from '../assets/images/dots.png';
+import {AvatarHeaderScrollView} from 'react-native-sticky-parallax-header';
+import MenuIcon from '../assets/images/menu_48.png';
+import moment from 'moment';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
@@ -17,6 +19,19 @@ const UserProfileScreen = () => {
   const [avatarURL, setAvatarURL] = React.useState('');
   const [bioText, setBioText] = React.useState('');
   const [loading, setLoading] = React.useState(true);
+
+  const image = () => {
+    return (
+      <>
+        <Avatar.Icon
+          icon={BackImage}
+          size={24}
+          color={COLORS.primaryLight}
+          style={{opacity: 0.8}}
+        />
+      </>
+    );
+  };
 
   useEffect(() => {
     firestore()
@@ -37,7 +52,7 @@ const UserProfileScreen = () => {
             if (documentSnapshot?.data()?.bio) {
               setBioText(documentSnapshot?.data()?.bio);
             } else if (documentSnapshot?.data()?.created_At) {
-              setBioText(documentSnapshot?.data()?.country_code);
+              setBioText(documentSnapshot?.data()?.created_At.toDate());
             }
             setLoading(false);
           }
@@ -51,37 +66,92 @@ const UserProfileScreen = () => {
   }
 
   return (
-    <AvatarHeaderScrollView
-      leftTopIcon={BackImage}
-      leftTopIconOnPress={() => {
-        navigation?.goBack();
-      }}
-      rightTopIcon={ThreeDots}
-      contentContainerStyle={{backgroundColor: COLORS.white}}
-      containerStyle={styles.stretchContainer}
-      backgroundColor={'green'}
-      hasBorderRadius
-      image={{uri: avatarURL}}
-      subtitle={bioText}
-      title={firstName}
-      titleStyle={styles.titleStyle}
-      showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        <Text>Hello There</Text>
-      </View>
-    </AvatarHeaderScrollView>
+    <>
+      <StatusBar
+        barStyle={'dark-content'}
+        backgroundColor={COLORS.accentLight}
+      />
+      <AvatarHeaderScrollView
+        leftTopIcon={
+          <Avatar.Icon
+            icon={BackImage}
+            size={24}
+            color={COLORS.primaryLight}
+            style={{opacity: 0.8}}
+          />
+        }
+        leftTopIconOnPress={() => {
+          navigation?.goBack();
+        }}
+        rightTopIcon={MenuIcon}
+        contentContainerStyle={{
+          backgroundColor: COLORS.primaryLight,
+        }}
+        containerStyle={styles.stretchContainer}
+        backgroundColor={COLORS.accentLight}
+        hasBorderRadius
+        image={{uri: avatarURL}}
+        subtitle={'Joined on ' + moment(bioText)?.format('MMMM Do YYYY')}
+        subtitleStyle={styles.subtitleStyle}
+        title={firstName + ' ' + lastName}
+        titleStyle={styles.titleStyle}
+        nestedScrollEnabled={true}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+          <Text>Hello There</Text>
+        </View>
+      </AvatarHeaderScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   titleStyle: {
     fontFamily: FONTS.regular,
+    color: COLORS.white,
+    opacity: 0.8,
+  },
+  subtitleStyle: {
+    fontFamily: FONTS.regular,
+    color: COLORS.white,
+    opacity: 0.8,
   },
   screenContainer: {
     alignItems: 'center',
     alignSelf: 'stretch',
     flex: 1,
     justifyContent: 'center',
+  },
+  content: {
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 24,
   },
 });
 export default UserProfileScreen;

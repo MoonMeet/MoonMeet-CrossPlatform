@@ -67,44 +67,23 @@ const SplashScreen = () => {
     const SplashScreenTimerTask = setTimeout(() => {
       if (isViewPagerCompleted()) {
         if (auth()?.currentUser !== null) {
-          let userDataOk = false;
+          let havePasscode = false;
           firestore()
             .collection('users')
             .doc(auth()?.currentUser?.uid)
             .get()
-            .finally(documentSnapshot => {
-              if (documentSnapshot?.data()?.uid) {
-                userDataOk = true;
+            .then(documentSnapshot => {
+              if (documentSnapshot?.exists) {
+                if (documentSnapshot?.data()?.passcode?.passcode_enabled) {
+                  havePasscode = true;
+                }
               }
             })
             .finally(() => {
-              if (userDataOk) {
-                let havePasscode = false;
-                firestore()
-                  .collection('users')
-                  .doc(auth()?.currentUser?.uid)
-                  .get()
-                  .then(documentSnapshot => {
-                    if (documentSnapshot?.exists) {
-                      if (
-                        documentSnapshot?.data()?.passcode?.passcode_enabled
-                      ) {
-                        havePasscode = true;
-                      }
-                    }
-                  })
-                  .finally(() => {
-                    if (havePasscode) {
-                      navigation?.navigate('passcodeVerify');
-                    } else {
-                      navigation?.navigate('home');
-                    }
-                  });
+              if (havePasscode) {
+                navigation?.navigate('passcodeVerify');
               } else {
-                console.log('found no data');
-                auth()
-                  ?.signOut()
-                  .finally(() => navigation?.navigate('login'));
+                navigation?.navigate('home');
               }
             });
         } else {

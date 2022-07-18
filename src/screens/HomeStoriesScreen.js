@@ -12,6 +12,7 @@ import {PurpleBackground} from '../index.d';
 import AsyncStorage from '@react-native-community/async-storage';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import StoriesList from '../components/HomeScreen/StoriesList';
+import NewStoriesList from '../components/HomeScreen/NewStoriesList';
 
 const HomeStoriesScreen = () => {
   const navigation = useNavigation();
@@ -220,7 +221,10 @@ const HomeStoriesScreen = () => {
               </Pressable>
             </View>
           </View>
-          <StoriesList ListData={storiesData} />
+          <NewStoriesList
+            ListData={storiesData}
+            myUID={auth()?.currentUser?.uid}
+          />
         </MiniBaseView>
       </Provider>
     );
