@@ -20,8 +20,6 @@ const HomeChatsScreen = () => {
 
   const [chatsData, setChatsData] = React.useState([]);
 
-  const currentStoryData = [];
-
   const [avatarURL, setAvatarURL] = React.useState('');
 
   const [newActiveTime, setNewActiveTime] = React.useState('');
@@ -121,6 +119,7 @@ const HomeChatsScreen = () => {
               .doc(documentSnapshot?.id)
               .collection('stories')
               .onSnapshot(subCollectionSnapshot => {
+                let tempStoriesData = [];
                 subCollectionSnapshot?.forEach(subDocument => {
                   if (
                     subDocument?.data()?.time &&
@@ -133,7 +132,7 @@ const HomeChatsScreen = () => {
                     ) {
                       deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
                     } else {
-                      currentStoryData.push({
+                      tempStoriesData.push({
                         ...subDocument?.data(),
                         avatar: documentSnapshot?.data()?.avatar,
                         first_name: documentSnapshot?.data()?.first_name,
@@ -143,7 +142,7 @@ const HomeChatsScreen = () => {
                       });
                     }
                   }
-                  setStoriesData(currentStoryData);
+                  setStoriesData(tempStoriesData);
                 });
               });
           }
