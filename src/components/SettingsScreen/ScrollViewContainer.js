@@ -1,5 +1,5 @@
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Linking, Platform, View} from 'react-native';
+import {Linking, Platform, Pressable} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -31,7 +31,6 @@ import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
 import moment from 'moment';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 interface ScrollViewContainerInterface {
   firstName: string;
@@ -47,6 +46,11 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const privacyRef = useRef(null);
   const faqRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['80%', '100%'], []);
+
+  const handleCloseAllModals = useCallback(() => {
+    privacyRef?.current?.forceClose();
+    faqRef?.current?.forceClose();
+  }, []);
 
   const handlePresentPrivacyModal = useCallback(() => {
     faqRef?.current?.forceClose();
@@ -83,10 +87,12 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
     default: () => undefined | null,
   });
   return (
-    <View
+    <Pressable
       style={{
         backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-      }}>
+        marginLeft: '-2%',
+      }}
+      onPressIn={() => handleCloseAllModals()}>
       <DataItemTitle titleItem={'Miscellaneous'} />
       <DataItemCustom
         leftIcon={DarkModeIcon}
@@ -101,6 +107,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         descriptionOpacity={0.4}
         onPressTrigger={() => {
+          handleCloseAllModals();
           navigation?.navigate('darkMode');
         }}
         onLongPressTrigger={null}
@@ -110,25 +117,34 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={EditIcon}
         leftIconColor={COLORS.purple}
         titleTextContainer={'Edit profile'}
-        onPressTrigger={() => navigation.navigate('editProfile')}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+          navigation.navigate('editProfile');
+        }}
       />
       <DataItem
         leftIcon={PassCodeIcon}
         leftIconColor={COLORS.green}
         titleTextContainer={'Setup passcode'}
-        onPressTrigger={() => navigation.navigate('passcodeSetup')}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+          navigation.navigate('passcodeSetup');
+        }}
       />
       <DataItem
         leftIcon={PrivacyIcon}
         leftIconColor={COLORS.orange}
         titleTextContainer={'Privacy and Security'}
-        onPressTrigger={null}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+        }}
       />
       <DataItem
         leftIcon={LogoutIcon}
         leftIconColor={COLORS.redLightError}
         titleTextContainer={'Log out'}
         onPressTrigger={() => {
+          handleCloseAllModals();
           try {
             auth()
               ?.signOut()
@@ -156,7 +172,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
             : moment(props?.activeTime)?.fromNow()
         }
         descriptionColor={COLORS.black}
-        onPressTrigger={() => navigation?.navigate('activeStatus')}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+          navigation?.navigate('activeStatus');
+        }}
         onLongPressTrigger={null}
       />
       <DataItemCustom
@@ -172,6 +191,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionColor={COLORS.black}
         onPressTrigger={() => navigation?.navigate('changeUsername')}
         onLongPressTrigger={() => {
+          handleCloseAllModals();
           try {
             Clipboard?.setString(props?.username);
             SuccessToast(
@@ -197,13 +217,18 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={NotificationsIcon}
         leftIconColor={COLORS.yellowDarkWarning}
         titleTextContainer={'Notifications Settings'}
-        onPressTrigger={() => Linking?.openSettings()}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+          Linking?.openSettings();
+        }}
       />
       <DataItem
         leftIcon={MessageIcon}
         leftIconColor={COLORS.blue_second}
         titleTextContainer={'Chat Settings'}
-        onPressTrigger={null}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+        }}
       />
       <DevicesScreen />
       <DataItemTitle titleItem={'Help'} />
@@ -211,7 +236,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={PriPoIcon}
         leftIconColor={COLORS.maroon}
         titleTextContainer={'Privacy Policy'}
-        onPressTrigger={() => handlePresentPrivacyModal()}
+        onPressTrigger={() => {
+          handlePresentPrivacyModal();
+        }}
       />
       <DataItem
         leftIcon={FAQIcon}
@@ -223,7 +250,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={ReportIcon}
         leftIconColor={COLORS.accentLight}
         titleTextContainer={'Report technical problem'}
-        onPressTrigger={() => navigation?.navigate('bugreport')}
+        onPressTrigger={() => {
+          handleCloseAllModals();
+          navigation?.navigate('bugreport');
+        }}
       />
       <PrivacyPolicy
         sheetRef={privacyRef}
@@ -235,7 +265,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         index={0}
         snapPoints={sheetSnapPoints}
       />
-    </View>
+    </Pressable>
   );
 };
 
