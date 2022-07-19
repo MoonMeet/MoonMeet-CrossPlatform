@@ -207,7 +207,7 @@ const ChatScreen = () => {
         }
       }
     } else {
-      let pickedImage = `chats/${getRandomString(18)}.${image?.substring(
+      let pickedImage = `chats/images/${getRandomString(18)}.${image?.substring(
         image?.lastIndexOf('.') + 1,
         3,
       )}`;
@@ -486,7 +486,7 @@ const ChatScreen = () => {
                     width: 1024,
                     cropper: false,
                   })
-                    .catch(async image => {
+                    .then(async image => {
                       const compressingResult = await Image.compress(
                         image?.path,
                         {
