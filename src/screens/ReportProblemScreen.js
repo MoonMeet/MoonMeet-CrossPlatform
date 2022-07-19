@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseView from '../components/BaseView/BaseView';
-import {StyleSheet, Text, View} from 'react-native';
-import {FAB, HelperText, TextInput} from 'react-native-paper';
+import {Image, StyleSheet, Text, View, Pressable} from 'react-native';
+import {FAB, HelperText, TextInput, Chip, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
@@ -14,27 +14,36 @@ import {
   ErrorToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/Dimensions';
+import PhotoCamera from '../assets/images/pick-photo.png';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+import RemoveIcon from '../assets/images/clear.png';
+import getRandomString from '../utils/generators/getRandomString';
 
 const ReportProblemScreen = () => {
+  const AnimatedFAB = Animated.createAnimatedComponent(FAB);
+
   const navigation = useNavigation();
 
   const translateY = useSharedValue(0);
-
-  const AnimatedFAB = Animated.createAnimatedComponent(FAB);
 
   const animateFab = () => {
     translateY.value = withDelay(
       30,
       withTiming(1500, {duration: 400}, isFinished => {
         if (isFinished) {
-          translateY.value = withDelay(1500, withTiming(0, {duration: 400}));
+          translateY.value = withDelay(1500, withTiming(30, {duration: 400}));
         }
       }),
     );
@@ -57,39 +66,106 @@ const ReportProblemScreen = () => {
   const [loaderVisible, setLoaderVisible] = React.useState(false);
 
   const onReportTextChange = _reportText => setReportText(_reportText);
+  const [UserPhoto, setUserPhoto] = React.useState(null);
+  const [ImageURL, setImageURL] = React.useState('');
 
-  function pushReport() {
+  function pushReport(type) {
     setLoaderVisible(true);
-    firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .collection('reports')
-      .add({
-        report_message: ReportText,
-        time: Date.now(),
-      })
-      .finally(() => {
-        SuccessToast(
-          'bottom',
-          'Report Delivered',
-          'Thank you for reporting bugs to Moon Meet Team.',
-          true,
-          2000,
-        );
-        setLoaderVisible(false);
-        navigation.goBack();
-      })
-      .catch(error => {
-        ErrorToast(
-          'bottom',
-          'Reporting Failed',
-          'An error occurred while sending your report.',
-          true,
-          2000,
-        );
-        setLoaderVisible(false);
-        navigation?.goBack();
-      });
+    switch (type) {
+      case 'text':
+        {
+          firestore()
+            .collection('users')
+            .doc(auth()?.currentUser?.uid)
+            .collection('reports')
+            .add({
+              report_message: ReportText,
+              time: Date.now(),
+            })
+            .finally(() => {
+              SuccessToast(
+                'bottom',
+                'Report Delivered',
+                'Thank you for reporting bugs to Moon Meet Team.',
+                true,
+                2000,
+              );
+              setLoaderVisible(false);
+              navigation.goBack();
+            })
+            .catch(error => {
+              ErrorToast(
+                'bottom',
+                'Reporting Failed',
+                'An error occurred while sending your report.',
+                true,
+                2000,
+              );
+              setLoaderVisible(false);
+              navigation?.goBack();
+            });
+        }
+        break;
+      case 'image':
+        {
+          let reportImageRef = `reports/image/${getRandomString(
+            10,
+          )}.${UserPhoto?.path?.substr(
+            UserPhoto.path?.lastIndexOf('.') + 1,
+            3,
+          )}`;
+
+          const storageRef = storage().ref(reportImageRef);
+
+          /**
+           * Uploading image to Firebase Storage
+           * @type {FirebaseStorageTypes.Task}
+           */
+
+          const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+
+          /**
+           * an async function to get {avatarUrl} and upload all user data.
+           */
+          uploadImageTask.then(async () => {
+            const image = await storage().ref(reportImageRef).getDownloadURL();
+            firestore()
+              .collection('users')
+              .doc(auth()?.currentUser?.uid)
+              .collection('reports')
+              .add({
+                report_message: ReportText,
+                image: image,
+                time: Date.now(),
+              })
+              .finally(() => {
+                SuccessToast(
+                  'bottom',
+                  'Report Delivered',
+                  'Thank you for reporting bugs to Moon Meet Team.',
+                  true,
+                  2000,
+                );
+                setLoaderVisible(false);
+                navigation.goBack();
+              })
+              .catch(error => {
+                ErrorToast(
+                  'bottom',
+                  'Reporting Failed',
+                  'An error occurred while sending your report.',
+                  true,
+                  2000,
+                );
+                setLoaderVisible(false);
+                navigation?.goBack();
+              });
+          });
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   const hasMoreLength = () => {
@@ -116,7 +192,9 @@ const ReportProblemScreen = () => {
           label="Report a problem"
           multiline={true}
           value={ReportText}
-          placeholder={'Here you can describe the problem in more detail'}
+          placeholder={
+            'Breifly explain what happened and what we need to do to reprrduce the problem.'
+          }
           theme={{
             colors: {
               text: COLORS.black,
@@ -140,6 +218,64 @@ const ReportProblemScreen = () => {
           Report message must be longer than 20 characters.
         </HelperText>
       )}
+      <View style={styles.attachView}>
+        {UserPhoto ? (
+          <>
+            <Image
+              source={{uri: UserPhoto?.path}}
+              style={{
+                marginTop: heightPercentageToDP(0.5),
+                height: heightPercentageToDP(40),
+                width: widthPercentageToDP(40),
+                borderRadius: 8,
+                resizeMode: 'contain',
+                overflow: 'hidden',
+              }}
+            />
+            <Pressable
+              style={{
+                position: 'relative',
+                marginTop: heightPercentageToDP(-39.5),
+                marginLeft: widthPercentageToDP(30.5),
+              }}
+              onPress={() => setUserPhoto(null)}>
+              <Avatar.Icon
+                size={30}
+                icon={RemoveIcon}
+                color={COLORS.black}
+                style={{
+                  overflow: 'hidden',
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            </Pressable>
+          </>
+        ) : (
+          <Chip
+            icon={PhotoCamera}
+            mode={'outlined'}
+            style={{width: widthPercentageToDP(30)}}
+            selectedColor={COLORS.black}
+            onPress={() => {
+              ImagePicker.openPicker({
+                width: 550,
+                height: 650,
+                cropping: false,
+                mediaType: 'photo',
+              })
+                .then(image => {
+                  setUserPhoto(image);
+                })
+                .catch(error => console.error(error));
+            }}>
+            Attach Photo
+          </Chip>
+        )}
+      </View>
       <AnimatedFAB
         style={[styles.fab, fabAnimation]}
         normal
@@ -154,7 +290,7 @@ const ReportProblemScreen = () => {
         onPress={() => {
           if (isConnected) {
             if (!hasMoreLength() && !hasLessLength()) {
-              pushReport();
+              pushReport(UserPhoto?.path ? 'image' : 'text');
             } else {
               animateFab();
               ErrorToast(
@@ -183,41 +319,19 @@ const ReportProblemScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: 22,
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
   bugInfo: {
     position: 'relative',
-    fontSize: 16,
+    fontSize: fontValue(16),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.black,
     opacity: 0.4,
     fontFamily: FONTS.regular,
+  },
+  attachView: {
+    paddingTop: heightPercentageToDP(0.5),
+    alignItems: 'center',
   },
   fab: {
     position: 'absolute',

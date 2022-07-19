@@ -4,6 +4,7 @@ const AvatarPicker = {
   width: 550,
   height: 650,
   cropping: true,
+  mediaType: 'photo',
 };
 
 export const openImagePicker = () => {
