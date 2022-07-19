@@ -1,5 +1,13 @@
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Image, Pressable, StyleSheet, Text, View, Keyboard} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Keyboard,
+  BackHandler,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Avatar, FAB, TextInput} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
@@ -30,6 +38,7 @@ import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator
 import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import {useFocusEffect} from '@react-navigation/native';
 
 const SetupScreen = ({route}) => {
   const pickerRef = useRef(null);
@@ -44,6 +53,20 @@ const SetupScreen = ({route}) => {
     pickerRef?.current?.close();
     pickerRef?.current?.forceClose();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
@@ -102,7 +125,12 @@ const SetupScreen = ({route}) => {
 
   return (
     <BaseView>
-      <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
+      <Pressable
+        style={{flex: 1}}
+        onPress={() => {
+          Keyboard.dismiss();
+          handleCloseModal();
+        }}>
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             Enter your name and select a profile picture
@@ -372,6 +400,7 @@ const SetupScreen = ({route}) => {
             openCamera()
               .then(image => {
                 setUserPhoto(image);
+                handleCloseModal();
               })
               .catch(e => {
                 console.error(e);
@@ -381,6 +410,7 @@ const SetupScreen = ({route}) => {
             openImagePicker()
               .then(image => {
                 setUserPhoto(image);
+                handleCloseModal();
               })
               .catch(e => {
                 console.error(e);

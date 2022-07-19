@@ -44,14 +44,6 @@ import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 
 const LoginScreen = () => {
   /**
-   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
-   * @type {Promise<NetInfoState>}
-   */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState.isConnected;
-  });
-
-  /**
    * Dummy NetInfoObserver
    */
 
@@ -79,18 +71,20 @@ const LoginScreen = () => {
   useEffect(() => {
     addNetInfoObserver();
     const currentSubscriber = auth()?.onAuthStateChanged(onAuthStateChanged);
-    const LoginScreenTimerTask = setTimeout(() => {
-      if (isConnected) {
+    const LoginScreenTimerTask = setTimeout(async () => {
+      let isConnected = await NetInfo.fetch();
+      if (isConnected.isConnected) {
         getCountryCodeFromApi();
       } else {
         setErrorSnackbarText(
           'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
         );
-        onToggleErrorSnackBar();
+        setErrorSnackBarVisible(true);
       }
     }, 500);
     return () => {
       currentSubscriber();
+      addNetInfoObserver();
       clearTimeout(LoginScreenTimerTask);
     };
   }, []);
@@ -214,8 +208,9 @@ const LoginScreen = () => {
 
   const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
 
-  const onToggleErrorSnackBar = () =>
+  const onToggleErrorSnackBar = useCallback(() => {
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
+  }, [ErrorSnackBarVisible]);
 
   const onDismissErrorSnackBar = () => {
     setBottomMargin(0);
@@ -434,6 +429,7 @@ const LoginScreen = () => {
                 keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                 label="Country Code"
                 value={CountryText}
+                maxLength={5}
                 onFocus={() => {
                   handleForceCloseAllModals();
                   countryInputOnFocus();
@@ -465,6 +461,7 @@ const LoginScreen = () => {
                 value={NumberText}
                 onFocus={() => handleForceCloseAllModals()}
                 placeholder={'eg, (123) 456 7890'}
+                maxLength={12}
                 multiline={false}
                 theme={{
                   colors: {
@@ -556,10 +553,11 @@ const LoginScreen = () => {
                   accent: COLORS.accentLight,
                 },
               }}
-              onPress={() => {
+              onPress={async () => {
                 try {
                   Keyboard.dismiss();
-                  if (isConnected) {
+                  const isConnected = await NetInfo.fetch();
+                  if (isConnected.isConnected) {
                     if (isSMSSendingAcceptable()) {
                       setLoaderVisible(true);
                       signInWithPhoneNumber(CountryText + NumberText)?.catch(
