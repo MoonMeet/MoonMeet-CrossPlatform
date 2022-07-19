@@ -1,9 +1,8 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
+import {ActivityIndicator} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
@@ -17,11 +16,11 @@ import {
   getVersion,
 } from 'react-native-device-info';
 import {v4 as uuidv4} from 'uuid';
-import AsyncStorage from '@react-native-community/async-storage';
 import DevicesList from '../components/DevicesScreen/DevicesList';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 import {heightPercentageToDP} from '../config/Dimensions';
 import {reverse, sortBy} from 'lodash';
+import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 
 const DevicesScreen = () => {
   const navigation = useNavigation();
@@ -184,21 +183,22 @@ const DevicesScreen = () => {
       </View>
       <View style={styles.terminateView}>
         <Text
-          onPress={async () => {
-            await AsyncStorage.setItem('currentUserJwtKey', newJwtKey).finally(
-              () => {
-                firestore()
-                  .collection('users')
-                  .doc(auth()?.currentUser?.uid)
-                  .update({
-                    jwtKey: newJwtKey,
-                  })
-                  .finally(async () => {
-                    await resendCurrentDevice();
-                  })
-                  .catch(error => console.error(error));
-              },
-            );
+          onPress={() => {
+            try {
+              JwtKeyMMKV.set('currentUserJwtKey', newJwtKey);
+            } catch {
+              console.error('failed updating JwtKey');
+            }
+            firestore()
+              .collection('users')
+              .doc(auth()?.currentUser?.uid)
+              .update({
+                jwtKey: newJwtKey,
+              })
+              .finally(async () => {
+                await resendCurrentDevice();
+              })
+              .catch(error => console.error(error));
           }}
           style={styles.headingTerminate}>
           Terminate All Other Sessions

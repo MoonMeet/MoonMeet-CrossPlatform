@@ -19,7 +19,6 @@ import {
 } from 'react-native-device-info';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
-import AsyncStorage from '@react-native-community/async-storage';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 import placeHolderPhoto from '../assets/images/pick-photo.png';
 import ArrowForward from '../assets/images/arrow-forward.png';
@@ -30,6 +29,7 @@ import {
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
+import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 
 const SetupScreen = ({route}) => {
   const pickerRef = useRef(null);
@@ -314,39 +314,34 @@ const SetupScreen = ({route}) => {
                    * we must push data to firebase.
                    */
 
-                  await AsyncStorage.setItem('currentUserJwtKey', jwt_key).then(
-                    () => {
-                      firestore()
-                        .collection('users')
-                        .doc(auth()?.currentUser?.uid)
-                        .set({
-                          ...user,
-                          first_name: lowerToUppercase(firstName),
-                          last_name: lowerToUppercase(lastName),
-                          avatar: avatarUrl,
-                          active_status: 'normal',
-                          info: {
-                            created_At: firestore.Timestamp.fromDate(
-                              new Date(),
-                            ),
-                            premuim: false,
-                            premuimUntil: 'none',
-                            banned: false,
-                            bannedUntil: '',
-                          },
-                          active_time: firestore.Timestamp.fromDate(new Date()),
-                          bio: '',
-                          jwtKey: jwt_key,
-                          passcode: {
-                            passcode_enabled: false,
-                          },
-                        })
-                        .finally(() => {
-                          navigation.navigate('home');
-                          setLoaderVisible(!LoaderVisible);
-                        });
-                    },
-                  );
+                  JwtKeyMMKV.set('currentUserJwtKey', jwt_key);
+                  firestore()
+                    .collection('users')
+                    .doc(auth()?.currentUser?.uid)
+                    .set({
+                      ...user,
+                      first_name: lowerToUppercase(firstName),
+                      last_name: lowerToUppercase(lastName),
+                      avatar: avatarUrl,
+                      active_status: 'normal',
+                      info: {
+                        created_At: firestore.Timestamp.fromDate(new Date()),
+                        premuim: false,
+                        premuimUntil: 'none',
+                        banned: false,
+                        bannedUntil: '',
+                      },
+                      active_time: firestore.Timestamp.fromDate(new Date()),
+                      bio: '',
+                      jwtKey: jwt_key,
+                      passcode: {
+                        passcode_enabled: false,
+                      },
+                    })
+                    .finally(() => {
+                      navigation.navigate('home');
+                      setLoaderVisible(!LoaderVisible);
+                    });
                 });
               } catch (e) {
                 console.log(e);

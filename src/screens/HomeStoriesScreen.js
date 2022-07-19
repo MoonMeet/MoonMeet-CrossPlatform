@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert,
   ImageBackground,
 } from 'react-native';
 import {ActivityIndicator, Avatar, Provider} from 'react-native-paper';
@@ -17,13 +16,11 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
-import AsyncStorage from '@react-native-community/async-storage';
 import Animated from 'react-native-reanimated';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
-import StoriesList from '../components/HomeScreen/StoriesList';
-import NewStoriesList from '../components/HomeScreen/NewStoriesList';
 import StickyItemFlatList from '@gorhom/sticky-item';
 import MoonStickyStoryItem from '../components/HomeScreen/task/modified';
+import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 
 const HomeStoriesScreen = () => {
   const navigation = useNavigation();
@@ -83,28 +80,28 @@ const HomeStoriesScreen = () => {
   const [storiesData, setStoriesData] = React.useState([]);
 
   function checkJwtKey(currentJwtKey) {
-    AsyncStorage?.getItem('currentUserJwtKey')?.then(_asyncJwt => {
-      if (_asyncJwt !== currentJwtKey) {
-        AsyncStorage.removeItem('currentUserJwtKey');
-        if (auth()?.currentUser != null) {
-          auth()
-            ?.signOut()
-            .then(() => {
-              navigation.navigate('login');
-              InfoToast(
-                'bottom',
-                'Session Expired',
-                'Your session in this account has been expired, Please re-login',
-                true,
-                3000,
-              );
-            })
-            .catch(() => {
-              navigation.navigate('login');
-            });
-        }
+    const currentKey = JwtKeyMMKV.getString('currentUserJwtKey');
+    if (currentKey !== currentJwtKey) {
+      JwtKeyMMKV.delete('currentUserJwtKey');
+      if (auth()?.currentUser != null) {
+        auth()
+          ?.signOut()
+          .then(() => {
+            navigation?.navigate('login');
+            InfoToast(
+              'bottom',
+              'Session Expired',
+              'Your session in this account has been expired, Please re-login',
+              true,
+              3000,
+            );
+          })
+          .catch(() => {
+            navigation?.navigate('login');
+            console.error('failed loggin out the user');
+          });
       }
-    });
+    }
   }
 
   async function updateUserActiveStatus() {
