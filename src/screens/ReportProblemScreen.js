@@ -227,15 +227,16 @@ const ReportProblemScreen = () => {
                 height: heightPercentageToDP(40),
                 width: widthPercentageToDP(40),
                 borderRadius: 8,
-                resizeMode: 'contain',
+                resizeMode: 'cover',
                 overflow: 'hidden',
               }}
             />
             <Pressable
+              android_ripple={{color: COLORS.black}}
               style={{
                 position: 'relative',
-                marginTop: heightPercentageToDP(-39.5),
-                marginLeft: widthPercentageToDP(30.5),
+                marginTop: heightPercentageToDP(-39.65),
+                marginLeft: widthPercentageToDP(30.85),
               }}
               onPress={() => setUserPhoto(null)}>
               <Avatar.Icon
