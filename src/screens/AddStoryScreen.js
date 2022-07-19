@@ -2,7 +2,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {
   BackHandler,
   Image,
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Keyboard,
 } from 'react-native';
 import {
   ActivityIndicator,
@@ -37,6 +38,19 @@ import getRandomString from '../utils/generators/getRandomString';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
+
+  const pickerRef = useRef(null);
+  const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
+
+  const handlePresentModal = useCallback(() => {
+    Keyboard.dismiss();
+    pickerRef?.current?.present();
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    Keyboard.pickerRef?.current?.close();
+    pickerRef?.current?.forceClose();
+  }, []);
 
   const [userSelection, setUserSelection] = React.useState('');
 
@@ -529,13 +543,13 @@ const AddStoryScreen = () => {
           </HelperText>
         ) : null}
         <ImagePickerActionSheet
-          hideModal={() => {
-            setPickerActionSheet(false);
-          }}
+          sheetRef={pickerRef}
+          index={0}
+          snapPoints={sheetSnapPoints}
           onCameraPress={() => {
             openCamera()
-              .then(async image => {
-                await setUserPhoto(image);
+              .then(image => {
+                setUserPhoto(image);
                 setImageVisible(true);
               })
               .catch(e => {
@@ -544,16 +558,15 @@ const AddStoryScreen = () => {
           }}
           onFilePicker={() => {
             openImagePicker()
-              .then(async image => {
+              .then(image => {
                 console.log(image);
-                await setUserPhoto(image);
+                setUserPhoto(image);
                 setImageVisible(true);
               })
               .catch(e => {
                 console.log(e);
               });
           }}
-          isVisible={PickerActionSheet}
         />
       </BaseView>
     );
