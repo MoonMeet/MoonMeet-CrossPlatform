@@ -45,7 +45,7 @@
     "react-native-big-list": "^1.5.4",
     "react-native-compressor": "^1.5.2",
     "react-native-device-info": "^10.0.2",
-    "react-native-gesture-handler": "2.2.0",
+    "react-native-gesture-handler": "2.5.0",
     "react-native-get-random-values": "^1.8.0",
     "react-native-gifted-chat": "^1.0.2",
     "react-native-image-crop-picker": "^0.38.0",
