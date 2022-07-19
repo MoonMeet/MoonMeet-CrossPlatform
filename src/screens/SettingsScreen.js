@@ -94,9 +94,7 @@ const SettingsScreen = () => {
           setLastName(documentSnapshot?.data()?.last_name);
           setUserName(documentSnapshot?.data()?.username);
           setActiveStatus(documentSnapshot?.data()?.active_status);
-          setActiveTime(documentSnapshot?.data()?.active_time.toDate());
-          console.log(documentSnapshot?.data()?.active_time);
-          console.log(documentSnapshot?.data()?.active_time.toDate());
+          setActiveTime(documentSnapshot?.data()?.active_time);
           if (documentSnapshot?.data()?.bio) {
             setUserBio(documentSnapshot?.data()?.bio);
           }

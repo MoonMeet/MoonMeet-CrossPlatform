@@ -33,13 +33,13 @@ import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 
 interface ScrollViewContainerInterface {
-  firstName: string;
-  lastName: string;
-  username: string;
-  avatar: string;
-  userBio: string;
-  activeStatus: string;
-  activeTime: string;
+  firstName?: string | undefined;
+  lastName?: string | undefined;
+  username?: string | undefined;
+  avatar?: string | undefined;
+  userBio?: string | undefined;
+  activeStatus?: string | undefined;
+  activeTime?: any;
 }
 
 const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
@@ -169,7 +169,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionText={
           props?.activeStatus === 'recently'
             ? 'Last seen recently'
-            : moment(props?.activeTime)?.fromNow()
+            : 'Active now'
         }
         descriptionColor={COLORS.black}
         onPressTrigger={() => {
