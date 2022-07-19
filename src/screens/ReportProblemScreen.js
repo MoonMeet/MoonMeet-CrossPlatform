@@ -43,7 +43,7 @@ const ReportProblemScreen = () => {
       30,
       withTiming(1500, {duration: 400}, isFinished => {
         if (isFinished) {
-          translateY.value = withDelay(1500, withTiming(30, {duration: 400}));
+          translateY.value = withDelay(1500, withTiming(0, {duration: 400}));
         }
       }),
     );
