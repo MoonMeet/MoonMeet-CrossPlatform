@@ -67,7 +67,6 @@ const ReportProblemScreen = () => {
 
   const onReportTextChange = _reportText => setReportText(_reportText);
   const [UserPhoto, setUserPhoto] = React.useState(null);
-  const [ImageURL, setImageURL] = React.useState('');
 
   function pushReport(type) {
     setLoaderVisible(true);
