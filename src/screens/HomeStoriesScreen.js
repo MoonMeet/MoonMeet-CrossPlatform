@@ -1,5 +1,13 @@
 import React, {useCallback, useEffect} from 'react';
-import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  BackHandler,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+  ImageBackground,
+} from 'react-native';
 import {ActivityIndicator, Avatar, Provider} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -10,9 +18,12 @@ import auth from '@react-native-firebase/auth';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import AsyncStorage from '@react-native-community/async-storage';
+import Animated from 'react-native-reanimated';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import StoriesList from '../components/HomeScreen/StoriesList';
 import NewStoriesList from '../components/HomeScreen/NewStoriesList';
+import StickyItemFlatList from '@gorhom/sticky-item';
+import MoonStickyStoryItem from '../components/HomeScreen/task/modified';
 
 const HomeStoriesScreen = () => {
   const navigation = useNavigation();
@@ -26,6 +37,46 @@ const HomeStoriesScreen = () => {
   const [activeStatusState, setActiveStatusState] = React.useState(null);
 
   const currentStoryData = [];
+
+  // dummy data
+  const data = [...Array(10)]
+    .fill(0)
+    .map((_, index) => ({id: `item-${index}`}));
+
+  // configs
+  const ITEM_WIDTH = 120;
+  const ITEM_HEIGHT = 200;
+  const STICKY_ITEM_WIDTH = 50;
+  const STICKY_ITEM_HEIGHT = 50;
+  const STICKY_ITEM_BACKGROUNDS = [COLORS.rippleColor, COLORS.accentLight];
+  const SEPARATOR_SIZE = 8;
+  const BORDER_RADIUS = 10;
+
+  const StickyItemView = ({
+    x,
+    threshold,
+    itemWidth,
+    itemHeight,
+    stickyItemWidth,
+    stickyItemHeight,
+    separatorSize,
+    isRTL,
+  }) => {
+    const amazingAnimation = {};
+
+    return (
+      <Animated.View style={amazingAnimation}>
+        <ImageBackground
+          resizeMode="cover"
+          style={{height: 100, width: 60, paddingVertical: 50}}
+          borderTopLeftRadius={10}
+          borderBottomRightRadius={10}
+          source={{uri: avatarURL}}>
+          <Text>Hello</Text>
+        </ImageBackground>
+      </Animated.View>
+    );
+  };
 
   const [myUID, setMyUID] = React.useState('');
 
@@ -155,6 +206,20 @@ const HomeStoriesScreen = () => {
     };
   }, []);
 
+  const handleStickyItemPress = () => navigation.navigate('addStory');
+
+  // render
+  const renderItem = ({item, index}) => (
+    <View
+      key={`item-${index}`}
+      style={{
+        backgroundColor: 'red',
+        width: ITEM_WIDTH,
+        height: ITEM_HEIGHT,
+      }}
+    />
+  );
+
   if (Loading) {
     return (
       <MiniBaseView>
@@ -221,9 +286,18 @@ const HomeStoriesScreen = () => {
               </Pressable>
             </View>
           </View>
-          <NewStoriesList
-            ListData={storiesData}
-            myUID={auth()?.currentUser?.uid}
+          <StickyItemFlatList
+            itemWidth={ITEM_WIDTH}
+            itemHeight={ITEM_HEIGHT}
+            separatorSize={SEPARATOR_SIZE}
+            borderRadius={BORDER_RADIUS}
+            stickyItemWidth={STICKY_ITEM_WIDTH}
+            stickyItemHeight={STICKY_ITEM_HEIGHT}
+            stickyItemBackgroundColors={STICKY_ITEM_BACKGROUNDS}
+            stickyItemContent={props => <MoonStickyStoryItem {...props} />}
+            onStickyItemPress={handleStickyItemPress}
+            data={data}
+            renderItem={renderItem}
           />
         </MiniBaseView>
       </Provider>
