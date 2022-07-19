@@ -2,7 +2,6 @@ import React from 'react';
 import BaseView from '../components/BaseView/BaseView';
 import {StyleSheet, Text, View} from 'react-native';
 import {FAB, HelperText, TextInput} from 'react-native-paper';
-// import BackImage from '../assets/images/back.png';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
@@ -16,9 +15,36 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 
 const ReportProblemScreen = () => {
   const navigation = useNavigation();
+
+  const translateY = useSharedValue(0);
+
+  const AnimatedFAB = Animated.createAnimatedComponent(FAB);
+
+  const animateFab = () => {
+    translateY.value = withDelay(
+      30,
+      withTiming(1500, {duration: 400}, isFinished => {
+        if (isFinished) {
+          translateY.value = withDelay(1500, withTiming(0, {duration: 400}));
+        }
+      }),
+    );
+  };
+
+  const fabAnimation = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: translateY.value}],
+    };
+  }, []);
 
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
@@ -48,7 +74,7 @@ const ReportProblemScreen = () => {
           'Report Delivered',
           'Thank you for reporting bugs to Moon Meet Team.',
           true,
-          3000,
+          2000,
         );
         setLoaderVisible(false);
         navigation.goBack();
@@ -59,7 +85,7 @@ const ReportProblemScreen = () => {
           'Reporting Failed',
           'An error occurred while sending your report.',
           true,
-          3000,
+          2000,
         );
         setLoaderVisible(false);
         navigation?.goBack();
@@ -76,35 +102,6 @@ const ReportProblemScreen = () => {
 
   return (
     <BaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            borderless={false}
-            rippleColor={COLORS.rippleColor}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>What happened ?</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <Text style={styles.bugInfo}>
         We will need to help as soon as you describe the problem in the
@@ -143,8 +140,8 @@ const ReportProblemScreen = () => {
           Report message must be longer than 20 characters.
         </HelperText>
       )}
-      <FAB
-        style={styles.fab}
+      <AnimatedFAB
+        style={[styles.fab, fabAnimation]}
         normal
         icon={ArrowForward}
         color={COLORS.primaryLight}
@@ -159,21 +156,23 @@ const ReportProblemScreen = () => {
             if (!hasMoreLength() && !hasLessLength()) {
               pushReport();
             } else {
+              animateFab();
               ErrorToast(
                 'bottom',
                 'Invalid report message',
                 'Report message must be between 20 and 240 characters.',
                 true,
-                3000,
+                2000,
               );
             }
           } else {
+            animateFab();
             ErrorToast(
               'bottom',
               'Network unavailable',
               'Network connection is needed to send bug reports.',
               true,
-              3000,
+              2000,
             );
           }
         }}
