@@ -480,7 +480,24 @@ const ChatScreen = () => {
             <Actions
               {...props}
               options={{
-                ['Image']: props => {
+                ['Open Camera']: props => {
+                  ImagePicker.openCamera({
+                    height: 1024,
+                    width: 1024,
+                    cropper: false,
+                  })
+                    .catch(async image => {
+                      const compressingResult = await Image.compress(
+                        image?.path,
+                        {
+                          compressionMethod: 'auto',
+                        },
+                      );
+                      sendMessage([], compressingResult);
+                    })
+                    .catch(() => {});
+                },
+                ['Pick Image']: props => {
                   ImagePicker.openPicker({
                     height: 1024,
                     width: 1024,
@@ -497,8 +514,8 @@ const ChatScreen = () => {
                     })
                     .catch(() => {});
                 },
-                Cancel: props => {
-                  console.log('Cancel');
+                ['Cancel']: props => {
+                  // DO NOTHING.
                 },
               }}
               icon={() => (
