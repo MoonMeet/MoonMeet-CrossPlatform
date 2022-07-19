@@ -32,7 +32,6 @@ const HomeChatsScreen = () => {
 
   function checkJwtKey(currentJwtKey) {
     const currentKey = JwtKeyMMKV.getString('currentUserJwtKey');
-    console.log(JwtKeyMMKV.getString('currentUserJwtKey'));
     if (currentKey !== currentJwtKey) {
       JwtKeyMMKV.delete('currentUserJwtKey');
       if (auth()?.currentUser != null) {
