@@ -39,7 +39,6 @@ import {
 } from 'react-native-device-info';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {getRandomInt} from '../utils/generators/getRandomNumber';
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 
 const LoginScreen = () => {
