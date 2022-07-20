@@ -25,6 +25,7 @@ import Animated, {
   useSharedValue,
   withDelay,
   withTiming,
+  useAnimatedRef,
 } from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
@@ -33,7 +34,7 @@ import getRandomString from '../utils/generators/getRandomString';
 
 const ReportProblemScreen = () => {
   const AnimatedFAB = Animated.createAnimatedComponent(FAB);
-  const AnimatedFABRef = useRef(null);
+  const AnimatedFABRef = useAnimatedRef();
 
   const navigation = useNavigation();
 
@@ -278,7 +279,7 @@ const ReportProblemScreen = () => {
         )}
       </View>
       <AnimatedFAB
-        ref={ref => (ref = AnimatedFABRef)}
+        ref={ref => (AnimatedFABRef.current.props = ref)}
         style={[styles.fab, fabAnimation]}
         normal
         icon={ArrowForward}
