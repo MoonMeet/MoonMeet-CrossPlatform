@@ -45,6 +45,7 @@ import {MoonMeetDarkTheme, MoonMeetLightTheme} from './Theme/Theme';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from './Theme/Context';
 import DarkModeSettings from '../screens/DarkModeScreen';
+import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -329,6 +330,21 @@ const StackNavigator = () => {
           component={DarkModeSettings}
           options={{
             headerTitle: 'Dark Mode',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: isThemeDark ? COLORS.white : COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: isThemeDark ? COLORS.white : COLORS.black,
+          }}
+        />
+        <Stack.Screen
+          name={'privacySecurity'}
+          component={PrivacySecurityScreen}
+          options={{
+            headerTitle: 'Privacy and Security',
             headerTitleStyle: {
               fontFamily: FONTS.regular,
               fontSize: fontValue(20.5),

@@ -51,23 +51,23 @@ const App = () => {
     [toggleTheme, isThemeDark],
   );
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
-      <BottomSheetModalProvider>
-        <ThemeContext.Provider value={themePrefernces}>
-          <PaperProvider theme={theme}>
-            <StatusBar
-              backgroundColor={
-                isThemeDark ? COLORS.primaryDark : COLORS.primaryLight
-              }
-              animated={true}
-              barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-            />
-            <StackNavigator />
-            <Toast />
-          </PaperProvider>
-        </ThemeContext.Provider>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <>
+      <StatusBar
+        backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
+        animated={true}
+        barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+      />
+      <GestureHandlerRootView style={{flex: 1}}>
+        <BottomSheetModalProvider>
+          <ThemeContext.Provider value={themePrefernces}>
+            <PaperProvider theme={theme}>
+              <StackNavigator />
+              <Toast />
+            </PaperProvider>
+          </ThemeContext.Provider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </>
   );
 };
 

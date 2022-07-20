@@ -30,6 +30,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
+import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -106,7 +107,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
     <Pressable
       style={{
         backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-        marginLeft: '-2%',
+        marginLeft: '-1.5%',
       }}
       onPressIn={() => handleCloseAllModals()}>
       <DataItemTitle titleItem={'Miscellaneous'} />
@@ -119,7 +120,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         iconColor={COLORS.white}
         titleColor={isThemeDark ? COLORS.white : COLORS.black}
         enableDescription={true}
-        descriptionText={'System'}
+        descriptionText={
+          ThemeMMKV.getBoolean('isThemeDark') === true ? 'On' : 'Off'
+        }
         descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         descriptionOpacity={0.4}
         onPressTrigger={() => {
@@ -153,6 +156,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleTextContainer={'Privacy and Security'}
         onPressTrigger={() => {
           handleCloseAllModals();
+          navigation?.navigate('privacySecurity');
         }}
       />
       <DataItem
