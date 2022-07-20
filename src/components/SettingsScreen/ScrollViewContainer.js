@@ -1,5 +1,5 @@
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Linking, Platform, Pressable} from 'react-native';
+import {Linking, Platform, Pressable, BackHandler} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -20,7 +20,7 @@ import FAQIcon from '../../assets/images/quiz.png';
 import ReportIcon from '../../assets/images/bug.png';
 
 import {COLORS} from '../../config/Miscellaneous';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
@@ -28,7 +28,6 @@ import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/Frequen
 
 import Clipboard from '@react-native-clipboard/clipboard';
 import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
-import moment from 'moment';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 
@@ -66,6 +65,23 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
 
   const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        handleCloseAllModals();
+        if (navigation?.canGoBack()) {
+          navigation?.goBack();
+        }
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   const DevicesScreen = Platform.select({
     ios: () => (
