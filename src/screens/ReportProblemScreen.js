@@ -234,7 +234,6 @@ const ReportProblemScreen = () => {
               }}
             />
             <Pressable
-              android_ripple={{color: COLORS.black}}
               style={{
                 position: 'relative',
                 marginTop: heightPercentageToDP(-39.65),
