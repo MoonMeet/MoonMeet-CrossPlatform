@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import BaseView from '../components/BaseView/BaseView';
 import {Image, StyleSheet, Text, View, Pressable} from 'react-native';
 import {FAB, HelperText, TextInput, Chip, Avatar} from 'react-native-paper';
@@ -33,6 +33,7 @@ import getRandomString from '../utils/generators/getRandomString';
 
 const ReportProblemScreen = () => {
   const AnimatedFAB = Animated.createAnimatedComponent(FAB);
+  const AnimatedFABRef = useRef(null);
 
   const navigation = useNavigation();
 
@@ -277,6 +278,7 @@ const ReportProblemScreen = () => {
         )}
       </View>
       <AnimatedFAB
+        ref={ref => (ref = AnimatedFABRef)}
         style={[styles.fab, fabAnimation]}
         normal
         icon={ArrowForward}
