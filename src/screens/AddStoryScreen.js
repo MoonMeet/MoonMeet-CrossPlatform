@@ -98,6 +98,7 @@ const AddStoryScreen = () => {
           if (SecondStoryTextInput) {
             setSecondStoryTextInput('');
           }
+          handleCloseModal();
           return true;
         } else {
           return false;
@@ -111,6 +112,7 @@ const AddStoryScreen = () => {
     }, [
       SecondStoryTextInput,
       StoryTextInput,
+      handleCloseModal,
       hideMainScreen,
       imageVisible,
       inputEnabledForImage,
@@ -229,8 +231,6 @@ const AddStoryScreen = () => {
   useEffect(() => {
     setLoading(false);
   }, []);
-
-  const [PickerActionSheet, setPickerActionSheet] = React.useState(false);
 
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
@@ -418,59 +418,23 @@ const AddStoryScreen = () => {
   } else if (userSelection === 'image') {
     return (
       <BaseView>
-        <View style={styles.toolbar}>
-          <View style={styles.left_side}>
-            <TouchableRipple
-              rippleColor={COLORS.rippleColor}
-              borderless={false}
-              onPress={() => {
-                navigation.goBack();
-              }}>
-              <Avatar.Icon
-                icon={BackImage}
-                size={37.5}
-                color={COLORS.black}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                  opacity: 0.4,
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            </TouchableRipple>
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.toolbar_text}>Image Story</Text>
-          </View>
-
-          {userSelection && hideMainScreen ? (
-            <View style={styles.right_side}>
+        <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
+          <View style={styles.toolbar}>
+            <View style={styles.left_side}>
               <TouchableRipple
                 rippleColor={COLORS.rippleColor}
                 borderless={false}
                 onPress={() => {
-                  setInputEnabledForImage(!inputEnabledForImage);
-                }}>
-                <Text style={styles.enableText}>Aa</Text>
-              </TouchableRipple>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  pushImageStory();
+                  navigation.goBack();
                 }}>
                 <Avatar.Icon
-                  icon={DoneImage}
-                  size={36.5}
+                  icon={BackImage}
+                  size={37.5}
                   color={COLORS.black}
                   style={{
+                    overflow: 'hidden',
                     marginRight: '-1%',
                     opacity: 0.4,
-                    overflow: 'hidden',
                   }}
                   theme={{
                     colors: {
@@ -480,94 +444,133 @@ const AddStoryScreen = () => {
                 />
               </TouchableRipple>
             </View>
-          ) : null}
-        </View>
-        <Spacer height={'2%'} />
-        <Pressable
-          onPress={() => setPickerActionSheet(true)}
-          style={styles.imageInputFlexedView}>
-          {UserPhoto ? (
-            <Image
+            <View style={styles.mid_side}>
+              <Text style={styles.toolbar_text}>Image Story</Text>
+            </View>
+
+            {userSelection && hideMainScreen ? (
+              <View style={styles.right_side}>
+                <TouchableRipple
+                  rippleColor={COLORS.rippleColor}
+                  borderless={false}
+                  onPress={() => {
+                    setInputEnabledForImage(!inputEnabledForImage);
+                  }}>
+                  <Text style={styles.enableText}>Aa</Text>
+                </TouchableRipple>
+                <TouchableRipple
+                  rippleColor={COLORS.rippleColor}
+                  borderless={false}
+                  onPress={() => {
+                    pushImageStory();
+                  }}>
+                  <Avatar.Icon
+                    icon={DoneImage}
+                    size={36.5}
+                    color={COLORS.black}
+                    style={{
+                      marginRight: '-1%',
+                      opacity: 0.4,
+                      overflow: 'hidden',
+                    }}
+                    theme={{
+                      colors: {
+                        primary: COLORS.transparent,
+                      },
+                    }}
+                  />
+                </TouchableRipple>
+              </View>
+            ) : null}
+          </View>
+          <Spacer height={'2%'} />
+          <Pressable
+            onPress={() => handlePresentModal()}
+            style={styles.imageInputFlexedView}>
+            {UserPhoto ? (
+              <Image
+                style={{
+                  height: '80%',
+                  width: '99%',
+                  resizeMode: 'cover',
+                }}
+                source={{uri: UserPhoto?.path}}
+              />
+            ) : null}
+            {!UserPhoto ? (
+              <Image
+                style={{
+                  height: 50,
+                  width: 50,
+                  tintColor: COLORS.darkGrey,
+                }}
+                source={PickImage}
+              />
+            ) : null}
+          </Pressable>
+          {inputEnabledForImage ? (
+            <TextInput
               style={{
-                height: '80%',
-                width: '99%',
-                resizeMode: 'cover',
+                width: '95%',
+                alignSelf: 'center',
+                paddingRight: '2%',
+                paddingLeft: '2%',
               }}
-              source={{uri: UserPhoto?.path}}
+              mode="outlined"
+              label="What's on your mind?"
+              multiline={true}
+              maxLength={240}
+              right={
+                <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
+              }
+              value={SecondStoryTextInput}
+              theme={{
+                colors: {
+                  text: COLORS.black,
+                  primary: COLORS.accentLight,
+                  backgroundColor: COLORS.rippleColor,
+                  placeholder: COLORS.darkGrey,
+                  underlineColor: '#566193',
+                  selectionColor: '#DADADA',
+                  outlineColor: '#566193',
+                },
+              }}
+              onChangeText={onSecondStoryTextInputChange}
             />
           ) : null}
-          {!UserPhoto ? (
-            <Image
-              style={{
-                height: 50,
-                width: 50,
-                tintColor: COLORS.darkGrey,
-              }}
-              source={PickImage}
-            />
+          {secondTextInputHasLessLength() && inputEnabledForImage ? (
+            <HelperText type="info" visible={textInputHasLessLength()}>
+              Story Text must be longer longer than 1 characters.
+            </HelperText>
           ) : null}
-        </Pressable>
-        {inputEnabledForImage ? (
-          <TextInput
-            style={{
-              width: '95%',
-              alignSelf: 'center',
-              paddingRight: '2%',
-              paddingLeft: '2%',
+          <ImagePickerActionSheet
+            sheetRef={pickerRef}
+            index={0}
+            snapPoints={sheetSnapPoints}
+            onCameraPress={() => {
+              openCamera()
+                .then(image => {
+                  setUserPhoto(image);
+                  setImageVisible(true);
+                  handleCloseModal();
+                })
+                .catch(e => {
+                  console.log(e);
+                });
             }}
-            mode="outlined"
-            label="What's on your mind?"
-            multiline={true}
-            maxLength={240}
-            right={
-              <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
-            }
-            value={SecondStoryTextInput}
-            theme={{
-              colors: {
-                text: COLORS.black,
-                primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
-              },
+            onFilePicker={() => {
+              openImagePicker()
+                .then(image => {
+                  setUserPhoto(image);
+                  setImageVisible(true);
+                  handleCloseModal();
+                })
+                .catch(e => {
+                  console.log(e);
+                });
             }}
-            onChangeText={onSecondStoryTextInputChange}
           />
-        ) : null}
-        {secondTextInputHasLessLength() && inputEnabledForImage ? (
-          <HelperText type="info" visible={textInputHasLessLength()}>
-            Story Text must be longer longer than 1 characters.
-          </HelperText>
-        ) : null}
-        <ImagePickerActionSheet
-          sheetRef={pickerRef}
-          index={0}
-          snapPoints={sheetSnapPoints}
-          onCameraPress={() => {
-            openCamera()
-              .then(image => {
-                setUserPhoto(image);
-                setImageVisible(true);
-              })
-              .catch(e => {
-                console.log(e);
-              });
-          }}
-          onFilePicker={() => {
-            openImagePicker()
-              .then(image => {
-                console.log(image);
-                setUserPhoto(image);
-                setImageVisible(true);
-              })
-              .catch(e => {
-                console.log(e);
-              });
-          }}
-        />
+        </Pressable>
       </BaseView>
     );
   }
