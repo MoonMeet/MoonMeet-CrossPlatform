@@ -278,7 +278,7 @@ const ReportProblemScreen = () => {
         )}
       </View>
       <AnimatedFAB
-        ref={ref => (AnimatedFABRef.current.props = ref)}
+        ref={ref => (AnimatedFABRef.current = ref)}
         style={[styles.fab, fabAnimation]}
         normal
         icon={ArrowForward}
