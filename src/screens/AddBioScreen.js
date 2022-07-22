@@ -1,16 +1,13 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   ActivityIndicator,
-  Avatar,
   FAB,
   HelperText,
   TextInput,
-  TouchableRipple,
 } from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import BackImage from '../assets/images/back.png';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import ArrowForward from '../assets/images/arrow-forward.png';
@@ -22,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
 
 const AddBioScreen = () => {
@@ -118,35 +116,6 @@ const AddBioScreen = () => {
 
   return (
     <BaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            borderless={false}
-            rippleColor={COLORS.rippleColor}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Add Bio</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View
         style={{
@@ -222,6 +191,7 @@ const AddBioScreen = () => {
           }
         }}
       />
+      <LoadingIndicator isVisible={loaderVisible} />
     </BaseView>
   );
 };
