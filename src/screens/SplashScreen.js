@@ -1,10 +1,7 @@
-import analytics from '@react-native-firebase/analytics';
-import appCheck from '@react-native-firebase/app-check';
 import auth from '@react-native-firebase/auth';
-import crashlytics from '@react-native-firebase/crashlytics';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useCallback} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useCallback, useEffect} from 'react';
 import {SafeAreaView, StyleSheet, Text} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {
@@ -14,7 +11,6 @@ import {
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import Animated, {
-  cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -24,7 +20,12 @@ import Animated, {
 import {useTheme} from 'react-native-paper';
 import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
+import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isNull} from 'lodash';
+
+if (__DEV__) {
+  initializeMMKVFlipper({default: OnboardingMMKV});
+}
 
 const SplashScreen = () => {
   const theme = useTheme();
@@ -56,7 +57,6 @@ const SplashScreen = () => {
   const scaleY = useSharedValue(0.1);
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
-  const [animationDisabled, setAnimationDisabled] = React.useState(false);
 
   const isViewPagerCompleted = () => {
     return (
@@ -65,30 +65,31 @@ const SplashScreen = () => {
     );
   };
 
-  async function enableFirebaseTools() {
-    await crashlytics()?.setCrashlyticsCollectionEnabled(true);
-    await analytics()?.setAnalyticsCollectionEnabled(true);
-    await appCheck()?.activate('ignored', false);
-  }
+  useFocusEffect(
+    useCallback(() => {
+      const AnimateSceneTimerTask = setTimeout(() => {
+        scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
+        scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
+        opacity.value = withTiming(0, {duration: 275});
+        translateY.value = withDelay(0, withTiming(375, {duration: 500}));
+        translateY.value = withDelay(300, withTiming(0, {duration: 750}));
+        scaleX.value = withSpring(0.09);
+        scaleY.value = withSpring(0.09);
+        scaleX.value = withSpring(0);
+        scaleY.value = withSpring(0);
+        opacity.value = withSpring(1);
+        scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
+        scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
+      }, 1000);
+      return () => {
+        clearTimeout(AnimateSceneTimerTask);
+      };
+    }, [opacity, scaleX, scaleY, translateY]),
+  );
 
-  const checkForPasscode = useCallback(async () => {
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot?.exists) {
-          if (documentSnapshot?.data()?.passcode?.passcode_enabled) {
-            setHavePasscode(true);
-          } else {
-            setHavePasscode(false);
-          }
-        }
-      });
-  }, []);
-
-  const checkForUpdates = useCallback(async () => {
-    await firestore()
+  useEffect(() => {
+    let SplashScreenTimerTask = null;
+    firestore()
       .collection('updates')
       .doc('releasedUpdate')
       .get()
@@ -99,73 +100,63 @@ const SplashScreen = () => {
           setUpdateChangelog(documentSnapshot?.data()?.changelog);
           setUpdateDateReleased(documentSnapshot?.data().dateReleased);
           setUpdateURL(documentSnapshot?.data()?.updateURL);
-          if (updateVersion) {
-            if (currentAppVersion != updateVersion) {
-              setUpdateAvailable(true);
-            }
+        }
+      })
+      .finally(() => {
+        if (updateVersion) {
+          if (currentAppVersion != updateVersion) {
+            setUpdateAvailable(true);
           }
+        }
+        if (SplashScreenTimerTask == null) {
+          SplashScreenTimerTask = setTimeout(() => {
+            if (updateVersion !== null && updateChangelog !== '') {
+              if (updateAvailable) {
+                console.log('update available');
+                // TODO: add design for update bottomsheet
+              } else {
+                if (isViewPagerCompleted()) {
+                  if (auth()?.currentUser !== null) {
+                    firestore()
+                      .collection('users')
+                      .doc(auth()?.currentUser?.uid)
+                      .get()
+                      .then(documentSnapshot => {
+                        if (documentSnapshot?.exists) {
+                          if (
+                            documentSnapshot?.data()?.passcode?.passcode_enabled
+                          ) {
+                            setHavePasscode(true);
+                          } else {
+                            setHavePasscode(false);
+                          }
+                        }
+                      })
+                      .finally(() => {
+                        if (!isNull(havePasscode)) {
+                          if (havePasscode) {
+                            navigation?.navigate('passcodeVerify');
+                          } else {
+                            navigation?.navigate('home');
+                          }
+                        }
+                      });
+                  } else {
+                    navigation?.navigate('login');
+                  }
+                } else {
+                  navigation?.navigate('onboarding');
+                }
+              }
+            }
+          }, 2000);
         }
       });
-  }, [currentAppVersion, updateVersion]);
-
-  const AnimateScene = useCallback(() => {
-    scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
-    scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
-    opacity.value = withTiming(0, {duration: 275});
-    translateY.value = withDelay(0, withTiming(375, {duration: 500}));
-    translateY.value = withDelay(300, withTiming(0, {duration: 750}));
-    scaleX.value = withSpring(0.09);
-    scaleY.value = withSpring(0.09);
-    scaleX.value = withSpring(0);
-    scaleY.value = withSpring(0);
-    opacity.value = withSpring(1);
-    scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
-    scaleY.value = withDelay(
-      750,
-      withTiming(0.09, {duration: 250}, isFinished => {}),
-    );
-  }, [opacity, scaleX, scaleY, translateY]);
-
-  useEffect(() => {
-    checkForUpdates();
-    enableFirebaseTools();
-    const AnimateSceneTimerTask = setTimeout(() => {
-      AnimateScene();
-    }, 1000);
-    const SplashScreenTimerTask = setTimeout(() => {
-      if (updateVersion !== null && updateChangelog !== '') {
-        if (updateAvailable) {
-          console.log('update available');
-          // TODO: add design for update bottomsheet
-        } else {
-          if (isViewPagerCompleted()) {
-            if (auth()?.currentUser !== null) {
-              checkForPasscode().finally(() => {
-                if (!isNull(havePasscode)) {
-                  if (havePasscode) {
-                    navigation?.navigate('passcodeVerify');
-                  } else {
-                    navigation?.navigate('home');
-                  }
-                }
-              });
-            } else {
-              navigation?.navigate('login');
-            }
-          } else {
-            navigation?.navigate('onboarding');
-          }
-        }
-      }
-    }, 2000);
     return () => {
       clearTimeout(SplashScreenTimerTask);
-      clearTimeout(AnimateSceneTimerTask);
     };
   }, [
-    AnimateScene,
-    checkForPasscode,
-    checkForUpdates,
+    currentAppVersion,
     havePasscode,
     navigation,
     updateAvailable,
