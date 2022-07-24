@@ -201,7 +201,6 @@ const HomeChatsScreen = () => {
           <View style={styles.right_side}>
             <Pressable
               onPress={() => {
-                // navigation.navigate('searchChats');
                 updateUserActiveStatus();
               }}>
               <MaterialIcons
