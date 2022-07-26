@@ -1,8 +1,8 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect} from 'react';
-import {SafeAreaView, StyleSheet, Text} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {Linking, SafeAreaView, StyleSheet, Text} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {
   fontValue,
@@ -22,6 +22,7 @@ import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isNull} from 'lodash';
+import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
 
 if (__DEV__) {
   initializeMMKVFlipper({default: OnboardingMMKV});
@@ -41,14 +42,56 @@ const SplashScreen = () => {
    * Update variables, used in to check for required updates.
    */
 
+  const updateSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['45%'], []);
+
+  const handleModalShow = useCallback(() => {
+    updateSheetRef?.current?.present();
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    updateSheetRef?.current?.forceClose();
+  }, []);
+
   const [updatedRequired, setUpdateRequired] = React.useState(false);
   const [updateVersion, setUpdateVersion] = React.useState('');
-  const [updateDateReleased, setUpdateDateReleased] = React.useState('');
   const [updateURL, setUpdateURL] = React.useState('');
-  const [updateChangelog, setUpdateChangelog] = React.useState('');
   const [updateAvailable, setUpdateAvailable] = React.useState(false);
 
   const [currentAppVersion] = React.useState(getVersion());
+
+  const ManualFetchForDoItLater = useCallback(() => {
+    if (isViewPagerCompleted()) {
+      if (auth()?.currentUser !== null) {
+        firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot?.exists) {
+              if (documentSnapshot?.data()?.passcode?.passcode_enabled) {
+                setHavePasscode(true);
+              } else {
+                setHavePasscode(false);
+              }
+            }
+          })
+          .finally(() => {
+            if (!isNull(havePasscode)) {
+              if (havePasscode) {
+                navigation?.navigate('passcodeVerify');
+              } else {
+                navigation?.navigate('home');
+              }
+            }
+          });
+      } else {
+        navigation?.navigate('login');
+      }
+    } else {
+      navigation?.navigate('onboarding');
+    }
+  }, [havePasscode, navigation]);
 
   /**
    * Splash Screen animations.
@@ -95,10 +138,8 @@ const SplashScreen = () => {
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
-          setUpdateRequired(documentSnapshot?.data()?.updatedRequired);
+          setUpdateRequired(documentSnapshot?.data()?.isRequired);
           setUpdateVersion(documentSnapshot?.data()?.version);
-          setUpdateChangelog(documentSnapshot?.data()?.changelog);
-          setUpdateDateReleased(documentSnapshot?.data().dateReleased);
           setUpdateURL(documentSnapshot?.data()?.updateURL);
         }
       })
@@ -110,10 +151,9 @@ const SplashScreen = () => {
         }
         if (SplashScreenTimerTask == null) {
           SplashScreenTimerTask = setTimeout(() => {
-            if (updateVersion !== null && updateChangelog !== '') {
+            if (updateVersion !== null) {
               if (updateAvailable) {
-                console.log('update available');
-                // TODO: add design for update bottomsheet
+                handleModalShow();
               } else {
                 if (isViewPagerCompleted()) {
                   if (auth()?.currentUser !== null) {
@@ -157,10 +197,10 @@ const SplashScreen = () => {
     };
   }, [
     currentAppVersion,
+    handleModalShow,
     havePasscode,
     navigation,
     updateAvailable,
-    updateChangelog,
     updateVersion,
   ]);
 
@@ -192,6 +232,23 @@ const SplashScreen = () => {
           We give people the closest distances
         </Text>
       </Animated.View>
+      <UpdateBottomSheet
+        sheetRef={updateSheetRef}
+        sheetIndex={0}
+        sheetSnapPoints={snapPoints}
+        required={updatedRequired}
+        onDownloadNowPress={() => {
+          if (Linking.canOpenURL(updateURL)) {
+            Linking.openURL(updateURL);
+          }
+          handleModalClose();
+          // Implement App Exit
+        }}
+        onDoItLaterPress={() => {
+          handleModalClose();
+          ManualFetchForDoItLater();
+        }}
+      />
     </SafeAreaView>
   );
 };
