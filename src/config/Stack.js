@@ -20,7 +20,6 @@ import DiscoverPeopleScreen from '../screens/DiscoverPeopleScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import HomeChats from '../screens/HomeChatsScreen.js';
 import HomePeople from '../screens/HomePeopleScreen';
-import HomeStories from '../screens/HomeStoriesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -35,7 +34,6 @@ import {Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from './Miscellaneous';
 
 import ChatIcon from '../assets/images/chat.png';
-import StoriesIcon from '../assets/images/stories.png';
 import PeopleIcon from '../assets/images/two_people.png';
 
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
@@ -88,24 +86,6 @@ function HomeScreen() {
               size={42.5}
               style={{
                 margin: heightPercentageToDP(-1.25),
-              }}
-              theme={{colors: {primary: COLORS.transparent}}}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Stories"
-        component={HomeStories}
-        options={{
-          tabBarLabel: 'Stories',
-          tabBarIcon: ({color}) => (
-            <Avatar.Icon
-              icon={StoriesIcon}
-              color={color}
-              size={40}
-              style={{
-                margin: heightPercentageToDP(-1),
               }}
               theme={{colors: {primary: COLORS.transparent}}}
             />
