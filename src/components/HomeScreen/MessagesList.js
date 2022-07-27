@@ -101,8 +101,8 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-end',
             }}>
-            <Text style={styles.subheading('right', false)}>
-              {moment(item?.time.toDate())?.calendar()}
+            <Text numberOfLines={1} style={styles.subheading('right', false)}>
+              {moment(item?.time?.toDate())?.calendar()}
             </Text>
           </View>
         </Pressable>
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   subheading: (align, isMessage) => {
     return {
-      fontSize: isMessage ? fontValue(14) : fontValue(12),
+      fontSize: isMessage ? fontValue(14) : fontValue(11.5),
       paddingTop: '1%',
       textAlign: align,
       color: COLORS.black,
