@@ -3,6 +3,7 @@ import { StyleSheet, Platform } from 'react-native';
 import Animated, { interpolateNode, Extrapolate } from 'react-native-reanimated';
 import { fontValue } from '../../config/Dimensions';
 import { COLORS } from '../../config/Miscellaneous';
+// @ts-ignore
 import AddIconImage from '../../assets/images/add_24.png'
 
 const MoonStickyStoryView = ({
