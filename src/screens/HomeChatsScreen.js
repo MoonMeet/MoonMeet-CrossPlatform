@@ -1,21 +1,58 @@
 import React, {useCallback, useEffect} from 'react';
-import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  BackHandler,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
-import {Avatar, Provider} from 'react-native-paper';
+import {Avatar} from 'react-native-paper';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
-import StoriesList from '../components/HomeScreen/StoriesList';
 import firestore from '@react-native-firebase/firestore';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
 import {reverse, sortBy} from 'lodash';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import StickyItemFlatList from '@gorhom/sticky-item';
+import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 
 const HomeChatsScreen = () => {
+  const data = [...Array(20)]
+    .fill(0)
+    .map((_, index) => ({id: `item-${index}`}));
+  // Sticky-Item Config
+  const ITEM_WIDTH = 120;
+  const ITEM_HEIGHT = 200;
+  const STICKY_ITEM_WIDTH = 50;
+  const STICKY_ITEM_HEIGHT = 50;
+  const STICKY_ITEM_BACKGROUNDS = [COLORS.rippleColor, COLORS.accentLight];
+  const SEPARATOR_SIZE = 8;
+  const BORDER_RADIUS = 10;
+
+  const handleStickyItemPress = () => navigation?.navigate('addStory');
+
+  const renderItem = ({item, index}) => {
+    <Pressable
+      onPress={() => {
+        console.log('abeth sex ');
+      }}>
+      <View
+        key={`item-${index}`}
+        style={{
+          backgroundColor: 'red',
+          width: ITEM_WIDTH,
+          height: ITEM_HEIGHT,
+        }}
+      />
+    </Pressable>;
+  };
+
   const navigation = useNavigation();
 
   const [chatsData, setChatsData] = React.useState([]);
@@ -126,7 +163,7 @@ const HomeChatsScreen = () => {
                     (subDocument?.data()?.text || subDocument?.data()?.image)
                   ) {
                     if (
-                      firestore.Timestamp.fromDate(new Date()) -
+                      firestore?.Timestamp?.fromDate(new Date()) -
                         subDocument?.data()?.time.toDate() >
                       86400000
                     ) {
@@ -171,50 +208,64 @@ const HomeChatsScreen = () => {
   }, []);
 
   return (
-    <Provider>
-      <MiniBaseView>
-        <View style={styles.toolbar}>
-          <View style={styles.left_side}>
-            <Pressable
-              hitSlop={15}
-              onPress={() => {
-                navigation.navigate('settings');
-              }}>
-              <Avatar.Image
-                size={35.5}
-                source={avatarURL ? {uri: avatarURL} : PurpleBackground}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
-              />
-            </Pressable>
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.top_text}>Chats</Text>
-          </View>
-          <View style={styles.right_side}>
-            <Pressable
-              onPress={() => {
-                updateUserActiveStatus();
-              }}>
-              <MaterialIcons
-                name={'search'}
-                size={fontValue(25)}
-                color={COLORS.darkGrey}
-              />
-            </Pressable>
-          </View>
+    <MiniBaseView>
+      <View style={styles.toolbar}>
+        <View style={styles.left_side}>
+          <Pressable
+            hitSlop={15}
+            onPress={() => {
+              navigation.navigate('settings');
+            }}>
+            <Avatar.Image
+              size={35.5}
+              source={avatarURL ? {uri: avatarURL} : PurpleBackground}
+              style={{
+                overflow: 'hidden',
+                marginRight: '-1%',
+              }}
+              theme={{
+                colors: {
+                  primary: COLORS.rippleColor,
+                },
+              }}
+            />
+          </Pressable>
         </View>
-        <StoriesList ListData={storiesData} myUID={myUID} />
-        <MessagesList ListData={chatsData} />
-      </MiniBaseView>
-    </Provider>
+        <View style={styles.mid_side}>
+          <Text style={styles.top_text}>Chats</Text>
+        </View>
+      </View>
+      <View
+        style={{
+          height: ITEM_HEIGHT,
+          width: '100%',
+        }}>
+        <StickyItemFlatList
+          itemWidth={ITEM_WIDTH}
+          scrollEnabled={true}
+          itemHeight={ITEM_HEIGHT}
+          showsHorizontalScrollIndicator={false}
+          separatorSize={SEPARATOR_SIZE}
+          borderRadius={BORDER_RADIUS}
+          stickyItemWidth={STICKY_ITEM_WIDTH}
+          stickyItemHeight={STICKY_ITEM_HEIGHT}
+          stickyItemBackgroundColors={STICKY_ITEM_BACKGROUNDS}
+          stickyItemContent={props => (
+            <MoonStickyStoryView
+              {...props}
+              userAvatar={avatarURL}
+              tempAvatar={PurpleBackground}
+            />
+          )}
+          onStickyItemPress={handleStickyItemPress}
+          data={data}
+          renderItem={({item, index}) => (
+            <View style={{backgroundColor: 'red'}} />
+          )}
+        />
+      </View>
+      <MessagesList ListData={chatsData} />
+    </MiniBaseView>
   );
 };
 
@@ -231,7 +282,7 @@ const styles = StyleSheet.create({
   top_text: {
     position: 'relative',
     fontSize: fontValue(24),
-    paddingLeft: '3%',
+    paddingLeft: '1%',
     paddingRight: '3%',
     textAlign: 'center',
     color: COLORS.black,
@@ -249,39 +300,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
-    fontSize: 18,
     marginLeft: '2.5%',
     marginRight: '2.5%',
-  },
-  right_side: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  right_icon: {
-    resizeMode: 'contain',
-    overflow: 'hidden',
-    paddingBottom: '0.2%',
-    paddingRight: '0.2%',
-    opacity: 0.4,
-  },
-  above_stories: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
-  pressContainerTop: {
-    position: 'relative',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '3%',
-    paddingRight: '2.5%',
-  },
-  pressContainerTopRight: {
-    position: 'relative',
-    paddingTop: '2%',
-    paddingBottom: '2%',
-    paddingLeft: '1.5%',
   },
 });
 
