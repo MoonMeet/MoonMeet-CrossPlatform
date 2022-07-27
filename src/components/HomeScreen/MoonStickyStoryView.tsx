@@ -16,6 +16,7 @@ const MoonStickyStoryView = ({
   isRTL,
   theme = 'light',
   userAvatar,
+  tempAvatar,
 }) => {
   const stickyItemX = itemWidth / 2 + (itemWidth / 2 - stickyItemWidth);
   const stickyItemY = itemHeight / 2 - stickyItemWidth / 2;
@@ -159,7 +160,7 @@ const MoonStickyStoryView = ({
 
   return (
     <>
-      <Animated.Image source={{ uri: userAvatar }} style={thumbnailStyle} />
+      <Animated.Image source={userAvatar ? { uri: userAvatar } : tempAvatar} style={thumbnailStyle} />
       <Animated.Text style={textStyle}>
         {`Create a story`}
       </Animated.Text>
