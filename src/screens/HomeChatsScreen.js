@@ -18,7 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
-import {isEmpty, reverse, sortBy, uniqBy} from 'lodash';
+import {reverse, sortBy, uniqBy} from 'lodash';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import StickyItemFlatList from '@gorhom/sticky-item';
 import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
@@ -34,8 +34,6 @@ const HomeChatsScreen = () => {
   const SEPARATOR_SIZE = 8;
   const BORDER_RADIUS = 10;
 
-  const handleStickyItemPress = () => navigation?.navigate('addStory');
-
   const navigation = useNavigation();
 
   const [chatsData, setChatsData] = React.useState([]);
@@ -50,13 +48,11 @@ const HomeChatsScreen = () => {
 
   const [myUID, setMyUID] = React.useState('');
 
-  const [shouldShowStories, setShouldShowStories] = React.useState(false);
-
   const checkJwtKey = useCallback(
     currentJwtKey => {
-      const currentKey = JwtKeyMMKV.getString('currentUserJwtKey');
+      const currentKey = JwtKeyMMKV?.getString('currentUserJwtKey');
       if (currentKey !== currentJwtKey) {
-        JwtKeyMMKV.delete('currentUserJwtKey');
+        JwtKeyMMKV?.delete('currentUserJwtKey');
         if (auth()?.currentUser != null) {
           auth()
             ?.signOut()
@@ -168,7 +164,6 @@ const HomeChatsScreen = () => {
                     }
                   }
                   setStoriesData(tempStoriesData);
-                  setShouldShowStories(true);
                 });
               });
           }
