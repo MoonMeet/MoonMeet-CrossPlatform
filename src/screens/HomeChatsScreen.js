@@ -2,6 +2,7 @@ import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
   Image,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -17,15 +18,13 @@ import firestore from '@react-native-firebase/firestore';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
-import {reverse, sortBy} from 'lodash';
+import {isEmpty, reverse, sortBy, uniqBy} from 'lodash';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import StickyItemFlatList from '@gorhom/sticky-item';
 import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
+import Spacer from '../components/Spacer/Spacer';
 
 const HomeChatsScreen = () => {
-  const data = [...Array(20)]
-    .fill(0)
-    .map((_, index) => ({id: `item-${index}`}));
   // Sticky-Item Config
   const ITEM_WIDTH = 120;
   const ITEM_HEIGHT = 200;
@@ -36,22 +35,6 @@ const HomeChatsScreen = () => {
   const BORDER_RADIUS = 10;
 
   const handleStickyItemPress = () => navigation?.navigate('addStory');
-
-  const renderItem = ({item, index}) => {
-    <Pressable
-      onPress={() => {
-        console.log('abeth sex ');
-      }}>
-      <View
-        key={`item-${index}`}
-        style={{
-          backgroundColor: 'red',
-          width: ITEM_WIDTH,
-          height: ITEM_HEIGHT,
-        }}
-      />
-    </Pressable>;
-  };
 
   const navigation = useNavigation();
 
@@ -67,30 +50,35 @@ const HomeChatsScreen = () => {
 
   const [myUID, setMyUID] = React.useState('');
 
-  function checkJwtKey(currentJwtKey) {
-    const currentKey = JwtKeyMMKV.getString('currentUserJwtKey');
-    if (currentKey !== currentJwtKey) {
-      JwtKeyMMKV.delete('currentUserJwtKey');
-      if (auth()?.currentUser != null) {
-        auth()
-          ?.signOut()
-          .then(() => {
-            navigation?.navigate('login');
-            InfoToast(
-              'bottom',
-              'Session Expired',
-              'Your session in this account has been expired, Please re-login',
-              true,
-              3000,
-            );
-          })
-          .catch(() => {
-            navigation?.navigate('login');
-            console.error('failed loggin out the user');
-          });
+  const [shouldShowStories, setShouldShowStories] = React.useState(false);
+
+  const checkJwtKey = useCallback(
+    currentJwtKey => {
+      const currentKey = JwtKeyMMKV.getString('currentUserJwtKey');
+      if (currentKey !== currentJwtKey) {
+        JwtKeyMMKV.delete('currentUserJwtKey');
+        if (auth()?.currentUser != null) {
+          auth()
+            ?.signOut()
+            .then(() => {
+              navigation?.navigate('login');
+              InfoToast(
+                'bottom',
+                'Session Expired',
+                'Your session in this account has been expired, Please re-login',
+                true,
+                3000,
+              );
+            })
+            .catch(() => {
+              navigation?.navigate('login');
+              console.error('failed loggin out the user');
+            });
+        }
       }
-    }
-  }
+    },
+    [navigation],
+  );
 
   async function updateUserActiveStatus() {
     await firestore()
@@ -180,6 +168,7 @@ const HomeChatsScreen = () => {
                     }
                   }
                   setStoriesData(tempStoriesData);
+                  setShouldShowStories(true);
                 });
               });
           }
@@ -205,7 +194,7 @@ const HomeChatsScreen = () => {
       userSusbcribe();
       chatSubscribe();
     };
-  }, []);
+  }, [checkJwtKey, deleteCurrentStory]);
 
   return (
     <MiniBaseView>
@@ -242,9 +231,7 @@ const HomeChatsScreen = () => {
         }}>
         <StickyItemFlatList
           itemWidth={ITEM_WIDTH}
-          scrollEnabled={true}
           itemHeight={ITEM_HEIGHT}
-          showsHorizontalScrollIndicator={false}
           separatorSize={SEPARATOR_SIZE}
           borderRadius={BORDER_RADIUS}
           stickyItemWidth={STICKY_ITEM_WIDTH}
@@ -257,13 +244,51 @@ const HomeChatsScreen = () => {
               tempAvatar={PurpleBackground}
             />
           )}
-          onStickyItemPress={handleStickyItemPress}
-          data={data}
-          renderItem={({item, index}) => (
-            <View style={{backgroundColor: 'red'}} />
+          onStickyItemPress={undefined}
+          data={uniqBy(storiesData, 'uid')}
+          renderItem={({item}) => (
+            <Pressable
+              style={{
+                height: ITEM_HEIGHT,
+                width: ITEM_WIDTH,
+                borderRadius: BORDER_RADIUS,
+                backgroundColor: COLORS.rippleColor,
+              }}
+              onPress={() => {
+                navigation?.navigate('story', {
+                  userUID: item?.uid,
+                  myUID: myUID,
+                });
+              }}>
+              <Image
+                style={{
+                  backgroundColor: COLORS.white,
+                  width: ITEM_WIDTH,
+                  height: ITEM_WIDTH,
+                  borderRadius: BORDER_RADIUS,
+                  resizeMode: 'contain',
+                }}
+                source={{uri: item.image ? item?.image : item?.avatar}}
+              />
+              <Text
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  textAlign: 'center',
+                  lineHeightight: 14,
+                  fontSize:
+                    Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
+                  fontWeight: '500',
+                  color: COLORS.black,
+                  fontFamily: FONTS.regular,
+                  paddingHorizontal: SEPARATOR_SIZE * 2,
+                  transform: [{translateY: ITEM_HEIGHT / 2 + ITEM_HEIGHT / 4}],
+                }}>{`${item?.first_name}${' '}${item?.last_name}`}</Text>
+            </Pressable>
           )}
         />
       </View>
+      <Spacer height={heightPercentageToDP(0.5)} />
       <MessagesList ListData={chatsData} />
     </MiniBaseView>
   );
