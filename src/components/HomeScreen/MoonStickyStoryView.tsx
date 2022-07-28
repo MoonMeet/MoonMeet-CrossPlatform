@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, Pressable } from 'react-native';
 import Animated, { interpolateNode, Extrapolate } from 'react-native-reanimated';
 import { fontValue } from '../../config/Dimensions';
-import { COLORS } from '../../config/Miscellaneous';
+import { COLORS, FONTS } from '../../config/Miscellaneous';
 // @ts-ignore
 import AddIconImage from '../../assets/images/add_24.png'
+import { useNavigation } from '@react-navigation/native';
 
 const MoonStickyStoryView = ({
   x,
@@ -19,6 +20,8 @@ const MoonStickyStoryView = ({
   userAvatar,
   tempAvatar,
 }) => {
+  const navigation = useNavigation()
+
   const stickyItemX = itemWidth / 2 + (itemWidth / 2 - stickyItemWidth);
   const stickyItemY = itemHeight / 2 - stickyItemWidth / 2;
   const stickyItemWidthWithoutPadding = stickyItemWidth - separatorSize * 2;
@@ -160,7 +163,9 @@ const MoonStickyStoryView = ({
   //#endregion
 
   return (
-    <>
+    <Pressable style={{ flex: 1 }} hitSlop={15} onPress={() => {
+      navigation?.navigate('addStory')
+    }}>
       <Animated.Image source={userAvatar ? { uri: userAvatar } : tempAvatar} style={thumbnailStyle} />
       <Animated.Text style={textStyle}>
         {`Create a story`}
@@ -168,7 +173,7 @@ const MoonStickyStoryView = ({
       <Animated.View style={addIconStyle}>
         <Animated.Image source={AddIconImage} style={styles.icon} />
       </Animated.View>
-    </>
+    </Pressable>
   );
 };
 
@@ -196,6 +201,7 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
     lineHeightight: 14,
+    fontFamily: FONTS.regular,
     fontSize: Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
     fontWeight: '500',
   },
