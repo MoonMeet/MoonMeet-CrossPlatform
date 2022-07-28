@@ -1,3 +1,4 @@
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -65,6 +66,8 @@ const AddStoryScreen = () => {
   const [inputEnabledForImage, setInputEnabledForImage] = React.useState(false);
 
   const [SecondStoryTextInput, setSecondStoryTextInput] = React.useState('');
+
+  const {dismissAll} = useBottomSheetModal();
 
   const onSecondStoryTextInputChange = _secondStoryText =>
     setSecondStoryTextInput(_secondStoryText);
@@ -552,7 +555,7 @@ const AddStoryScreen = () => {
                 .then(image => {
                   setUserPhoto(image);
                   setImageVisible(true);
-                  handleCloseModal();
+                  dismissAll();
                 })
                 .catch(e => {
                   console.log(e);
@@ -563,7 +566,7 @@ const AddStoryScreen = () => {
                 .then(image => {
                   setUserPhoto(image);
                   setImageVisible(true);
-                  handleCloseModal();
+                  dismissAll();
                 })
                 .catch(e => {
                   console.log(e);
