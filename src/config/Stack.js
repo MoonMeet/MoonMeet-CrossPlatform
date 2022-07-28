@@ -258,7 +258,11 @@ const StackNavigator = () => {
             headerTintColor: COLORS.black,
           }}
         />
-        <Stack.Screen name={'story'} component={StoryScreen} />
+        <Stack.Screen
+          name={'story'}
+          component={StoryScreen}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
         <Stack.Screen
           name={'addStory'}
           component={AddStoryScreen}
