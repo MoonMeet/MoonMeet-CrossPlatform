@@ -3,6 +3,11 @@ import React from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 
 import moment from 'moment';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/Dimensions';
 
 interface UserListInterface {
   ListData: any;
@@ -36,12 +41,12 @@ const DevicesList = (props: UserListInterface) => {
                   ' ' +
                   item?.app_version}
               </Text>
-              <Text style={styles.subheading}>
+              <Text style={styles.subheading(false)}>
                 {item?.manufacturer + ' ' + item?.model}
               </Text>
             </View>
             <View style={styles.right_side}>
-              <Text style={styles.subheading}>
+              <Text style={styles.subheading(true)}>
                 {moment(item?.time.toDate())?.calendar()}
               </Text>
             </View>
@@ -55,7 +60,10 @@ const DevicesList = (props: UserListInterface) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: '2%',
+    paddingTop: heightPercentageToDP(1.25),
+    paddingBottom: heightPercentageToDP(1.25),
+    paddingLeft: widthPercentageToDP(1.25),
+    paddingRight: widthPercentageToDP(1.25),
     flexDirection: 'row',
   },
   topView: {
@@ -70,15 +78,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heading: {
-    fontSize: 16,
+    fontSize: fontValue(16),
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
-  subheading: {
-    fontSize: 14,
-    paddingTop: '1%',
-    color: COLORS.black,
-    opacity: 0.4,
+  subheading: isTime => {
+    return {
+      fontSize: isTime ? fontValue(12) : fontValue(13),
+      paddingTop: '1%',
+      color: COLORS.black,
+      opacity: 0.4,
+    };
   },
 });
 
