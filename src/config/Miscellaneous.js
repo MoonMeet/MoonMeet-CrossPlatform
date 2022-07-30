@@ -25,6 +25,7 @@ const COLORS = {
   redDarkError: '#CF6679',
   yellowLightWarning: '#ffff00',
   yellowDarkWarning: '#ffca28',
+  dimmed: '#F0F0F0',
   black: '#2f3042',
   white: '#fffefe',
   transparent: '#00000000',
@@ -37,6 +38,9 @@ const COLORS = {
   maroon: '#800000',
   orange: '#FF7F50',
   pink: '#DE3163',
+  grey: '#838383',
+  grey1: '#C0C0C0',
+  grey2: 'A0A0A0',
   chats: {
     rightBubble: '#566193',
     leftBubble: '#e4e6eb',
