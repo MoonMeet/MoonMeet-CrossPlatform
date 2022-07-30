@@ -9,17 +9,11 @@ import {
   widthPercentageToDP,
 } from '../../config/Dimensions';
 
-interface UserListInterface {
-  ListData: any;
-  onPressTrigger: (() => void) | undefined;
-  onLongPressTrigger: (() => void) | undefined;
-}
-
-const DevicesList = (props: UserListInterface) => {
+const DevicesList = ({ListData}) => {
   return (
     <View style={{flex: 1}}>
       <FlatList
-        data={props.ListData}
+        data={ListData}
         contentContainerStyle={{
           paddingStart: widthPercentageToDP(1.75),
           paddingEnd: widthPercentageToDP(1.75),
