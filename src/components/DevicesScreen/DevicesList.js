@@ -21,8 +21,8 @@ const DevicesList = (props: UserListInterface) => {
       <FlatList
         data={props.ListData}
         contentContainerStyle={{
-          paddingStart: '1%',
-          paddingEnd: '2%',
+          paddingStart: widthPercentageToDP(1.75),
+          paddingEnd: widthPercentageToDP(1.75),
         }}
         showsVerticalScrollIndicator={false}
         disableVirtualization
@@ -60,11 +60,11 @@ const DevicesList = (props: UserListInterface) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'row',
     paddingTop: heightPercentageToDP(1.25),
     paddingBottom: heightPercentageToDP(1.25),
     paddingLeft: widthPercentageToDP(1.25),
     paddingRight: widthPercentageToDP(1.25),
-    flexDirection: 'row',
   },
   topView: {
     flexDirection: 'row',
