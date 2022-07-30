@@ -1,37 +1,30 @@
 import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import {
-  StyleSheet,
-  Text,
-  View,
-  StyleProp,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/Dimensions';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 
-interface ViewItemTitleInterface {
-  titleItem?: string | undefined;
-  titleStyle?: StyleProp<TextStyle> | undefined;
-  viewStyle?: StyleProp<ViewStyle> | undefined;
-}
-
-const ViewItemTitle = (props: ViewItemTitleInterface) => {
+const ViewItemTitle = ({titleItem}) => {
   return (
     <View style={styles.titleView}>
-      <Text style={styles.titleTextView}>{props?.titleItem}</Text>
+      <Text style={styles.titleTextView}>{titleItem}</Text>
     </View>
   );
 };
 const styles = StyleSheet.create({
   titleView: {
-    padding: '2%',
+    paddingTop: heightPercentageToDP(1),
+    paddingBottom: heightPercentageToDP(0.25),
+    paddingRight: widthPercentageToDP(1),
+    paddingLeft: widthPercentageToDP(1),
     flexDirection: 'row',
   },
   titleTextView: {
-    fontSize: 18,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    textAlign: 'center',
+    paddingLeft: widthPercentageToDP(3.75),
+    fontSize: fontValue(15),
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
   },
