@@ -33,6 +33,7 @@ import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
 import {reverse, sortBy} from 'lodash';
+import EmojiPicker from 'rn-emoji-keyboard';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -64,6 +65,12 @@ const ChatScreen = () => {
   const [isLoading, setLoading] = React.useState(true);
 
   let _id = uuidv4() + getRandomString(3);
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const handlePick = emojiObject => {
+    console.log(emojiObject.emoji);
+    setMessageText(mMessageText + emojiObject?.emoji);
+  };
 
   useEffect(() => {
     const userSubscribe = firestore()
@@ -229,13 +236,11 @@ const ChatScreen = () => {
         InfoToast(
           'bottom',
           'Sending Image',
-          `${
-            bytesToSize(taskSnapshot?.bytesTransferred) === 'N/A'
-              ? 0
-              : bytesToSize(taskSnapshot?.bytesTransferred)
-          } transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
+          `${bytesToSize(
+            taskSnapshot?.bytesTransferred,
+          )} transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
           true,
-          1000,
+          750,
         );
       });
 
@@ -480,6 +485,9 @@ const ChatScreen = () => {
             <Actions
               {...props}
               options={{
+                ['Open Emoji Keyboard']: props => {
+                  setIsOpen(true);
+                },
                 ['Open Camera']: props => {
                   ImagePicker.openCamera({
                     height: 1024,
@@ -540,6 +548,11 @@ const ChatScreen = () => {
           name: myFirstName + ' ' + myLastName,
         }}
         scrollToBottom
+      />
+      <EmojiPicker
+        onEmojiSelected={handlePick}
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
       />
     </BaseView>
   );
