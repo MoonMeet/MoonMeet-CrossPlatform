@@ -78,6 +78,7 @@ const AddBioScreen = () => {
           true,
           3000,
         );
+        setOldBioText(BioText);
         setLoaderVisible(false);
       })
       .catch(error => {
