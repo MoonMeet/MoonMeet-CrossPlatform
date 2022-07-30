@@ -18,9 +18,11 @@ import {
 import {v4 as uuidv4} from 'uuid';
 import DevicesList from '../components/DevicesScreen/DevicesList';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {reverse, sortBy} from 'lodash';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import NetInfo from '@react-native-community/netinfo';
+import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 
 const DevicesScreen = () => {
   const navigation = useNavigation();
@@ -137,35 +139,6 @@ const DevicesScreen = () => {
 
   return (
     <MiniBaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Devices</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.75)} />
       <Text style={styles.miniHeaderText}>This device</Text>
       <View style={styles.under_header}>
@@ -183,22 +156,33 @@ const DevicesScreen = () => {
       </View>
       <View style={styles.terminateView}>
         <Text
-          onPress={() => {
-            try {
-              JwtKeyMMKV.set('currentUserJwtKey', newJwtKey);
-            } catch {
-              console.error('failed updating JwtKey');
+          onPress={async () => {
+            let response = await NetInfo?.fetch();
+            if (response?.isConnected) {
+              try {
+                JwtKeyMMKV.set('currentUserJwtKey', newJwtKey);
+              } catch {
+                console.error('failed updating JwtKey');
+              }
+              firestore()
+                .collection('users')
+                .doc(auth()?.currentUser?.uid)
+                .update({
+                  jwtKey: newJwtKey,
+                })
+                .finally(async () => {
+                  await resendCurrentDevice();
+                })
+                .catch(error => console.error(error));
+            } else {
+              ErrorToast(
+                'bottom',
+                'Network unavailable',
+                'Network connection is needed to send bug reports.',
+                true,
+                2000,
+              );
             }
-            firestore()
-              .collection('users')
-              .doc(auth()?.currentUser?.uid)
-              .update({
-                jwtKey: newJwtKey,
-              })
-              .finally(async () => {
-                await resendCurrentDevice();
-              })
-              .catch(error => console.error(error));
           }}
           style={styles.headingTerminate}>
           Terminate All Other Sessions
@@ -207,7 +191,7 @@ const DevicesScreen = () => {
           Log out all devices except for this one.
         </Text>
       </View>
-      <Spacer height={'3%'} />
+      <Spacer height={heightPercentageToDP(1)} />
       <Text style={styles.miniHeaderText}>Active sessions</Text>
       <DevicesList
         ListData={masterData}
@@ -222,35 +206,9 @@ const styles = StyleSheet.create({
     padding: '2%',
     flexDirection: 'row',
   },
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: 22,
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
   miniHeaderText: {
     fontSize: 16,
-    paddingLeft: '3%',
+    paddingLeft: widthPercentageToDP(3),
     textAlign: 'left',
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
