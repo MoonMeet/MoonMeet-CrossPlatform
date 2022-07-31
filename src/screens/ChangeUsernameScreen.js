@@ -2,18 +2,15 @@ import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {
   ActivityIndicator,
-  Avatar,
   FAB,
   HelperText,
   TextInput,
-  TouchableRipple,
 } from 'react-native-paper';
 import ArrowForward from '../assets/images/arrow-forward.png';
-import BackImage from '../assets/images/back.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
@@ -23,7 +20,7 @@ import {
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import {heightPercentageToDP} from '../config/Dimensions';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+import {COLORS} from '../config/Miscellaneous';
 
 const ChangeUsernameScreen = () => {
   const navigation = useNavigation();
@@ -71,47 +68,64 @@ const ChangeUsernameScreen = () => {
     return () => {};
   }, []);
 
-  function pushUsername() {
+  const pushUsername = useCallback(() => {
     setLoaderVisible(true);
     firestore()
       .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        username: UsernameText,
-      })
-      .finally(() => {
-        SuccessToast(
-          'bottom',
-          'Username updated',
-          'You have successfully changed your username.',
-          true,
-          3000,
-        );
-        setOldUsernameText(UsernameText);
-        setLoaderVisible(false);
-      })
-      .catch(error => {
-        ErrorToast(
-          'bottom',
-          'Updating Failed',
-          'An error occurred while updating your username.',
-          true,
-          3000,
-        );
-        console.log(error);
-        setLoaderVisible(false);
-        if (navigation?.canGoBack()) {
-          navigation?.goBack();
+      .where('username', '==', UsernameText?.trim())
+      .get()
+      .then(async collectionSnapshot => {
+        if (collectionSnapshot?.empty) {
+          firestore()
+            .collection('users')
+            .doc(auth()?.currentUser?.uid)
+            .update({
+              username: UsernameText?.trim(),
+            })
+            .finally(() => {
+              SuccessToast(
+                'bottom',
+                'Username updated',
+                'You have successfully changed your username.',
+                true,
+                2000,
+              );
+              setOldUsernameText(UsernameText?.trim());
+              setLoaderVisible(false);
+            })
+            .catch(error => {
+              ErrorToast(
+                'bottom',
+                'Updating Failed',
+                'An error occurred while updating your username.',
+                true,
+                2000,
+              );
+              console.log(error);
+              setLoaderVisible(false);
+              if (navigation?.canGoBack()) {
+                navigation?.goBack();
+              }
+            });
+        } else {
+          ErrorToast(
+            'bottom',
+            'Username already taken',
+            'Please choose another username which it is not taken.',
+            true,
+            2000,
+          );
+          setLoaderVisible(false);
         }
       });
-  }
+  }, [UsernameText, navigation]);
 
   const hasMoreLength = () => {
-    return UsernameText.length > 30;
+    return UsernameText?.trim()?.length > 30;
   };
 
   const hasLessLength = () => {
-    return UsernameText.length < 6;
+    return UsernameText?.trim()?.length < 6;
   };
 
   if (loading) {
@@ -135,35 +149,6 @@ const ChangeUsernameScreen = () => {
 
   return (
     <BaseView>
-      {/**<View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            borderless={false}
-            rippleColor={COLORS.rippleColor}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-        <View style={styles.mid_side}>
-          <Text style={styles.toolbar_text}>Change Username</Text>
-        </View>
-      </View>*/}
       <Spacer height={heightPercentageToDP(0.5)} />
       <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
         <TextInput
@@ -219,7 +204,7 @@ const ChangeUsernameScreen = () => {
         onPress={() => {
           if (isConnected) {
             if (!hasMoreLength() && !hasLessLength()) {
-              if (UsernameText === oldUsernameText) {
+              if (UsernameText?.trim() === oldUsernameText?.trim()) {
                 if (navigation?.canGoBack) {
                   navigation?.goBack();
                 }
@@ -251,32 +236,6 @@ const ChangeUsernameScreen = () => {
   );
 };
 const styles = StyleSheet.create({
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: 22,
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
   fab: {
     position: 'absolute',
     margin: 16,
