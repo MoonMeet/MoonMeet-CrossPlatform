@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import StackNavigator from './src/config/Stack';
-import {StatusBar} from 'react-native';
+import {StatusBar, StyleSheet} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {COLORS} from './src/config/Miscellaneous';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
@@ -65,23 +65,25 @@ const App = () => {
     [toggleTheme, isThemeDark],
   );
   return (
-    <>
+    <GestureHandlerRootView
+      style={{
+        ...StyleSheet.absoluteFill,
+        backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
+      }}>
       <StatusBar
         backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
         animated={true}
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
       />
-      <GestureHandlerRootView style={{flex: 1}}>
-        <BottomSheetModalProvider>
-          <ThemeContext.Provider value={themePrefernces}>
-            <PaperProvider theme={theme}>
-              <StackNavigator />
-              <Toast />
-            </PaperProvider>
-          </ThemeContext.Provider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-    </>
+      <ThemeContext.Provider value={themePrefernces}>
+        <PaperProvider theme={theme}>
+          <BottomSheetModalProvider>
+            <StackNavigator />
+            <Toast />
+          </BottomSheetModalProvider>
+        </PaperProvider>
+      </ThemeContext.Provider>
+    </GestureHandlerRootView>
   );
 };
 
