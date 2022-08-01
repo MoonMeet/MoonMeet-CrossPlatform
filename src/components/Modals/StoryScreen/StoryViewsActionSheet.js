@@ -1,14 +1,11 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 import {COLORS} from '../../../config/Miscellaneous';
 import Modal from 'react-native-modal';
 import BackImage from '../../../assets/images/back.png';
 import ViewsList from './ViewsList';
-import {
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../../../config/Dimensions';
+import {heightPercentageToDP} from '../../../config/Dimensions';
 
 interface StoryViewsInterface {
   hideModal: Function;
