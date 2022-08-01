@@ -65,11 +65,7 @@ const App = () => {
     [toggleTheme, isThemeDark],
   );
   return (
-    <GestureHandlerRootView
-      style={{
-        ...StyleSheet.absoluteFill,
-        backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-      }}>
+    <>
       <StatusBar
         backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
         animated={true}
@@ -77,13 +73,22 @@ const App = () => {
       />
       <ThemeContext.Provider value={themePrefernces}>
         <PaperProvider theme={theme}>
-          <BottomSheetModalProvider>
-            <StackNavigator />
-            <Toast />
-          </BottomSheetModalProvider>
+          <GestureHandlerRootView
+            style={{
+              flex: 1,
+              flexGrow: 1,
+              backgroundColor: isThemeDark
+                ? COLORS.primaryDark
+                : COLORS.primaryLight,
+            }}>
+            <BottomSheetModalProvider>
+              <StackNavigator />
+              <Toast />
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
         </PaperProvider>
       </ThemeContext.Provider>
-    </GestureHandlerRootView>
+    </>
   );
 };
 
