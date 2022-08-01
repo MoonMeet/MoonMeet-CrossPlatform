@@ -21,12 +21,12 @@ import {
   widthPercentageToDP,
 } from '../config/Dimensions';
 import DotsImage from '../assets/images/dots.png';
-import EyeImage from '../assets/images/eye.png';
+// import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
-import {sortBy, reverse} from 'lodash';
+import {sortBy} from 'lodash';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -39,8 +39,6 @@ const StoryScreen = () => {
   const [storyLastName, setStoryLastName] = React.useState('');
   const [storyAvatar, setStoryAvatar] = React.useState('');
   const [storyId, setStoryId] = React.useState('');
-  const [storyTime, setStoryTime] = React.useState('');
-  const [storyText, setStoryText] = React.useState('');
   const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
@@ -95,7 +93,7 @@ const StoryScreen = () => {
 
               setAllCurrentUserStories(collectionDocs);
               setLoading(false);
-              if (!Loading && storyId !== undefined) {
+              if (!Loading) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
                   firestore()
                     .collection('users')
@@ -130,7 +128,7 @@ const StoryScreen = () => {
       });
 
     return () => {};
-  }, []);
+  }, [Loading, myUID, storyId, userStoryUID]);
 
   if (Loading) {
     return (
@@ -194,43 +192,47 @@ const StoryScreen = () => {
                 <Text style={styles.timeText}>
                   {moment(
                     Object.values(allCurrentUserStories)?.length > 0
-                      ? allCurrentUserStories[current]?.time.toDate()
+                      ? allCurrentUserStories[current]?.time?.toDate()
                       : Date.now(),
                   ).fromNow()}
                 </Text>
               </View>
             </View>
-            {!storyText !== null || auth?.currentUser.uid !== userStoryUID ? (
-              <View style={styles.right_side}>
-                <Pressable
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                    alignItems: 'flex-start',
-                  }}
-                  onPress={() => {
-                    setStoryViewsVisible(!storyViewsVisible);
-                  }}>
-                  <Avatar.Icon
-                    icon={EyeImage}
-                    size={37.5}
-                    color={COLORS.black}
+            {
+              /**!storyText !== null || auth?.currentUser.uid !== userStoryUID*/ true ? (
+                <View style={styles.right_side}>
+                  {/**
+                  <Pressable
                     style={{
-                      marginRight: '-1%',
-                      opacity: 0.4,
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'flex-start',
                     }}
-                    theme={{
-                      colors: {
-                        primary: COLORS.transparent,
-                      },
-                    }}
-                  />
-                  <Text style={styles.viewsNumber}>
-                    {viewsData?.length > 0
-                      ? Object?.values(viewsData)?.length
-                      : '0'}
-                  </Text>
+                    onPress={() => {
+                      //setStoryViewsVisible(!storyViewsVisible);
+                    }}>
+                    <Avatar.Icon
+                      icon={EyeImage}
+                      size={37.5}
+                      color={COLORS.black}
+                      style={{
+                        marginRight: '-1%',
+                        opacity: 0.4,
+                      }}
+                      theme={{
+                        colors: {
+                          primary: COLORS.transparent,
+                        },
+                      }}
+                    />
+                    <Text style={styles.viewsNumber}>
+                      {viewsData?.length > 0
+                        ? Object?.values(viewsData)?.length
+                        : '0'}
+                    </Text>
+                  </Pressable>
                   <View style={{width: widthPercentageToDP(2.5)}} />
+            */}
                   <Pressable
                     style={{
                       flexDirection: 'row',
@@ -253,9 +255,9 @@ const StoryScreen = () => {
                       }}
                     />
                   </Pressable>
-                </Pressable>
-              </View>
-            ) : null}
+                </View>
+              ) : null
+            }
           </View>
           <FlatList
             ref={storiesRef}
@@ -308,8 +310,7 @@ const StoryScreen = () => {
                 size={36.5}
                 color={COLORS.black}
                 style={{
-                  marginRight: '-1%',
-                  opacity: 0.4,
+                  opacity: 0.6,
                 }}
                 theme={{
                   colors: {
@@ -321,7 +322,7 @@ const StoryScreen = () => {
           </View>
           <View style={styles.footer_mid}>
             <Text style={styles.footer_text}>
-              {current + 1} /{' '}
+              {current + 1} /
               {Object?.values?.(allCurrentUserStories)?.length > 1
                 ? Object?.values?.(allCurrentUserStories)?.length
                 : 1}
@@ -346,8 +347,7 @@ const StoryScreen = () => {
                 size={36.5}
                 color={COLORS.black}
                 style={{
-                  marginRight: '-1%',
-                  opacity: 0.4,
+                  opacity: 0.6,
                   transform: [{rotate: '180deg'}],
                 }}
                 theme={{
@@ -383,12 +383,10 @@ const StoryScreen = () => {
             );
           }}
           showSave={
-            allCurrentUserStories[current]?.image
-              ? allCurrentUserStories[current]?.image
-              : false
+            false // TODO: Will be enabled soon.
           }
           onSaveSelected={() => {
-            console.log(allCurrentUserStories[current]?.image);
+            // console.log(allCurrentUserStories[current]?.image);
           }}
           currentStoryUID={userStoryUID}
           isVisible={ActionSheetVisible}
@@ -425,16 +423,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   toolbar_text: {
-    fontSize: 18,
-    paddingLeft: '2%',
-
+    fontSize: fontValue(18),
+    paddingLeft: widthPercentageToDP(1.5),
     textAlign: 'left',
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   timeText: {
-    fontSize: 14,
-    paddingLeft: '2%',
+    fontSize: fontValue(14),
+    paddingLeft: widthPercentageToDP(1.5),
     textAlign: 'left',
     color: COLORS.black,
     opacity: 0.4,
@@ -450,19 +447,14 @@ const styles = StyleSheet.create({
   },
   storyImage: {
     width: widthPercentageToDP(100),
-    height: heightPercentageToDP(70),
-    resizeMode: 'cover',
+    height: heightPercentageToDP(55),
+    resizeMode: 'contain',
   },
   right_side: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
-  },
-  right_icon: {
-    paddingBottom: '0.2%',
-    paddingRight: '0.2%',
-    opacity: 0.4,
   },
   footer: {
     padding: '2%',
