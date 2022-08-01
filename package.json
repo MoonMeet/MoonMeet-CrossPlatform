@@ -14,7 +14,7 @@
     "assembleDebug": "cd android && gradlew assembleDebug"
   },
   "dependencies": {
-    "@gorhom/bottom-sheet": "^4.4.2",
+    "@gorhom/bottom-sheet": "^4.4.3",
     "@gorhom/sticky-item": "^2.1.1",
     "@react-native-clipboard/clipboard": "^1.10.0",
     "@react-native-community/async-storage": "^1.12.1",
