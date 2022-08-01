@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {BackHandler, Pressable, StyleSheet, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import ViewItem from '../components/PrivacySecurityScreen/ViewItem';
 import ViewItemTitle from '../components/PrivacySecurityScreen/ViewItemTitle';
@@ -10,18 +10,39 @@ import {
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Text} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
 
 const PrivacySecurityScreen = () => {
   const navigation = useNavigation();
+
+  const PnPRef = useRef(null);
+  const snapPoints = useMemo(() => ['45%'], []);
+  const handleOpenModal = useCallback(() => {
+    PnPRef?.current?.present();
+  }, []);
 
   const [phoneNumberStatus, setPhoneNumberStatus] = React.useState('');
   const [lastSeenNOnline, setLastSeenNOnline] = React.useState('');
 
   const [loading, setLoading] = React.useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        PnPRef?.current?.dismiss();
+        return false;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   useEffect(() => {
     const UserSubscribe = firestore()
@@ -43,7 +64,7 @@ const PrivacySecurityScreen = () => {
 
   return (
     <BaseView>
-      <View style={{flex: 1}} onPress={undefined}>
+      <Pressable style={{flex: 1}} onPress={() => PnPRef?.current?.dismiss()}>
         <Spacer height={heightPercentageToDP(0.25)} />
         <ViewItemTitle titleItem="Privacy" />
         <ViewItem
@@ -55,7 +76,7 @@ const PrivacySecurityScreen = () => {
             phoneNumberStatus === 'none' ? 'Everyone' : 'Only me'
           }
           withDivider
-          onPressTrigger={undefined}
+          onPressTrigger={() => handleOpenModal()}
         />
         <ViewItem
           titleText={'Last seen & Online'}
@@ -93,7 +114,12 @@ const PrivacySecurityScreen = () => {
             Manage your sessions on all your devices.
           </Text>
         </View>
-      </View>
+        <PrivacyBottomSheet
+          sheetRef={PnPRef}
+          sheetIndex={0}
+          sheetSnapPoints={snapPoints}
+        />
+      </Pressable>
     </BaseView>
   );
 };
