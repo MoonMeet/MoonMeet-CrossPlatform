@@ -11,21 +11,27 @@ import {
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {Text} from 'react-native-paper';
+import {ActivityIndicator, Text} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 
 const PrivacySecurityScreen = () => {
   const navigation = useNavigation();
 
   const PnPRef = useRef(null);
-  const snapPoints = useMemo(() => ['45%'], []);
+  const snapPoints = useMemo(
+    () => [heightPercentageToDP(10), heightPercentageToDP(25)],
+    [],
+  );
   const handleOpenModal = useCallback(() => {
     PnPRef?.current?.present();
   }, []);
 
   const [phoneNumberStatus, setPhoneNumberStatus] = React.useState('');
+
   const [lastSeenNOnline, setLastSeenNOnline] = React.useState('');
 
   const [loading, setLoading] = React.useState(true);
@@ -59,9 +65,23 @@ const PrivacySecurityScreen = () => {
   });
 
   if (loading) {
-    return <></>;
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
   }
-
   return (
     <BaseView>
       <Pressable style={{flex: 1}} onPress={() => PnPRef?.current?.dismiss()}>
@@ -72,9 +92,7 @@ const PrivacySecurityScreen = () => {
           rippleColor={COLORS.rippleColor}
           titleColor={COLORS.black}
           enableDescription
-          descriptionText={
-            phoneNumberStatus === 'none' ? 'Everyone' : 'Only me'
-          }
+          descriptionText={phoneNumberStatus === 'none' ? 'Everyone' : 'Nobody'}
           withDivider
           onPressTrigger={() => handleOpenModal()}
         />
@@ -118,6 +136,7 @@ const PrivacySecurityScreen = () => {
           sheetRef={PnPRef}
           sheetIndex={0}
           sheetSnapPoints={snapPoints}
+          phoneNumberStatus={phoneNumberStatus}
         />
       </Pressable>
     </BaseView>
@@ -138,4 +157,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PrivacySecurityScreen;
+export default gestureHandlerRootHOC(PrivacySecurityScreen);
