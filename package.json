@@ -11,8 +11,8 @@
     "test": "jest",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
-    "assembleDebug": "cd android && gradlew assembleDebug",
-    "assembleRelease": "cd android && gradlew assembleRelease"
+    "assembleDebug": "cd android && ./gradlew assembleDebug",
+    "assembleRelease": "cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.4.3",
