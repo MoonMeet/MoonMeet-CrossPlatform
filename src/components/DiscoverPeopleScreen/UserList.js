@@ -1,5 +1,5 @@
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
+import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
@@ -7,20 +7,16 @@ import MiniBaseView from '../MiniBaseView/MiniBaseView';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
 import {PurpleBackground} from '../../index.d';
+import {uniqBy} from 'lodash';
+import {fontValue} from '../../config/Dimensions';
 
-interface UserListInterface {
-  ListData: any;
-  onPressTrigger: (() => void) | undefined;
-  onLongPressTrigger: (() => void) | undefined;
-}
-
-const UserList = (props: UserListInterface) => {
+const UserList = ({ListData}) => {
   const navigation = useNavigation();
 
   return (
     <View style={{flex: 1}}>
       <FlatList
-        data={props.ListData}
+        data={uniqBy(ListData, 'uid')}
         contentContainerStyle={{
           paddingStart: '1%',
           paddingEnd: '2%',
@@ -28,7 +24,7 @@ const UserList = (props: UserListInterface) => {
         showsVerticalScrollIndicator={false}
         disableVirtualization
         removeClippedSubviews={true}
-        initialNumToRender={10}
+        initialNumToRender={25}
         keyExtractor={item => item?.uid}
         renderItem={({item}) => (
           <MiniBaseView>
@@ -54,7 +50,7 @@ const UserList = (props: UserListInterface) => {
                   <Text style={styles.subheading}>
                     {item?.active_status === 'recently'
                       ? 'Last seen recently'
-                      : moment(item?.active_time.toDate())?.calendar()}
+                      : moment(item?.active_time?.toDate())?.calendar()}
                   </Text>
                 </View>
               </Pressable>
@@ -83,13 +79,13 @@ const styles = StyleSheet.create({
     marginRight: '2.5%',
   },
   heading: {
-    fontSize: 16,
+    fontSize: fontValue(16),
     textAlign: 'left',
     color: COLORS.black,
     fontFamily: FONTS.regular,
   },
   subheading: {
-    fontSize: 14,
+    fontSize: fontValue(14),
     paddingTop: '1%',
     textAlign: 'left',
     color: COLORS.black,
