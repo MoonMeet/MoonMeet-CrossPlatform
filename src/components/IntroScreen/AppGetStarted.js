@@ -4,11 +4,7 @@ import {Button} from 'react-native-paper';
 import {IntroStyles} from './IntroStyles';
 import GetStarted from '../../assets/images/get_started.png';
 
-interface AppGetStartedInterface {
-  onPressButton: (() => void) | undefined;
-}
-
-const AppGetStarted = (props: AppGetStartedInterface) => {
+const AppGetStarted = ({onPressButton}) => {
   return (
     <View style={IntroStyles.PagerRender} key="2">
       <Image style={IntroStyles.illustration} source={GetStarted} />
@@ -22,7 +18,7 @@ const AppGetStarted = (props: AppGetStartedInterface) => {
         uppercase={false}
         color="#566193"
         mode="contained"
-        onPress={props?.onPressButton}>
+        onPress={onPressButton}>
         Continue
       </Button>
     </View>
