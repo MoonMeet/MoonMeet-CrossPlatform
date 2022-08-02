@@ -1,14 +1,11 @@
 import React from 'react';
+import {isUndefined} from 'lodash';
 import {StyleSheet, View} from 'react-native';
 
-type SpacerProps = {
-  height: number | undefined,
-};
-
-const Spacer = (props: SpacerProps) => {
+const Spacer = ({height}) => {
   const styles = StyleSheet.create({
     spacerStyle: {
-      height: props?.height || 10,
+      height: isUndefined(height) ? 10 : height,
       width: '100%',
     },
   });
