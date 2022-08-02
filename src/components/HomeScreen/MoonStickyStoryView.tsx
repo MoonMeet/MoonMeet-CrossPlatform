@@ -30,7 +30,7 @@ const MoonStickyStoryView = ({
     0.2
   );
 
-  //#region thumbnail
+  // Thumbnail Animation
   const thumbnailWidth = itemWidth;
   const thumbnailHeight = itemWidth;
 
@@ -84,9 +84,9 @@ const MoonStickyStoryView = ({
       ],
     },
   ];
-  //#endregion
+  // End Thumbnail Animation.
 
-  //#region add icon
+  // Add Icon Animation.
   const addIconWidth = 30;
   const addIconHeight = 30;
 
@@ -134,9 +134,9 @@ const MoonStickyStoryView = ({
       ],
     },
   ];
-  //#endregion
+  // End Add Icon animation.
 
-  //#region text
+  // Text Animation.
   const animatedTextOpacity = interpolateNode(x, {
     inputRange: [separatorSize, threshold * 0.6],
     outputRange: [1, 0],
@@ -160,10 +160,11 @@ const MoonStickyStoryView = ({
       ] as Animated.AnimatedTransform,
     },
   ];
-  //#endregion
+  // End Add Icon animation.
 
   return (
     <Pressable style={{ flex: 1 }} hitSlop={15} onPress={() => {
+      // @ts-ignore
       navigation?.navigate('addStory')
     }}>
       <Animated.Image source={userAvatar ? { uri: userAvatar } : tempAvatar} style={thumbnailStyle} />
