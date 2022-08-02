@@ -11,20 +11,15 @@ import {
 } from '@gorhom/bottom-sheet';
 import {fontValue} from '../../config/Dimensions';
 
-interface imagePickerInterface {
-  sheetRef?: Ref | undefined;
-  snapPoints?:
-    | Array<string | number>
-    | SharedValue<Array<string | number>>
-    | undefined;
-  index?: number | undefined;
-  onCameraPress: (() => void) | undefined;
-  onFilePicker: (() => void) | undefined;
-}
-
-const ImagePickerActionSheet = (props: imagePickerInterface) => {
+const ImagePickerActionSheet = ({
+  sheetRef,
+  snapPoints,
+  index,
+  onCameraPress,
+  onFilePicker,
+}) => {
   const {animatedHandleHeight, handleContentLayout} =
-    useBottomSheetDynamicSnapPoints(props.snapPoints);
+    useBottomSheetDynamicSnapPoints(snapPoints);
 
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
@@ -44,9 +39,9 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
   );
   return (
     <BottomSheetModal
-      ref={props?.sheetRef}
-      index={props?.index}
-      snapPoints={props?.snapPoints}
+      ref={sheetRef}
+      index={index}
+      snapPoints={snapPoints}
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
@@ -72,7 +67,7 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
-              props?.onCameraPress();
+              onCameraPress();
             }}
             style={styles.optionContainer}>
             <Image source={CameraImage} style={styles.arrowStyle} />
@@ -89,7 +84,7 @@ const ImagePickerActionSheet = (props: imagePickerInterface) => {
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
-              props?.onFilePicker();
+              onFilePicker();
             }}
             style={styles.optionContainer}>
             <Image source={GalleryImage} style={styles.arrowStyle} />
