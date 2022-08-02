@@ -7,11 +7,7 @@ import {uniqBy} from 'lodash';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 
-interface ActivePeopleListInterface {
-  ListData: any;
-}
-
-const ActivePeopleList = (props: ActivePeopleListInterface) => {
+const ActivePeopleList = ({ListData}) => {
   const navigation = useNavigation();
 
   const listEmptyComponent = () => {
@@ -60,7 +56,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
 
   return (
     <FlatList
-      data={uniqBy(props.ListData, 'uid')}
+      data={uniqBy(ListData, 'uid')}
       contentContainerStyle={{
         paddingStart: '1%',
         paddingEnd: '2%',
@@ -68,7 +64,7 @@ const ActivePeopleList = (props: ActivePeopleListInterface) => {
       showsVerticalScrollIndicator={false}
       disableVirtualization
       removeClippedSubviews={true}
-      initialNumToRender={10}
+      initialNumToRender={25}
       ListEmptyComponent={listEmptyComponent}
       keyExtractor={item => item?.avatar}
       renderItem={({item}) => renderItem(item)}
