@@ -248,6 +248,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleTextContainer={'Chat Settings'}
         onPressTrigger={() => {
           handleCloseAllModals();
+          navigation?.navigate('chatSettings');
         }}
       />
       <DevicesScreen />

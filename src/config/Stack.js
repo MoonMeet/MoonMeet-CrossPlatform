@@ -44,6 +44,7 @@ import {useTheme} from 'react-native-paper';
 import {ThemeContext} from './Theme/Context';
 import DarkModeSettings from '../screens/DarkModeScreen';
 import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
+import ChatSettingsScreen from '../screens/ChatSettingsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -283,6 +284,23 @@ const StackNavigator = () => {
           name={'chat'}
           component={ChatScreen}
           options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'chatSettings'}
+          component={ChatSettingsScreen}
+          options={{
+            gestureEnabled: false,
+            headerShown: true,
+            headerTitle: 'Chat Settings',
+            headerTitleStyle: {
+              fontFamily: FONTS.regular,
+              fontSize: fontValue(20.5),
+              color: COLORS.black,
+            },
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
         />
         <Stack.Screen
           name={'passcodeSetup'}
