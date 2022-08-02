@@ -1,19 +1,16 @@
 import React from 'react';
+import {isUndefined} from 'lodash';
 import {StyleSheet, View} from 'react-native';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/Dimensions';
 
-type SpacerProps = {
-  width: number | undefined,
-};
-
-const SpacerHorizontal = (props: SpacerProps) => {
+const SpacerHorizontal = ({width}) => {
   const styles = StyleSheet.create({
     spacerStyle: {
       height: heightPercentageToDP(1),
-      width: widthPercentageToDP(props.width) || 10,
+      width: isUndefined(width) ? 10 : widthPercentageToDP(width),
     },
   });
 
