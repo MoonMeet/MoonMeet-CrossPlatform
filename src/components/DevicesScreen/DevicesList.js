@@ -41,7 +41,7 @@ const DevicesList = ({ListData}) => {
             </View>
             <View style={styles.right_side}>
               <Text style={styles.subheading(true)}>
-                {moment(item?.time.toDate())?.calendar()}
+                {moment(item?.time?.toDate())?.calendar()}
               </Text>
             </View>
           </Pressable>
