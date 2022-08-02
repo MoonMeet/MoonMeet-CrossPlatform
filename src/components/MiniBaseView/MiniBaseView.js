@@ -6,7 +6,6 @@ import {ThemeContext} from '../../config/Theme/Context';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 const MiniBaseView = ({children}) => {
-  const theme = useTheme();
   const {isThemeDark} = React.useContext(ThemeContext);
 
   const styles = StyleSheet.create({
