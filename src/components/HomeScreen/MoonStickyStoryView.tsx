@@ -136,7 +136,7 @@ const MoonStickyStoryView = ({
   ];
   // End Add Icon animation.
 
-  // Text Animation.
+  // Text animation.
   const animatedTextOpacity = interpolateNode(x, {
     inputRange: [separatorSize, threshold * 0.6],
     outputRange: [1, 0],
@@ -160,7 +160,7 @@ const MoonStickyStoryView = ({
       ] as Animated.AnimatedTransform,
     },
   ];
-  // End Add Icon animation.
+  // End Text animation.
 
   return (
     <Pressable style={{ flex: 1 }} hitSlop={15} onPress={() => {
