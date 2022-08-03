@@ -23,7 +23,6 @@ import appCheck from '@react-native-firebase/app-check';
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
   await analytics()?.setAnalyticsCollectionEnabled(true);
-  await appCheck()?.activate('ignored', false);
 }
 
 if (__DEV__) {
