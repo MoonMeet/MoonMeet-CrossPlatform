@@ -147,8 +147,8 @@ const HomeChatsScreen = () => {
                     (subDocument?.data()?.text || subDocument?.data()?.image)
                   ) {
                     if (
-                      firestore?.Timestamp?.fromDate(new Date()) -
-                        subDocument?.data()?.time.toDate() >
+                      firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                        subDocument?.data()?.time?.toDate() >
                       86400000
                     ) {
                       deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
