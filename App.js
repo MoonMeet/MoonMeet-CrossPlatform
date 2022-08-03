@@ -28,13 +28,13 @@ async function enableFirebaseTools() {
 
 if (__DEV__) {
   initializeMMKVFlipper({default: ThemeMMKV});
-  enableFirebaseTools();
 }
 
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   useEffect(() => {
+    enableFirebaseTools();
     if (ThemeMMKV.contains('isThemeDark')) {
       if (ThemeMMKV.getBoolean('isThemeDark')) {
         if (!isThemeDark) {
