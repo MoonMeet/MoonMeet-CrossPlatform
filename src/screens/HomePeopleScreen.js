@@ -76,7 +76,7 @@ const HomePeopleScreen = () => {
           }
           if (
             documentSnapshot?.data()?.active_status == 'normal' &&
-            firestore?.Timestamp?.fromDate(new Date()) -
+            firestore?.Timestamp?.fromDate(new Date())?.toDate() -
               documentSnapshot?.data()?.active_time?.toDate() <
               180000
           ) {
