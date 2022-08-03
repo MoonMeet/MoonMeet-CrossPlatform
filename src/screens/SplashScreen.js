@@ -21,7 +21,7 @@ import {useTheme} from 'react-native-paper';
 import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
-import {isNull} from 'lodash';
+import {isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
 
 if (__DEV__) {
@@ -56,7 +56,6 @@ const SplashScreen = () => {
   const [updatedRequired, setUpdateRequired] = React.useState(false);
   const [updateVersion, setUpdateVersion] = React.useState('');
   const [updateURL, setUpdateURL] = React.useState('');
-  const [updateAvailable, setUpdateAvailable] = React.useState(false);
 
   const [currentAppVersion] = React.useState(getVersion());
 
@@ -131,7 +130,6 @@ const SplashScreen = () => {
   );
 
   useEffect(() => {
-    let SplashScreenTimerTask = null;
     firestore()
       .collection('updates')
       .doc('releasedUpdate')
@@ -144,63 +142,51 @@ const SplashScreen = () => {
         }
       })
       .finally(() => {
-        if (updateVersion) {
+        if (!isEmpty(updateVersion)) {
           if (currentAppVersion != updateVersion) {
-            setUpdateAvailable(true);
+            handleModalShow();
+          } else {
+            if (isViewPagerCompleted()) {
+              if (auth()?.currentUser !== null) {
+                firestore()
+                  .collection('users')
+                  .doc(auth()?.currentUser?.uid)
+                  .get()
+                  .then(documentSnapshot => {
+                    if (documentSnapshot?.exists) {
+                      if (
+                        documentSnapshot?.data()?.passcode?.passcode_enabled
+                      ) {
+                        setHavePasscode(true);
+                      } else {
+                        setHavePasscode(false);
+                      }
+                    }
+                  })
+                  .finally(() => {
+                    if (!isNull(havePasscode)) {
+                      if (havePasscode) {
+                        navigation?.navigate('passcodeVerify');
+                      } else {
+                        navigation?.navigate('home');
+                      }
+                    }
+                  });
+              } else {
+                navigation?.navigate('login');
+              }
+            } else {
+              navigation?.navigate('onboarding');
+            }
           }
         }
-        if (SplashScreenTimerTask == null) {
-          SplashScreenTimerTask = setTimeout(() => {
-            if (updateVersion !== null) {
-              if (updateAvailable) {
-                handleModalShow();
-              } else {
-                if (isViewPagerCompleted()) {
-                  if (auth()?.currentUser !== null) {
-                    firestore()
-                      .collection('users')
-                      .doc(auth()?.currentUser?.uid)
-                      .get()
-                      .then(documentSnapshot => {
-                        if (documentSnapshot?.exists) {
-                          if (
-                            documentSnapshot?.data()?.passcode?.passcode_enabled
-                          ) {
-                            setHavePasscode(true);
-                          } else {
-                            setHavePasscode(false);
-                          }
-                        }
-                      })
-                      .finally(() => {
-                        if (!isNull(havePasscode)) {
-                          if (havePasscode) {
-                            navigation?.navigate('passcodeVerify');
-                          } else {
-                            navigation?.navigate('home');
-                          }
-                        }
-                      });
-                  } else {
-                    navigation?.navigate('login');
-                  }
-                } else {
-                  navigation?.navigate('onboarding');
-                }
-              }
-            }
-          }, 2000);
-        }
       });
-    return () => {
-      clearTimeout(SplashScreenTimerTask);
-    };
+    return () => {};
   }, [
     currentAppVersion,
     handleModalShow,
     havePasscode,
     navigation,
-    updateAvailable,
     updateVersion,
   ]);
 
