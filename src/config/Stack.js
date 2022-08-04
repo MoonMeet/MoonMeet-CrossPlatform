@@ -325,7 +325,12 @@ const StackNavigator = () => {
         <Stack.Screen
           name={'userProfile'}
           component={UserProfileScreen}
-          options={{gestureEnabled: false, headerShown: false}}
+          options={{
+            headerTitle: '',
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
         />
         <Stack.Screen
           name={'darkMode'}
