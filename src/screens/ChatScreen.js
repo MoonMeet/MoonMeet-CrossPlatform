@@ -361,7 +361,10 @@ const ChatScreen = () => {
             rippleColor={COLORS.rippleColor}
             borderless={false}
             onPress={() => {
-              navigation?.navigate('userProfile', {uid: userUID});
+              navigation?.navigate('userProfile', {
+                uid: userUID,
+                cameFrom: 'chats',
+              });
             }}>
             <Avatar.Icon
               icon={<MaterialIcons name="home" />}
