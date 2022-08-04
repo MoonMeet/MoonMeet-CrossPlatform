@@ -59,7 +59,7 @@ const AddBioScreen = () => {
   }, []);
 
   const hasMoreLength = () => {
-    return BioText.length > 71;
+    return BioText?.trim()?.length > 50;
   };
 
   function pushBio() {
@@ -151,7 +151,7 @@ const AddBioScreen = () => {
         will see this text.
       </HelperText>
       <HelperText type="error" visible={hasMoreLength()}>
-        Bio text must be less or equal 70 characters.
+        Bio text must be less or equal 50 characters.
       </HelperText>
       <FAB
         style={styles.fab}
