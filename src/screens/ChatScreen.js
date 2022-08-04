@@ -404,12 +404,6 @@ const ChatScreen = () => {
               }}>
               Getting Messages, Hang on
             </Text>
-            <Spacer height={heightPercentageToDP(2)} />
-            <ActivityIndicator
-              size={'large'}
-              color={COLORS.accentLight}
-              animating={true}
-            />
           </View>
         )}
         showAvatarForEveryMessage={false}
