@@ -107,7 +107,7 @@ const UserProfileScreen = () => {
                 onPress={() => {
                   navigation?.navigate('chat', {item: userUID});
                 }}>
-                <MaterialIcons name="chat" size={16} color={COLORS.white} />
+                <MaterialIcons name="chat" size={18} color={COLORS.white} />
               </Pressable>
             ) : (
               <></>
