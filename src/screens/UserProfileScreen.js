@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Image, StyleSheet} from 'react-native';
+import {Image, Pressable, StatusBar, StyleSheet} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {Text, View} from 'react-native';
@@ -8,29 +8,34 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import {ScrollView} from 'react-native-gesture-handler';
 import {PurpleBackground} from '../index.d';
-import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../config/Dimensions';
+import {fontValue} from '../config/Dimensions';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import Spacer from '../components/Spacer/Spacer';
+import ViewItem from '../components/UserProfileScreen/ViewItem';
+import ViewItemTitle from '../components/UserProfileScreen/ViewItemTitle';
+import Clipboard from '@react-native-clipboard/clipboard';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import ImageView from 'react-native-image-viewing';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
   const stackRoute = useRoute();
   const userUID = useMemo(() => stackRoute?.params?.uid, []);
+  const cameFrom = useMemo(() => stackRoute?.params?.cameFrom, []);
 
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [avatarURL, setAvatarURL] = React.useState('');
   const [bioText, setBioText] = React.useState('');
   const [joinedDate, setJoinedDate] = React.useState();
-  const [username, setUsername] = React.useState('');
+  const [usernameText, setUsername] = React.useState('');
   const [phoneNumber, setPhoneNumber] = React.useState('');
   const [activeStatus, setActiveStatus] = React.useState('');
   const [activeTime, setActiveTime] = React.useState();
   const [phoneNumberStatus, setPhoneNumberStatus] = React.useState('');
+
   const [loading, setLoading] = React.useState(true);
+  const [imageViewVisible, setImageViewVisible] = React.useState(false);
 
   useEffect(() => {
     firestore()
@@ -74,84 +79,178 @@ const UserProfileScreen = () => {
   }
 
   return (
-    <MiniBaseView>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled={true}>
-        <View style={{alignSelf: 'center'}}>
-          <View style={styles.profileImage}>
-            <Image
-              source={avatarURL ? {uri: avatarURL} : PurpleBackground}
+    <>
+      <StatusBar
+        backgroundColor={
+          imageViewVisible ? COLORS.primaryDark : COLORS.primaryLight
+        }
+        animated={true}
+        barStyle={imageViewVisible ? 'light-content' : 'dark-content'}
+      />
+      <MiniBaseView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}>
+          <View style={{alignSelf: 'center'}}>
+            <Pressable
               style={styles.profileImage}
-              resizeMode="contain"
+              onPress={() => setImageViewVisible(true)}>
+              <Image
+                source={avatarURL ? {uri: avatarURL} : PurpleBackground}
+                style={styles.profileImage}
+                resizeMode="contain"
+              />
+            </Pressable>
+            {cameFrom === 'others' ? (
+              <Pressable
+                style={styles.add}
+                onPress={() => {
+                  navigation?.navigate('chat', {item: userUID});
+                }}>
+                <MaterialIcons name="chat" size={16} color={COLORS.white} />
+              </Pressable>
+            ) : (
+              <></>
+            )}
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text
+              style={[
+                styles.text,
+                {fontWeight: '200', fontSize: fontValue(34)},
+              ]}>
+              {`${firstName}${' '}${lastName}`}
+            </Text>
+            <Text
+              style={[
+                styles.text,
+                {color: COLORS.black, opacity: 0.4, fontSize: fontValue(14)},
+              ]}>
+              {activeStatus === 'normal'
+                ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                    activeTime >
+                  8640000
+                  ? `active on ${moment(activeTime)?.format(
+                      'YYYY MMMM DD - hh:mm A',
+                    )}`
+                  : `last seen on ${moment(activeTime)?.format('hh:mm A')}`
+                : 'Last seen recently'}
+            </Text>
+          </View>
+          <Spacer />
+          <ViewItemTitle titleItem={'Info'} />
+          {bioText ? (
+            <ViewItem
+              withDivider
+              enableDescription={true}
+              descriptionColor={COLORS.black}
+              descriptionText={bioText}
+              rippleColor={COLORS.rippleColor}
+              titleColor={COLORS.accentLight}
+              titleText={'Biography'}
+              onLongPressTrigger={() => {
+                Clipboard.setString(bioText);
+                InfoToast(
+                  'bottom',
+                  'Biography copied!',
+                  `${firstName}${' '}${lastName}'s biography has been copied to Clipboard.`,
+                );
+              }}
             />
-          </View>
-
-          {/*<View style={styles.active} />*/}
-          <View style={styles.add}>
-            <MaterialIcons name="chat" size={24} color={COLORS.white} />
-          </View>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <Text
-            style={[styles.text, {fontWeight: '200', fontSize: fontValue(34)}]}>
-            {`${firstName}${' '}${lastName}`}
-          </Text>
-          <Text
-            style={[
-              styles.text,
-              {color: COLORS.black, opacity: 0.4, fontSize: fontValue(14)},
-            ]}>
-            {activeStatus === 'normal'
-              ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                  activeTime >
-                8640000
-                ? `active on ${moment(activeTime)?.format(
-                    'YYYY MMMM DD - hh:mm A',
-                  )}`
-                : `last seen on ${moment(activeTime)?.format('hh:mm A')}`
-              : 'Last seen recently'}
-          </Text>
-        </View>
-      </ScrollView>
-    </MiniBaseView>
+          ) : (
+            <></>
+          )}
+          <ViewItem
+            withDivider
+            enableDescription={true}
+            descriptionColor={COLORS.black}
+            descriptionText={
+              phoneNumberStatus === 'none' ? phoneNumber : 'Unknown'
+            }
+            rippleColor={COLORS.rippleColor}
+            titleColor={COLORS.accentLight}
+            titleText={'Phone number'}
+            onLongPressTrigger={() => {
+              if (phoneNumberStatus === 'none') {
+                Clipboard.setString(phoneNumber);
+                InfoToast(
+                  'bottom',
+                  'Number copied!',
+                  `${firstName}${' '}${lastName}'s number has been copied to Clipboard.`,
+                );
+              }
+            }}
+          />
+          <ViewItem
+            withDivider
+            enableDescription={true}
+            descriptionColor={COLORS.black}
+            descriptionText={usernameText}
+            rippleColor={COLORS.rippleColor}
+            titleColor={COLORS.accentLight}
+            titleText={'Username'}
+            onLongPressTrigger={() => {
+              Clipboard.setString(usernameText);
+              InfoToast(
+                'bottom',
+                'username copied!',
+                `${firstName}${' '}${lastName}'s username has been copied to Clipboard.`,
+              );
+            }}
+          />
+          <ViewItem
+            withDivider
+            enableDescription={true}
+            descriptionColor={COLORS.black}
+            descriptionText={`${firstName} ${lastName} have a hand since ${moment(
+              joinedDate,
+            )?.format('YYYY MMMM MM')}`}
+            rippleColor={COLORS.rippleColor}
+            titleColor={COLORS.accentLight}
+            titleText={'Joined date'}
+            onLongPressTrigger={() => {
+              Clipboard.setString(usernameText);
+              InfoToast(
+                'bottom',
+                'username copied!',
+                `${firstName}${' '}${lastName}'s username has been copied to Clipboard.`,
+              );
+            }}
+          />
+        </ScrollView>
+        <ImageView
+          images={[{uri: avatarURL}]}
+          imageIndex={0}
+          visible={imageViewVisible}
+          animationType={'slide'}
+          onRequestClose={() => setImageViewVisible(false)}
+          presentationStyle={'fullScreen'}
+        />
+      </MiniBaseView>
+    </>
   );
 };
+
 const styles = StyleSheet.create({
   text: {
     fontFamily: FONTS.regular,
     color: COLORS.black,
   },
-  image: {
-    flex: 1,
-    height: undefined,
-    width: undefined,
-  },
   profileImage: {
-    width: 200 - 0.1 * 200,
-    height: 200 - 0.1 * 200,
+    width: 150 - 0.1 * 150,
+    height: 150 - 0.1 * 150,
     borderRadius: 100,
     overflow: 'hidden',
   },
-  active: {
-    backgroundColor: '#34FFB9',
-    position: 'absolute',
-    bottom: heightPercentageToDP(3),
-    left: widthPercentageToDP(2.25),
-    padding: heightPercentageToDP(1),
-    height: heightPercentageToDP(2),
-    width: widthPercentageToDP(2),
-    borderRadius: 20,
-  },
   add: {
-    backgroundColor: '#41444B',
+    backgroundColor: COLORS.black,
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: widthPercentageToDP(11),
-    height: heightPercentageToDP(5),
-    borderRadius: 30,
+    bottom: 5 - 0.1 * 5,
+    right: 5 - 0.1 * 5,
+    width: 35,
+    height: 35,
+    borderRadius: 360,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -160,25 +259,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16 - 0.1 * 16,
   },
-  recent: {
-    marginLeft: 78 - 0.1 * 78,
-    marginTop: 32,
-    marginBottom: 6,
-    fontSize: 10,
-  },
-  recentItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  activityIndicator: {
-    backgroundColor: '#CABFAB',
-    padding: 4,
-    height: 12,
-    width: 12,
-    borderRadius: 6,
-    marginTop: 3,
-    marginRight: 20,
-  },
 });
+
 export default UserProfileScreen;
