@@ -44,31 +44,27 @@ const UserProfileScreen = () => {
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
-          if (
-            documentSnapshot?.data()?.avatar &&
-            documentSnapshot?.data()?.first_name &&
-            documentSnapshot?.data()?.last_name
-          ) {
-            setFirstName(documentSnapshot?.data()?.first_name);
-            setLastName(documentSnapshot?.data()?.last_name);
-            setAvatarURL(documentSnapshot?.data()?.avatar);
-            setUsername(documentSnapshot?.data()?.username);
-            setPhoneNumber(documentSnapshot?.data()?.phone_number);
-            setPhoneNumberStatus(documentSnapshot?.data()?.phone_status);
-            setActiveStatus(documentSnapshot?.data()?.active_status);
+          setFirstName(documentSnapshot?.data()?.first_name);
+          setLastName(documentSnapshot?.data()?.last_name);
+          setAvatarURL(documentSnapshot?.data()?.avatar);
+          setUsername(documentSnapshot?.data()?.username);
+          setPhoneNumber(documentSnapshot?.data()?.phone_number);
+          setPhoneNumberStatus(documentSnapshot?.data()?.phone_status);
+          setActiveStatus(documentSnapshot?.data()?.active_status);
+          if (documentSnapshot?.data()?.active_time === 'Last seen recently') {
+            setActiveTime(documentSnapshot?.data()?.active_time);
+          } else {
             setActiveTime(documentSnapshot?.data()?.active_time?.toDate());
-            if (documentSnapshot?.data()?.bio) {
-              setBioText(documentSnapshot?.data()?.bio);
-            }
-            if (documentSnapshot?.data()?.created_At) {
-              setJoinedDate(documentSnapshot?.data()?.created_At?.toDate());
-            } else {
-              setJoinedDate(
-                documentSnapshot?.data()?.info?.created_At?.toDate(),
-              );
-            }
-            setLoading(false);
           }
+          if (documentSnapshot?.data()?.bio) {
+            setBioText(documentSnapshot?.data()?.bio);
+          }
+          if (documentSnapshot?.data()?.created_At) {
+            setJoinedDate(documentSnapshot?.data()?.created_At?.toDate());
+          } else {
+            setJoinedDate(documentSnapshot?.data()?.info?.created_At?.toDate());
+          }
+          setLoading(false);
         }
       });
     return () => {};
