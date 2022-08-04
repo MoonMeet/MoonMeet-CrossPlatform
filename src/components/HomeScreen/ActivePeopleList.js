@@ -28,7 +28,10 @@ const ActivePeopleList = ({ListData}) => {
         style={styles.container}
         onPress={() => {
           if (item?.uid !== auth()?.currentUser?.uid) {
-            navigation.navigate('userProfile', {uid: item?.uid});
+            navigation.navigate('userProfile', {
+              uid: item?.uid,
+              cameFrom: 'others',
+            });
           }
         }}
         onLongPress={() => {
