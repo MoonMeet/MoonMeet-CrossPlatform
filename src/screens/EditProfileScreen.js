@@ -29,10 +29,12 @@ import {heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {PurpleBackground} from '../index.d';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 const EditProfileScreen = () => {
   const pickerRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
+  const {dismissAll} = useBottomSheetModal();
 
   const handlePresentModal = useCallback(() => {
     Keyboard.dismiss();
@@ -97,11 +99,11 @@ const EditProfileScreen = () => {
   }, []);
 
   const firstnameHasLessLength = () => {
-    return firstName.length < 3;
+    return firstName?.trim()?.length < 1;
   };
 
   const lastnameHasLessLength = () => {
-    return lastName.length < 3;
+    return lastName?.trim()?.length < 1;
   };
 
   async function pushUserData() {
@@ -225,7 +227,7 @@ const EditProfileScreen = () => {
   return (
     <BaseView>
       <Spacer height={heightPercentageToDP(0.5)} />
-      <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
+      <Pressable style={{flex: 1}} onPress={() => dismissAll()}>
         <Pressable
           onLongPress={() => {
             if (UserPhoto) {
@@ -282,7 +284,7 @@ const EditProfileScreen = () => {
               paddingLeft: '2%',
             }}
             mode="outlined"
-            label="First Name"
+            label="First name"
             multiline={false}
             value={firstName}
             onFocus={handleCloseModal}
@@ -303,7 +305,7 @@ const EditProfileScreen = () => {
           />
           {firstnameHasLessLength() ? (
             <HelperText type="error" visible={firstnameHasLessLength()}>
-              First Name must be longer than 2 characters.
+              First name must be longer or equal to 1 character.
             </HelperText>
           ) : null}
           <TextInput
@@ -334,7 +336,7 @@ const EditProfileScreen = () => {
           />
           {lastnameHasLessLength() ? (
             <HelperText type="error" visible={lastnameHasLessLength()}>
-              Last Name must be longer than 2 characters.
+              Last name must be longer or equal to 1 character.
             </HelperText>
           ) : null}
         </View>
@@ -378,7 +380,7 @@ const EditProfileScreen = () => {
           }}
           onPress={() => {
             if (isConnected) {
-              if (!firstnameHasLessLength() && !firstnameHasLessLength()) {
+              if (!firstnameHasLessLength() && !lastnameHasLessLength()) {
                 if (
                   firstName === oldFirstname &&
                   lastName === oldLastname &&
@@ -401,8 +403,10 @@ const EditProfileScreen = () => {
               } else {
                 ErrorToast(
                   'bottom',
-                  'Invalid report message',
-                  'Report message must be between 20 and 240 characters',
+                  'Your name is too short',
+                  `${
+                    firstnameHasLessLength() ? 'First name' : 'Last name'
+                  } must be longer or equal to 1 characters.`,
                   true,
                   3000,
                 );
@@ -424,9 +428,9 @@ const EditProfileScreen = () => {
           snapPoints={sheetSnapPoints}
           onCameraPress={() => {
             openCamera()
-              .then(image => {
-                console.log(image);
+              .then(async image => {
                 setUserPhoto(image);
+                await dismissAll();
               })
               .catch(e => {
                 setLoaderVisible(false);
@@ -435,8 +439,9 @@ const EditProfileScreen = () => {
           }}
           onFilePicker={() => {
             openImagePicker()
-              .then(image => {
+              .then(async image => {
                 setUserPhoto(image);
+                await dismissAll();
               })
               .catch(e => {
                 setLoaderVisible(false);
