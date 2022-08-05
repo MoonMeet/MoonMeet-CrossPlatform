@@ -29,6 +29,7 @@ ios/.xcode.env.local
 #
 .idea
 .gradle
+android/app/google-services.json
 local.properties
 *.iml
 
