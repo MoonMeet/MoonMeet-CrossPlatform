@@ -1,22 +1,20 @@
 ### MoonMeet CrossPlatform
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
-<img src="https://img.shields.io/github/last-commit/MoonMeet/MoonMeet-CrossPlatform" />
 <img src="https://img.shields.io/badge/license-GPL-blue.svg" />
 <img src="https://visitor-badge.laobi.icu/badge?page_id=MoonMeet.MoonMeet-CrossPlatform" />
 <img  src="https://img.shields.io/github/issues/MoonMeet/MoonMeet-CrossPlatform?color=0088ff" />
-<img  src="https://img.shields.io/github/issues-pr/MoonMeet/MoonMeet-CrossPlatform?color=0088ff?color=0088ff" />
 </p>
-- A new era of chatting and meeting people !
+- We give people the closest distances
 
 ### Description
 - **Moon Meet** is a social media platform including chatting feature.
-- **Moon Meet** is a platform formed with Mobile Android App & Website.
-- **Moon Meet** is an Open Source Project licensed under the GNU GPL License 2.0.
+- **Moon Meet** is a platform formed with Mobile Android App.
+- **Moon Meet** is licensed under the GNU GPL License 3.0.
 - **Moon Meet** is an Open Source Project means that anyone can see, change, get the source code and can contribute to make this project more better.
-- **Moon Meet** nothing with its contributors, so let's contribute together to make it Alive !
+- **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
-### Commit message
+### Commit message (Optional sometimes)
 When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that *commit*.
 
 You should read these guidelines:
@@ -43,7 +41,7 @@ And that summarized:
 Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
 ### Social
-- [Facebook](https://www.facebook.com/moonmeet.inc)
+- [Facebook](https://www.facebook.com/moonmeetofficial)
 - [Telegram](https://t.me/MoonMeet)
 
 ### License
