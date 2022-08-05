@@ -40,10 +40,12 @@
 -dontwarn com.facebook.react.**
 -keep class com.facebook.**
 
+# Hermes
+
 -keep class com.facebook.hermes.unicode.** { *; }
 -keep class com.facebook.jni.** { *; }
 
-# okhttp
+# Okhttp3
 
 -keepattributes Signature
 -keepattributes *Annotation*
@@ -51,17 +53,17 @@
 -keep interface com.squareup.okhttp.** { *; }
 -dontwarn com.squareup.okhttp.**
 
-# okio
+# Okio
 
 -keep class sun.misc.Unsafe { *; }
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.*
 -dontwarn okio.**
 
-# stetho
+# Stetho
 
 -dontwarn com.facebook.stetho.**
 
-# slf4j
+# Slf4j
 
 -dontwarn org.slf4j.impl.StaticLoggerBinder
