@@ -268,7 +268,7 @@ const StackNavigator = () => {
           name={'addStory'}
           component={AddStoryScreen}
           options={{
-            headerShown: false,
+            headerShown: true,
             headerTitle: 'Add Story',
             headerTitleStyle: {
               fontFamily: FONTS.regular,
@@ -283,7 +283,12 @@ const StackNavigator = () => {
         <Stack.Screen
           name={'chat'}
           component={ChatScreen}
-          options={{gestureEnabled: false, headerShown: false}}
+          options={{
+            headerShown: true,
+            headerBackTitleVisible: true,
+            headerShadowVisible: false,
+            headerTintColor: COLORS.black,
+          }}
         />
         <Stack.Screen
           name={'chatSettings'}
