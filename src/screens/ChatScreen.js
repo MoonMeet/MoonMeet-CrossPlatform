@@ -1,8 +1,19 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect} from 'react';
-import {Dimensions, StyleSheet, Text, View} from 'react-native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {
+  Dimensions,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {
   Actions,
   GiftedChat,
@@ -28,16 +39,24 @@ import storage from '@react-native-firebase/storage';
 import getRandomString from '../utils/generators/getRandomString';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {bytesToSize} from '../utils/converters/bytesToSize';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcons from 'react-native-vector-icons/FontAwesome5';
 import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
 import {reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
+import moment from 'moment';
+import ImageView from 'react-native-image-viewing';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
-  const destinedUser = useRoute()?.params?.item;
+  const stackRoute = useRoute();
+  navigation?.setOptions({
+    headerTitle: props => <ChatTitle {...props} />,
+  });
+  const destinedUser = useMemo(() => stackRoute?.params?.item, []);
+
+  const [imageViewVisible, setImageViewVisible] = React.useState(false);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
@@ -46,7 +65,8 @@ const ChatScreen = () => {
   const [userFirstName, setUserFirstName] = React.useState('');
   const [userLastName, setUserLastName] = React.useState('');
   const [userAvatar, setUserAvatar] = React.useState('');
-  const [You, setYou] = React.useState('');
+  const [userActiveStatus, setUserActiveStatus] = React.useState('');
+  const [userActiveTime, setUserActiveTime] = React.useState('');
 
   /**
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
@@ -56,7 +76,6 @@ const ChatScreen = () => {
   const [myFirstName, setMyFirstName] = React.useState('');
   const [myLastName, setMyLastName] = React.useState('');
   const [myAvatar, setMyAvatar] = React.useState('');
-  const [Me, setMe] = React.useState('');
   /**
    * Message Variables
    */
@@ -88,6 +107,13 @@ const ChatScreen = () => {
             setUserFirstName(userSnapshot?.data()?.first_name);
             setUserLastName(userSnapshot?.data()?.last_name);
             setUserAvatar(userSnapshot?.data()?.avatar);
+            setUserActiveStatus(userSnapshot?.data()?.active_status);
+
+            if (userSnapshot?.data()?.active_time === 'Last seen recently') {
+              setUserActiveTime(userSnapshot?.data()?.active_time);
+            } else {
+              setUserActiveTime(userSnapshot?.data()?.active_time?.toDate());
+            }
           }
         }
       });
@@ -134,6 +160,62 @@ const ChatScreen = () => {
       messagesSubscribe();
     };
   }, [destinedUser]);
+
+  function ChatTitle() {
+    return (
+      <Pressable
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          marginLeft: -10 - 0.1 * -10,
+        }}>
+        <Avatar.Image
+          source={userAvatar ? {uri: userAvatar} : PurpleBackground}
+          size={38}
+          style={{
+            alignSelf: 'center',
+          }}
+          theme={{
+            colors: {
+              primary: COLORS.rippleColor,
+            },
+          }}
+        />
+        <View style={{flexDirection: 'column', marginLeft: 5 - 0.1 * 5}}>
+          <Text
+            adjustsFontSizeToFit
+            numberOfLines={1}
+            style={{
+              fontSize: fontValue(16),
+              fontFamily: FONTS.regular,
+              color: COLORS.black,
+              opacity: 0.9,
+            }}>
+            {`${userFirstName}${' '}${userLastName}`}
+          </Text>
+          <Text
+            adjustsFontSizeToFit
+            numberOfLines={1}
+            style={{
+              fontSize: fontValue(14),
+              fontFamily: FONTS.regular,
+              color: COLORS.black,
+              opacity: 0.4,
+            }}>
+            {userActiveStatus === 'normal'
+              ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                  userActiveTime >
+                8640000
+                ? `last seen on ${moment(userActiveTime)?.format(
+                    'YYYY MMMM DD',
+                  )}`
+                : `last seen on ${moment(userActiveTime)?.format('HH:MM A')}`
+              : 'Last seen recently'}
+          </Text>
+        </View>
+      </Pressable>
+    );
+  }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sendMessage = useCallback((mChatData = [], image) => {
@@ -323,294 +405,201 @@ const ChatScreen = () => {
   });
 
   return (
-    <BaseView>
-      <View style={styles.toolbar}>
-        <View style={styles.left_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation?.goBack();
-            }}>
-            <Avatar.Icon
-              icon={BackImage}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-          <Avatar.Image
-            size={40}
-            source={userAvatar ? {uri: userAvatar} : PurpleBackground}
-          />
-          <Text style={styles.userFullName}>
-            {userFirstName} {userLastName}
-          </Text>
-        </View>
-        <View style={styles.right_side}>
-          <TouchableRipple
-            rippleColor={COLORS.rippleColor}
-            borderless={false}
-            onPress={() => {
-              navigation?.navigate('userProfile', {
-                uid: userUID,
-                cameFrom: 'chats',
-              });
-            }}>
-            <Avatar.Icon
-              icon={<MaterialIcons name="home" />}
-              size={37.5}
-              color={COLORS.black}
-              style={{
-                overflow: 'hidden',
-                marginRight: '-1%',
-                opacity: 0.4,
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-          </TouchableRipple>
-        </View>
-      </View>
-      <View
-        style={{
-          width: '100%',
-          height: heightPercentageToDP(0.125),
-          backgroundColor: COLORS.controlNormal,
-        }}
+    <>
+      <StatusBar
+        backgroundColor={
+          imageViewVisible ? COLORS.primaryDark : COLORS.primaryLight
+        }
+        animated={true}
+        barStyle={imageViewVisible ? 'light-content' : 'dark-content'}
       />
-      <GiftedChat
-        text={mMessageText}
-        isLoadingEarlier={isLoading}
-        messageIdGenerator={() => uuidv4()}
-        renderLoading={() => (
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text
-              style={{
-                fontSize: fontValue(14),
-                textAlign: 'center',
-                color: COLORS.black,
-                opacity: 0.4,
-                fontFamily: FONTS.regular,
-              }}>
-              Getting Messages, Hang on
-            </Text>
-          </View>
-        )}
-        showAvatarForEveryMessage={false}
-        showUserAvatar={false}
-        onInputTextChanged={text => setMessageText(text)}
-        messages={mChatData}
-        renderMessageImage={props => {
-          return (
-            <MessageImage
-              {...props}
-              containerStyle={{
-                ...props.containerStyle,
-              }}
-              imageStyle={{
-                width: widthPercentageToDP(50),
-                height: heightPercentageToDP(20),
-                borderRadius: 13,
-                margin: 3,
-                resizeMode: 'cover',
-              }}
-            />
-          );
-        }}
-        renderMessageText={props => {
-          return (
-            <MessageText
-              {...props}
-              textStyle={{
-                left: {color: COLORS.black},
-                right: {color: COLORS.white},
-              }}
-            />
-          );
-        }}
-        renderBubble={props => {
-          return (
-            <Bubble
-              {...props}
-              wrapperStyle={{
-                right: {
-                  backgroundColor: COLORS.accentLight,
-                },
-                left: {
-                  backgroundColor: COLORS.chats.leftBubble,
-                },
-              }}
-            />
-          );
-        }}
-        renderInputToolbar={props => <MoonInputToolbar {...props} />}
-        renderComposer={props => <Composer {...props} />}
-        renderSend={props => {
-          return (
-            <Send {...props}>
-              <MaterialIcons
-                name="send"
-                color={COLORS.darkGrey}
-                size={26}
+      <BaseView>
+        <GiftedChat
+          text={mMessageText}
+          isLoadingEarlier={isLoading}
+          messageIdGenerator={() => uuidv4()}
+          renderLoading={() => (
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <Text
                 style={{
-                  right: widthPercentageToDP(0.125),
-                  bottom: heightPercentageToDP(1),
+                  fontSize: fontValue(14),
+                  textAlign: 'center',
+                  color: COLORS.black,
+                  opacity: 0.4,
+                  fontFamily: FONTS.regular,
+                }}>
+                Getting Messages, Hang on
+              </Text>
+            </View>
+          )}
+          showAvatarForEveryMessage={false}
+          showUserAvatar={false}
+          onInputTextChanged={text => setMessageText(text)}
+          messages={mChatData}
+          renderMessageImage={props => {
+            return (
+              <MessageImage
+                {...props}
+                containerStyle={{
+                  ...props.containerStyle,
+                }}
+                imageStyle={{
+                  width: widthPercentageToDP(50),
+                  height: heightPercentageToDP(20),
+                  borderRadius: 13,
+                  margin: 3,
+                  resizeMode: 'cover',
                 }}
               />
-            </Send>
-          );
-        }}
-        onSend={messages => {
-          sendMessage(messages, '');
-          setMessageText('');
-        }}
-        renderActions={props => {
-          return (
-            <Actions
-              {...props}
-              options={{
-                ['Open Emoji Keyboard']: props => {
-                  setIsOpen(true);
-                },
-                ['Open Camera']: props => {
-                  ImagePicker.openCamera({
-                    height: 1024,
-                    width: 1024,
-                    cropper: false,
-                  })
-                    .then(async image => {
-                      const compressingResult = await Image.compress(
-                        image?.path,
-                        {
-                          compressionMethod: 'auto',
-                        },
-                      );
-                      sendMessage([], compressingResult);
-                    })
-                    .catch(() => {});
-                },
-                ['Pick Image']: props => {
-                  ImagePicker.openPicker({
-                    height: 1024,
-                    width: 1024,
-                    cropper: false,
-                  })
-                    .then(async image => {
-                      const compressingResult = await Image.compress(
-                        image?.path,
-                        {
-                          compressionMethod: 'auto',
-                        },
-                      );
-                      sendMessage([], compressingResult);
-                    })
-                    .catch(() => {});
-                },
-                ['Cancel']: props => {
-                  // DO NOTHING.
-                },
-              }}
-              icon={() => (
+            );
+          }}
+          renderMessageText={props => {
+            return (
+              <MessageText
+                {...props}
+                textStyle={{
+                  left: {color: COLORS.black},
+                  right: {color: COLORS.white},
+                }}
+              />
+            );
+          }}
+          renderBubble={props => {
+            return (
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  right: {
+                    backgroundColor: COLORS.accentLight,
+                  },
+                  left: {
+                    backgroundColor: COLORS.chats.leftBubble,
+                  },
+                }}
+              />
+            );
+          }}
+          renderInputToolbar={props => <MoonInputToolbar {...props} />}
+          renderComposer={props => <Composer {...props} />}
+          parsePatterns={linkStyle => [
+            {
+              pattern: /#(\w+)/,
+              style: {...linkStyle, color: COLORS.yellowLightWarning},
+              onPress: this.onPressHashtag,
+            },
+          ]}
+          onPressAvatar={() => {
+            setImageViewVisible(true);
+          }}
+          maxInputLength={1500}
+          renderSend={props => {
+            return (
+              <Send {...props} sendButtonProps={{hitSlop: 15}}>
                 <MaterialIcons
-                  name={'add'}
-                  size={28}
-                  color={COLORS.black}
+                  name="telegram-plane"
+                  color={COLORS.darkGrey}
+                  size={26}
                   style={{
-                    left: widthPercentageToDP(0.125),
-                    bottom: heightPercentageToDP(0.125),
-                    opacity: 0.4,
+                    margin: 3 - 0.1 * 3,
+                    right: widthPercentageToDP(0.125),
+                    bottom: heightPercentageToDP(1),
                   }}
                 />
-              )}
-              optionTintColor={COLORS.black}
-            />
-          );
-        }}
-        user={{
-          _id: auth()?.currentUser?.uid,
-          avatar: myAvatar,
-          name: myFirstName + ' ' + myLastName,
-        }}
-        scrollToBottom
-      />
-      <EmojiPicker
-        onEmojiSelected={handlePick}
-        open={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
-    </BaseView>
+              </Send>
+            );
+          }}
+          onSend={messages => {
+            sendMessage(messages, '');
+            setMessageText('');
+          }}
+          renderActions={props => {
+            return (
+              <Actions
+                {...props}
+                options={{
+                  ['Open Emoji Keyboard']: props => {
+                    setIsOpen(true);
+                  },
+                  ['Open Camera']: props => {
+                    ImagePicker.openCamera({
+                      height: 1024,
+                      width: 1024,
+                      cropper: false,
+                    })
+                      .then(async image => {
+                        const compressingResult = await Image.compress(
+                          image?.path,
+                          {
+                            compressionMethod: 'auto',
+                          },
+                        );
+                        sendMessage([], compressingResult);
+                      })
+                      .catch(() => {});
+                  },
+                  ['Pick Image']: props => {
+                    ImagePicker.openPicker({
+                      height: 1024,
+                      width: 1024,
+                      cropper: false,
+                    })
+                      .then(async image => {
+                        const compressingResult = await Image.compress(
+                          image?.path,
+                          {
+                            compressionMethod: 'auto',
+                          },
+                        );
+                        sendMessage([], compressingResult);
+                      })
+                      .catch(() => {});
+                  },
+                  ['Cancel']: props => {
+                    // DO NOTHING.
+                  },
+                }}
+                icon={() => (
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <MaterialIcons
+                      name={'plus'}
+                      size={20}
+                      color={COLORS.black}
+                      light
+                      style={{
+                        top: 2.5 - 0.1 * 2.5,
+                        opacity: 0.4,
+                      }}
+                    />
+                  </View>
+                )}
+                optionTintColor={COLORS.black}
+              />
+            );
+          }}
+          user={{
+            _id: auth()?.currentUser?.uid,
+            avatar: myAvatar,
+            name: myFirstName + ' ' + myLastName,
+          }}
+          scrollToBottom
+        />
+        <EmojiPicker
+          onEmojiSelected={handlePick}
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+        <ImageView
+          images={[{uri: userAvatar}]}
+          imageIndex={0}
+          visible={imageViewVisible}
+          animationType={'slide'}
+          onRequestClose={() => setImageViewVisible(false)}
+          presentationStyle={'fullScreen'}
+        />
+      </BaseView>
+    </>
   );
 };
-const styles = StyleSheet.create({
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  userFullName: {
-    fontSize: fontValue(16),
-    paddingLeft: heightPercentageToDP(1),
-    textAlign: 'left',
-    color: COLORS.black,
-    opacity: 0.4,
-    fontFamily: FONTS.regular,
-  },
-  emptyHolderHeaderText: {
-    fontSize: fontValue(14),
-    textAlign: 'center',
-    color: COLORS.black,
-    opacity: 0.6,
-    fontFamily: FONTS.regular,
-  },
-  emptyHolderSubText: {
-    fontSize: fontValue(13.5),
-    paddingTop: '2%',
-    textAlign: 'center',
-    color: COLORS.black,
-    opacity: 0.4,
-    fontFamily: FONTS.regular,
-  },
-  messageInputBox: {
-    flexDirection: 'row',
-    borderRadius: 20,
-    backgroundColor: COLORS.rippleColor,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    width: (Dimensions.get('window').width / 100) * 93.37,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  right_side: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-});
+const styles = StyleSheet.create({undefined});
 export default ChatScreen;
