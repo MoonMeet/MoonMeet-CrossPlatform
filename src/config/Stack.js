@@ -269,7 +269,7 @@ const StackNavigator = () => {
           component={AddStoryScreen}
           options={{
             headerShown: true,
-            headerTitle: 'Add Story',
+            headerTitle: 'Add story',
             headerTitleStyle: {
               fontFamily: FONTS.regular,
               fontSize: fontValue(20.5),
