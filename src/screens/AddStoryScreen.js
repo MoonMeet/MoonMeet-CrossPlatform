@@ -3,7 +3,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import {
   BackHandler,
   Image,
@@ -49,7 +49,7 @@ const AddStoryScreen = () => {
   }, []);
 
   const handleCloseModal = useCallback(() => {
-    Keyboard.pickerRef?.current?.close();
+    Keyboard.dismiss();
     pickerRef?.current?.forceClose();
   }, []);
 
@@ -73,14 +73,14 @@ const AddStoryScreen = () => {
     setSecondStoryTextInput(_secondStoryText);
 
   const secondTextInputHasLessLength = () => {
-    return StoryTextInput.length < 1;
+    return StoryTextInput?.trim()?.length < 1;
   };
 
   const textInputHasLessLength = () => {
-    return StoryTextInput.length < 1;
+    return StoryTextInput?.trim()?.length < 1;
   };
 
-  const [Loading, setLoading] = React.useState(true);
+  const [Loading, setLoading] = React.useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -88,6 +88,9 @@ const AddStoryScreen = () => {
         if (hideMainScreen && userSelection) {
           setHideMainScreen(false);
           setUserSelection('');
+          navigation?.setOptions({
+            title: 'Add story',
+          });
           if (imageVisible) {
             setUserPhoto(null);
             setImageVisible(false);
@@ -119,6 +122,7 @@ const AddStoryScreen = () => {
       hideMainScreen,
       imageVisible,
       inputEnabledForImage,
+      navigation,
       userSelection,
     ]),
   );
@@ -169,7 +173,7 @@ const AddStoryScreen = () => {
       setLoading(!Loading);
       let _userStoryRef = `stories/${getRandomString(
         28,
-      )}.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+      )}.${UserPhoto.path?.substring(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
 
       const storageRef = storage().ref(_userStoryRef);
 
@@ -231,11 +235,21 @@ const AddStoryScreen = () => {
     }
   }
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
   const [UserPhoto, setUserPhoto] = React.useState(null);
+
+  if (!hideMainScreen) {
+    navigation?.setOptions({
+      headerTitle: 'Add story',
+    });
+  } else if (userSelection === 'text') {
+    navigation?.setOptions({
+      headerTitle: 'Text story',
+    });
+  } else {
+    navigation?.setOptions({
+      headerTitle: 'Image story',
+    });
+  }
 
   if (Loading) {
     return (
