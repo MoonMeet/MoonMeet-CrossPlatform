@@ -38,15 +38,15 @@ const VerifyPasscodeScreen = () => {
     setRecoveryTextInput(RePass);
   };
   const passwordHasLessLength = () => {
-    if (mRecoveryTextInput.length == 0) {
+    if (mRecoveryTextInput?.trim()?.length === 0) {
       return false;
     }
-    return mRecoveryTextInput.length < 3;
+    return mRecoveryTextInput?.trim()?.length < 3;
   };
 
   const checkCode = code => {
     if (code === mPINCode) {
-      navigation.navigate('home');
+      navigation?.navigate('home');
     } else {
       setErrorSnackbarText('Wrong PIN, Try again.');
       setErrorSnackBarVisible(!ErrorSnackBarVisible);
@@ -197,7 +197,7 @@ const VerifyPasscodeScreen = () => {
             },
           }}
           onPress={() => {
-            if (mRecoveryTextInput.length < 1) {
+            if (mRecoveryTextInput?.trim()?.length < 1) {
               setBottomMargin(heightPercentageToDP(7));
               setErrorSnackbarText('Please submit your recovery password');
               setErrorSnackBarVisible(!ErrorSnackBarVisible);
@@ -210,7 +210,7 @@ const VerifyPasscodeScreen = () => {
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
                 .update({
-                  passcode: firestore.FieldValue.delete(),
+                  passcode: firestore?.FieldValue?.delete(),
                 })
                 .finally(() => {
                   firestore()
@@ -222,7 +222,7 @@ const VerifyPasscodeScreen = () => {
                       },
                     })
                     .finally(() => {
-                      navigation.navigate('home');
+                      navigation?.navigate('home');
                       InfoToast(
                         'bottom',
                         'Passcode Removed',
@@ -282,7 +282,6 @@ const VerifyPasscodeScreen = () => {
             containerStyle={styles.TextInputContainer}
             textInputStyle={styles.RoundedTextInput}
             handleTextChange={code => {
-              console.log(code);
               if (code.length > 3) {
                 checkCode(code);
               }
@@ -318,6 +317,7 @@ const VerifyPasscodeScreen = () => {
     );
   }
 };
+
 const styles = StyleSheet.create({
   toolbar: {
     padding: heightPercentageToDP(0.5),
@@ -396,4 +396,5 @@ const styles = StyleSheet.create({
     };
   },
 });
+
 export default VerifyPasscodeScreen;
