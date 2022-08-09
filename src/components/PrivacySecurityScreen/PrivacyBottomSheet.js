@@ -45,7 +45,7 @@ const PrivacyBottomSheet = ({
     phoneNumberStatus === 'none' ? 'none' : 'hidden',
   );
 
-  const {dimsiss, dismissAll} = useBottomSheetModal();
+  const {dismissAll} = useBottomSheetModal();
 
   const renderBackdrop = useCallback(
     props => <BottomSheetBackdrop {...props} />,
@@ -85,16 +85,11 @@ const PrivacyBottomSheet = ({
       <RadioButton.Group
         onValueChange={phoneStatus => {
           setUserChoice(phoneStatus);
-          firestore()
-            .collection('users')
-            .doc(auth()?.currentUser?.uid)
-            .update({
-              phone_status: phoneStatus,
-            })
-            .then(() => {
-              dismissAll();
-              sheetRef?.current?.forceClose();
-            });
+          firestore().collection('users').doc(auth()?.currentUser?.uid).update({
+            phone_status: phoneStatus,
+          });
+          dismissAll();
+          sheetRef?.current?.forceClose();
         }}
         value={userChoice}>
         <RadioButton.Item
