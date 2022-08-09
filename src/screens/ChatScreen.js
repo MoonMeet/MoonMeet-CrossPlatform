@@ -1,19 +1,8 @@
+import React, {useCallback, useEffect, useMemo} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo} from 'react';
-import {
-  Dimensions,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {Pressable, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {
   Actions,
   GiftedChat,
@@ -23,11 +12,9 @@ import {
   MessageText,
   Composer,
 } from 'react-native-gifted-chat';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
+import {Avatar} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
-import BackImage from '../assets/images/back.png';
 import BaseView from '../components/BaseView/BaseView';
-import Spacer from '../components/Spacer/Spacer';
 import {
   fontValue,
   heightPercentageToDP,
@@ -50,10 +37,8 @@ import ImageView from 'react-native-image-viewing';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
+
   const stackRoute = useRoute();
-  navigation?.setOptions({
-    headerTitle: props => <ChatTitle {...props} />,
-  });
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
   const [imageViewVisible, setImageViewVisible] = React.useState(false);
@@ -92,6 +77,9 @@ const ChatScreen = () => {
   };
 
   useEffect(() => {
+    navigation?.setOptions({
+      headerTitle: props => <ChatTitle {...props} />,
+    });
     const userSubscribe = firestore()
       .collection('users')
       .doc(destinedUser)
@@ -159,9 +147,9 @@ const ChatScreen = () => {
       mySubscribe();
       messagesSubscribe();
     };
-  }, [destinedUser]);
+  }, [destinedUser, navigation]);
 
-  function ChatTitle() {
+  const ChatTitle = () => {
     return (
       <Pressable
         style={{
@@ -215,7 +203,7 @@ const ChatScreen = () => {
         </View>
       </Pressable>
     );
-  }
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sendMessage = useCallback((mChatData = [], image) => {
@@ -601,5 +589,5 @@ const ChatScreen = () => {
     </>
   );
 };
-const styles = StyleSheet.create({undefined});
+
 export default ChatScreen;
