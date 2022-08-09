@@ -1,18 +1,11 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Snackbar, Text, TextInput, HelperText, FAB} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
-import {IconButton} from 'react-native-paper';
-
-import BackImage from '../assets/images/back.png';
-import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../config/Dimensions';
+import {heightPercentageToDP} from '../config/Dimensions';
 import ArrowForward from '../assets/images/arrow-forward.png';
 
 import auth from '@react-native-firebase/auth';
@@ -24,17 +17,17 @@ const SetupPasscodeScreen = () => {
   const [mRecoveryPassword, setRecoveryPassword] = React.useState('');
   const [mRecoveryPasswordHint, setRecoveryPasswordHint] = React.useState('');
   const passwordHasLessLength = () => {
-    if (mRecoveryPassword.length == 0) {
+    if (mRecoveryPassword?.trim()?.length === 0) {
       return false;
     }
-    return mRecoveryPassword.length < 3;
+    return mRecoveryPassword?.trim()?.length < 3;
   };
 
   const passwordHintHasLessLength = () => {
-    if (mRecoveryPasswordHint.length == 0) {
+    if (mRecoveryPasswordHint?.trim()?.length === 0) {
       return false;
     }
-    return mRecoveryPasswordHint.length < 3;
+    return mRecoveryPasswordHint?.trim()?.length < 3;
   };
 
   const mPINRef = useRef();
@@ -51,34 +44,15 @@ const SetupPasscodeScreen = () => {
     React.useState(false);
 
   const [mBottomMargin, setBottomMargin] = React.useState(0);
-  const onToggleErrorSnackBar = () =>
-    setErrorSnackBarVisible(!ErrorSnackBarVisible);
 
   const onDismissErrorSnackBar = () => {
     setBottomMargin(0);
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
   };
 
-  useEffect(() => {
-    return () => {};
-  });
-
   if (mSettingRecoveryPassword) {
     return (
       <BaseView>
-        {/**<View
-          style={{
-            alignItems: 'flex-start',
-          }}>
-          <IconButton
-            icon={BackImage}
-            color={'#999999'}
-            size={25}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          />
-        </View>*/}
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             Please set a Recovery Password and Hint in case You forget your PIN
@@ -164,7 +138,10 @@ const SetupPasscodeScreen = () => {
             },
           }}
           onPress={() => {
-            if (mRecoveryPassword.length && mRecoveryPassword.length > 2) {
+            if (
+              mRecoveryPassword?.trim()?.length &&
+              mRecoveryPassword?.trim()?.length > 2
+            ) {
               firestore()
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
@@ -178,8 +155,8 @@ const SetupPasscodeScreen = () => {
                   },
                 })
                 .finally(() => {
-                  if (navigation.canGoBack()) {
-                    navigation.goBack();
+                  if (navigation?.canGoBack()) {
+                    navigation?.goBack();
                   }
                 });
             } else {
@@ -215,19 +192,6 @@ const SetupPasscodeScreen = () => {
   } else {
     return (
       <BaseView>
-        {/**<View
-          style={{
-            alignItems: 'flex-start',
-          }}>
-          <IconButton
-            icon={BackImage}
-            color={'#999999'}
-            size={25}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          />
-        </View>*/}
         <View style={styles.top_bar}>
           <Text style={styles.top_text}>
             {mConfirmingCodeForSetup
@@ -326,27 +290,8 @@ const SetupPasscodeScreen = () => {
     );
   }
 };
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    padding: '2%',
-  },
-  top_bar: {
-    flexDirection: 'row',
-    paddingTop: heightPercentageToDP(1),
-    paddingBottom: heightPercentageToDP(1),
-    justifyContent: 'center',
-  },
-  top_text: {
-    position: 'relative',
-    fontSize: fontValue(28),
-    textAlign: 'center',
-    color: COLORS.accentLight,
-    fontFamily: FONTS.regular,
-  },
   TextInputContainer: {
     marginRight: heightPercentageToDP(8),
     marginLeft: heightPercentageToDP(8),
@@ -364,4 +309,5 @@ const styles = StyleSheet.create({
     };
   },
 });
+
 export default SetupPasscodeScreen;
