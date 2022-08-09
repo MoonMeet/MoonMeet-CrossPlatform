@@ -6,13 +6,12 @@ import {COLORS} from './src/config/Miscellaneous';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {ThemeContext} from './src/config/Theme/Context';
 import {ThemeMMKV} from './src/config/MMKV/ThemeMMKV';
-import {MoonMeetDarkTheme, MoonMeetLightTheme} from './src/config/Theme/Theme';
+import {MoonMeetDarkTheme} from './src/config/Theme/Theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
-import appCheck from '@react-native-firebase/app-check';
 
 /**
  * Enabling the experimental freeze of react-native-screens
@@ -72,14 +71,7 @@ const App = () => {
       />
       <ThemeContext.Provider value={themePrefernces}>
         <PaperProvider theme={theme}>
-          <GestureHandlerRootView
-            style={{
-              flex: 1,
-              flexGrow: 1,
-              backgroundColor: isThemeDark
-                ? COLORS.primaryDark
-                : COLORS.primaryLight,
-            }}>
+          <GestureHandlerRootView style={styles.GHRV}>
             <BottomSheetModalProvider>
               <StackNavigator />
               <Toast />
@@ -90,5 +82,15 @@ const App = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  GHRV: theme => {
+    return {
+      flex: 1,
+      flexGrow: 1,
+      backgroundColor: theme ? COLORS.primaryDark : COLORS.primaryLight,
+    };
+  },
+});
 
 export default App;
