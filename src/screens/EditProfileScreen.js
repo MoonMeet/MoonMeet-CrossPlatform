@@ -42,7 +42,7 @@ const EditProfileScreen = () => {
   }, []);
 
   const handleCloseModal = useCallback(() => {
-    Keyboard.pickerRef?.current?.close();
+    Keyboard.dismiss();
     pickerRef?.current?.forceClose();
   }, []);
 
@@ -62,8 +62,6 @@ const EditProfileScreen = () => {
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
   const [oldAvatar, setOldAvatar] = React.useState('');
-
-  const [PickerActionSheet, setPickerActionSheet] = React.useState(false);
 
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
@@ -430,7 +428,7 @@ const EditProfileScreen = () => {
             openCamera()
               .then(async image => {
                 setUserPhoto(image);
-                await dismissAll();
+                dismissAll();
               })
               .catch(e => {
                 setLoaderVisible(false);
@@ -441,14 +439,13 @@ const EditProfileScreen = () => {
             openImagePicker()
               .then(async image => {
                 setUserPhoto(image);
-                await dismissAll();
+                dismissAll();
               })
               .catch(e => {
                 setLoaderVisible(false);
                 console.warn(e);
               });
           }}
-          isVisible={PickerActionSheet}
         />
         <LoadingIndicator isVisible={loaderVisible} />
       </Pressable>
