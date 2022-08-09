@@ -199,6 +199,7 @@ const HomeChatsScreen = () => {
             hitSlop={15}
             onPress={() => {
               navigation.navigate('settings');
+              updateUserActiveStatus();
             }}>
             <Avatar.Image
               size={35.5}
