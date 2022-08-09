@@ -1,4 +1,4 @@
-import React, from 'react';
+import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Spacer from '../components/Spacer/Spacer';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
