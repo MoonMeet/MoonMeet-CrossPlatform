@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Spacer from '../components/Spacer/Spacer';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -8,7 +8,7 @@ import {
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {withTheme} from 'react-native-paper';
-import {RadioButton, HelperText, useTheme} from 'react-native-paper';
+import {RadioButton, useTheme} from 'react-native-paper';
 import {ThemeContext} from '../config/Theme/Context';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
