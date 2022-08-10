@@ -1,9 +1,10 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import CameraImage from '../../assets/images/photo-camera.png';
 import GalleryImage from '../../assets/images/photo-library.png';
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
@@ -37,6 +38,18 @@ const ImagePickerActionSheet = ({
     }),
     [],
   );
+
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
   return (
     <BottomSheetModal
       ref={sheetRef}
@@ -46,6 +59,7 @@ const ImagePickerActionSheet = ({
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
       animationConfigs={animationConfigs}
+      backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
