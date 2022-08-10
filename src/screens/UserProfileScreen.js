@@ -126,7 +126,7 @@ const UserProfileScreen = () => {
               {activeStatus === 'normal'
                 ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
                     activeTime >
-                  8640000
+                  86400000
                   ? `active on ${moment(activeTime)?.format(
                       'YYYY MMMM DD - hh:mm A',
                     )}`
