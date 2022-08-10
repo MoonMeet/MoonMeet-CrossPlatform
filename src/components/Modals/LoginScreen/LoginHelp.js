@@ -1,9 +1,10 @@
-import React, {Ref, useMemo} from 'react';
+import React, {Ref, useCallback, useMemo} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {SharedValue} from 'react-native-reanimated';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import {isAndroid} from '../../../utils/device/DeviceInfo';
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
@@ -42,6 +43,17 @@ const LoginHelp = (props: LoginHelpInterface) => {
     [],
   );
 
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
   return (
     <BottomSheetModal
       ref={props?.sheetRef}
@@ -50,6 +62,7 @@ const LoginHelp = (props: LoginHelpInterface) => {
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
+      backdropComponent={renderBackdrop}
       animationConfigs={animationConfigs}
       animateOnMount={true}
       style={sheetStyle}>
