@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Pressable, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StatusBar, Text, View} from 'react-native';
 import {
   Actions,
   GiftedChat,
@@ -34,6 +34,7 @@ import {reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
+import {ChatSettingsMMKV} from '../config/MMKV/ChatSettingsMMKV';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -72,14 +73,43 @@ const ChatScreen = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handlePick = emojiObject => {
-    console.log(emojiObject.emoji);
     setMessageText(mMessageText + emojiObject?.emoji);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (!isLoading) {
+      if (ChatSettingsMMKV?.contains(destinedUser)) {
+        if (ChatSettingsMMKV?.getString(destinedUser)) {
+          setMessageText(ChatSettingsMMKV?.getString(destinedUser));
+        }
+      }
+    }
     navigation?.setOptions({
-      headerTitle: props => <ChatTitle {...props} />,
+      headerTitle: props => (
+        <ChatTitle
+          {...props}
+          firstName={userFirstName}
+          lastName={userLastName}
+          avatar={userAvatar}
+          activeStatus={userActiveStatus}
+          activeTime={userActiveTime}
+        />
+      ),
     });
+
+    return () => {};
+  }, [
+    destinedUser,
+    isLoading,
+    navigation,
+    userActiveStatus,
+    userActiveTime,
+    userAvatar,
+    userFirstName,
+    userLastName,
+  ]);
+
+  useEffect(() => {
     const userSubscribe = firestore()
       .collection('users')
       .doc(destinedUser)
@@ -147,9 +177,15 @@ const ChatScreen = () => {
       mySubscribe();
       messagesSubscribe();
     };
-  }, [destinedUser, navigation]);
+  }, [destinedUser]);
 
-  const ChatTitle = () => {
+  const ChatTitle = ({
+    firstName,
+    lastName,
+    avatar,
+    activeTime,
+    activeStatus,
+  }) => {
     return (
       <Pressable
         style={{
@@ -158,7 +194,7 @@ const ChatScreen = () => {
           marginLeft: -10 - 0.1 * -10,
         }}>
         <Avatar.Image
-          source={userAvatar ? {uri: userAvatar} : PurpleBackground}
+          source={avatar ? {uri: avatar} : PurpleBackground}
           size={38}
           style={{
             alignSelf: 'center',
@@ -179,7 +215,7 @@ const ChatScreen = () => {
               color: COLORS.black,
               opacity: 0.9,
             }}>
-            {`${userFirstName}${' '}${userLastName}`}
+            {`${firstName}${' '}${lastName}`}
           </Text>
           <Text
             adjustsFontSizeToFit
@@ -190,14 +226,12 @@ const ChatScreen = () => {
               color: COLORS.black,
               opacity: 0.4,
             }}>
-            {userActiveStatus === 'normal'
+            {activeStatus === 'normal'
               ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                  userActiveTime >
-                8640000
-                ? `last seen on ${moment(userActiveTime)?.format(
-                    'YYYY MMMM DD',
-                  )}`
-                : `last seen on ${moment(userActiveTime)?.format('HH:MM A')}`
+                  activeTime >
+                86400000
+                ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
+                : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
               : 'Last seen recently'}
           </Text>
         </View>
@@ -403,7 +437,7 @@ const ChatScreen = () => {
       />
       <BaseView>
         <GiftedChat
-          text={mMessageText}
+          text={mMessageText || ChatSettingsMMKV?.getString(destinedUser)}
           isLoadingEarlier={isLoading}
           messageIdGenerator={() => uuidv4()}
           renderLoading={() => (
@@ -416,13 +450,16 @@ const ChatScreen = () => {
                   opacity: 0.4,
                   fontFamily: FONTS.regular,
                 }}>
-                Getting Messages, Hang on
+                Getting Messages, Hang on.
               </Text>
             </View>
           )}
           showAvatarForEveryMessage={false}
           showUserAvatar={false}
-          onInputTextChanged={text => setMessageText(text)}
+          onInputTextChanged={text => {
+            setMessageText(text);
+            ChatSettingsMMKV?.set(destinedUser, text);
+          }}
           messages={mChatData}
           renderMessageImage={props => {
             return (
@@ -490,7 +527,7 @@ const ChatScreen = () => {
                   style={{
                     margin: 3 - 0.1 * 3,
                     right: widthPercentageToDP(0.125),
-                    bottom: heightPercentageToDP(1),
+                    bottom: heightPercentageToDP(0.5),
                   }}
                 />
               </Send>
