@@ -31,6 +31,14 @@ if (__DEV__) {
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
+  const styles = StyleSheet.create({
+    GHRV: {
+      flex: 1,
+      flexGrow: 1,
+      backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
+    },
+  });
+
   useEffect(() => {
     enableFirebaseTools();
     if (ThemeMMKV.contains('isThemeDark')) {
@@ -82,15 +90,5 @@ const App = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  GHRV: theme => {
-    return {
-      flex: 1,
-      flexGrow: 1,
-      backgroundColor: theme ? COLORS.primaryDark : COLORS.primaryLight,
-    };
-  },
-});
 
 export default App;
