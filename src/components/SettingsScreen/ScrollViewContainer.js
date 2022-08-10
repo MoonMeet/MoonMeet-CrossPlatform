@@ -27,10 +27,15 @@ import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
 import FrequentlyAskedQuestions from '../Modals/FrequentlyAskedQuestions/FrequentlyAskedQuestions';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import {ErrorToast, SuccessToast} from '../ToastInitializer/ToastInitializer';
+import {
+  ErrorToast,
+  InfoToast,
+  SuccessToast,
+} from '../ToastInitializer/ToastInitializer';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
+import {once} from 'lodash';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -81,7 +86,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [handleCloseAllModals, navigation]),
   );
 
   const DevicesScreen = Platform.select({
@@ -127,7 +132,19 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionOpacity={0.4}
         onPressTrigger={() => {
           handleCloseAllModals();
-          navigation?.navigate('darkMode');
+          if (__DEV__) {
+            navigation?.navigate('darkMode');
+          } else {
+            once(() => {
+              InfoToast(
+                'bottom',
+                'Feature will be available soon',
+                'stay tuned for Moon Meet new updates.',
+                true,
+                2000,
+              );
+            }, []);
+          }
         }}
         onLongPressTrigger={null}
       />
@@ -239,7 +256,19 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleTextContainer={'Notifications Settings'}
         onPressTrigger={() => {
           handleCloseAllModals();
-          Linking?.openSettings();
+          if (__DEV__) {
+            Linking?.openSettings();
+          } else {
+            once(() => {
+              InfoToast(
+                'bottom',
+                'Feature will be available soon',
+                'stay tuned for Moon Meet new updates.',
+                true,
+                2000,
+              );
+            }, []);
+          }
         }}
       />
       <DataItem
@@ -248,7 +277,19 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         titleTextContainer={'Chat Settings'}
         onPressTrigger={() => {
           handleCloseAllModals();
-          navigation?.navigate('chatSettings');
+          if (__DEV__) {
+            navigation?.navigate('chatSettings');
+          } else {
+            once(() => {
+              InfoToast(
+                'bottom',
+                'Feature will be available soon',
+                'stay tuned for Moon Meet new updates.',
+                true,
+                2000,
+              );
+            }, []);
+          }
         }}
       />
       <DevicesScreen />
