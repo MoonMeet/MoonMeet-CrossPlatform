@@ -35,7 +35,6 @@ import {
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
-import {once} from 'lodash';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -135,15 +134,13 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           if (__DEV__) {
             navigation?.navigate('darkMode');
           } else {
-            once(() => {
-              InfoToast(
-                'bottom',
-                'Feature will be available soon',
-                'stay tuned for Moon Meet new updates.',
-                true,
-                2000,
-              );
-            }, []);
+            InfoToast(
+              'bottom',
+              'Feature will be available soon',
+              'stay tuned for Moon Meet new updates.',
+              true,
+              2000,
+            );
           }
         }}
         onLongPressTrigger={null}
@@ -259,15 +256,13 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           if (__DEV__) {
             Linking?.openSettings();
           } else {
-            once(() => {
-              InfoToast(
-                'bottom',
-                'Feature will be available soon',
-                'stay tuned for Moon Meet new updates.',
-                true,
-                2000,
-              );
-            }, []);
+            InfoToast(
+              'bottom',
+              'Feature will be available soon',
+              'stay tuned for Moon Meet new updates.',
+              true,
+              2000,
+            );
           }
         }}
       />
@@ -280,15 +275,13 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           if (__DEV__) {
             navigation?.navigate('chatSettings');
           } else {
-            once(() => {
-              InfoToast(
-                'bottom',
-                'Feature will be available soon',
-                'stay tuned for Moon Meet new updates.',
-                true,
-                2000,
-              );
-            }, []);
+            InfoToast(
+              'bottom',
+              'Feature will be available soon',
+              'stay tuned for Moon Meet new updates.',
+              true,
+              2000,
+            );
           }
         }}
       />
