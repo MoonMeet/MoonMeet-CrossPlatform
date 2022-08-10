@@ -73,7 +73,7 @@ const MessagesList = ({ListData}) => {
       removeClippedSubviews={true}
       initialNumToRender={10}
       keyExtractor={item => item?.sent_to_uid}
-      renderItem={({item, index}) => (
+      renderItem={({item}) => (
         <Pressable
           android_ripple={{color: COLORS.rippleColor}}
           onPress={() => {
