@@ -1,12 +1,13 @@
+import React from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
-import React from 'react';
 import auth from '@react-native-firebase/auth';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
+import firestore from '@react-native-firebase/firestore';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -23,7 +24,7 @@ const MessagesList = ({ListData}) => {
 
   const messageText = item => {
     if (item?.type === 'message') {
-      let messageLength = item?.to_message_text.length;
+      let messageLength = item?.to_message_text?.length;
       let message =
         item?.last_uid === auth()?.currentUser?.uid
           ? `You: ${item?.to_message_text}`
@@ -40,6 +41,24 @@ const MessagesList = ({ListData}) => {
     }
   };
 
+  /**
+  const dateText = ({item}) => {
+    let finalTime;
+    if (Date.now() - item?.time?.toDate() > 86400000) {
+      finalTime = moment(item?.time?.toDate())?.format('ddd');
+    } else if (
+      firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+        item?.time?.toDate() >
+      2629746000
+    ) {
+      finalTime = moment(item?.time?.toDate())?.format('MMM ddd');
+    } else {
+      finalTime = moment(item?.time?.toDate())?.format('ddd HH:MM A');
+    }
+    return finalTime;
+  };
+  */
+
   return (
     <FlatList
       style={{flex: 1}}
@@ -54,7 +73,7 @@ const MessagesList = ({ListData}) => {
       removeClippedSubviews={true}
       initialNumToRender={10}
       keyExtractor={item => item?.sent_to_uid}
-      renderItem={({item}) => (
+      renderItem={({item, index}) => (
         <Pressable
           android_ripple={{color: COLORS.rippleColor}}
           onPress={() => {
@@ -102,7 +121,7 @@ const MessagesList = ({ListData}) => {
               alignItems: 'flex-end',
             }}>
             <Text numberOfLines={1} style={styles.subheading('right', false)}>
-              {moment(item?.time?.toDate())?.calendar()}
+              {moment(item.time?.toDate())?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
         </Pressable>
