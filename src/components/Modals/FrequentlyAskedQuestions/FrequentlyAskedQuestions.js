@@ -1,10 +1,8 @@
-import React, {useMemo} from 'react';
-import Modal from 'react-native-modal';
-import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useMemo} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
-import {IconButton} from 'react-native-paper';
-import BackImage from '../../../assets/images/back.png';
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
@@ -40,6 +38,18 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
     }),
     [],
   );
+
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
   return (
     <BottomSheetModal
       ref={props?.sheetRef}
@@ -49,9 +59,11 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
       animationConfigs={animationConfigs}
+      backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
+        onLayout={handleContentLayout}
         style={{
           flex: 1,
           backgroundColor: COLORS.primaryLight,
