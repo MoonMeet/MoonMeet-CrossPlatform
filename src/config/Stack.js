@@ -138,7 +138,7 @@ const StackNavigator = () => {
           name={'settings'}
           component={SettingsScreen}
           options={{
-            headerTitle: 'Settings',
+            headerTitle: 'Me',
             headerTitleStyle: {
               fontFamily: FONTS.regular,
               fontSize: fontValue(20.5),
