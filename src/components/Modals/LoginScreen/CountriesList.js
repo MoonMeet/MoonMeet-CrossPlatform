@@ -6,6 +6,7 @@ import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import ClearImage from '../../../assets/images/clear.png';
 import {unionBy, sortBy} from 'lodash';
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
@@ -131,6 +132,17 @@ const CountriesList = (props: CountriesListInterface) => {
     );
   };
 
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
   return (
     <BottomSheetModal
       ref={props?.sheetRef}
@@ -141,6 +153,7 @@ const CountriesList = (props: CountriesListInterface) => {
       handleHeight={animatedHandleHeight}
       animationConfigs={animationConfigs}
       animateOnMount={true}
+      backdropComponent={renderBackdrop}
       onLayout={handleContentLayout}
       style={sheetStyle}>
       <BottomSheetView
