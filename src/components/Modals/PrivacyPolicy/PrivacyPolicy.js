@@ -1,8 +1,9 @@
-import React, {useMemo} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useMemo} from 'react';
+import {StyleSheet, Text} from 'react-native';
 
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
@@ -41,6 +42,17 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
     [],
   );
 
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
+
   return (
     <BottomSheetModal
       ref={props?.sheetRef}
@@ -50,6 +62,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
       animationConfigs={animationConfigs}
+      backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
