@@ -1,9 +1,15 @@
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useMemo, useRef} from 'react';
 import {
   BackHandler,
   Image,
@@ -20,7 +26,6 @@ import {
   TextInput,
   TouchableRipple,
 } from 'react-native-paper';
-import BackImage from '../assets/images/back.png';
 import DoneImage from '../assets/images/done.png';
 import CameraImage from '../assets/images/photo-camera.png';
 import PickImage from '../assets/images/pick-photo.png';
@@ -32,7 +37,11 @@ import {
   ErrorToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
-import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/Dimensions';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import getRandomString from '../utils/generators/getRandomString';
@@ -41,7 +50,7 @@ const AddStoryScreen = () => {
   const navigation = useNavigation();
 
   const pickerRef = useRef(null);
-  const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
+  const sheetSnapPoints = useMemo(() => ['20%', '30%'], []);
 
   const handlePresentModal = useCallback(() => {
     Keyboard.dismiss();
@@ -80,7 +89,12 @@ const AddStoryScreen = () => {
     return StoryTextInput?.trim()?.length < 1;
   };
 
-  const [Loading, setLoading] = React.useState(false);
+  const [Loading, setLoading] = React.useState(true);
+
+  useEffect(() => {
+    setLoading(false);
+    return () => {};
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -90,6 +104,7 @@ const AddStoryScreen = () => {
           setUserSelection('');
           navigation?.setOptions({
             title: 'Add story',
+            headerRight: null,
           });
           if (imageVisible) {
             setUserPhoto(null);
@@ -127,8 +142,98 @@ const AddStoryScreen = () => {
     ]),
   );
 
-  function pushTextStory() {
-    if (StoryTextInput.length < 1) {
+  const [UserPhoto, setUserPhoto] = React.useState(null);
+
+  function TitleText() {
+    return (
+      <Pressable
+        rippleColor={COLORS.rippleColor}
+        borderless={false}
+        onPress={() => pushTextStory()}>
+        <Avatar.Icon
+          icon={DoneImage}
+          size={36.5}
+          color={COLORS.black}
+          style={{
+            overflow: 'hidden',
+          }}
+          theme={{
+            colors: {
+              primary: COLORS.transparent,
+            },
+          }}
+        />
+      </Pressable>
+    );
+  }
+
+  function ImageTitle() {
+    return (
+      <>
+        <TouchableRipple
+          rippleColor={COLORS.rippleColor}
+          borderless={false}
+          onPress={() => {
+            setInputEnabledForImage(!inputEnabledForImage);
+          }}>
+          <Text style={styles.enableText}>Aa</Text>
+        </TouchableRipple>
+        <TouchableRipple
+          rippleColor={COLORS.rippleColor}
+          borderless={false}
+          onPress={() => {
+            pushImageStory();
+          }}>
+          <Avatar.Icon
+            icon={DoneImage}
+            size={36.5}
+            color={COLORS.black}
+            style={{
+              overflow: 'hidden',
+            }}
+            theme={{
+              colors: {
+                primary: COLORS.transparent,
+              },
+            }}
+          />
+        </TouchableRipple>
+      </>
+    );
+  }
+
+  useLayoutEffect(() => {
+    if (!hideMainScreen) {
+      navigation?.setOptions({
+        headerTitle: 'Add story',
+      });
+    } else if (userSelection === 'text') {
+      navigation?.setOptions({
+        headerTitle: 'Text story',
+        headerRight: props => <TitleText {...props} />,
+      });
+    } else {
+      navigation?.setOptions({
+        headerTitle: 'Image story',
+        headerRight: props => <ImageTitle {...props} />,
+      });
+    }
+    return () => {};
+  }, [
+    hideMainScreen,
+    inputEnabledForImage,
+    navigation,
+    pushImageStory,
+    pushTextStory,
+    userSelection,
+    StoryTextInput, // should be added manually.
+    SecondStoryTextInput, // should be added manually.
+    Loading, // should be added manually.
+    UserPhoto, // should be added manually.
+  ]);
+
+  const pushTextStory = useCallback(() => {
+    if (StoryTextInput?.trim()?.length < 1) {
       ErrorToast(
         'bottom',
         'Error sharing story',
@@ -136,7 +241,7 @@ const AddStoryScreen = () => {
         true,
         3000,
       );
-    } else if (StoryTextInput.length > 241) {
+    } else if (StoryTextInput?.trim()?.length > 240) {
       ErrorToast(
         'bottom',
         'Error sharing story',
@@ -152,7 +257,7 @@ const AddStoryScreen = () => {
         .collection('stories')
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
-          text: StoryTextInput,
+          text: StoryTextInput?.trim(),
         })
         .finally(() => {
           setLoading(!Loading);
@@ -166,9 +271,37 @@ const AddStoryScreen = () => {
           }
         });
     }
-  }
+  }, [StoryTextInput, Loading, navigation]);
 
-  function pushImageStory() {
+  const pushImageData = useCallback(
+    storyImageURL => {
+      firestore()
+        .collection('users')
+        .doc(auth()?.currentUser?.uid)
+        .collection('stories')
+        .add({
+          time: firestore.Timestamp.fromDate(new Date()),
+          image: storyImageURL,
+          text: SecondStoryTextInput ? SecondStoryTextInput : '',
+        })
+        .finally(() => {
+          setLoading(!Loading);
+          if (navigation?.canGoBack()) {
+            navigation?.goBack();
+          }
+          SuccessToast(
+            'bottom',
+            'Story shared',
+            'Your story has been shared successfully.',
+            true,
+            3000,
+          );
+        });
+    },
+    [Loading, SecondStoryTextInput, navigation],
+  );
+
+  const pushImageStory = useCallback(() => {
     if (UserPhoto) {
       setLoading(!Loading);
       let _userStoryRef = `stories/${getRandomString(
@@ -199,31 +332,6 @@ const AddStoryScreen = () => {
           .getDownloadURL();
         pushImageData(storyImageURL);
       });
-
-      function pushImageData(storyImageURL) {
-        firestore()
-          .collection('users')
-          .doc(auth()?.currentUser?.uid)
-          .collection('stories')
-          .add({
-            time: firestore.Timestamp.fromDate(new Date()),
-            image: storyImageURL,
-            text: SecondStoryTextInput ? SecondStoryTextInput : '',
-          })
-          .finally(() => {
-            setLoading(!Loading);
-            if (navigation?.canGoBack()) {
-              navigation?.goBack();
-            }
-            SuccessToast(
-              'bottom',
-              'Story shared',
-              'Your story has been shared successfully.',
-              true,
-              3000,
-            );
-          });
-      }
     } else {
       ErrorToast(
         'bottom',
@@ -233,23 +341,7 @@ const AddStoryScreen = () => {
         3000,
       );
     }
-  }
-
-  const [UserPhoto, setUserPhoto] = React.useState(null);
-
-  if (!hideMainScreen) {
-    navigation?.setOptions({
-      headerTitle: 'Add story',
-    });
-  } else if (userSelection === 'text') {
-    navigation?.setOptions({
-      headerTitle: 'Text story',
-    });
-  } else {
-    navigation?.setOptions({
-      headerTitle: 'Image story',
-    });
-  }
+  }, [Loading, UserPhoto, pushImageData]);
 
   if (Loading) {
     return (
@@ -271,35 +363,6 @@ const AddStoryScreen = () => {
   } else if (!hideMainScreen) {
     return (
       <MiniBaseView>
-        <View style={styles.toolbar}>
-          <View style={styles.left_side}>
-            <TouchableRipple
-              rippleColor={COLORS.rippleColor}
-              borderless={false}
-              onPress={() => {
-                navigation.goBack();
-              }}>
-              <Avatar.Icon
-                icon={BackImage}
-                size={37.5}
-                color={COLORS.black}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                  opacity: 0.4,
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            </TouchableRipple>
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.toolbar_text}>Add Story</Text>
-          </View>
-        </View>
         <Spacer height={'2%'} />
         <View style={styles.userChoice}>
           <Pressable
@@ -342,61 +405,6 @@ const AddStoryScreen = () => {
   } else if (userSelection === 'text') {
     return (
       <BaseView>
-        <View style={styles.toolbar}>
-          <View style={styles.left_side}>
-            <TouchableRipple
-              rippleColor={COLORS.rippleColor}
-              borderless={false}
-              onPress={() => {
-                navigation.goBack();
-              }}>
-              <Avatar.Icon
-                icon={BackImage}
-                size={37.5}
-                color={COLORS.black}
-                style={{
-                  overflow: 'hidden',
-                  marginRight: '-1%',
-                  opacity: 0.4,
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            </TouchableRipple>
-          </View>
-          <View style={styles.mid_side}>
-            <Text style={styles.toolbar_text}>Text Story</Text>
-          </View>
-          {userSelection && hideMainScreen ? (
-            <View style={styles.right_side}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  pushTextStory();
-                }}>
-                <Avatar.Icon
-                  icon={DoneImage}
-                  size={36.5}
-                  color={COLORS.black}
-                  style={{
-                    marginRight: '-1%',
-                    opacity: 0.4,
-                    overflow: 'hidden',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
-          ) : null}
-        </View>
         <Spacer height={heightPercentageToDP(1)} />
         <View style={styles.textInputFlexedView}>
           <TextInput
@@ -409,7 +417,9 @@ const AddStoryScreen = () => {
             label="What's on your mind?"
             multiline={true}
             maxLength={240}
-            right={<TextInput.Affix text={`${StoryTextInput.length}/240`} />}
+            right={
+              <TextInput.Affix text={`${StoryTextInput?.trim()?.length}/240`} />
+            }
             value={StoryTextInput}
             theme={{
               colors: {
@@ -436,70 +446,6 @@ const AddStoryScreen = () => {
     return (
       <BaseView>
         <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
-          <View style={styles.toolbar}>
-            <View style={styles.left_side}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  navigation.goBack();
-                }}>
-                <Avatar.Icon
-                  icon={BackImage}
-                  size={37.5}
-                  color={COLORS.black}
-                  style={{
-                    overflow: 'hidden',
-                    marginRight: '-1%',
-                    opacity: 0.4,
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
-            <View style={styles.mid_side}>
-              <Text style={styles.toolbar_text}>Image Story</Text>
-            </View>
-
-            {userSelection && hideMainScreen ? (
-              <View style={styles.right_side}>
-                <TouchableRipple
-                  rippleColor={COLORS.rippleColor}
-                  borderless={false}
-                  onPress={() => {
-                    setInputEnabledForImage(!inputEnabledForImage);
-                  }}>
-                  <Text style={styles.enableText}>Aa</Text>
-                </TouchableRipple>
-                <TouchableRipple
-                  rippleColor={COLORS.rippleColor}
-                  borderless={false}
-                  onPress={() => {
-                    pushImageStory();
-                  }}>
-                  <Avatar.Icon
-                    icon={DoneImage}
-                    size={36.5}
-                    color={COLORS.black}
-                    style={{
-                      marginRight: '-1%',
-                      opacity: 0.4,
-                      overflow: 'hidden',
-                    }}
-                    theme={{
-                      colors: {
-                        primary: COLORS.transparent,
-                      },
-                    }}
-                  />
-                </TouchableRipple>
-              </View>
-            ) : null}
-          </View>
           <Spacer height={'2%'} />
           <Pressable
             onPress={() => handlePresentModal()}
@@ -570,6 +516,7 @@ const AddStoryScreen = () => {
                   setUserPhoto(image);
                   setImageVisible(true);
                   dismissAll();
+                  dismissAll();
                 })
                 .catch(e => {
                   console.log(e);
@@ -580,6 +527,7 @@ const AddStoryScreen = () => {
                 .then(image => {
                   setUserPhoto(image);
                   setImageVisible(true);
+                  dismissAll();
                   dismissAll();
                 })
                 .catch(e => {
@@ -671,10 +619,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   enableText: {
-    fontSize: 16,
+    fontSize: fontValue(16),
     textAlign: 'center',
-    color: COLORS.accentLight,
-    opacity: 1,
+    color: COLORS.black,
     fontFamily: FONTS.regular,
   },
 });
