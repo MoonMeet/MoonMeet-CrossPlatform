@@ -12,12 +12,14 @@ import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
+import {enableFreeze} from 'react-native-screens';
 
 /**
  * Enabling the experimental freeze of react-native-screens
- * enableFreeze(true);
  * Will enable this soon
  **/
+
+enableFreeze(true);
 
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
