@@ -182,7 +182,6 @@ const ChatScreen = () => {
           }));
           collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
           collectionDocs = reverse(collectionDocs);
-          console.error(collectionDocs);
           setChatData(collectionDocs);
         }
         setLoading(false);
