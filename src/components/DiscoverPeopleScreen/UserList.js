@@ -3,7 +3,6 @@ import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-import MiniBaseView from '../MiniBaseView/MiniBaseView';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
 import {PurpleBackground} from '../../index.d';
@@ -14,51 +13,53 @@ const UserList = ({ListData}) => {
   const navigation = useNavigation();
 
   return (
-    <View style={{flex: 1}}>
-      <FlatList
-        data={uniqBy(ListData, 'uid')}
-        contentContainerStyle={{
-          paddingStart: '1%',
-          paddingEnd: '2%',
-        }}
-        showsVerticalScrollIndicator={false}
-        disableVirtualization
-        removeClippedSubviews={true}
-        initialNumToRender={25}
-        keyExtractor={item => item?.uid}
-        renderItem={({item}) => (
-          <MiniBaseView>
-            {auth()?.currentUser?.uid !== item?.uid ? (
-              <Pressable
-                android_ripple={{color: COLORS.rippleColor}}
-                style={styles.container}
-                onPress={() => {
-                  navigation?.navigate('chat', {item: item?.uid});
-                }}>
-                <View style={styles.left_side}>
-                  <Avatar.Image
-                    source={
-                      item?.avatar ? {uri: item?.avatar} : PurpleBackground
-                    }
-                    size={55}
-                  />
-                </View>
-                <View style={styles.mid_side}>
-                  <Text style={styles.heading}>
-                    {item?.first_name + ' ' + item?.last_name}
-                  </Text>
-                  <Text style={styles.subheading}>
-                    {item?.active_status === 'recently'
-                      ? 'Last seen recently'
-                      : moment(item?.active_time?.toDate())?.calendar()}
-                  </Text>
-                </View>
-              </Pressable>
-            ) : null}
-          </MiniBaseView>
-        )}
-      />
-    </View>
+    <FlatList
+      data={uniqBy(ListData, 'uid')}
+      contentContainerStyle={{
+        paddingStart: '1%',
+        paddingEnd: '2%',
+      }}
+      showsVerticalScrollIndicator={false}
+      disableVirtualization
+      removeClippedSubviews={true}
+      initialNumToRender={25}
+      keyExtractor={item => item?.uid}
+      renderItem={({item}) => (
+        <>
+          {auth()?.currentUser?.uid !== item?.uid ? (
+            <Pressable
+              android_ripple={{color: COLORS.rippleColor}}
+              style={styles.container}
+              onPress={() => {
+                navigation?.navigate('chat', {item: item?.uid});
+              }}
+              onLongPress={() => {
+                navigation?.navigate('userProfile', {
+                  uid: item?.uid,
+                  cameFrom: 'others',
+                });
+              }}>
+              <View style={styles.left_side}>
+                <Avatar.Image
+                  source={item?.avatar ? {uri: item?.avatar} : PurpleBackground}
+                  size={55}
+                />
+              </View>
+              <View style={styles.mid_side}>
+                <Text style={styles.heading}>
+                  {item?.first_name + ' ' + item?.last_name}
+                </Text>
+                <Text style={styles.subheading}>
+                  {item?.active_status === 'recently'
+                    ? 'Last seen recently'
+                    : moment(item?.active_time?.toDate())?.calendar()}
+                </Text>
+              </View>
+            </Pressable>
+          ) : null}
+        </>
+      )}
+    />
   );
 };
 
