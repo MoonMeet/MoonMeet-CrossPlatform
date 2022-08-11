@@ -33,7 +33,7 @@ const AddBioScreen = () => {
   const [Loading, setLoading] = React.useState(true);
 
   /**
-   * Checking if network is OK before sending SMS or catching and SnackBar Exception.
+   * Checking if network is OK.
    */
   let isConnected = NetInfo.fetch().then(networkState => {
     isConnected = networkState?.isConnected;
@@ -167,8 +167,8 @@ const AddBioScreen = () => {
         onPress={() => {
           if (isConnected) {
             if (!hasMoreLength()) {
-              if (BioText === oldBioText) {
-                navigation.goBack();
+              if (BioText?.trim() === oldBioText?.trim()) {
+                navigation?.goBack();
               } else {
                 pushBio();
               }
@@ -178,7 +178,7 @@ const AddBioScreen = () => {
                 'Invalid Bio',
                 'Bio text must not be more than 70 characters',
                 true,
-                3000,
+                1500,
               );
             }
           } else {
@@ -187,7 +187,7 @@ const AddBioScreen = () => {
               'Network unavailable',
               'Network connection is needed to update your bio.',
               true,
-              3000,
+              1500,
             );
           }
         }}
@@ -196,38 +196,14 @@ const AddBioScreen = () => {
     </BaseView>
   );
 };
+
 const styles = StyleSheet.create({
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
-  toolbar_text: {
-    fontSize: 22,
-    paddingLeft: '2%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
   fab: {
     position: 'absolute',
-    margin: 16,
+    margin: 16 - 0.1 * 16,
     right: 0,
     bottom: 0,
   },
 });
+
 export default AddBioScreen;
