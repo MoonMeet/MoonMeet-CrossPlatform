@@ -130,6 +130,21 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", /*"x86", "x86_64",*/ "arm64-v8a"]
 }
 
+/**
+ * you should create a file named keystore.properties in app/config folder
+ * Example:
+ keyAlias=YourKeyAlias
+ keyPassword=YourKeyPassword
+ storePassword=YourKeyStorePassword
+ * You can also use separate properties for building like:
+ releaseKeyAlias=YourReleaseKeyAlias
+ debugKeyAlias=yourDebugKeyAlias
+ */
+
+def keystorePropertiesFile = rootProject.file("app/config/keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -229,16 +244,16 @@ android {
     signingConfigs {
         debug {
             storeFile file('config/release.jks')
-            storePassword MOON_MEET_STORE_PASSWORD
-            keyAlias MOON_MEET_KEY_ALIAS
-            keyPassword MOON_MEET_KEY_PASSWORD
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
             
         }
         release { 
             storeFile file('config/release.jks')
-            storePassword MOON_MEET_STORE_PASSWORD
-            keyAlias MOON_MEET_KEY_ALIAS
-            keyPassword MOON_MEET_KEY_PASSWORD
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         } // I am using my own keystore for debugging and release, you SHOULD follow README.md for instructions.
     }
     buildTypes {
