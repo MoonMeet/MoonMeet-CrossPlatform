@@ -16,6 +16,7 @@ import ViewItemTitle from '../components/UserProfileScreen/ViewItemTitle';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import ImageView from 'react-native-image-viewing';
+import {ActivityIndicator} from 'react-native-paper';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
@@ -71,7 +72,22 @@ const UserProfileScreen = () => {
   }, [userUID]);
 
   if (loading) {
-    return <></>;
+    return (
+      <MiniBaseView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            animating={true}
+            size={'large'}
+            color={COLORS.accentLight}
+          />
+        </View>
+      </MiniBaseView>
+    );
   }
 
   return (
