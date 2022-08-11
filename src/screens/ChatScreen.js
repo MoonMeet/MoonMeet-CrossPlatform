@@ -165,9 +165,24 @@ const ChatScreen = () => {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
             id: subMap?.id,
+            user: {
+              _id:
+                subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                  ? auth()?.currentUser?.uid
+                  : destinedUser,
+              name:
+                subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                  ? myFirstName + ' ' + myLastName
+                  : userFirstName + ' ' + userLastName,
+              avatar:
+                subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                  ? myAvatar
+                  : userAvatar,
+            }, // we must completed the full object as it is destroyed when adding one or more item.
           }));
           collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
           collectionDocs = reverse(collectionDocs);
+          console.error(collectionDocs);
           setChatData(collectionDocs);
         }
         setLoading(false);
@@ -177,7 +192,15 @@ const ChatScreen = () => {
       mySubscribe();
       messagesSubscribe();
     };
-  }, [destinedUser]);
+  }, [
+    destinedUser,
+    myAvatar,
+    myFirstName,
+    myLastName,
+    userAvatar,
+    userFirstName,
+    userLastName,
+  ]);
 
   const ChatTitle = ({
     firstName,
@@ -437,7 +460,7 @@ const ChatScreen = () => {
       />
       <BaseView>
         <GiftedChat
-          text={mMessageText || ChatSettingsMMKV?.getString(destinedUser)}
+          text={mMessageText}
           isLoadingEarlier={isLoading}
           messageIdGenerator={() => uuidv4()}
           renderLoading={() => (
@@ -526,7 +549,7 @@ const ChatScreen = () => {
                   size={26}
                   style={{
                     margin: 3 - 0.1 * 3,
-                    right: widthPercentageToDP(0.125),
+                    right: widthPercentageToDP(1.5),
                     bottom: heightPercentageToDP(0.5),
                   }}
                 />
