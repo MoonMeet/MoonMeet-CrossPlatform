@@ -45,6 +45,7 @@ import {
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import getRandomString from '../utils/generators/getRandomString';
+import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -146,10 +147,7 @@ const AddStoryScreen = () => {
 
   function TitleText() {
     return (
-      <Pressable
-        rippleColor={COLORS.rippleColor}
-        borderless={false}
-        onPress={() => pushTextStory()}>
+      <Pressable hitSlop={20} onPress={() => pushTextStory()}>
         <Avatar.Icon
           icon={DoneImage}
           size={36.5}
@@ -170,17 +168,16 @@ const AddStoryScreen = () => {
   function ImageTitle() {
     return (
       <>
-        <TouchableRipple
-          rippleColor={COLORS.rippleColor}
-          borderless={false}
+        <Pressable
+          hitSlop={20}
           onPress={() => {
             setInputEnabledForImage(!inputEnabledForImage);
           }}>
           <Text style={styles.enableText}>Aa</Text>
-        </TouchableRipple>
-        <TouchableRipple
-          rippleColor={COLORS.rippleColor}
-          borderless={false}
+        </Pressable>
+        <SpacerHorizontal width={widthPercentageToDP(0.5)} />
+        <Pressable
+          hitSlop={20}
           onPress={() => {
             pushImageStory();
           }}>
@@ -197,7 +194,7 @@ const AddStoryScreen = () => {
               },
             }}
           />
-        </TouchableRipple>
+        </Pressable>
       </>
     );
   }
