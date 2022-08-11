@@ -1,6 +1,10 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {Linking, SafeAreaView, StyleSheet, Text} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
@@ -23,6 +27,7 @@ import {getVersion} from 'react-native-device-info';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 
 if (__DEV__) {
   initializeMMKVFlipper({default: OnboardingMMKV});
@@ -143,7 +148,7 @@ const SplashScreen = () => {
       })
       .finally(() => {
         if (!isEmpty(updateVersion)) {
-          if (currentAppVersion != updateVersion) {
+          if (currentAppVersion !== updateVersion) {
             handleModalShow();
           } else {
             if (isViewPagerCompleted()) {
@@ -161,6 +166,24 @@ const SplashScreen = () => {
                       } else {
                         setHavePasscode(false);
                       }
+                    } else {
+                      auth()
+                        ?.signOut()
+                        .catch(error => console.log(error))
+                        .finally(() => {
+                          navigation?.dispatch(
+                            CommonActions?.reset({
+                              index: 0,
+                              routes: [{name: 'splash'}],
+                            }),
+                          );
+                          InfoToast(
+                            'bottom',
+                            'Please re-login',
+                            'You need to re-login and complete your profile',
+                          );
+                          navigation?.navigate('login');
+                        });
                     }
                   })
                   .finally(() => {
