@@ -40,6 +40,7 @@ import {
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {getRandomInt} from '../utils/generators/getRandomNumber';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 
 const LoginScreen = () => {
   /**
@@ -176,28 +177,6 @@ const LoginScreen = () => {
   }
 
   /**
-   * void to confirm code, else we handle an Exception.
-   * @returns {Promise<void>}
-   */
-
-  async function confirmCode(text) {
-    try {
-      setLoaderVisible(true);
-      await ConfirmCode.confirm(text);
-    } catch (error) {
-      setLoaderVisible(false);
-      if (error !== null) {
-        if (error.code === 'auth/invalid-verification-code') {
-          console.log('Invalid code.');
-        } else {
-          console.log('Account linking error');
-          console.log(error);
-        }
-      }
-    }
-  }
-
-  /**
    * SnackBar Stuff
    */
 
@@ -263,17 +242,19 @@ const LoginScreen = () => {
   const [Model, setModel] = React.useState(getModel());
   const [appVersion, setAppVersion] = React.useState(getVersion());
 
-  function addCodeObserver(text) {
-    if (text.length > 5) {
+  async function addCodeObserver(text) {
+    if (text?.length > 5) {
       Keyboard.dismiss();
-      confirmCode(text)
-        .finally(() => {
-          firestore()
-            .collection('users')
-            .doc(auth()?.currentUser?.uid)
-            .get()
-            .then(documentSnapshot => {
-              if (documentSnapshot?.exists) {
+      try {
+        setLoaderVisible(true);
+        await ConfirmCode.confirm(text);
+        firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot?.exists) {
+              if (documentSnapshot?.data()?.uid) {
                 JwtKeyMMKV.set(
                   'currentUserJwtKey',
                   documentSnapshot?.data().jwtKey,
@@ -308,32 +289,55 @@ const LoginScreen = () => {
                   }),
                 );
                 navigation?.navigate('home');
-              } else {
-                const generatedUsername = auth()
-                  ?.currentUser?.uid?.substring(0, 4)
-                  .concat(getRandomInt(100000, 999999));
-                navigation?.navigate('setup', {
-                  user: {
-                    uid: auth()?.currentUser?.uid,
-                    username: generatedUsername,
-                    phone: NumberText,
-                    phone_number: CountryText + ' ' + NumberText,
-                    phone_status: 'none',
-                    country_code: CountryText,
-                  },
-                });
-                setLoaderVisible(false);
               }
-            });
-        })
-        .catch(error => {
-          setLoaderVisible(false);
-          if (error !== null) {
-            if (error.code === 'firestore/permission-denied') {
-              console.log('Invalid code.');
+            } else {
+              const generatedUsername = auth()
+                ?.currentUser?.uid?.substring(0, 4)
+                .concat(getRandomInt(100000, 999999));
+              navigation?.dispatch(
+                CommonActions?.reset({
+                  index: 0,
+                  routes: [{name: 'login'}],
+                }),
+              );
+              navigation?.navigate('setup', {
+                user: {
+                  uid: auth()?.currentUser?.uid,
+                  username: generatedUsername,
+                  phone: NumberText,
+                  phone_number: CountryText + ' ' + NumberText,
+                  phone_status: 'none',
+                  country_code: CountryText,
+                },
+              });
+              setLoaderVisible(false);
             }
+          });
+        setLoaderVisible(false);
+      } catch (error) {
+        setLoaderVisible(false);
+        if (error !== null) {
+          if (error.code === 'auth/invalid-verification-code') {
+            setLoaderVisible(false);
           }
-        });
+          ErrorToast(
+            'bottom',
+            'Invalid code',
+            'Try checking if the code is correct or not',
+            true,
+            2000,
+          );
+        } else {
+          setLoaderVisible(false);
+          ErrorToast(
+            'bottom',
+            'Account linking error',
+            'Try restarting Moon Meet and try again',
+            true,
+            2000,
+          );
+        }
+      }
     }
   }
 
