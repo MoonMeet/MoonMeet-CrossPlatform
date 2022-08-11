@@ -51,11 +51,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const faqRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['80%', '100%'], []);
 
-  const handleCloseAllModals = useCallback(() => {
-    privacyRef?.current?.forceClose();
-    faqRef?.current?.forceClose();
-  }, []);
-
   const handlePresentPrivacyModal = useCallback(() => {
     faqRef?.current?.forceClose();
     privacyRef?.current?.present();
@@ -74,7 +69,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        handleCloseAllModals();
         if (navigation?.canGoBack()) {
           navigation?.goBack();
         }
@@ -85,7 +79,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [handleCloseAllModals, navigation]),
+    }, [navigation]),
   );
 
   const DevicesScreen = Platform.select({
@@ -105,15 +99,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         onPressTrigger={() => navigation?.navigate('devices')}
       />
     ),
-    default: () => undefined | null,
+    default: () => undefined,
   });
   return (
-    <Pressable
-      style={{
-        backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-        marginLeft: '-1.5%',
-      }}
-      onPressIn={() => handleCloseAllModals()}>
+    <>
       <DataItemTitle titleItem={'Miscellaneous'} />
       <DataItemCustom
         leftIcon={DarkModeIcon}
@@ -130,7 +119,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         descriptionOpacity={0.4}
         onPressTrigger={() => {
-          handleCloseAllModals();
           if (__DEV__) {
             navigation?.navigate('darkMode');
           } else {
@@ -151,7 +139,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.purple}
         titleTextContainer={'Edit profile'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           navigation.navigate('editProfile');
         }}
       />
@@ -160,8 +147,17 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.green}
         titleTextContainer={'Setup passcode'}
         onPressTrigger={() => {
-          handleCloseAllModals();
-          navigation.navigate('passcodeSetup');
+          if (__DEV__) {
+            navigation.navigate('passcodeSetup');
+          } else {
+            InfoToast(
+              'bottom',
+              'Feature will be available soon',
+              'stay tuned for Moon Meet new updates.',
+              true,
+              2000,
+            );
+          }
         }}
       />
       <DataItem
@@ -169,7 +165,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.orange}
         titleTextContainer={'Privacy and Security'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           navigation?.navigate('privacySecurity');
         }}
       />
@@ -178,7 +173,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.redLightError}
         titleTextContainer={'Log out'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           try {
             auth()
               ?.signOut()
@@ -200,14 +194,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         iconColor={COLORS.white}
         titleColor={COLORS.black}
         enableDescription={true}
-        descriptionText={
-          props?.activeStatus === 'recently'
-            ? 'Last seen recently'
-            : 'Active now'
-        }
+        descriptionText={props?.activeStatus === 'recently' ? 'Off' : 'On'}
         descriptionColor={COLORS.black}
         onPressTrigger={() => {
-          handleCloseAllModals();
           navigation?.navigate('activeStatus');
         }}
         onLongPressTrigger={null}
@@ -225,7 +214,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         descriptionColor={COLORS.black}
         onPressTrigger={() => navigation?.navigate('changeUsername')}
         onLongPressTrigger={() => {
-          handleCloseAllModals();
           try {
             Clipboard?.setString(props?.username);
             SuccessToast(
@@ -252,7 +240,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.yellowDarkWarning}
         titleTextContainer={'Notifications Settings'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           if (__DEV__) {
             Linking?.openSettings();
           } else {
@@ -271,7 +258,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.blue_second}
         titleTextContainer={'Chat Settings'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           if (__DEV__) {
             navigation?.navigate('chatSettings');
           } else {
@@ -306,7 +292,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIconColor={COLORS.accentLight}
         titleTextContainer={'Report technical problem'}
         onPressTrigger={() => {
-          handleCloseAllModals();
           navigation?.navigate('bugreport');
         }}
       />
@@ -320,7 +305,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         index={0}
         snapPoints={sheetSnapPoints}
       />
-    </Pressable>
+    </>
   );
 };
 
