@@ -442,97 +442,93 @@ const AddStoryScreen = () => {
   } else if (userSelection === 'image') {
     return (
       <BaseView>
-        <Pressable style={{flex: 1}} onPress={() => handleCloseModal()}>
-          <Spacer height={'2%'} />
-          <Pressable
-            onPress={() => handlePresentModal()}
-            style={styles.imageInputFlexedView}>
-            {UserPhoto ? (
-              <Image
-                style={{
-                  height: '80%',
-                  width: '99%',
-                  resizeMode: 'cover',
-                }}
-                source={{uri: UserPhoto?.path}}
-              />
-            ) : null}
-            {!UserPhoto ? (
-              <Image
-                style={{
-                  height: 50,
-                  width: 50,
-                  tintColor: COLORS.darkGrey,
-                }}
-                source={PickImage}
-              />
-            ) : null}
-          </Pressable>
-          {inputEnabledForImage ? (
-            <TextInput
+        <Spacer height={'2%'} />
+        <Pressable
+          onPress={() => handlePresentModal()}
+          style={styles.imageInputFlexedView}>
+          {UserPhoto ? (
+            <Image
               style={{
-                width: '95%',
-                alignSelf: 'center',
-                paddingRight: '2%',
-                paddingLeft: '2%',
+                height: '80%',
+                width: '99%',
+                resizeMode: 'cover',
               }}
-              mode="outlined"
-              label="What's on your mind?"
-              multiline={true}
-              maxLength={240}
-              right={
-                <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
-              }
-              value={SecondStoryTextInput}
-              theme={{
-                colors: {
-                  text: COLORS.black,
-                  primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
-                },
-              }}
-              onChangeText={onSecondStoryTextInputChange}
+              source={{uri: UserPhoto?.path}}
             />
           ) : null}
-          {secondTextInputHasLessLength() && inputEnabledForImage ? (
-            <HelperText type="info" visible={textInputHasLessLength()}>
-              Story Text must be longer longer than 1 characters.
-            </HelperText>
+          {!UserPhoto ? (
+            <Image
+              style={{
+                height: 50,
+                width: 50,
+                tintColor: COLORS.darkGrey,
+              }}
+              source={PickImage}
+            />
           ) : null}
-          <ImagePickerActionSheet
-            sheetRef={pickerRef}
-            index={0}
-            snapPoints={sheetSnapPoints}
-            onCameraPress={() => {
-              openCamera()
-                .then(image => {
-                  setUserPhoto(image);
-                  setImageVisible(true);
-                  dismissAll();
-                  dismissAll();
-                })
-                .catch(e => {
-                  console.log(e);
-                });
-            }}
-            onFilePicker={() => {
-              openImagePicker()
-                .then(image => {
-                  setUserPhoto(image);
-                  setImageVisible(true);
-                  dismissAll();
-                  dismissAll();
-                })
-                .catch(e => {
-                  console.log(e);
-                });
-            }}
-          />
         </Pressable>
+        {inputEnabledForImage ? (
+          <TextInput
+            style={{
+              width: '95%',
+              alignSelf: 'center',
+              paddingRight: '2%',
+              paddingLeft: '2%',
+            }}
+            mode="outlined"
+            label="What's on your mind?"
+            multiline={true}
+            maxLength={240}
+            right={
+              <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
+            }
+            value={SecondStoryTextInput}
+            theme={{
+              colors: {
+                text: COLORS.black,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
+              },
+            }}
+            onChangeText={onSecondStoryTextInputChange}
+          />
+        ) : null}
+        {secondTextInputHasLessLength() && inputEnabledForImage ? (
+          <HelperText type="info" visible={textInputHasLessLength()}>
+            Story Text must be longer longer than 1 characters.
+          </HelperText>
+        ) : null}
+        <ImagePickerActionSheet
+          sheetRef={pickerRef}
+          index={0}
+          snapPoints={sheetSnapPoints}
+          onCameraPress={() => {
+            openCamera()
+              .then(image => {
+                setUserPhoto(image);
+                setImageVisible(true);
+                dismissAll();
+              })
+              .catch(e => {
+                console.log(e);
+              });
+          }}
+          onFilePicker={() => {
+            openImagePicker()
+              .then(image => {
+                setUserPhoto(image);
+                setImageVisible(true);
+                dismissAll();
+              })
+              .catch(e => {
+                console.log(e);
+              });
+          }}
+        />
       </BaseView>
     );
   }
