@@ -12,7 +12,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
 const ActiveStatusScreen = () => {
   const navigation = useNavigation();
@@ -55,60 +55,60 @@ const ActiveStatusScreen = () => {
       <Spacer height={heightPercentageToDP(0.5)} />
       <View style={styles.switchRow}>
         <Text style={styles.activeText}>Show when you're active</Text>
-        <View style={{flex: 1}}>
-          <Switch
-            value={switchState}
-            color={COLORS.accentLight}
-            onValueChange={() => {
-              if (isConnected) {
-                setSwitchState(!switchState);
-                firestore()
-                  .collection('users')
-                  .doc(auth()?.currentUser?.uid)
-                  .update({
-                    active_status: switchState == true ? 'recently' : 'normal',
-                    active_time:
-                      newActiveTime == 'Last seen recently'
-                        ? firestore?.Timestamp?.fromDate(new Date())
-                        : 'Last seen recently',
-                  })
-                  .finally(() => {
-                    SuccessToast(
-                      'bottom',
-                      'Active status changed',
-                      'Your active status has changed',
-                      true,
-                      3000,
-                    );
-                    if (navigation?.canGoBack()) {
-                      navigation?.goBack();
-                    }
-                  })
-                  .catch(() => {
-                    ErrorToast(
-                      'bottom',
-                      'Changing active status failed',
-                      'An error occurred when changing your Active Status',
-                    );
-                    if (navigation?.canGoBack()) {
-                      navigation?.goBack();
-                    }
-                  });
-              } else {
-                ErrorToast(
-                  'bottom',
-                  'Network unavailable',
-                  'Network connection is needed to change your active status',
-                  true,
-                  3000,
-                );
-                if (navigation?.canGoBack()) {
-                  navigation?.goBack();
-                }
+        <Switch
+          value={switchState}
+          color={COLORS.accentLight}
+          onValueChange={() => {
+            if (isConnected) {
+              setSwitchState(!switchState);
+              firestore()
+                .collection('users')
+                .doc(auth()?.currentUser?.uid)
+                .update({
+                  active_status: switchState === true ? 'recently' : 'normal',
+                  active_time:
+                    newActiveTime === 'Last seen recently'
+                      ? firestore?.Timestamp?.fromDate(new Date())
+                      : 'Last seen recently',
+                })
+                .finally(() => {
+                  SuccessToast(
+                    'bottom',
+                    'Active status changed',
+                    'Your active status has changed',
+                    true,
+                    1500,
+                  );
+                  if (navigation?.canGoBack()) {
+                    navigation?.goBack();
+                  }
+                })
+                .catch(() => {
+                  ErrorToast(
+                    'bottom',
+                    'Changing active status failed',
+                    'An error occurred when changing your Active Status',
+                    true,
+                    1500,
+                  );
+                  if (navigation?.canGoBack()) {
+                    navigation?.goBack();
+                  }
+                });
+            } else {
+              ErrorToast(
+                'bottom',
+                'Network unavailable',
+                'Network connection is needed to change your active status',
+                true,
+                1500,
+              );
+              if (navigation?.canGoBack()) {
+                navigation?.goBack();
               }
-            }}
-          />
-        </View>
+            }
+          }}
+        />
       </View>
       <View style={styles.switchRow}>
         <HelperText type={'info'} visible={true}>
@@ -123,28 +123,15 @@ const ActiveStatusScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
   switchRow: {
     padding: '2%',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   activeText: {
     position: 'relative',
-    fontSize: 16,
+    fontSize: fontValue(16),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
