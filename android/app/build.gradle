@@ -228,17 +228,18 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            storeFile file('config/release.jks')
+            storePassword MOON_MEET_STORE_PASSWORD
+            keyAlias MOON_MEET_KEY_ALIAS
+            keyPassword MOON_MEET_KEY_PASSWORD
+            
         }
-        release { // will added my own keystore later.
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
+        release { 
+            storeFile file('config/release.jks')
+            storePassword MOON_MEET_STORE_PASSWORD
+            keyAlias MOON_MEET_KEY_ALIAS
+            keyPassword MOON_MEET_KEY_PASSWORD
+        } // I am using my own keystore for debugging and release, you SHOULD follow README.md for instructions.
     }
     buildTypes {
         debug {
