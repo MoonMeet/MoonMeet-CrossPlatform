@@ -147,7 +147,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 1
-        versionName "0.1.2"
+        versionName "0.1.1"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
         if (isNewArchitectureEnabled()) {
@@ -242,13 +242,11 @@ android {
     }
     buildTypes {
         debug {
-            versionNameSuffix ".debug-rc"
             signingConfig signingConfigs.debug
             multiDexEnabled true
             minifyEnabled false
         }
         release {
-            versionNameSuffix ".release-rc"
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
