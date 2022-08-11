@@ -5,7 +5,7 @@ import {Snackbar, Text, TextInput, HelperText, FAB} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import ArrowForward from '../assets/images/arrow-forward.png';
 
 import auth from '@react-native-firebase/auth';
@@ -139,8 +139,8 @@ const SetupPasscodeScreen = () => {
           }}
           onPress={() => {
             if (
-              mRecoveryPassword?.trim()?.length &&
-              mRecoveryPassword?.trim()?.length > 2
+              mRecoveryPassword?.trim()?.length > 1 &&
+              mRecoveryPassword?.trim()?.length > 1
             ) {
               firestore()
                 .collection('users')
@@ -148,8 +148,8 @@ const SetupPasscodeScreen = () => {
                 .update({
                   passcode: {
                     pin: mPinCode,
-                    recovery_password: mRecoveryPassword,
-                    password_hint: mRecoveryPasswordHint,
+                    recovery_password: mRecoveryPassword?.trim(),
+                    password_hint: mRecoveryPasswordHint?.trim(),
                     time: Date.now(),
                     passcode_enabled: true,
                   },
@@ -292,6 +292,19 @@ const SetupPasscodeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  top_bar: {
+    flexDirection: 'row',
+    paddingTop: heightPercentageToDP(1),
+    paddingBottom: heightPercentageToDP(1),
+    justifyContent: 'center',
+  },
+  top_text: {
+    position: 'relative',
+    fontSize: fontValue(28),
+    textAlign: 'center',
+    color: COLORS.accentLight,
+    fontFamily: FONTS.regular,
+  },
   TextInputContainer: {
     marginRight: heightPercentageToDP(8),
     marginLeft: heightPercentageToDP(8),
@@ -303,7 +316,7 @@ const styles = StyleSheet.create({
   fab: bottomMargin => {
     return {
       position: 'absolute',
-      margin: 16,
+      margin: 16 - 0.1 * 16,
       right: 0,
       bottom: bottomMargin,
     };
