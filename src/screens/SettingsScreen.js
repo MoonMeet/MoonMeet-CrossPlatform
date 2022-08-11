@@ -10,6 +10,7 @@ import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../config/Theme/Context';
 import {PurpleBackground} from '../index.d';
+import {fontValue} from '../config/Dimensions';
 
 const SettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
@@ -28,32 +29,14 @@ const SettingsScreen = () => {
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
 
   const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: COLORS.primaryLight,
-    },
     under_header: {
       padding: '2%',
       justifyContent: 'center',
       alignItems: 'center',
     },
-    left_side: {
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      flexDirection: 'row',
-    },
-    mid_side: {
-      flex: 2,
-      backgroundColor: 'white',
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginLeft: '1%',
-      marginRight: '2.5%',
-    },
-
     under_header_text: {
       position: 'relative',
-      fontSize: 24,
+      fontSize: fontValue(24),
       paddingLeft: '3%',
       paddingRight: '3%',
       paddingTop: '1%',
@@ -64,7 +47,7 @@ const SettingsScreen = () => {
     bioText: userBio => {
       return {
         position: 'relative',
-        fontSize: 16,
+        fontSize: fontValue(16),
         paddingLeft: '2.5%',
         paddingRight: '2.5%',
         paddingTop: '1%',
@@ -81,14 +64,7 @@ const SettingsScreen = () => {
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .onSnapshot(documentSnapshot => {
-        if (
-          documentSnapshot?.data()?.avatar &&
-          documentSnapshot?.data()?.first_name &&
-          documentSnapshot?.data()?.last_name &&
-          documentSnapshot?.data()?.username &&
-          documentSnapshot?.data()?.active_status &&
-          documentSnapshot?.data()?.active_time
-        ) {
+        if (documentSnapshot.exists) {
           setAvatarURL(documentSnapshot?.data()?.avatar);
           setFirstName(documentSnapshot?.data()?.first_name);
           setLastName(documentSnapshot?.data()?.last_name);
@@ -132,17 +108,30 @@ const SettingsScreen = () => {
             size={85}
             source={avatarURL ? {uri: avatarURL} : PurpleBackground}
           />
-          <Text style={styles.under_header_text}>
+          <Text
+            adjustsFontSizeToFit={
+              firstName?.trim()?.length >= 10 && lastName?.trim()?.length >= 10
+            }
+            numberOfLines={
+              firstName?.trim()?.length >= 10 && lastName?.trim()?.length >= 10
+                ? 1
+                : 2
+            }
+            style={styles.under_header_text}>
             {firstName + ' ' + lastName}
           </Text>
           {userBio ? (
             <Text
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
               onPress={() => navigation?.navigate('addBio')}
               style={styles.bioText(userBio)}>
               {userBio}
             </Text>
           ) : (
             <Text
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
               style={styles.bioText(userBio)}
               onPress={() => navigation?.navigate('addBio')}>
               Tap to add a bio
