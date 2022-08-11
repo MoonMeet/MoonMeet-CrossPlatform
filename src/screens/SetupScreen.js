@@ -16,7 +16,7 @@ import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePi
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {
   getManufacturer,
   getModel,
@@ -360,6 +360,12 @@ const SetupScreen = ({route}) => {
                       },
                     })
                     .finally(() => {
+                      navigation?.dispatch(
+                        CommonActions?.reset({
+                          index: 0,
+                          routes: [{name: 'setup'}],
+                        }),
+                      );
                       navigation.navigate('home');
                       setLoaderVisible(!LoaderVisible);
                     });
