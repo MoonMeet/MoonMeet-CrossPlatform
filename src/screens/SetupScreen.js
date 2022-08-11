@@ -35,24 +35,22 @@ import {
   InfoToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import {useFocusEffect} from '@react-navigation/native';
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 const SetupScreen = ({route}) => {
   const pickerRef = useRef(null);
-  const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
+  const sheetSnapPoints = useMemo(() => ['25%'], []);
 
   const handlePresentModal = useCallback(() => {
     Keyboard.dismiss();
     pickerRef?.current?.present();
   }, []);
 
-  const handleCloseModal = useCallback(() => {
-    pickerRef?.current?.close();
-    pickerRef?.current?.forceClose();
-  }, []);
+  const {dismissAll} = useBottomSheetModal();
 
   useFocusEffect(
     useCallback(() => {
@@ -125,153 +123,148 @@ const SetupScreen = ({route}) => {
 
   return (
     <BaseView>
-      <Pressable
-        style={{flex: 1}}
-        onPress={() => {
-          Keyboard.dismiss();
-          handleCloseModal();
-        }}>
-        <View style={styles.top_bar}>
-          <Text style={styles.top_text}>
-            Enter your name and select a profile picture
-          </Text>
-        </View>
-        <View style={styles.large_box}>
-          <Pressable
-            onPress={() => {
-              Keyboard.dismiss();
-              handlePresentModal();
-            }}
-            onLongPress={() => {
-              if (UserPhoto) {
-                setUserPhoto(null);
-                InfoToast(
-                  'bottom',
-                  'Photo Removed',
-                  'Now select a new photo',
-                  true,
-                  2000,
-                );
-              }
-            }}
-            style={{
-              justifyContent: 'center',
-              paddingLeft: '2.5%',
-            }}>
-            {UserPhoto ? (
-              <Avatar.Image
+      <View style={styles.top_bar}>
+        <Text style={styles.top_text}>
+          Enter your name and select a profile picture
+        </Text>
+      </View>
+      <View style={styles.large_box}>
+        <Pressable
+          onPress={() => {
+            Keyboard.dismiss();
+            handlePresentModal();
+          }}
+          onLongPress={() => {
+            if (UserPhoto) {
+              setUserPhoto(null);
+              InfoToast(
+                'bottom',
+                'Photo Removed',
+                'Now select a new photo',
+                true,
+                2000,
+              );
+            }
+          }}
+          style={{
+            justifyContent: 'center',
+            paddingLeft: '2.5%',
+          }}>
+          {UserPhoto ? (
+            <Avatar.Image
+              style={{
+                height: 55,
+                width: 55,
+                backgroundColor: COLORS.rippleColor,
+              }}
+              color={COLORS.rippleColor}
+              size={55}
+              source={{uri: UserPhoto?.path}}
+              theme={{
+                colors: {
+                  primary: COLORS.accentLight,
+                },
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                height: 55,
+                width: 55,
+                backgroundColor: COLORS.darkGrey,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 27,
+                overflow: 'hidden',
+              }}>
+              <Image
                 style={{
-                  height: 55,
-                  width: 55,
-                  backgroundColor: COLORS.rippleColor,
-                }}
-                color={COLORS.rippleColor}
-                size={55}
-                source={{uri: UserPhoto?.path}}
-                theme={{
-                  colors: {
-                    primary: COLORS.accentLight,
-                  },
-                }}
-              />
-            ) : (
-              <View
-                style={{
-                  height: 55,
-                  width: 55,
+                  height: 30,
+                  width: 30,
                   backgroundColor: COLORS.darkGrey,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 27,
-                  overflow: 'hidden',
-                }}>
-                <Image
-                  style={{
-                    height: 30,
-                    width: 30,
-                    backgroundColor: COLORS.darkGrey,
-                    resizeMode: 'cover',
-                  }}
-                  source={placeHolderPhoto}
-                />
-              </View>
-            )}
-          </Pressable>
-          <View
+                  resizeMode: 'cover',
+                }}
+                source={placeHolderPhoto}
+              />
+            </View>
+          )}
+        </Pressable>
+        <View
+          style={{
+            height: '-1%',
+            width: '3%',
+          }}
+        />
+        <View
+          style={{
+            flexDirection: 'column',
+            width: '100%',
+            padding: '1%',
+          }}>
+          <TextInput
             style={{
-              height: '-1%',
-              width: '3%',
+              width: '80%',
+            }}
+            mode="outlined"
+            label="First Name"
+            value={firstName}
+            onFocus={() => dismissAll()}
+            multiline={false}
+            theme={{
+              colors: {
+                text: COLORS.accentLight,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
+              },
+            }}
+            onChangeText={_firstName => {
+              setFirstName(_firstName);
             }}
           />
-          <View
+          <TextInput
             style={{
-              flexDirection: 'column',
-              width: '100%',
-              padding: '1%',
-            }}>
-            <TextInput
-              style={{
-                width: '80%',
-              }}
-              mode="outlined"
-              label="First Name"
-              value={firstName}
-              onFocus={() => handleCloseModal()}
-              multiline={false}
-              theme={{
-                colors: {
-                  text: COLORS.accentLight,
-                  primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
-                },
-              }}
-              onChangeText={_firstName => {
-                setFirstName(_firstName);
-              }}
-            />
-            <TextInput
-              style={{
-                width: '80%',
-              }}
-              mode="outlined"
-              label="Last Name"
-              value={lastName}
-              multiline={false}
-              onFocus={() => handleCloseModal()}
-              theme={{
-                colors: {
-                  text: COLORS.accentLight,
-                  primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
-                },
-              }}
-              onChangeText={_lastName => {
-                setLastName(_lastName);
-              }}
-            />
-          </View>
+              width: '80%',
+            }}
+            mode="outlined"
+            label="Last Name"
+            value={lastName}
+            multiline={false}
+            onFocus={() => dismissAll()}
+            theme={{
+              colors: {
+                text: COLORS.accentLight,
+                primary: COLORS.accentLight,
+                backgroundColor: COLORS.rippleColor,
+                placeholder: COLORS.darkGrey,
+                underlineColor: '#566193',
+                selectionColor: '#DADADA',
+                outlineColor: '#566193',
+              },
+            }}
+            onChangeText={_lastName => {
+              setLastName(_lastName);
+            }}
+          />
         </View>
-        <FAB
-          style={styles.fab}
-          normal
-          icon={ArrowForward}
-          color={COLORS.primaryLight}
-          animated={true}
-          theme={{
-            colors: {
-              accent: COLORS.accentLight,
-            },
-          }}
-          onPress={async () => {
-            if (UserPhoto) {
+      </View>
+      <FAB
+        style={styles.fab}
+        normal
+        icon={ArrowForward}
+        color={COLORS.primaryLight}
+        animated={true}
+        theme={{
+          colors: {
+            accent: COLORS.accentLight,
+          },
+        }}
+        onPress={async () => {
+          if (UserPhoto) {
+            if (firstName?.trim()?.length > 1 && lastName?.trim()?.length > 1) {
               setLoaderVisible(!LoaderVisible);
               /**
                * Reference to users image path
@@ -378,54 +371,58 @@ const SetupScreen = ({route}) => {
             } else {
               ErrorToast(
                 'bottom',
-                'Please select a photo',
-                'Select a photo and try again.',
+                'Please enter your name',
+                'fill the blanks with your name and try again.',
                 true,
                 3000,
               );
             }
-          }}
-        />
-        <LoadingIndicator
-          isVisible={LoaderVisible}
-          hideModal={() => {
-            setLoaderVisible(!LoaderVisible);
-          }}
-        />
-        <ImagePickerActionSheet
-          sheetRef={pickerRef}
-          index={0}
-          snapPoints={sheetSnapPoints}
-          onCameraPress={() => {
-            openCamera()
-              .then(image => {
-                setUserPhoto(image);
-                handleCloseModal();
-              })
-              .catch(e => {
-                console.error(e);
-              });
-          }}
-          onFilePicker={() => {
-            openImagePicker()
-              .then(image => {
-                setUserPhoto(image);
-                handleCloseModal();
-              })
-              .catch(e => {
-                console.error(e);
-              });
-          }}
-        />
-      </Pressable>
+          } else {
+            ErrorToast(
+              'bottom',
+              'Please select a photo',
+              'Select a photo and try again.',
+              true,
+              3000,
+            );
+          }
+        }}
+      />
+      <LoadingIndicator
+        isVisible={LoaderVisible}
+        hideModal={() => {
+          setLoaderVisible(!LoaderVisible);
+        }}
+      />
+      <ImagePickerActionSheet
+        sheetRef={pickerRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
+        onCameraPress={() => {
+          openCamera()
+            .then(image => {
+              setUserPhoto(image);
+              dismissAll();
+            })
+            .catch(e => {
+              console.error(e);
+            });
+        }}
+        onFilePicker={() => {
+          openImagePicker()
+            .then(image => {
+              setUserPhoto(image);
+              dismissAll();
+            })
+            .catch(e => {
+              console.error(e);
+            });
+        }}
+      />
     </BaseView>
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-  },
   top_bar: {
     flexDirection: 'row',
     paddingTop: '3%',
@@ -436,7 +433,7 @@ const styles = StyleSheet.create({
   },
   top_text: {
     position: 'relative',
-    fontSize: 28,
+    fontSize: fontValue(28),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
