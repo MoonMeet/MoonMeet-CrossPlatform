@@ -7,7 +7,7 @@ import {
   HelperText,
   TextInput,
 } from 'react-native-paper';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+import {COLORS} from '../config/Miscellaneous';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
 import ArrowForward from '../assets/images/arrow-forward.png';
@@ -68,7 +68,7 @@ const AddBioScreen = () => {
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
-        bio: BioText,
+        bio: BioText?.trim(),
       })
       .finally(() => {
         SuccessToast(
@@ -78,7 +78,7 @@ const AddBioScreen = () => {
           true,
           3000,
         );
-        setOldBioText(BioText);
+        setOldBioText(BioText?.trim());
         setLoaderVisible(false);
       })
       .catch(error => {
