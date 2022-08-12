@@ -112,9 +112,11 @@ const EditProfileScreen = () => {
     const uploadImageTask = storageRef.putFile(UserPhoto?.path);
 
     uploadImageTask.on('state_changed', taskSnapshot => {
-      console.log(
-        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-      );
+      if (__DEV__) {
+        console.log(
+          `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+        );
+      }
     });
 
     /**
