@@ -8,7 +8,6 @@ interface ViewListInterface {
 }
 
 const ViewList = (props: ViewListInterface) => {
-  console.log(props.ViewsData);
   const [usersData, setUsersData] = React.useState([]);
   const listEmptyComponent = () => {
     return (
@@ -23,7 +22,6 @@ const ViewList = (props: ViewListInterface) => {
 
   useEffect(() => {
     Object.values(props.ViewsData).map(value => {
-      console.log(value.uid);
       firestore()
         .collection('users')
         .doc(value.uid)
