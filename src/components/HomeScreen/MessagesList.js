@@ -40,24 +40,6 @@ const MessagesList = ({ListData}) => {
     }
   };
 
-  /**
-  const dateText = ({item}) => {
-    let finalTime;
-    if (Date.now() - item?.time?.toDate() > 86400000) {
-      finalTime = moment(item?.time?.toDate())?.format('ddd');
-    } else if (
-      firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-        item?.time?.toDate() >
-      2629746000
-    ) {
-      finalTime = moment(item?.time?.toDate())?.format('MMM ddd');
-    } else {
-      finalTime = moment(item?.time?.toDate())?.format('ddd HH:MM A');
-    }
-    return finalTime;
-  };
-  */
-
   return (
     <FlatList
       style={{flex: 1}}
