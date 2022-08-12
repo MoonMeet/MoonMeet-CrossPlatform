@@ -182,6 +182,7 @@ const HomeChatsScreen = () => {
         if (!collectionSnapshot?.empty) {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
+            id: subMap?.id,
           }));
           collectionDocs = sortBy(collectionDocs, [
             data => data?.time?.toDate(),
