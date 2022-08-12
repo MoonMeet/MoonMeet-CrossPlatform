@@ -71,7 +71,8 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
         <Text style={styles.headerText}>Privacy Policy</Text>
         <ScrollView
           nestedScrollEnabled={true}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: 12 - 0.1 * 12}}>
           <Text style={styles.subText}>
             Rayen Sbai built the Moon Meet app as an Open Source app. This
             SERVICE is provided by Rayen Sbai at no cost and is intended for use
@@ -99,7 +100,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
           <Text style={styles.subText}>- Google Crashlytics for Firebase</Text>
           <Text style={styles.subText}>- Google Analytics for Firebase</Text>
           <Text style={styles.subText}>- Google Play Services</Text>
-          <Text style={styles.subText}>- Log Data</Text>
+          <Text style={styles.subText}>- Google Phone Auth Recaptcha</Text>
           <Text style={styles.subText}>
             I want to inform you that whenever you use my Service, in a case of
             an error in the app I collect data and information (through
