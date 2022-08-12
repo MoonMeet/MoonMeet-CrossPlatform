@@ -314,9 +314,11 @@ const AddStoryScreen = () => {
        */
 
       uploadImageTask.on('state_changed', taskSnapshot => {
-        console.log(
-          `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-        );
+        if (__DEV__) {
+          console.log(
+            `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+          );
+        }
       });
 
       /**
@@ -514,7 +516,13 @@ const AddStoryScreen = () => {
                 dismissAll();
               })
               .catch(e => {
-                console.log(e);
+                ErrorToast(
+                  'bottom',
+                  'Failed to open camera',
+                  'please accept camera permission from settings',
+                  true,
+                  1000,
+                );
               });
           }}
           onFilePicker={() => {
@@ -525,7 +533,13 @@ const AddStoryScreen = () => {
                 dismissAll();
               })
               .catch(e => {
-                console.log(e);
+                ErrorToast(
+                  'bottom',
+                  'Failed to open camera',
+                  'please accept camera permission from settings',
+                  true,
+                  1000,
+                );
               });
           }}
         />
