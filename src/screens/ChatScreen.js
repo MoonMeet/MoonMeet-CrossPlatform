@@ -33,7 +33,7 @@ import MaterialIcons from 'react-native-vector-icons/FontAwesome5';
 import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
-import {isEmpty, reverse, sortBy} from 'lodash';
+import {reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
@@ -180,15 +180,11 @@ const ChatScreen = () => {
                   : destinedUser,
               name:
                 subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                  ? isEmpty(Me)
-                    ? myFirstName + ' ' + myLastName
-                    : Me?.first_name + ' ' + Me?.last_name
+                  ? Me?.first_name + ' ' + Me?.last_name
                   : userFirstName + ' ' + userLastName,
               avatar:
                 subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                  ? isEmpty(Me?.avatar)
-                    ? myAvatar
-                    : Me?.avatar
+                  ? Me?.avatar
                   : userAvatar,
             }, // we must complete the full object as it is destroyed when adding one or more item.
           }));
@@ -204,14 +200,10 @@ const ChatScreen = () => {
       messagesSubscribe();
     };
   }, [
-    Me,
     Me?.avatar,
     Me?.first_name,
     Me?.last_name,
     destinedUser,
-    myAvatar,
-    myFirstName,
-    myLastName,
     userAvatar,
     userFirstName,
     userLastName,
@@ -339,7 +331,7 @@ const ChatScreen = () => {
               to_last_name: userLastName,
               to_message_text: mMessageText,
               to_avatar: userAvatar,
-              time: firestore.Timestamp.fromDate(new Date()),
+              time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'message',
               last_uid: auth()?.currentUser?.uid,
               sent_to_uid: destinedUser,
@@ -350,12 +342,10 @@ const ChatScreen = () => {
             .collection('discussions')
             .doc(auth()?.currentUser?.uid)
             .set({
-              to_first_name: isEmpty(Me?.first_name)
-                ? myFirstName
-                : Me?.first_name,
-              to_last_name: isEmpty(Me?.last_name) ? myLastName : Me?.last_name,
+              to_first_name: Me?.first_name,
+              to_last_name: Me?.last_name,
               to_message_text: mMessageText,
-              to_avatar: isEmpty(Me?.avatar) ? myAvatar : Me?.avatar,
+              to_avatar: Me?.avatar,
               time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'message',
               last_uid: auth()?.currentUser?.uid,
@@ -462,12 +452,10 @@ const ChatScreen = () => {
             .collection('discussions')
             .doc(auth()?.currentUser?.uid)
             .set({
-              to_first_name: isEmpty(Me?.first_name)
-                ? myFirstName
-                : Me?.first_name,
-              to_last_name: isEmpty(Me?.last_name) ? myLastName : Me?.last_name,
+              to_first_name: Me?.first_name,
+              to_last_name: Me?.last_name,
               to_message_image: uploadedImageURL,
-              to_avatar: isEmpty(Me?.avatar) ? myAvatar : Me?.avatar,
+              to_avatar: Me?.avatar,
               time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'image',
               last_uid: auth()?.currentUser?.uid,
@@ -655,11 +643,8 @@ const ChatScreen = () => {
           }}
           user={{
             _id: auth()?.currentUser?.uid,
-            avatar: isEmpty(Me?.avatar) ? myAvatar : Me?.avatar,
-            name:
-              isEmpty(Me?.first_name) && isEmpty(Me.last_name)
-                ? myFirstName + ' ' + myLastName
-                : Me?.first_name + ' ' + Me?.last_name,
+            avatar: Me?.avatar,
+            name: Me?.first_name + ' ' + Me?.last_name,
           }}
           scrollToBottom
         />
