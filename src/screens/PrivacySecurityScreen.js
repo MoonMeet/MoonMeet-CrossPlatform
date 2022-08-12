@@ -17,6 +17,7 @@ import auth from '@react-native-firebase/auth';
 import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
 import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import {InfoToast} from 'react-native-toast-message';
 
 const PrivacySecurityScreen = () => {
   const navigation = useNavigation();
@@ -118,7 +119,19 @@ const PrivacySecurityScreen = () => {
           rippleColor={COLORS.rippleColor}
           titleColor={COLORS.black}
           withDivider
-          onPressTrigger={() => navigation?.navigate('passcodeSetup')}
+          onPressTrigger={() => {
+            if (__DEV__) {
+              navigation?.navigate('passcodeSetup');
+            } else {
+              InfoToast(
+                'bottom',
+                'Feature will be available soon',
+                'stay tuned for Moon Meet new updates.',
+                true,
+                2000,
+              );
+            }
+          }}
         />
         <ViewItem
           titleText={'Devices'}
