@@ -41,6 +41,7 @@ import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {getRandomInt} from '../utils/generators/getRandomNumber';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
+import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const LoginScreen = () => {
   /**
@@ -274,6 +275,16 @@ const LoginScreen = () => {
                   'currentUserJwtKey',
                   documentSnapshot?.data().jwtKey,
                 );
+
+                /**
+                 * Saving data to to UserDataMMKV preference.
+                 */
+
+                UserDataMMKV.set(
+                  'Me',
+                  JSON.stringify(documentSnapshot?.data()),
+                );
+
                 /**
                  * pushing device information for later use in DeviceScreen.js
                  */
