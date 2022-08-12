@@ -1,5 +1,5 @@
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Linking, Platform, Pressable, BackHandler} from 'react-native';
+import {Linking, Platform, BackHandler} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
