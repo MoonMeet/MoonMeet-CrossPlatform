@@ -282,7 +282,7 @@ const LoginScreen = () => {
 
                 UserDataMMKV.set(
                   'Me',
-                  JSON.stringify(documentSnapshot?.data()),
+                  JSON?.stringify(documentSnapshot?.data()),
                 );
 
                 /**
