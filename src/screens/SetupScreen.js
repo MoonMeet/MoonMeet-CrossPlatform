@@ -358,6 +358,7 @@ const SetupScreen = ({route}) => {
                         passcode_enabled: false,
                       },
                     })
+
                     .finally(() => {
                       navigation?.dispatch(
                         CommonActions?.reset({
@@ -365,12 +366,11 @@ const SetupScreen = ({route}) => {
                           routes: [{name: 'setup'}],
                         }),
                       );
-                      navigation.navigate('home');
+                      navigation?.navigate('home');
                       setLoaderVisible(!LoaderVisible);
                     });
                 });
               } catch (e) {
-                console.log(e);
                 setLoaderVisible(!LoaderVisible);
               }
             } else {
