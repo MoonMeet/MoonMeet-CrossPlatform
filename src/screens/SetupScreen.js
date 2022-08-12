@@ -305,7 +305,6 @@ const SetupScreen = ({route}) => {
                   const avatarUrl = await storage()
                     .ref(_userAvatarRef)
                     .getDownloadURL();
-                  console.log(avatarUrl);
 
                   /**
                    * pushing device information for later use in DeviceScreen.js
