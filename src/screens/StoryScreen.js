@@ -93,7 +93,8 @@ const StoryScreen = () => {
 
               setAllCurrentUserStories(collectionDocs);
               setLoading(false);
-              if (!Loading) {
+              /**
+                if (!Loading) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
                   firestore()
                     .collection('users')
@@ -123,6 +124,7 @@ const StoryScreen = () => {
                     });
                 }
               }
+               */
             });
           });
       });
