@@ -101,7 +101,6 @@ const ChangeUsernameScreen = () => {
                 true,
                 2000,
               );
-              console.log(error);
               setLoaderVisible(false);
               if (navigation?.canGoBack()) {
                 navigation?.goBack();
