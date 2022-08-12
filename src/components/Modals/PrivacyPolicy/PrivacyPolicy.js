@@ -86,7 +86,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             our Terms and Conditions, which are accessible at Moon Meet unless
             otherwise defined in this Privacy Policy.
           </Text>
-          <Text style={styles.lastUpdate}>last updated: August 1, 2022</Text>
+          <Text style={styles.lastUpdate}>last updated: August 15, 2022</Text>
           <Text style={styles.subText}>
             For a better experience, while using our Service, I may require you
             to provide us with certain personally identifiable information. The
