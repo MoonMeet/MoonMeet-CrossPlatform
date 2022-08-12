@@ -385,9 +385,7 @@ const StoryScreen = () => {
           showSave={
             false // TODO: Will be enabled soon.
           }
-          onSaveSelected={() => {
-            // console.log(allCurrentUserStories[current]?.image);
-          }}
+          onSaveSelected={undefined}
           currentStoryUID={userStoryUID}
           isVisible={ActionSheetVisible}
         />
