@@ -43,7 +43,7 @@ const MessagesList = ({ListData}) => {
   return (
     <FlatList
       style={{flex: 1}}
-      data={uniqBy(ListData, 'to_avatar')}
+      data={uniqBy(ListData, 'id')}
       ListEmptyComponent={listEmptyComponent}
       contentContainerStyle={{
         paddingStart: '1%',
