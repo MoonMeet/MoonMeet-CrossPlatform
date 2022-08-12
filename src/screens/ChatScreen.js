@@ -178,7 +178,7 @@ const ChatScreen = () => {
                 subMap?.data()?.user?._id === auth()?.currentUser?.uid
                   ? myAvatar
                   : userAvatar,
-            }, // we must completed the full object as it is destroyed when adding one or more item.
+            }, // we must complete the full object as it is destroyed when adding one or more item.
           }));
           collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
           collectionDocs = reverse(collectionDocs);
@@ -264,7 +264,7 @@ const ChatScreen = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sendMessage = useCallback((mChatData = [], image) => {
     if (!image) {
-      if (mMessageText.length < 1) {
+      if (mMessageText?.trim()?.length < 1) {
         // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
       } else {
         try {
@@ -274,11 +274,11 @@ const ChatScreen = () => {
             .collection('users')
             .doc(auth()?.currentUser?.uid)
             .collection('messages')
-            .doc(userUID)
+            .doc(destinedUser)
             .collection('discussions')
             .add({
               _id: _id,
-              text: mMessageText,
+              text: mMessageText?.trim(),
               createdAt: Date.now(),
               user: {
                 _id: myUID,
@@ -288,14 +288,14 @@ const ChatScreen = () => {
             });
           firestore()
             .collection('users')
-            .doc(userUID)
+            .doc(destinedUser)
             .collection('messages')
             .doc(auth()?.currentUser?.uid)
             .collection('discussions')
             .add({
               _id: _id,
               createdAt: Date.now(),
-              text: mMessageText,
+              text: mMessageText?.trim(),
               user: {
                 _id: myUID,
                 name: myFirstName + ' ' + myLastName,
@@ -310,20 +310,20 @@ const ChatScreen = () => {
             .collection('chats')
             .doc(auth()?.currentUser?.uid)
             .collection('discussions')
-            .doc(userUID)
+            .doc(destinedUser)
             .set({
               to_first_name: userFirstName,
               to_last_name: userLastName,
-              to_message_text: mMessageText,
+              to_message_text: mMessageText?.trim(),
               to_avatar: userAvatar,
               time: firestore.Timestamp.fromDate(new Date()),
               type: 'message',
               last_uid: myUID,
-              sent_to_uid: userUID,
+              sent_to_uid: destinedUser,
             });
           firestore()
             .collection('chats')
-            .doc(userUID)
+            .doc(destinedUser)
             .collection('discussions')
             .doc(auth()?.currentUser?.uid)
             .set({
@@ -383,7 +383,7 @@ const ChatScreen = () => {
           .collection('users')
           .doc(auth()?.currentUser?.uid)
           .collection('messages')
-          .doc(userUID)
+          .doc(destinedUser)
           .collection('discussions')
           .add({
             _id: _id,
@@ -397,7 +397,7 @@ const ChatScreen = () => {
           });
         await firestore()
           .collection('users')
-          .doc(userUID)
+          .doc(destinedUser)
           .collection('messages')
           .doc(auth()?.currentUser?.uid)
           .collection('discussions')
@@ -419,7 +419,7 @@ const ChatScreen = () => {
           .collection('chats')
           .doc(auth()?.currentUser?.uid)
           .collection('discussions')
-          .doc(userUID)
+          .doc(destinedUser)
           .set({
             to_first_name: userFirstName,
             to_last_name: userLastName,
@@ -428,11 +428,11 @@ const ChatScreen = () => {
             time: firestore.Timestamp.fromDate(new Date()),
             type: 'image',
             last_uid: myUID,
-            sent_to_uid: userUID,
+            sent_to_uid: destinedUser,
           });
         firestore()
           .collection('chats')
-          .doc(userUID)
+          .doc(destinedUser)
           .collection('discussions')
           .doc(auth()?.currentUser?.uid)
           .set({
