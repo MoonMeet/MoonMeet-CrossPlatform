@@ -23,6 +23,7 @@ import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import StickyItemFlatList from '@gorhom/sticky-item';
 import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
+import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const HomeChatsScreen = () => {
   // Sticky-Item Config
@@ -133,6 +134,10 @@ const HomeChatsScreen = () => {
                   setActiveStatusState(false);
                 }
                 setNewActiveTime(documentSnapshot?.data()?.active_time);
+                UserDataMMKV.set(
+                  'Me',
+                  JSON?.stringify(documentSnapshot?.data()),
+                );
               }
             }
             firestore()
