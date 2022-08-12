@@ -37,7 +37,6 @@ import {reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
-import {ChatSettingsMMKV} from '../config/MMKV/ChatSettingsMMKV';
 import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
@@ -85,13 +84,6 @@ const ChatScreen = () => {
   };
 
   useLayoutEffect(() => {
-    if (!isLoading) {
-      if (ChatSettingsMMKV?.contains(destinedUser)) {
-        if (ChatSettingsMMKV?.getString(destinedUser)) {
-          setMessageText(ChatSettingsMMKV?.getString(destinedUser));
-        }
-      }
-    }
     navigation?.setOptions({
       headerTitle: props => (
         <ChatTitle
@@ -107,8 +99,6 @@ const ChatScreen = () => {
 
     return () => {};
   }, [
-    destinedUser,
-    isLoading,
     navigation,
     userActiveStatus,
     userActiveTime,
@@ -497,7 +487,6 @@ const ChatScreen = () => {
           showUserAvatar={false}
           onInputTextChanged={text => {
             setMessageText(text);
-            ChatSettingsMMKV?.set(destinedUser, text);
           }}
           messages={mChatData}
           renderMessageImage={props => {
