@@ -143,7 +143,7 @@ const LoginScreen = () => {
    */
 
   const isSMSSendingAcceptable = () => {
-    return CountryText.length > 1 && NumberText.length > 4;
+    return CountryText?.trim()?.length > 1 && NumberText?.trim()?.length > 4;
   };
 
   /**
@@ -171,9 +171,24 @@ const LoginScreen = () => {
    */
 
   async function signInWithPhoneNumber(phoneNumber) {
-    const sendCodeTask = await auth()?.signInWithPhoneNumber(phoneNumber);
-    setConfirmCode(sendCodeTask);
-    setLoaderVisible(false);
+    try {
+      const sendCodeTask = await auth()?.signInWithPhoneNumber(phoneNumber);
+      setConfirmCode(sendCodeTask);
+      setLoaderVisible(false);
+    } catch (error) {
+      setLoaderVisible(false);
+      if (error !== null) {
+        if (error?.code === 'auth/invalid-phone-number') {
+          ErrorToast(
+            'bottom',
+            'Invalid phone number',
+            'please check your phone number again',
+            true,
+            1500,
+          );
+        }
+      }
+    }
   }
 
   /**
