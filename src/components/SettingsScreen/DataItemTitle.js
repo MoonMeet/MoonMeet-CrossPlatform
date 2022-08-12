@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+import {fontValue} from '../../config/Dimensions';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 
 interface DataItemTitleInterface {
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   titleTextView: {
-    fontSize: 18,
+    fontSize: fontValue(18),
     paddingLeft: '3%',
     paddingRight: '3%',
     textAlign: 'center',
