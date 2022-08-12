@@ -27,7 +27,10 @@ import {getVersion} from 'react-native-device-info';
 import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {
+  ErrorToast,
+  InfoToast,
+} from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 if (__DEV__) {
@@ -168,7 +171,15 @@ const SplashScreen = () => {
                     } else {
                       auth()
                         ?.signOut()
-                        .catch(error => console.log(error))
+                        .catch(error => {
+                          ErrorToast(
+                            'bottom',
+                            'Failed to log out',
+                            `${error}`,
+                            true,
+                            1000,
+                          );
+                        })
                         .finally(() => {
                           navigation?.dispatch(
                             CommonActions?.reset({
