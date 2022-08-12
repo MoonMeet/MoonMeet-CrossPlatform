@@ -7,7 +7,6 @@ import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
-import firestore from '@react-native-firebase/firestore';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -30,7 +29,7 @@ const MessagesList = ({ListData}) => {
           ? `You: ${item?.to_message_text}`
           : `${item?.to_message_text}`;
       let modifiedtext =
-        messageLength < 35 ? message : message.substring(0, 35) + '...';
+        messageLength < 35 ? message : message?.substring(0, 35) + '...';
       return modifiedtext;
     } else {
       let message =
@@ -156,6 +155,7 @@ const styles = StyleSheet.create({
     };
   },
   emptyView: {
+    marginTop: 8 - 0.1 * 8,
     flex: 1,
     backgroundColor: COLORS.white,
     alignSelf: 'center',
