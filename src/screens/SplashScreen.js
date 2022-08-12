@@ -28,6 +28,7 @@ import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 if (__DEV__) {
   initializeMMKVFlipper({default: OnboardingMMKV});
@@ -43,6 +44,8 @@ const SplashScreen = () => {
 
   const [havePasscode, setHavePasscode] = React.useState(null);
 
+  const {dismissAll} = useBottomSheetModal();
+
   /**
    * Update variables, used in to check for required updates.
    */
@@ -52,10 +55,6 @@ const SplashScreen = () => {
 
   const handleModalShow = useCallback(() => {
     updateSheetRef?.current?.present();
-  }, []);
-
-  const handleModalClose = useCallback(() => {
-    updateSheetRef?.current?.forceClose();
   }, []);
 
   const [updatedRequired, setUpdateRequired] = React.useState(false);
@@ -250,11 +249,11 @@ const SplashScreen = () => {
           if (Linking.canOpenURL(updateURL)) {
             Linking.openURL(updateURL);
           }
-          handleModalClose();
+          dismissAll();
           // Implement App Exit
         }}
         onDoItLaterPress={() => {
-          handleModalClose();
+          dismissAll();
           ManualFetchForDoItLater();
         }}
       />
