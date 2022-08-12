@@ -57,7 +57,7 @@ const PrivacySecurityScreen = () => {
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot?.exists) {
           setPhoneNumberStatus(documentSnapshot?.data()?.phone_status);
-          setLastSeenNOnline(documentSnapshot?.data().active_status);
+          setLastSeenNOnline(documentSnapshot?.data()?.active_status);
           setLoading(false);
         }
       });
