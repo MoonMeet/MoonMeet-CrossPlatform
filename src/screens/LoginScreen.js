@@ -547,7 +547,7 @@ const LoginScreen = () => {
                   fontFamily: FONTS.regular,
                 }}
                 onPress={() => handlePresentPrivacyModal()}>
-                Terms of Service
+                Privacy Policy
               </Text>
             </View>
             <Snackbar
