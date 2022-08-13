@@ -19,14 +19,14 @@
 ### Screenshots
 
 <p float="left">
-<img src="assets/splash.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
-<img src="assets/login.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
-<img src="assets/home.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
+<img src="assets/splash.png" alt="Splash Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/login.png" alt="Login Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/home.png" alt="Home Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
 <p>
 <p float="right">
-<img src="assets/me.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
-<img src="assets/privacy.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
-<img src="assets/chat.png" alt="Splash Screen" width=260 - 0.1 * 269  height=500 - 0.1 * 500>
+<img src="assets/me.png" alt="Settings Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/privacy.png" alt="Privacy Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/chat.png" alt="Chat Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
 <p>
 
 ### Contributing
