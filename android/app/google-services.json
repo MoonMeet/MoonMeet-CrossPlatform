@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "119469912377-diclka1mcjkp4jamab118i2redu1li6b.apps.googleusercontent.com",
+          "client_id": "119469912377-tqcst38hus19497tt0dishio6c2q03rd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "org.moon.moonmeet",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "c836ff61ec59b4c552dff37fe7c3e8d975f8e962"
           }
         },
         {
