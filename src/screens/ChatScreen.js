@@ -33,7 +33,7 @@ import MaterialIcons from 'react-native-vector-icons/FontAwesome5';
 import {Image} from 'react-native-compressor';
 import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
-import {reverse, sortBy} from 'lodash';
+import {isEmpty, reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
@@ -61,11 +61,6 @@ const ChatScreen = () => {
   /**
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
    */
-
-  const [myUID, setMyUID] = React.useState('');
-  const [myFirstName, setMyFirstName] = React.useState('');
-  const [myLastName, setMyLastName] = React.useState('');
-  const [myAvatar, setMyAvatar] = React.useState('');
 
   const Me = JSON?.parse(UserDataMMKV?.getString('Me'));
 
@@ -124,7 +119,6 @@ const ChatScreen = () => {
             setUserLastName(userSnapshot?.data()?.last_name);
             setUserAvatar(userSnapshot?.data()?.avatar);
             setUserActiveStatus(userSnapshot?.data()?.active_status);
-
             if (userSnapshot?.data()?.active_time === 'Last seen recently') {
               setUserActiveTime(userSnapshot?.data()?.active_time);
             } else {
@@ -133,25 +127,10 @@ const ChatScreen = () => {
           }
         }
       });
+    return () => userSubscribe();
+  }, []);
 
-    const mySubscribe = firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .onSnapshot(mySnapshot => {
-        if (mySnapshot?.exists) {
-          if (
-            mySnapshot?.data()?.avatar &&
-            mySnapshot?.data()?.first_name &&
-            mySnapshot?.data()?.last_name
-          ) {
-            setMyUID(mySnapshot?.data()?.uid);
-            setMyFirstName(mySnapshot?.data()?.first_name);
-            setMyLastName(mySnapshot?.data()?.last_name);
-            setMyAvatar(mySnapshot?.data()?.avatar);
-          }
-        }
-      });
-
+  useEffect(() => {
     const messagesSubscribe = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -185,8 +164,6 @@ const ChatScreen = () => {
         setLoading(false);
       });
     return () => {
-      userSubscribe();
-      mySubscribe();
       messagesSubscribe();
     };
   }, [
@@ -385,42 +362,46 @@ const ChatScreen = () => {
        * an async function to get {avatarUrl} and upload all user data.
        */
       uploadImageTask.then(async () => {
-        try {
-          const uploadedImageURL = await storage()
-            .ref(pickedImage)
-            .getDownloadURL();
-          firestore()
-            .collection('users')
-            .doc(auth()?.currentUser?.uid)
-            .collection('messages')
-            .doc(destinedUser)
-            .collection('discussions')
-            .add({
-              _id: _id,
-              image: uploadedImageURL,
-              createdAt: Date.now(),
-              user: {
-                _id: auth()?.currentUser?.uid,
-              },
-            });
-          firestore()
-            .collection('users')
-            .doc(destinedUser)
-            .collection('messages')
-            .doc(auth()?.currentUser?.uid)
-            .collection('discussions')
-            .add({
-              _id: _id,
-              createdAt: Date.now(),
-              image: uploadedImageURL,
-              user: {
-                _id: auth()?.currentUser?.uid,
-              },
-            });
-          setChatData(previousMessage =>
-            GiftedChat.append(previousMessage, mChatData),
-          );
-          // Chats messages on home screen goes here
+        const uploadedImageURL = await storage()
+          .ref(pickedImage)
+          .getDownloadURL();
+        firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .collection('messages')
+          .doc(destinedUser)
+          .collection('discussions')
+          .add({
+            _id: _id,
+            image: uploadedImageURL,
+            createdAt: Date.now(),
+            user: {
+              _id: auth()?.currentUser?.uid,
+            },
+          });
+        firestore()
+          .collection('users')
+          .doc(destinedUser)
+          .collection('messages')
+          .doc(auth()?.currentUser?.uid)
+          .collection('discussions')
+          .add({
+            _id: _id,
+            createdAt: Date.now(),
+            image: uploadedImageURL,
+            user: {
+              _id: auth()?.currentUser?.uid,
+            },
+          });
+        setChatData(previousMessage =>
+          GiftedChat.append(previousMessage, mChatData),
+        );
+        // Chats messages on home screen goes here
+        if (
+          !isEmpty(userFirstName) &&
+          !isEmpty(userLastName) &&
+          isEmpty(userAvatar)
+        ) {
           firestore()
             .collection('chats')
             .doc(auth()?.currentUser?.uid)
@@ -436,21 +417,21 @@ const ChatScreen = () => {
               last_uid: auth()?.currentUser?.uid,
               sent_to_uid: destinedUser,
             });
-          firestore()
-            .collection('chats')
-            .doc(destinedUser)
-            .collection('discussions')
-            .doc(auth()?.currentUser?.uid)
-            .set({
-              to_first_name: Me?.first_name,
-              to_last_name: Me?.last_name,
-              to_message_image: uploadedImageURL,
-              to_avatar: Me?.avatar,
-              time: firestore?.Timestamp?.fromDate(new Date()),
-              type: 'image',
-              last_uid: auth()?.currentUser?.uid,
-            });
-        } catch (ignore) {}
+        }
+        firestore()
+          .collection('chats')
+          .doc(destinedUser)
+          .collection('discussions')
+          .doc(auth()?.currentUser?.uid)
+          .set({
+            to_first_name: Me?.first_name,
+            to_last_name: Me?.last_name,
+            to_message_image: uploadedImageURL,
+            to_avatar: Me?.avatar,
+            time: firestore?.Timestamp?.fromDate(new Date()),
+            type: 'image',
+            last_uid: auth()?.currentUser?.uid,
+          });
       });
     }
   });
