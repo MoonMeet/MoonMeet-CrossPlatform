@@ -44,17 +44,6 @@ import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const LoginScreen = () => {
-  /**
-   * Dummy NetInfoObserver
-   */
-
-  const addNetInfoObserver = () => {
-    NetInfo.addEventListener(networkState => {
-      console.info(networkState.details);
-      console.info(networkState.type);
-    });
-  };
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -70,11 +59,8 @@ const LoginScreen = () => {
   );
 
   useEffect(() => {
-    addNetInfoObserver();
-    const currentSubscriber = auth()?.onAuthStateChanged(onAuthStateChanged);
-    const LoginScreenTimerTask = setTimeout(async () => {
-      let isConnected = await NetInfo.fetch();
-      if (isConnected.isConnected) {
+    const netEventListener = NetInfo?.addEventListener(listenerState => {
+      if (listenerState?.isConnected) {
         getCountryCodeFromApi();
       } else {
         setErrorSnackbarText(
@@ -82,12 +68,8 @@ const LoginScreen = () => {
         );
         setErrorSnackBarVisible(true);
       }
-    }, 500);
-    return () => {
-      currentSubscriber();
-      addNetInfoObserver();
-      clearTimeout(LoginScreenTimerTask);
-    };
+    });
+    return netEventListener;
   }, []);
 
   const navigation = useNavigation();
@@ -147,18 +129,11 @@ const LoginScreen = () => {
     return CountryText?.trim()?.length > 1 && NumberText?.trim()?.length > 4;
   };
 
-  /**
-   * Firebase Phone Auth Stuff
-   */
-
-  function onAuthStateChanged(currentUser) {
-    setMoonMeetUser(currentUser);
-  }
   const phoneRef = useRef();
 
-  const [MoonMeetUser, setMoonMeetUser] = React.useState();
+  const [ConfirmCode, setConfirmCode] = React.useState(false);
 
-  const [ConfirmCode, setConfirmCode] = React.useState(null);
+  const [verificationId, setVerificationId] = React.useState('');
 
   /**
    * Loader stuff
@@ -173,8 +148,10 @@ const LoginScreen = () => {
 
   async function signInWithPhoneNumber(phoneNumber) {
     try {
-      const sendCodeTask = await auth()?.signInWithPhoneNumber(phoneNumber);
-      setConfirmCode(sendCodeTask);
+      setLoaderVisible(true);
+      const sendCodeTask = await auth()?.verifyPhoneNumber(phoneNumber);
+      setVerificationId(sendCodeTask?.verificationId);
+      setConfirmCode(true);
       setLoaderVisible(false);
     } catch (error) {
       setLoaderVisible(false);
@@ -184,6 +161,14 @@ const LoginScreen = () => {
             'bottom',
             'Invalid phone number',
             'please check your phone number again',
+            true,
+            1500,
+          );
+        } else {
+          ErrorToast(
+            'bottom',
+            'Unexpected error occured',
+            `${error}`,
             true,
             1500,
           );
@@ -260,10 +245,14 @@ const LoginScreen = () => {
 
   async function addCodeObserver(text) {
     if (text?.length > 5) {
-      Keyboard.dismiss();
       try {
+        Keyboard?.dismiss();
         setLoaderVisible(true);
-        await ConfirmCode.confirm(text);
+        const credential = auth?.PhoneAuthProvider?.credential(
+          verificationId,
+          text,
+        );
+        await auth()?.signInWithCredential(credential);
         firestore()
           .collection('users')
           .doc(auth()?.currentUser?.uid)
@@ -344,24 +333,22 @@ const LoginScreen = () => {
         setLoaderVisible(false);
         if (error !== null) {
           if (error.code === 'auth/invalid-verification-code') {
-            setLoaderVisible(false);
+            ErrorToast(
+              'bottom',
+              'Invalid code',
+              'Please check the code again',
+              true,
+              2000,
+            );
+          } else {
+            ErrorToast(
+              'bottom',
+              'Unexpected error occured',
+              `${error}`,
+              true,
+              2000,
+            );
           }
-          ErrorToast(
-            'bottom',
-            'Invalid code',
-            'Try checking if the code is correct or not',
-            true,
-            2000,
-          );
-        } else {
-          setLoaderVisible(false);
-          ErrorToast(
-            'bottom',
-            'Account linking error',
-            'Try restarting Moon Meet and try again',
-            true,
-            2000,
-          );
         }
       }
     }
@@ -588,12 +575,7 @@ const LoginScreen = () => {
                   const isConnected = await NetInfo.fetch();
                   if (isConnected.isConnected) {
                     if (isSMSSendingAcceptable()) {
-                      setLoaderVisible(true);
-                      signInWithPhoneNumber(CountryText + NumberText)?.catch(
-                        () => {
-                          setLoaderVisible(false);
-                        },
-                      );
+                      signInWithPhoneNumber(CountryText + NumberText);
                     } else {
                       setBottomMargin(heightPercentageToDP(7.5));
                       setErrorSnackbarText(
