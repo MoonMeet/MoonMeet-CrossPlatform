@@ -10,6 +10,8 @@
 
 ### Description
 
+---
+
 - **Moon Meet** is a social media platform including chatting feature.
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
@@ -17,6 +19,8 @@
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
 ### Screenshots
+
+---
 
 <p float="left">
 <img src="assets/splash.png" alt="Splash Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
@@ -30,6 +34,8 @@
 <p>
 
 ### Contributing
+
+---
 
 #### Requirments:
 
@@ -58,11 +64,16 @@
 ---
 
 - `[TASK] react-native-compressor-verifyReleaseRessources [FAILED] in release mode:`
+  
   fix: Go to `node_modules/react-native-compressor/android.build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
+  
 - `[TASK] bundleReleaseJsAndAssets [FAILED]:`
+  
   fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
 ### Commit message
+
+---
 
 When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that *commit*.
 
@@ -87,9 +98,10 @@ And that summarized:
 - `fix: Fix story not showing in some browsers`
 - `refactor: Reformat code at File.*`
 - `chore: bump Moon Meet version from X.X.X to X.X.X `
-- ...
 
 ### Thanks for contributing
+
+---
 
 Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
