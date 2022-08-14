@@ -80,6 +80,32 @@ const SplashScreen = () => {
               } else {
                 setHavePasscode(false);
               }
+            } else {
+              auth()
+                ?.signOut()
+                .catch(error => {
+                  ErrorToast(
+                    'bottom',
+                    'Failed to log out',
+                    `${error}`,
+                    true,
+                    1000,
+                  );
+                })
+                .finally(() => {
+                  navigation?.dispatch(
+                    CommonActions?.reset({
+                      index: 0,
+                      routes: [{name: 'splash'}],
+                    }),
+                  );
+                  InfoToast(
+                    'bottom',
+                    'Please re-login',
+                    'You need to re-login and complete your profile',
+                  );
+                  navigation?.navigate('login');
+                });
             }
           })
           .finally(() => {
