@@ -128,7 +128,7 @@ def enableHermes = project.ext.react.get("enableHermes", false);
  */
 def reactNativeArchitectures() {
     def value = project.getProperties().get("reactNativeArchitectures")
-    return value ? value.split(",") : ["armeabi-v7a", /*"x86", "x86_64",*/ "arm64-v8a"]
+    return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
 /**
@@ -187,7 +187,7 @@ android {
             }
             if (!enableSeparateBuildPerCPUArchitecture) {
                 ndk {
-                    abiFilters (*reactNativeArchitectures())
+                    abiFilters "armeabi-v7a", "arm64-v8a" //(*reactNativeArchitectures())
                 }
             }
         }
@@ -238,25 +238,23 @@ android {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
+            universalApk true  // If true, also generate a universal APK
             include (*reactNativeArchitectures())
         }
     }
     signingConfigs {
         debug {
-            storeFile file('config/release.jks')
+            storeFile file('config/release.keystore')
             storePassword keystoreProperties['storePassword']
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
-            enableV3Signing = true
             
         }
         release { 
-            storeFile file('config/release.jks')
+            storeFile file('config/release.keystore')
             storePassword keystoreProperties['storePassword']
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
-            enableV3Signing = true
         } // I am using my own keystore for debugging and release, you SHOULD follow README.md for instructions.
     }
     buildTypes {
@@ -307,7 +305,7 @@ dependencies {
     implementation project(':react-native-vector-icons')
 
     implementation "androidx.core:core:1.8.0"
-
+    
     implementation "androidx.core:core-ktx:1.8.0"
 
     implementation 'androidx.multidex:multidex:2.0.1'
