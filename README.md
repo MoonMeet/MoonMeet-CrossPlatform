@@ -1,4 +1,4 @@
-### MoonMeet CrossPlatform
+## MoonMeet CrossPlatform 🎉️ 
 
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
@@ -66,7 +66,6 @@
 - `[TASK] react-native-compressor-verifyReleaseRessources [FAILED] in release mode:`
   
   fix: Go to `node_modules/react-native-compressor/android.build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
-  
 - `[TASK] bundleReleaseJsAndAssets [FAILED]:`
   
   fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
@@ -107,10 +106,14 @@ Thanks, they help to keep **Moon Meet** alive. It's better to have multiple peop
 
 ### Social
 
+---
+
 - [Facebook](https://www.facebook.com/moonmeetofficial)
 - [Telegram](https://t.me/MoonMeet)
 
 ### License
+
+---
 
 ```
 Copyright (C) 2022  SectionTN
