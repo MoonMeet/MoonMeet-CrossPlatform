@@ -31,7 +31,36 @@
 
 ### Contributing
 
-`Please back soon we'll make a section about this.`
+#### Requirments:
+
+---
+
+- A Working react native envirment environment.
+- Physical device (real device) because emulators have problem with SHA-256.
+- NDK Version `21.4.7075529`, NOTE: for Mac M1 users, you'll just need NDK version `24.0.8215888`.
+- SDK Version `33, 32, 31 and 30`.
+- ICU for linux (optional):
+  
+  ```
+  git clone https://github.com/unicode-org/icu
+  cd icu/icu4c
+  cd source
+  ./configure --prefix=/usr
+  make
+  sudo make install
+  ```
+- Your own `release.keystore, sensitive.js and google-service.json`.
+
+---
+
+##### Troubleshooting:
+
+---
+
+- `[TASK] react-native-compressor-verifyReleaseRessources [FAILED] in release mode:`
+  fix: Go to `node_modules/react-native-compressor/android.build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
+- `[TASK] bundleReleaseJsAndAssets [FAILED]:`
+  fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
 ### Commit message
 
@@ -84,3 +113,4 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
 GNU General Public License for more details.
 ```
+
