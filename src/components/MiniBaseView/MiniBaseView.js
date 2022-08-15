@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 import React from 'react';
 import {COLORS} from '../../config/Miscellaneous';
-import {withTheme, useTheme} from 'react-native-paper';
+import {withTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
