@@ -67,3 +67,7 @@
 # Slf4j
 
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+
+# WebRTC
+
+-keep class org.webrtc.** { *; }
