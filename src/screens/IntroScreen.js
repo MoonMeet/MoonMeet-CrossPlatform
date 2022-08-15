@@ -16,18 +16,18 @@ const IntroScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        BackHandler.exitApp();
+        BackHandler?.exitApp();
         return true;
       };
 
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      BackHandler?.addEventListener('hardwareBackPress', onBackPress);
 
       return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        BackHandler?.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
   const setViewPagerCompleted = () => {
-    OnboardingMMKV.set('onboardingComplete', true);
+    OnboardingMMKV?.set('onboardingComplete', true);
   };
 
   return (
