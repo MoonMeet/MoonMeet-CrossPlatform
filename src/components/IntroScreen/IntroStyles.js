@@ -12,8 +12,8 @@ export const IntroStyles = StyleSheet.create({
     padding: '2%',
   },
   illustration: {
-    height: 300,
-    width: 300,
+    height: 300 - 0.1 * 300,
+    width: 300 - 0.1 * 300,
     bottom: '12.5%',
     position: 'relative',
   },
