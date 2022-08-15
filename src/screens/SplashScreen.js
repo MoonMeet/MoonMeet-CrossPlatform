@@ -1,3 +1,4 @@
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {
@@ -5,8 +6,13 @@ import {
   useFocusEffect,
   useNavigation,
 } from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {Linking, SafeAreaView, StyleSheet, Text} from 'react-native';
+import {
+  BackHandler,
+  Linking,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {
   fontValue,
@@ -135,8 +141,8 @@ const SplashScreen = () => {
 
   const isViewPagerCompleted = () => {
     return (
-      OnboardingMMKV.contains('onboardingComplete') &&
-      OnboardingMMKV.getBoolean('onboardingComplete')
+      OnboardingMMKV?.contains('onboardingComplete') &&
+      OnboardingMMKV?.getBoolean('onboardingComplete')
     );
   };
 
@@ -251,14 +257,14 @@ const SplashScreen = () => {
 
   const viewAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateY: translateY.value}],
+      transform: [{translateY: translateY?.value}],
     };
   }, []);
 
   const imageAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{scaleX: scaleX.value}, {scaleY: scaleY.value}],
-      opacity: opacity.value,
+      transform: [{scaleX: scaleX?.value}, {scaleY: scaleY?.value}],
+      opacity: opacity?.value,
     };
   }, []);
 
@@ -287,7 +293,7 @@ const SplashScreen = () => {
             Linking.openURL(updateURL);
           }
           dismissAll();
-          // Implement App Exit
+          BackHandler?.exitApp();
         }}
         onDoItLaterPress={() => {
           dismissAll();
