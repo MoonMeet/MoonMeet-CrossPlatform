@@ -122,299 +122,315 @@ const SetupScreen = ({route}) => {
   const [appVersion, setAppVersion] = React.useState(getVersion());
 
   return (
-    <BaseView>
-      <View style={styles.top_bar}>
-        <Text style={styles.top_text}>
-          Enter your name and select a profile picture
-        </Text>
-      </View>
-      <View style={styles.large_box}>
-        <Pressable
-          onPress={() => {
-            Keyboard.dismiss();
-            handlePresentModal();
+    <>
+      <BaseView>
+        <View style={styles.top_bar}>
+          <Text style={styles.top_text}>
+            Enter your name and select a profile picture
+          </Text>
+        </View>
+        <View style={styles.large_box}>
+          <Pressable
+            onPress={() => {
+              Keyboard.dismiss();
+              handlePresentModal();
+            }}
+            onLongPress={() => {
+              if (UserPhoto) {
+                setUserPhoto(null);
+                InfoToast(
+                  'bottom',
+                  'Photo Removed',
+                  'Now select a new photo',
+                  true,
+                  2000,
+                );
+              }
+            }}
+            style={{
+              justifyContent: 'center',
+              paddingLeft: '2.5%',
+            }}>
+            {UserPhoto ? (
+              <Avatar.Image
+                style={{
+                  height: 55 - 0.1 * 55,
+                  width: 55 - 0.1 * 55,
+                  backgroundColor: COLORS.rippleColor,
+                }}
+                color={COLORS.rippleColor}
+                size={55}
+                source={{uri: UserPhoto?.path}}
+                theme={{
+                  colors: {
+                    primary: COLORS.accentLight,
+                  },
+                }}
+              />
+            ) : (
+              <View
+                style={{
+                  height: 55 - 0.1 * 55,
+                  width: 55 - 0.1 * 55,
+                  backgroundColor: COLORS.darkGrey,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 27,
+                  overflow: 'hidden',
+                }}>
+                <Image
+                  style={{
+                    height: 30 - 0.1 * 30,
+                    width: 30 - 0.1 * 30,
+                    backgroundColor: COLORS.darkGrey,
+                    resizeMode: 'cover',
+                  }}
+                  source={placeHolderPhoto}
+                />
+              </View>
+            )}
+          </Pressable>
+          <View
+            style={{
+              height: '-1%',
+              width: '3%',
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'column',
+              width: '100%',
+              padding: '1%',
+            }}>
+            <TextInput
+              style={{
+                width: '80%',
+              }}
+              mode="outlined"
+              label="First name"
+              value={firstName}
+              multiline={false}
+              theme={{
+                colors: {
+                  text: COLORS.accentLight,
+                  primary: COLORS.accentLight,
+                  backgroundColor: COLORS.rippleColor,
+                  placeholder: COLORS.darkGrey,
+                  underlineColor: '#566193',
+                  selectionColor: '#DADADA',
+                  outlineColor: '#566193',
+                },
+              }}
+              onChangeText={_firstName => {
+                setFirstName(_firstName);
+              }}
+            />
+            <TextInput
+              style={{
+                width: '80%',
+              }}
+              mode="outlined"
+              label="Last name"
+              value={lastName}
+              multiline={false}
+              theme={{
+                colors: {
+                  text: COLORS.accentLight,
+                  primary: COLORS.accentLight,
+                  backgroundColor: COLORS.rippleColor,
+                  placeholder: COLORS.darkGrey,
+                  underlineColor: '#566193',
+                  selectionColor: '#DADADA',
+                  outlineColor: '#566193',
+                },
+              }}
+              onChangeText={_lastName => {
+                setLastName(_lastName);
+              }}
+            />
+          </View>
+        </View>
+        <FAB
+          style={styles.fab}
+          normal
+          icon={ArrowForward}
+          color={COLORS.primaryLight}
+          animated={true}
+          theme={{
+            colors: {
+              accent: COLORS.accentLight,
+            },
           }}
-          onLongPress={() => {
+          onPress={async () => {
             if (UserPhoto) {
-              setUserPhoto(null);
-              InfoToast(
+              if (
+                firstName?.trim()?.length > 1 &&
+                lastName?.trim()?.length > 1
+              ) {
+                setLoaderVisible(true);
+                /**
+                 * Reference to users image path
+                 * @type {FirebaseStorageTypes.Reference}
+                 */
+                try {
+                  let _userAvatarRef = `avatars/${
+                    auth()?.currentUser?.uid
+                  }.${UserPhoto?.path?.substr(
+                    UserPhoto?.path?.lastIndexOf('.') + 1,
+                    3,
+                  )}`;
+
+                  const storageRef = storage().ref(_userAvatarRef);
+
+                  /**
+                   * Uploading image to Firebase Storage
+                   * @type {FirebaseStorageTypes.Task}
+                   */
+
+                  const uploadImageTask = storageRef?.putFile(UserPhoto?.path);
+
+                  /**
+                   * Add observer to image uploading.
+                   */
+
+                  uploadImageTask.on('state_changed', taskSnapshot => {
+                    if (__DEV__) {
+                      console.log(
+                        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+                      );
+                    }
+                  });
+
+                  /**
+                   * an async function to get {avatarUrl} and upload all user data.
+                   */
+
+                  uploadImageTask.then(async () => {
+                    const avatarUrl = await storage()
+                      .ref(_userAvatarRef)
+                      .getDownloadURL();
+
+                    /**
+                     * pushing device information for later use in DeviceScreen.js
+                     */
+                    if (!isWindows && !isWeb) {
+                      firestore()
+                        .collection('users')
+                        .doc(auth()?.currentUser?.uid)
+                        .collection('devices')
+                        .add({
+                          manufacturer: Manufacturer,
+                          system_name: systemName,
+                          system_version: systemVersion,
+                          product: Product,
+                          model: Model,
+                          app_version: appVersion,
+                          time: firestore.Timestamp.fromDate(new Date()),
+                        })
+                        .catch(error => {
+                          if (__DEV__) {
+                            console.error(error);
+                          }
+                          setLoaderVisible(false);
+                        });
+                    }
+
+                    /**
+                     * Since we got everything except a girlfriend.
+                     * we must push data to firebase.
+                     */
+
+                    JwtKeyMMKV?.set('currentUserJwtKey', jwt_key);
+                    firestore()
+                      .collection('users')
+                      .doc(auth()?.currentUser?.uid)
+                      .set({
+                        ...user,
+                        first_name: lowerToUppercase(firstName),
+                        last_name: lowerToUppercase(lastName),
+                        avatar: avatarUrl,
+                        active_status: 'normal',
+                        info: {
+                          created_At: firestore?.Timestamp?.fromDate(
+                            new Date(),
+                          ),
+                          premuim: false,
+                          premuimUntil: 'none',
+                          banned: false,
+                          bannedUntil: '',
+                        },
+                        active_time: firestore?.Timestamp?.fromDate(new Date()),
+                        bio: '',
+                        jwtKey: jwt_key,
+                        passcode: {
+                          passcode_enabled: false,
+                        },
+                      })
+
+                      .finally(() => {
+                        navigation?.dispatch(
+                          CommonActions?.reset({
+                            index: 0,
+                            routes: [{name: 'setup'}],
+                          }),
+                        );
+                        navigation?.navigate('home');
+                        setLoaderVisible(false);
+                      });
+                  });
+                } catch (e) {
+                  setLoaderVisible(false);
+                  ErrorToast(
+                    'bottom',
+                    'Unexpected error occured',
+                    `${e}`,
+                    true,
+                    2000,
+                  );
+                }
+              } else {
+                ErrorToast(
+                  'bottom',
+                  'Please enter your name',
+                  'fill the blanks with your name and try again.',
+                  true,
+                  2000,
+                );
+              }
+            } else {
+              ErrorToast(
                 'bottom',
-                'Photo Removed',
-                'Now select a new photo',
+                'Please select a photo',
+                'Select a photo and try again.',
                 true,
                 2000,
               );
             }
           }}
-          style={{
-            justifyContent: 'center',
-            paddingLeft: '2.5%',
-          }}>
-          {UserPhoto ? (
-            <Avatar.Image
-              style={{
-                height: 55,
-                width: 55,
-                backgroundColor: COLORS.rippleColor,
-              }}
-              color={COLORS.rippleColor}
-              size={55}
-              source={{uri: UserPhoto?.path}}
-              theme={{
-                colors: {
-                  primary: COLORS.accentLight,
-                },
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                height: 55,
-                width: 55,
-                backgroundColor: COLORS.darkGrey,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 27,
-                overflow: 'hidden',
-              }}>
-              <Image
-                style={{
-                  height: 30,
-                  width: 30,
-                  backgroundColor: COLORS.darkGrey,
-                  resizeMode: 'cover',
-                }}
-                source={placeHolderPhoto}
-              />
-            </View>
-          )}
-        </Pressable>
-        <View
-          style={{
-            height: '-1%',
-            width: '3%',
-          }}
         />
-        <View
-          style={{
-            flexDirection: 'column',
-            width: '100%',
-            padding: '1%',
-          }}>
-          <TextInput
-            style={{
-              width: '80%',
-            }}
-            mode="outlined"
-            label="First Name"
-            value={firstName}
-            onFocus={() => dismissAll()}
-            multiline={false}
-            theme={{
-              colors: {
-                text: COLORS.accentLight,
-                primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
-              },
-            }}
-            onChangeText={_firstName => {
-              setFirstName(_firstName);
-            }}
-          />
-          <TextInput
-            style={{
-              width: '80%',
-            }}
-            mode="outlined"
-            label="Last Name"
-            value={lastName}
-            multiline={false}
-            onFocus={() => dismissAll()}
-            theme={{
-              colors: {
-                text: COLORS.accentLight,
-                primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
-              },
-            }}
-            onChangeText={_lastName => {
-              setLastName(_lastName);
-            }}
-          />
-        </View>
-      </View>
-      <FAB
-        style={styles.fab}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
-        animated={true}
-        theme={{
-          colors: {
-            accent: COLORS.accentLight,
-          },
-        }}
-        onPress={async () => {
-          if (UserPhoto) {
-            if (firstName?.trim()?.length > 1 && lastName?.trim()?.length > 1) {
-              setLoaderVisible(!LoaderVisible);
-              /**
-               * Reference to users image path
-               * @type {FirebaseStorageTypes.Reference}
-               */
-              try {
-                let _userAvatarRef = `avatars/${
-                  auth()?.currentUser?.uid
-                }.${UserPhoto.path?.substr(
-                  UserPhoto.path?.lastIndexOf('.') + 1,
-                  3,
-                )}`;
-
-                const storageRef = storage().ref(_userAvatarRef);
-
-                /**
-                 * Uploading image to Firebase Storage
-                 * @type {FirebaseStorageTypes.Task}
-                 */
-
-                const uploadImageTask = storageRef.putFile(UserPhoto?.path);
-
-                /**
-                 * Add observer to image uploading.
-                 */
-
-                uploadImageTask.on('state_changed', taskSnapshot => {
-                  console.log(
-                    `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-                  );
-                });
-
-                /**
-                 * an async function to get {avatarUrl} and upload all user data.
-                 */
-
-                uploadImageTask.then(async () => {
-                  const avatarUrl = await storage()
-                    .ref(_userAvatarRef)
-                    .getDownloadURL();
-
-                  /**
-                   * pushing device information for later use in DeviceScreen.js
-                   */
-                  if (!isWindows && !isWeb) {
-                    firestore()
-                      .collection('users')
-                      .doc(auth()?.currentUser?.uid)
-                      .collection('devices')
-                      .add({
-                        manufacturer: Manufacturer,
-                        system_name: systemName,
-                        system_version: systemVersion,
-                        product: Product,
-                        model: Model,
-                        app_version: appVersion,
-                        time: firestore.Timestamp.fromDate(new Date()),
-                      })
-                      .catch(error => {
-                        console.error(error);
-                        setLoaderVisible(!LoaderVisible);
-                      });
-                  }
-
-                  /**
-                   * Since we got everything except a girlfriend.
-                   * we must push data to firebase.
-                   */
-
-                  JwtKeyMMKV.set('currentUserJwtKey', jwt_key);
-                  firestore()
-                    .collection('users')
-                    .doc(auth()?.currentUser?.uid)
-                    .set({
-                      ...user,
-                      first_name: lowerToUppercase(firstName),
-                      last_name: lowerToUppercase(lastName),
-                      avatar: avatarUrl,
-                      active_status: 'normal',
-                      info: {
-                        created_At: firestore.Timestamp.fromDate(new Date()),
-                        premuim: false,
-                        premuimUntil: 'none',
-                        banned: false,
-                        bannedUntil: '',
-                      },
-                      active_time: firestore.Timestamp.fromDate(new Date()),
-                      bio: '',
-                      jwtKey: jwt_key,
-                      passcode: {
-                        passcode_enabled: false,
-                      },
-                    })
-
-                    .finally(() => {
-                      navigation?.dispatch(
-                        CommonActions?.reset({
-                          index: 0,
-                          routes: [{name: 'setup'}],
-                        }),
-                      );
-                      navigation?.navigate('home');
-                      setLoaderVisible(!LoaderVisible);
-                    });
-                });
-              } catch (e) {
-                setLoaderVisible(!LoaderVisible);
-              }
-            } else {
-              ErrorToast(
-                'bottom',
-                'Please enter your name',
-                'fill the blanks with your name and try again.',
-                true,
-                3000,
-              );
-            }
-          } else {
-            ErrorToast(
-              'bottom',
-              'Please select a photo',
-              'Select a photo and try again.',
-              true,
-              3000,
-            );
-          }
-        }}
-      />
+      </BaseView>
       <LoadingIndicator
         isVisible={LoaderVisible}
         hideModal={() => {
-          setLoaderVisible(!LoaderVisible);
+          setLoaderVisible(false);
         }}
       />
       <ImagePickerActionSheet
         sheetRef={pickerRef}
         index={0}
         snapPoints={sheetSnapPoints}
-        onCameraPress={() => {
-          openCamera()
+        onCameraPress={async () => {
+          await openCamera()
             .then(image => {
               setUserPhoto(image);
-              dismissAll();
             })
             .catch(e => {
               console.error(e);
             });
+          dismissAll();
         }}
-        onFilePicker={() => {
-          openImagePicker()
+        onFilePicker={async () => {
+          await openImagePicker()
             .then(image => {
               setUserPhoto(image);
               dismissAll();
@@ -422,11 +438,13 @@ const SetupScreen = ({route}) => {
             .catch(e => {
               console.error(e);
             });
+          dismissAll();
         }}
       />
-    </BaseView>
+    </>
   );
 };
+
 const styles = StyleSheet.create({
   top_bar: {
     flexDirection: 'row',
@@ -456,4 +474,5 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
+
 export default SetupScreen;
