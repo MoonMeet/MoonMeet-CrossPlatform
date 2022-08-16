@@ -433,10 +433,11 @@ const SetupScreen = ({route}) => {
           await openImagePicker()
             .then(image => {
               setUserPhoto(image);
-              dismissAll();
             })
             .catch(e => {
-              console.error(e);
+              if (__DEV__) {
+                console.error(e);
+              }
             });
           dismissAll();
         }}
