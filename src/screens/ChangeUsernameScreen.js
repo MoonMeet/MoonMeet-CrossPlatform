@@ -32,17 +32,6 @@ const ChangeUsernameScreen = () => {
     isConnected = networkState?.isConnected;
   });
 
-  /**
-   * Dummy NetInfoObserver
-   */
-
-  const addNetInfoObserver = () => {
-    NetInfo.addEventListener(networkState => {
-      console.info(networkState.details);
-      console.info(networkState.type);
-    });
-  };
-
   const [UsernameText, setUsernameText] = React.useState('');
   const [oldUsernameText, setOldUsernameText] = React.useState('');
 
