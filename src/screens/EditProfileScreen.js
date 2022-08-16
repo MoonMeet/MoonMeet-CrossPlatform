@@ -154,7 +154,9 @@ const EditProfileScreen = () => {
       })
       .catch(error => {
         setLoaderVisible(false);
-        console.warn(error);
+        if (__DEV__) {
+          console.warn(error);
+        }
         ErrorToast(
           'bottom',
           'Avatar update failed',
