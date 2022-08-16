@@ -24,7 +24,6 @@ import {
   Avatar,
   HelperText,
   TextInput,
-  TouchableRipple,
 } from 'react-native-paper';
 import DoneImage from '../assets/images/done.png';
 import CameraImage from '../assets/images/photo-camera.png';
