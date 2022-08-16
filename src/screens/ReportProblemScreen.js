@@ -271,7 +271,11 @@ const ReportProblemScreen = () => {
                 .then(image => {
                   setUserPhoto(image);
                 })
-                .catch(error => console.error(error));
+                .catch(error => {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                });
             }}>
             Attach Photo
           </Chip>
