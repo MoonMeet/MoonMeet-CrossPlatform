@@ -162,7 +162,9 @@ const DevicesScreen = () => {
               try {
                 JwtKeyMMKV.set('currentUserJwtKey', newJwtKey);
               } catch {
-                console.error('failed updating JwtKey');
+                if (__DEV__) {
+                  console.error('failed updating JwtKey');
+                }
               }
               firestore()
                 .collection('users')
