@@ -45,6 +45,7 @@ import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import getRandomString from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
+import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -77,6 +78,8 @@ const AddStoryScreen = () => {
   const [SecondStoryTextInput, setSecondStoryTextInput] = React.useState('');
 
   const {dismissAll} = useBottomSheetModal();
+
+  const Me = JSON?.parse(UserDataMMKV?.getString('me'));
 
   const onSecondStoryTextInputChange = _secondStoryText =>
     setSecondStoryTextInput(_secondStoryText);
@@ -226,6 +229,9 @@ const AddStoryScreen = () => {
     SecondStoryTextInput, // should be added manually.
     Loading, // should be added manually.
     UserPhoto, // should be added manually.
+    Me?.first_name,
+    Me?.last_name,
+    Me?.avatar,
   ]);
 
   const pushTextStory = useCallback(() => {
@@ -248,12 +254,14 @@ const AddStoryScreen = () => {
     } else {
       setLoading(!Loading);
       firestore()
-        .collection('users')
-        .doc(auth()?.currentUser?.uid)
         .collection('stories')
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
           text: StoryTextInput?.trim(),
+          first_name: Me?.first_name,
+          last_name: Me?.last_name,
+          avatar: Me?.avatar,
+          uid: auth()?.currentUser?.uid,
         })
         .finally(() => {
           setLoading(!Loading);
@@ -267,18 +275,27 @@ const AddStoryScreen = () => {
           }
         });
     }
-  }, [StoryTextInput, Loading, navigation]);
+  }, [
+    StoryTextInput,
+    Loading,
+    Me?.first_name,
+    Me?.last_name,
+    Me?.avatar,
+    navigation,
+  ]);
 
   const pushImageData = useCallback(
     storyImageURL => {
       firestore()
-        .collection('users')
-        .doc(auth()?.currentUser?.uid)
         .collection('stories')
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
           image: storyImageURL,
-          text: SecondStoryTextInput ? SecondStoryTextInput : '',
+          text: SecondStoryTextInput,
+          first_name: Me?.first_name,
+          last_name: Me?.last_name,
+          avatar: Me?.avatar,
+          uid: auth()?.currentUser?.uid,
         })
         .finally(() => {
           setLoading(!Loading);
@@ -294,7 +311,14 @@ const AddStoryScreen = () => {
           );
         });
     },
-    [Loading, SecondStoryTextInput, navigation],
+    [
+      Loading,
+      Me?.avatar,
+      Me?.first_name,
+      Me?.last_name,
+      SecondStoryTextInput,
+      navigation,
+    ],
   );
 
   const pushImageStory = useCallback(() => {
@@ -302,11 +326,14 @@ const AddStoryScreen = () => {
       setLoading(!Loading);
       let _userStoryRef = `stories/${getRandomString(
         28,
-      )}.${UserPhoto.path?.substring(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+      )}.${UserPhoto?.path?.substring(
+        UserPhoto?.path?.lastIndexOf('.') + 1,
+        3,
+      )}`;
 
       const storageRef = storage().ref(_userStoryRef);
 
-      const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+      const uploadImageTask = storageRef?.putFile(UserPhoto?.path);
 
       /**
        * Add observer to image uploading.
