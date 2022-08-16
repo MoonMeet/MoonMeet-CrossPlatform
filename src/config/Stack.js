@@ -8,7 +8,11 @@
 import React from 'react';
 
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
+import {
+  DefaultTheme,
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import ActiveStatusScreen from '../screens/ActiveStatusScreen';
@@ -30,6 +34,7 @@ import StoryScreen from '../screens/StoryScreen';
 import ChatScreen from '../screens/ChatScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
 import {Avatar} from 'react-native-paper';
+import analytics from '@react-native-firebase/analytics';
 
 import {COLORS, FONTS} from './Miscellaneous';
 
@@ -100,8 +105,30 @@ function HomeScreen() {
 const StackNavigator = () => {
   const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+
+  const routeNameRef = React.useRef();
+  const navigationRef = useNavigationContainerRef();
+
   return (
-    <NavigationContainer theme={isThemeDark ? MoonMeetDarkTheme : DefaultTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={() => {
+        routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
+      }}
+      onStateChange={async () => {
+        const previousRouteName = routeNameRef?.current;
+        const currentRouteName =
+          navigationRef?.current?.getCurrentRoute()?.name;
+
+        if (previousRouteName !== currentRouteName) {
+          await analytics()?.logScreenView({
+            screen_name: currentRouteName,
+            screen_class: currentRouteName,
+          });
+        }
+        routeNameRef.current = currentRouteName;
+      }}
+      theme={isThemeDark ? MoonMeetDarkTheme : DefaultTheme}>
       <Stack.Navigator options={{headerShown: false}}>
         <Stack.Screen
           name={'splash'}
