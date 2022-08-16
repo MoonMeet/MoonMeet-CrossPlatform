@@ -180,7 +180,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
                 navigation?.navigate('login');
               });
           } catch (e) {
-            console.error(e);
+            if (__DEV__) {
+              console.error(e);
+            }
           }
         }}
       />
