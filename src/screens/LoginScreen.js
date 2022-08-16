@@ -1,12 +1,5 @@
 import React, {useCallback, useEffect, useRef, useMemo} from 'react';
-import {
-  BackHandler,
-  Keyboard,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-} from 'react-native';
+import {BackHandler, Keyboard, StyleSheet, Text, View} from 'react-native';
 import {FAB, IconButton, Menu, Snackbar, TextInput} from 'react-native-paper';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -42,6 +35,7 @@ import {getRandomInt} from '../utils/generators/getRandomNumber';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -91,34 +85,27 @@ const LoginScreen = () => {
   const countriesRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['50%', '100%'], []);
 
+  const {dismissAll} = useBottomSheetModal();
+
   // Bottom Sheet Callbacks
 
   const handlePresentHelpModal = useCallback(() => {
     Keyboard.dismiss();
-    privacyRef?.current?.forceClose();
-    countriesRef?.current?.forceClose();
+    dismissAll();
     helpRef?.current?.present();
-  }, []);
+  }, [dismissAll]);
 
   const handlePresentPrivacyModal = useCallback(() => {
     Keyboard.dismiss();
-    helpRef?.current?.forceClose();
-    countriesRef?.current?.forceClose();
+    dismissAll();
     privacyRef?.current?.present();
-  }, []);
+  }, [dismissAll]);
 
   const handlePresentCountriesModal = useCallback(() => {
     Keyboard.dismiss();
-    privacyRef?.current?.forceClose();
-    helpRef?.current?.forceClose();
+    dismissAll();
     countriesRef?.current?.present();
-  }, []);
-
-  const handleForceCloseAllModals = useCallback(() => {
-    helpRef?.current?.forceClose();
-    privacyRef?.current?.forceClose();
-    countriesRef?.current?.forceClose();
-  }, []);
+  }, [dismissAll]);
 
   /**
    * allow SMS sending if country code and number is probably real
@@ -146,35 +133,51 @@ const LoginScreen = () => {
    * @returns {Promise<void>}
    */
 
-  async function signInWithPhoneNumber(phoneNumber) {
-    try {
-      setLoaderVisible(true);
-      const sendCodeTask = await auth()?.verifyPhoneNumber(phoneNumber);
-      setVerificationId(sendCodeTask?.verificationId);
-      setConfirmCode(true);
-      setLoaderVisible(false);
-    } catch (error) {
-      setLoaderVisible(false);
-      if (error !== null) {
-        if (error?.code === 'auth/invalid-phone-number') {
-          ErrorToast(
-            'bottom',
-            'Invalid phone number',
-            'please check your phone number again',
-            true,
-            1500,
-          );
-        } else {
-          ErrorToast(
-            'bottom',
-            'Unexpected error occured',
-            `${error}`,
-            true,
-            1500,
-          );
-        }
-      }
-    }
+  async function verifyPhoneNumber(phoneNumber) {
+    setLoaderVisible(true);
+    await auth()
+      ?.verifyPhoneNumber(phoneNumber, 60, false)
+      .on('state_changed', async phoneAuthSnapshot => {
+        switch (phoneAuthSnapshot?.state) {
+          case auth?.PhoneAuthState?.CODE_SENT:
+            if (__DEV__) {
+              console.log(
+                'code sent - verificationId: ' +
+                  phoneAuthSnapshot.verificationId,
+              );
+            }
+            setVerificationId(phoneAuthSnapshot?.verificationId);
+            setConfirmCode(true);
+            setLoaderVisible(false);
+            break;
+          case auth?.PhoneAuthState?.ERROR:
+            if (__DEV__) {
+              console.log(
+                'verification error, phoneAuthSnapshot: ',
+                phoneAuthSnapshot,
+              );
+            }
+            setLoaderVisible(false);
+            if (phoneAuthSnapshot.error?.code === 'auth/invalid-phone-number') {
+              ErrorToast(
+                'bottom',
+                'Invalid phone number',
+                'please check your phone number again',
+                true,
+                1500,
+              );
+            } else {
+              ErrorToast(
+                'bottom',
+                'Unexpected error occured',
+                `${phoneAuthSnapshot?.error.message}`,
+                true,
+                1500,
+              );
+            }
+            break;
+        } // TODO: Add more events here.
+      });
   }
 
   /**
@@ -220,7 +223,7 @@ const LoginScreen = () => {
 
   const countryInputOnFocus = () => {
     Keyboard.dismiss();
-    handleForceCloseAllModals();
+    dismissAll();
     handlePresentCountriesModal();
   };
 
@@ -325,7 +328,6 @@ const LoginScreen = () => {
                   country_code: CountryText,
                 },
               });
-              setLoaderVisible(false);
             }
           });
         setLoaderVisible(false);
@@ -360,9 +362,8 @@ const LoginScreen = () => {
    */
 
   const setCountryCodeData = data => {
-    countriesRef?.current?.close();
     CountrySetText(data);
-    countriesRef?.current?.forceClose();
+    dismissAll();
   };
 
   /**
@@ -381,249 +382,229 @@ const LoginScreen = () => {
 
   return (
     //////////////////////////// FIRST PART ////////////////////////////
-    <BaseView>
-      <Pressable style={{flex: 1}} onPress={() => handleForceCloseAllModals()}>
-        <View style={{alignItems: 'flex-end'}}>
-          <Menu
-            visible={MenuVisible}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton
-                icon={DotsImage}
-                color={'#999999'}
-                size={24}
+    <>
+      <BaseView>
+        <View style={{flex: 1}}>
+          <View style={{alignItems: 'flex-end'}}>
+            <Menu
+              visible={MenuVisible}
+              onDismiss={closeMenu}
+              anchor={
+                <IconButton
+                  icon={DotsImage}
+                  color={'#999999'}
+                  size={24}
+                  onPress={() => {
+                    openMenu();
+                  }}
+                />
+              }>
+              <Menu.Item
                 onPress={() => {
-                  openMenu();
+                  dismissAll();
+                  handlePresentHelpModal();
                 }}
+                title="Help"
               />
-            }>
-            <Menu.Item
-              onPress={() => {
-                handleForceCloseAllModals();
-                handlePresentHelpModal();
-              }}
-              title="Help"
-            />
-          </Menu>
-        </View>
-        {!ConfirmCode ? (
-          <MiniBaseView>
-            <View style={styles.top_bar}>
-              <Text style={styles.top_text}>
-                Enter your phone number to get started
-              </Text>
-            </View>
-            <View
-              style={{
-                paddingLeft: '2%',
-                paddingRight: '2%',
-              }}>
-              <Text
+            </Menu>
+          </View>
+          {!ConfirmCode ? (
+            <MiniBaseView>
+              <View style={styles.top_bar}>
+                <Text style={styles.top_text}>
+                  Enter your phone number to get started
+                </Text>
+              </View>
+              <View
                 style={{
-                  color: COLORS.black,
-                  fontSize: fontValue(16),
-                  textAlign: 'center',
-                  paddingBottom: '4%',
-                  opacity: 0.4,
-                  fontFamily: FONTS.regular,
-                }}>
-                You will receive a verification code, Carrier rates {'\n'} may
-                apply.
-              </Text>
-            </View>
-            <View
-              style={{
-                padding: '2%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <TextInput
-                style={{
-                  width: '36%',
-                }}
-                mode="outlined"
-                keyboardType={isAndroid ? 'numeric' : 'number-pad'}
-                label="Country Code"
-                value={CountryText}
-                maxLength={5}
-                onFocus={() => {
-                  handleForceCloseAllModals();
-                  countryInputOnFocus();
-                }}
-                multiline={false}
-                theme={{
-                  colors: {
-                    text: COLORS.accentLight,
-                    primary: COLORS.accentLight,
-                    backgroundColor: COLORS.rippleColor,
-                    placeholder: COLORS.darkGrey,
-                    underlineColor: '#566193',
-                    selectionColor: '#DADADA',
-                    outlineColor: '#566193',
-                  },
-                }}
-                onChangeText={text => {
-                  CountrySetText(text);
-                }}
-              />
-              <TextInput
-                style={{
-                  width: '62%',
+                  paddingLeft: '2%',
                   paddingRight: '2%',
-                }}
-                mode="outlined"
-                keyboardType={isAndroid ? 'numeric' : 'number-pad'}
-                label="Phone Number"
-                value={NumberText}
-                onFocus={() => handleForceCloseAllModals()}
-                placeholder={'eg, (123) 456 7890'}
-                maxLength={12}
-                multiline={false}
-                theme={{
-                  colors: {
-                    text: COLORS.accentLight,
-                    primary: COLORS.accentLight,
-                    backgroundColor: COLORS.rippleColor,
-                    placeholder: COLORS.darkGrey,
-                    underlineColor: '#566193',
-                    selectionColor: '#DADADA',
-                    outlineColor: '#566193',
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.black,
+                    fontSize: fontValue(16),
+                    textAlign: 'center',
+                    paddingBottom: '4%',
+                    opacity: 0.4,
+                    fontFamily: FONTS.regular,
+                  }}>
+                  You will receive a verification code, Carrier rates {'\n'} may
+                  apply.
+                </Text>
+              </View>
+              <View
+                style={{
+                  padding: '2%',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <TextInput
+                  style={{
+                    width: '36%',
+                  }}
+                  mode="outlined"
+                  keyboardType={isAndroid ? 'numeric' : 'number-pad'}
+                  label="Country Code"
+                  value={CountryText}
+                  maxLength={5}
+                  onFocus={() => {
+                    countryInputOnFocus();
+                  }}
+                  multiline={false}
+                  theme={{
+                    colors: {
+                      text: COLORS.accentLight,
+                      primary: COLORS.accentLight,
+                      backgroundColor: COLORS.rippleColor,
+                      placeholder: COLORS.darkGrey,
+                      underlineColor: '#566193',
+                      selectionColor: '#DADADA',
+                      outlineColor: '#566193',
+                    },
+                  }}
+                  onChangeText={text => {
+                    CountrySetText(text);
+                  }}
+                />
+                <TextInput
+                  style={{
+                    width: '62%',
+                    paddingRight: '2%',
+                  }}
+                  mode="outlined"
+                  keyboardType={isAndroid ? 'numeric' : 'number-pad'}
+                  label="Phone Number"
+                  value={NumberText}
+                  placeholder={'eg, (123) 456 7890'}
+                  maxLength={12}
+                  multiline={false}
+                  theme={{
+                    colors: {
+                      text: COLORS.accentLight,
+                      primary: COLORS.accentLight,
+                      backgroundColor: COLORS.rippleColor,
+                      placeholder: COLORS.darkGrey,
+                      underlineColor: '#566193',
+                      selectionColor: '#DADADA',
+                      outlineColor: '#566193',
+                    },
+                  }}
+                  onChangeText={_NumberText => {
+                    onNumberTextChange(_NumberText);
+                  }}
+                />
+              </View>
+              <View
+                style={{
+                  paddingLeft: '4%',
+                  paddingRight: '2%',
+                  position: 'relative',
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.black,
+                    fontSize: fontValue(16),
+                    opacity: 0.4,
+                    fontFamily: FONTS.regular,
+                  }}>
+                  By signing up.
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  position: 'relative',
+                  paddingLeft: '4%',
+                  paddingRight: '2%',
+                }}>
+                <Text
+                  style={{
+                    color: COLORS.black,
+                    fontSize: fontValue(16),
+                    opacity: 0.4,
+                    fontFamily: FONTS.regular,
+                  }}>
+                  You agree to the{' '}
+                </Text>
+                <Text
+                  style={{
+                    color: COLORS.accentLight,
+                    fontSize: fontValue(16),
+                    fontFamily: FONTS.regular,
+                  }}
+                  onPress={() => {
+                    dismissAll();
+                    handlePresentPrivacyModal();
+                  }}>
+                  Privacy Policy
+                </Text>
+              </View>
+              <Snackbar
+                visible={ErrorSnackBarVisible}
+                onDismiss={onDismissErrorSnackBar}
+                duration={3000}
+                action={{
+                  label: 'OK',
+                  onPress: () => {
+                    onDismissErrorSnackBar();
                   },
                 }}
-                onChangeText={_NumberText => {
-                  onNumberTextChange(_NumberText);
+                theme={{
+                  colors: {
+                    onSurface: COLORS.redLightError,
+                    accent: COLORS.white,
+                  },
                 }}
-              />
-            </View>
-            <View
-              style={{
-                paddingLeft: '4%',
-                paddingRight: '2%',
-                position: 'relative',
-              }}>
-              <Text
                 style={{
-                  color: COLORS.black,
-                  fontSize: fontValue(16),
-                  opacity: 0.4,
-                  fontFamily: FONTS.regular,
+                  margin: '4%',
                 }}>
-                By signing up.
-              </Text>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                position: 'relative',
-                paddingLeft: '4%',
-                paddingRight: '2%',
-              }}>
-              <Text
-                style={{
-                  color: COLORS.black,
-                  fontSize: fontValue(16),
-                  opacity: 0.4,
-                  fontFamily: FONTS.regular,
-                }}>
-                You agree to the{' '}
-              </Text>
-              <Text
-                style={{
-                  color: COLORS.accentLight,
-                  fontSize: fontValue(16),
-                  fontFamily: FONTS.regular,
+                {ErrorSnackbarText}
+              </Snackbar>
+              <FAB
+                style={styles.fab(mBottomMargin)}
+                normal
+                icon={ArrowForward}
+                color={COLORS.primaryLight}
+                animated={true}
+                theme={{
+                  colors: {
+                    accent: COLORS.accentLight,
+                  },
                 }}
-                onPress={() => handlePresentPrivacyModal()}>
-                Privacy Policy
-              </Text>
-            </View>
-            <Snackbar
-              visible={ErrorSnackBarVisible}
-              onDismiss={onDismissErrorSnackBar}
-              duration={3000}
-              action={{
-                label: 'OK',
-                onPress: () => {
-                  onDismissErrorSnackBar();
-                },
-              }}
-              theme={{
-                colors: {
-                  onSurface: COLORS.redLightError,
-                  accent: COLORS.white,
-                },
-              }}
-              style={{
-                margin: '4%',
-              }}>
-              {ErrorSnackbarText}
-            </Snackbar>
-            <FAB
-              style={styles.fab(mBottomMargin)}
-              normal
-              icon={ArrowForward}
-              color={COLORS.primaryLight}
-              animated={true}
-              theme={{
-                colors: {
-                  accent: COLORS.accentLight,
-                },
-              }}
-              onPress={async () => {
-                try {
-                  Keyboard.dismiss();
-                  const isConnected = await NetInfo.fetch();
-                  if (isConnected.isConnected) {
-                    if (isSMSSendingAcceptable()) {
-                      signInWithPhoneNumber(CountryText + NumberText);
+                onPress={async () => {
+                  try {
+                    Keyboard.dismiss();
+                    const isConnected = await NetInfo?.fetch();
+                    if (isConnected.isConnected) {
+                      if (isSMSSendingAcceptable()) {
+                        verifyPhoneNumber(CountryText + NumberText);
+                      } else {
+                        setBottomMargin(heightPercentageToDP(7.5));
+                        setErrorSnackbarText(
+                          'Please enter a valid Country Code and Phone Number',
+                        );
+                        onToggleErrorSnackBar();
+                      }
                     } else {
                       setBottomMargin(heightPercentageToDP(7.5));
                       setErrorSnackbarText(
-                        'Please enter a valid Country Code and Phone Number',
+                        'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
                       );
                       onToggleErrorSnackBar();
                     }
-                  } else {
-                    setBottomMargin(heightPercentageToDP(7.5));
-                    setErrorSnackbarText(
-                      'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
-                    );
-                    onToggleErrorSnackBar();
+                  } catch (e) {
+                    console.error(e);
                   }
-                } catch (e) {
-                  console.error(e);
-                }
-              }}
-            />
-            <PrivacyPolicy
-              sheetRef={privacyRef}
-              index={0}
-              snapPoints={sheetSnapPoints}
-            />
-            <CountriesList
-              sheetRef={countriesRef}
-              index={0}
-              snapPoints={sheetSnapPoints}
-              sharedData={setCountryCodeData}
-            />
-            <LoginHelp
-              sheetRef={helpRef}
-              index={0}
-              snapPoints={sheetSnapPoints}
-            />
-            <LoadingIndicator isVisible={LoaderVisible} />
-          </MiniBaseView>
-        ) : (
-          //////////////////////////// SECOND PART ////////////////////////////
-          /**
-           * Render ConfirmScreen when user is in ConfirmCode mode.
-           */
-          <MiniBaseView style={styles.container}>
-            <Pressable
-              style={{flex: 1}}
-              onPress={() => {
-                handleForceCloseAllModals();
-              }}>
+                }}
+              />
+            </MiniBaseView>
+          ) : (
+            //////////////////////////// SECOND PART ////////////////////////////
+            /**
+             * Render ConfirmScreen when user is in ConfirmCode mode.
+             */
+            <MiniBaseView style={styles.container}>
               <View style={styles.top_bar}>
                 <Text style={styles.top_text}>
                   Enter the code that we sent {'\n'} to{' '}
@@ -692,17 +673,24 @@ const LoginScreen = () => {
                   CLEAR CODE
                 </Text>
               </View>
-              <LoginHelp
-                sheetRef={helpRef}
-                index={0}
-                snapPoints={sheetSnapPoints}
-              />
-              <LoadingIndicator isVisible={LoaderVisible} />
-            </Pressable>
-          </MiniBaseView>
-        )}
-      </Pressable>
-    </BaseView>
+            </MiniBaseView>
+          )}
+        </View>
+      </BaseView>
+      <PrivacyPolicy
+        sheetRef={privacyRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
+      />
+      <CountriesList
+        sheetRef={countriesRef}
+        index={0}
+        snapPoints={sheetSnapPoints}
+        sharedData={setCountryCodeData}
+      />
+      <LoginHelp sheetRef={helpRef} index={0} snapPoints={sheetSnapPoints} />
+      <LoadingIndicator isVisible={LoaderVisible} />
+    </>
   );
 };
 
