@@ -50,8 +50,6 @@ const ChatScreen = () => {
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
    */
-  const [userData, setUserData] = React.useState([]);
-  const [userUID, setUserUID] = React.useState('');
   const [userFirstName, setUserFirstName] = React.useState('');
   const [userLastName, setUserLastName] = React.useState('');
   const [userAvatar, setUserAvatar] = React.useState('');
@@ -113,8 +111,6 @@ const ChatScreen = () => {
             userSnapshot?.data().first_name &&
             userSnapshot?.data()?.last_name
           ) {
-            setUserData(userSnapshot?.data());
-            setUserUID(userSnapshot?.data()?.uid);
             setUserFirstName(userSnapshot?.data()?.first_name);
             setUserLastName(userSnapshot?.data()?.last_name);
             setUserAvatar(userSnapshot?.data()?.avatar);
