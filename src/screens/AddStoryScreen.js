@@ -79,7 +79,7 @@ const AddStoryScreen = () => {
 
   const {dismissAll} = useBottomSheetModal();
 
-  const Me = JSON?.parse(UserDataMMKV?.getString('me'));
+  const Me = JSON?.parse(UserDataMMKV?.getString('Me'));
 
   const onSecondStoryTextInputChange = _secondStoryText =>
     setSecondStoryTextInput(_secondStoryText);
