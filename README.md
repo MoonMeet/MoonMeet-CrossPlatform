@@ -31,9 +31,7 @@
 
 ### Contributing
 
-
 #### Requirments:
-
 
 - A Working react native envirment environment.
 - Physical device (real device) because emulators have problem with SHA-256.
@@ -53,12 +51,15 @@
 
 ##### Troubleshooting:
 
-- `[TASK] react-native-compressor-verifyReleaseRessources [FAILED] in release mode:`
-  
-  fix: Go to `node_modules/react-native-compressor/android.build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
-- `[TASK] bundleReleaseJsAndAssets [FAILED]:`
-  
-  fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
+`[TASK] react-native-compressor-verifyReleaseRessources [FAILED]:`
+
+=> fix: Go to `node_modules/react-native-compressor/android/build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
+
+---
+
+`[TASK] bundleReleaseJsAndAssets [FAILED]:`
+=> fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
+
 
 ### Commit message
 
