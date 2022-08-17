@@ -31,15 +31,13 @@ import {sortBy} from 'lodash';
 const StoryScreen = () => {
   const navigation = useNavigation();
   const userStoryUID = useRoute()?.params?.userUID;
-  const myUID = useRoute()?.params?.myUID;
+  // const myUID = useRoute()?.params?.myUID;
 
   const storiesRef = useRef(null);
 
   const [storyFirstName, setStoryFirstName] = React.useState('');
   const [storyLastName, setStoryLastName] = React.useState('');
   const [storyAvatar, setStoryAvatar] = React.useState('');
-  const [storyId, setStoryId] = React.useState('');
-  const [storyUID, setStoryUID] = React.useState('');
   const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
   const [current, setCurrent] = React.useState({});
   const [viewsData, setViewsData] = React.useState([]);
@@ -72,28 +70,31 @@ const StoryScreen = () => {
       .doc(userStoryUID)
       .get()
       .then(documentSnapshot => {
-        setStoryAvatar(documentSnapshot?.data()?.avatar);
         setStoryFirstName(documentSnapshot?.data()?.first_name);
-        setStoryLastName(documentSnapshot?.data()?.last_name);
-        setStoryUID(documentSnapshot?.data()?.uid);
-        firestore()
-          .collection('users')
-          .doc(userStoryUID)
-          .collection('stories')
-          .get()
-          .then(collectionSnapshot => {
-            collectionSnapshot?.forEach(subDocumentSnapshot => {
-              let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
-                ...subMap?.data(),
-                sid: subMap?.id,
-              }));
-              collectionDocs = sortBy(collectionDocs, [
-                docs => docs?.time?.toDate(),
-              ]);
+        setStoryLastName(documentSnapshot?.data().last_name);
+        setStoryAvatar(documentSnapshot?.data()?.avatar);
+      });
+  }, [userStoryUID]);
 
-              setAllCurrentUserStories(collectionDocs);
-              setLoading(false);
-              /**
+  useEffect(() => {
+    firestore()
+      .collection('stories')
+      .get()
+      .then(collectionSnapshot => {
+        let collectionDocs = [];
+        // eslint-disable-next-line no-unused-vars
+        let unusedVar = collectionSnapshot?.docs.map((element, index) => {
+          if (element?.data().uid === userStoryUID) {
+            collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
+              ...subMap?.data(),
+              sid: subMap?.id,
+            }));
+          }
+        });
+        collectionDocs = sortBy(collectionDocs, [docs => docs?.time?.toDate()]);
+        setAllCurrentUserStories(collectionDocs);
+        setLoading(false);
+        /**
                 if (!Loading) {
                 if (auth()?.currentUser?.uid == userStoryUID) {
                   firestore()
@@ -125,12 +126,10 @@ const StoryScreen = () => {
                 }
               }
                */
-            });
-          });
       });
 
     return () => {};
-  }, [Loading, myUID, storyId, userStoryUID]);
+  }, []);
 
   if (Loading) {
     return (
