@@ -1,4 +1,4 @@
-## MoonMeet CrossPlatform 🎉️ 
+## MoonMeet CrossPlatform 🎉️
 
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
@@ -10,8 +10,6 @@
 
 ### Description
 
----
-
 - **Moon Meet** is a social media platform including chatting feature.
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
@@ -19,8 +17,6 @@
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
 ### Screenshots
-
----
 
 <p float="left">
 <img src="assets/splash.png" alt="Splash Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
@@ -35,11 +31,9 @@
 
 ### Contributing
 
----
 
 #### Requirments:
 
----
 
 - A Working react native envirment environment.
 - Physical device (real device) because emulators have problem with SHA-256.
@@ -57,11 +51,7 @@
   ```
 - Your own `release.keystore, sensitive.js and google-service.json`.
 
----
-
 ##### Troubleshooting:
-
----
 
 - `[TASK] react-native-compressor-verifyReleaseRessources [FAILED] in release mode:`
   
@@ -71,8 +61,6 @@
   fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
 ### Commit message
-
----
 
 When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that *commit*.
 
@@ -100,20 +88,14 @@ And that summarized:
 
 ### Thanks for contributing
 
----
-
 Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
 ### Social
 
----
-
 - [Facebook](https://www.facebook.com/moonmeetofficial)
 - [Telegram](https://t.me/MoonMeet)
 
-### License
-
----
+## License
 
 ```
 Copyright (C) 2022  SectionTN
