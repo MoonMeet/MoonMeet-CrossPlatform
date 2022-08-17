@@ -74,7 +74,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 12 - 0.1 * 12}}>
           <Text style={styles.subText}>
-            Rayen Sbai built the Moon Meet app as an Open Source app. This
+            Rayen sbai built the Moon Meet app as an Open Source app. This
             SERVICE is provided by Rayen Sbai at no cost and is intended for use
             as is. This page is used to inform visitors regarding my policies
             with the collection, use, and disclosure of Personal Information if
