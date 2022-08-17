@@ -71,3 +71,11 @@
 # WebRTC
 
 -keep class org.webrtc.** { *; }
+
+# Device Info
+
+-keep class com.google.android.gms.common.** {*;}
+
+-keepclassmembers class com.android.installreferrer.api.** {
+  *;
+}
