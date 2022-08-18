@@ -14,7 +14,6 @@ import ArrowIcon from '../assets/images/back.png';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import {
   fontValue,
   heightPercentageToDP,
@@ -26,7 +25,9 @@ import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet'
 import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
-import {sortBy} from 'lodash';
+import {filter, sortBy} from 'lodash';
+import {PurpleBackground} from '../index.d';
+import {DecryptAES} from '../utils/crypto/cryptoTools';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -47,12 +48,7 @@ const StoryScreen = () => {
   const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
   const deleteCurrentStory = useCallback(async sid => {
-    return await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .collection('stories')
-      .doc(sid)
-      .delete();
+    return await firestore().collection('stories').doc(sid).delete();
   }, []);
 
   /**
@@ -82,17 +78,21 @@ const StoryScreen = () => {
       .get()
       .then(collectionSnapshot => {
         let collectionDocs = [];
-        // eslint-disable-next-line no-unused-vars
-        let unusedVar = collectionSnapshot?.docs.map((element, index) => {
-          if (element?.data().uid === userStoryUID) {
-            collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
-              ...subMap?.data(),
-              sid: subMap?.id,
-            }));
-          }
-        });
+        collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
+          ...subMap?.data(),
+          text:
+            DecryptAES(subMap?.data()?.text) === ''
+              ? "We're sorry, we couldn't decrypt this story for you."
+              : DecryptAES(subMap?.data()?.text),
+          sid: subMap?.id,
+        }));
         collectionDocs = sortBy(collectionDocs, [docs => docs?.time?.toDate()]);
-        setAllCurrentUserStories(collectionDocs);
+        setAllCurrentUserStories(
+          filter(
+            collectionDocs,
+            documentCols => documentCols?.uid === userStoryUID,
+          ),
+        );
         setLoading(false);
         /**
                 if (!Loading) {
@@ -177,9 +177,7 @@ const StoryScreen = () => {
             <View style={styles.mid_side}>
               <Avatar.Image
                 size={40}
-                source={{
-                  uri: storyAvatar,
-                }}
+                source={storyAvatar ? {uri: storyAvatar} : PurpleBackground}
               />
               <View
                 style={{
