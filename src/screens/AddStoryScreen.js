@@ -46,6 +46,7 @@ import {COLORS, FONTS} from '../config/Miscellaneous';
 import getRandomString from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {EncryptAES} from '../utils/crypto/cryptoTools';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -257,7 +258,7 @@ const AddStoryScreen = () => {
         .collection('stories')
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
-          text: StoryTextInput?.trim(),
+          text: EncryptAES(StoryTextInput?.trim()),
           first_name: Me?.first_name,
           last_name: Me?.last_name,
           avatar: Me?.avatar,
@@ -291,7 +292,7 @@ const AddStoryScreen = () => {
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
           image: storyImageURL,
-          text: SecondStoryTextInput,
+          text: EncryptAES(SecondStoryTextInput),
           first_name: Me?.first_name,
           last_name: Me?.last_name,
           avatar: Me?.avatar,
