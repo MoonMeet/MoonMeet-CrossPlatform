@@ -1,4 +1,4 @@
-## MoonMeet CrossPlatform 🎉️
+## MoonMeet CrossPlatform 🎉️ 
 
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
@@ -38,7 +38,7 @@
 - NDK Version `21.4.7075529`, NOTE: for Mac M1 users, you'll just need NDK version `24.0.8215888`.
 - SDK Version `33, 32, 31 and 30`.
 - ICU for linux (optional):
-  
+
   ```
   git clone https://github.com/unicode-org/icu
   cd icu/icu4c
@@ -58,8 +58,9 @@
 ---
 
 `[TASK] bundleReleaseJsAndAssets [FAILED]:`
-=> fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
+
+=> fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
 ### Commit message
 
@@ -111,4 +112,3 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
 GNU General Public License for more details.
 ```
-
