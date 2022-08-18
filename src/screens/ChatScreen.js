@@ -39,6 +39,7 @@ import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
 import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -124,6 +125,7 @@ const ChatScreen = () => {
         }
       });
     return () => userSubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -138,6 +140,10 @@ const ChatScreen = () => {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
             id: subMap?.id,
+            text:
+              DecryptAES(subMap?.data()?.text) === ''
+                ? "We're sorry, we couldn't decrypt this message for you."
+                : DecryptAES(subMap?.data()?.text),
             user: {
               _id:
                 subMap?.data()?.user?._id === auth()?.currentUser?.uid
@@ -260,7 +266,7 @@ const ChatScreen = () => {
             .collection('discussions')
             .add({
               _id: _id,
-              text: mMessageText,
+              text: EncryptAES(mMessageText),
               createdAt: Date.now(),
               user: {
                 _id: auth()?.currentUser?.uid,
@@ -275,7 +281,7 @@ const ChatScreen = () => {
             .add({
               _id: _id,
               createdAt: Date.now(),
-              text: mMessageText,
+              text: EncryptAES(mMessageText),
               user: {
                 _id: auth()?.currentUser?.uid,
               },
@@ -292,7 +298,7 @@ const ChatScreen = () => {
             .set({
               to_first_name: userFirstName,
               to_last_name: userLastName,
-              to_message_text: mMessageText,
+              to_message_text: EncryptAES(mMessageText),
               to_avatar: userAvatar,
               time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'message',
@@ -307,7 +313,7 @@ const ChatScreen = () => {
             .set({
               to_first_name: Me?.first_name,
               to_last_name: Me?.last_name,
-              to_message_text: mMessageText,
+              to_message_text: EncryptAES(mMessageText),
               to_avatar: Me?.avatar,
               time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'message',
@@ -523,20 +529,22 @@ const ChatScreen = () => {
           }}
           maxInputLength={1500}
           renderSend={props => {
-            return (
-              <Send {...props} sendButtonProps={{hitSlop: 15}}>
-                <MaterialIcons
-                  name="telegram-plane"
-                  color={COLORS.darkGrey}
-                  size={26}
-                  style={{
-                    margin: 3 - 0.1 * 3,
-                    right: widthPercentageToDP(1.5),
-                    bottom: heightPercentageToDP(0.5),
-                  }}
-                />
-              </Send>
-            );
+            if (mMessageText?.trim()?.length > 0) {
+              return (
+                <Send {...props} sendButtonProps={{hitSlop: 15}}>
+                  <MaterialIcons
+                    name="telegram-plane"
+                    color={COLORS.darkGrey}
+                    size={26}
+                    style={{
+                      margin: 3 - 0.1 * 3,
+                      right: widthPercentageToDP(1.5),
+                      bottom: heightPercentageToDP(0.5),
+                    }}
+                  />
+                </Send>
+              );
+            }
           }}
           onSend={messages => {
             sendMessage(messages, '');
