@@ -28,6 +28,8 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+    - name: Go to android path
+      run: cd android
     - name: Make Gradle executable
       run: chmod +x ./gradlew
     - name: Build Release APK
@@ -36,6 +38,6 @@ jobs:
       uses: kyze8439690/action-release-releaseapk@master
       env:
        GITHUB_TOKEN: ${{ secrets.MooonMeet-CrossPlatform }}
-       APP_FOLDER: android/app
+       APP_FOLDER: app
       with:
         arguments: build
