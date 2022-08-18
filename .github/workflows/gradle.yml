@@ -28,12 +28,10 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Go to android path
-      run: cd android
     - name: Make Gradle executable
-      run: chmod +x ./gradlew
+      run: chmod +x ./android/gradlew
     - name: Build Release APK
-      run: ./gradlew assembleRelease --no-daemon
+      run: ./android/gradlew assembleRelease --no-daemon
     - name: Releasing using Hub
       uses: kyze8439690/action-release-releaseapk@master
       env:
