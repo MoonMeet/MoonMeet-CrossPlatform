@@ -54,7 +54,7 @@ const HomeChatsScreen = () => {
       const currentKey = JwtKeyMMKV?.getString('currentUserJwtKey');
       if (currentKey !== currentJwtKey) {
         JwtKeyMMKV?.delete('currentUserJwtKey');
-        if (auth()?.currentUser != null) {
+        if (auth()?.currentUser !== null) {
           auth()
             ?.signOut()
             .then(() => {
@@ -68,8 +68,14 @@ const HomeChatsScreen = () => {
               );
             })
             .catch(() => {
-              navigation?.navigate('login');
-              console.error('failed loggin out the user');
+              auth()
+                ?.signOut()
+                .then(() => {
+                  navigation?.navigate('login');
+                });
+              if (__DEV__) {
+                console.error('failed loggin out the user');
+              }
             });
         }
       }
@@ -90,13 +96,8 @@ const HomeChatsScreen = () => {
       });
   }
 
-  const deleteCurrentStory = useCallback(async (uid, sid) => {
-    return await firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('stories')
-      .doc(sid)
-      .delete();
+  const deleteCurrentStory = useCallback(async sid => {
+    return await firestore().collection('stories').doc(sid).delete();
   }, []);
 
   useFocusEffect(
@@ -112,6 +113,7 @@ const HomeChatsScreen = () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
+
   useEffect(() => {
     const userSusbcribe = firestore()
       .collection('users')
@@ -140,40 +142,15 @@ const HomeChatsScreen = () => {
                 );
               }
             }
-            firestore()
-              .collection('users')
-              .doc(documentSnapshot?.id)
-              .collection('stories')
-              .onSnapshot(subCollectionSnapshot => {
-                let tempStoriesData = [];
-                subCollectionSnapshot?.forEach(subDocument => {
-                  if (
-                    subDocument?.data()?.time &&
-                    (subDocument?.data()?.text || subDocument?.data()?.image)
-                  ) {
-                    if (
-                      firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                        subDocument?.data()?.time?.toDate() >
-                      86400000
-                    ) {
-                      deleteCurrentStory(documentSnapshot?.id, subDocument?.id);
-                    } else {
-                      tempStoriesData.push({
-                        ...subDocument?.data(),
-                        avatar: documentSnapshot?.data()?.avatar,
-                        first_name: documentSnapshot?.data()?.first_name,
-                        last_name: documentSnapshot?.data()?.last_name,
-                        uid: documentSnapshot?.data()?.uid,
-                        sid: subDocument?.id,
-                      });
-                    }
-                  }
-                  setStoriesData(tempStoriesData);
-                });
-              });
           }
         });
       });
+    return () => {
+      userSusbcribe();
+    };
+  }, [checkJwtKey]);
+
+  useEffect(() => {
     const chatSubscribe = firestore()
       .collection('chats')
       .doc(auth()?.currentUser?.uid)
@@ -192,10 +169,58 @@ const HomeChatsScreen = () => {
         }
       });
     return () => {
-      userSusbcribe();
       chatSubscribe();
     };
-  }, [checkJwtKey, deleteCurrentStory]);
+  }, []);
+
+  useEffect(() => {
+    const storySubsribe = firestore()
+      .collection('stories')
+      .onSnapshot(subCollectionSnapshot => {
+        subCollectionSnapshot?.forEach(subDocument => {
+          if (
+            subDocument?.data()?.time &&
+            (subDocument?.data()?.text || subDocument?.data()?.image)
+          ) {
+            if (
+              firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                subDocument?.data()?.time?.toDate() >
+              86400000
+            ) {
+              deleteCurrentStory(subDocument?.id);
+            }
+          }
+        });
+      });
+    return () => {
+      storySubsribe();
+    };
+  }, [deleteCurrentStory]);
+
+  useEffect(() => {
+    const storiesSubscribe = firestore()
+      .collection('stories')
+      .onSnapshot(collectionSnapshot => {
+        if (!collectionSnapshot?.empty) {
+          let collectionDocs = collectionSnapshot?.docs?.map(element => ({
+            ...element?.data(),
+            id: element?.id,
+          }));
+
+          collectionDocs = sortBy(collectionDocs, [
+            docs => docs?.time?.toDate(),
+          ]);
+          collectionDocs = reverse(collectionDocs);
+          setStoriesData(collectionDocs);
+        } else {
+          setStoriesData([]);
+        }
+      });
+
+    return () => {
+      storiesSubscribe();
+    };
+  }, []);
 
   return (
     <MiniBaseView>
