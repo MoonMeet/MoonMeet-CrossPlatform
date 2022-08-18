@@ -8,8 +8,8 @@ import {
   useNavigation,
   CommonActions,
 } from '@react-navigation/native';
-import {isAndroid, isWeb, isWindows} from '../utils/device/DeviceInfo';
 
+import {isAndroid} from '../utils/device/DeviceInfo';
 import auth from '@react-native-firebase/auth';
 import CountriesList from '../components/Modals/LoginScreen/CountriesList';
 import PrivacyPolicy from '../components/Modals/PrivacyPolicy/PrivacyPolicy';
@@ -22,6 +22,7 @@ import DotsImage from '../assets/images/dots.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
+
 import {
   getManufacturer,
   getModel,
@@ -30,12 +31,16 @@ import {
   getSystemVersion,
   getVersion,
 } from 'react-native-device-info';
+
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {getRandomInt} from '../utils/generators/getRandomNumber';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import axios from 'axios';
+import {waitForAnd} from '../utils/timers/delay';
+import getRandomString from '../utils/generators/getRandomString';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -87,6 +92,8 @@ const LoginScreen = () => {
 
   const {dismissAll} = useBottomSheetModal();
 
+  const [codeCorrect, setCodeCorrect] = React.useState(null);
+
   // Bottom Sheet Callbacks
 
   const handlePresentHelpModal = useCallback(() => {
@@ -118,9 +125,7 @@ const LoginScreen = () => {
 
   const phoneRef = useRef();
 
-  const [ConfirmCode, setConfirmCode] = React.useState(false);
-
-  const [verificationId, setVerificationId] = React.useState('');
+  const [ConfirmCode, setConfirmCode] = React.useState(null);
 
   /**
    * Loader stuff
@@ -133,51 +138,32 @@ const LoginScreen = () => {
    * @returns {Promise<void>}
    */
 
-  async function verifyPhoneNumber(phoneNumber) {
-    setLoaderVisible(true);
-    await auth()
-      ?.verifyPhoneNumber(phoneNumber, 60, false)
-      .on('state_changed', async phoneAuthSnapshot => {
-        switch (phoneAuthSnapshot?.state) {
-          case auth?.PhoneAuthState?.CODE_SENT:
-            if (__DEV__) {
-              console.log(
-                'code sent - verificationId: ' +
-                  phoneAuthSnapshot.verificationId,
-              );
-            }
-            setVerificationId(phoneAuthSnapshot?.verificationId);
-            setConfirmCode(true);
-            setLoaderVisible(false);
-            break;
-          case auth?.PhoneAuthState?.ERROR:
-            if (__DEV__) {
-              console.log(
-                'verification error, phoneAuthSnapshot: ',
-                phoneAuthSnapshot,
-              );
-            }
-            setLoaderVisible(false);
-            if (phoneAuthSnapshot.error?.code === 'auth/invalid-phone-number') {
-              ErrorToast(
-                'bottom',
-                'Invalid phone number',
-                'please check your phone number again',
-                true,
-                1500,
-              );
-            } else {
-              ErrorToast(
-                'bottom',
-                'Unexpected error occured',
-                `${phoneAuthSnapshot?.error.message}`,
-                true,
-                1500,
-              );
-            }
-            break;
-        } // TODO: Add more events here.
-      });
+  async function signInWithPhoneNumber(phoneNumber) {
+    try {
+      setLoaderVisible(true);
+      const signInResult = await auth()?.signInWithPhoneNumber(phoneNumber);
+      setConfirmCode(signInResult);
+      setLoaderVisible(false);
+    } catch (error) {
+      setLoaderVisible(false);
+      if (error?.code === 'auth/invalid-phone-number') {
+        ErrorToast(
+          'bottom',
+          'Invalid phone number',
+          'please check your phone number again',
+          true,
+          1500,
+        );
+      } else {
+        ErrorToast(
+          'bottom',
+          'Unexpected error occured',
+          `${error?.message}`,
+          true,
+          1500,
+        );
+      }
+    }
   }
 
   /**
@@ -203,22 +189,23 @@ const LoginScreen = () => {
    * get dial code from internet API
    * @return {NaN, String} data to {CountryText}
    */
-  const getCountryCodeFromApi = async () => {
+  const getCountryCodeFromApi = () => {
     const ApiURL = 'https://ipapi.co/country_calling_code';
-    try {
-      await fetch(ApiURL)
-        .then(dialCode => dialCode?.text())
-        .then(data => {
-          if (data?.includes('error')) {
-            CountrySetText('+1');
-          } else {
-            CountrySetText(data);
-          }
-        });
-    } catch (e) {
-      console.error(e);
-      CountrySetText(+1);
-    }
+    axios
+      .get(ApiURL, {method: 'get'})
+      .then(element => {
+        if (element?.data?.includes('error')) {
+          CountrySetText('+1');
+        } else {
+          CountrySetText(element?.data);
+        }
+      })
+      .catch(error => {
+        if (__DEV__) {
+          console.error(error);
+        }
+        CountrySetText(+1);
+      });
   };
 
   const countryInputOnFocus = () => {
@@ -231,31 +218,20 @@ const LoginScreen = () => {
    * Used for getting Device Information, useful for DeviceScreen.js
    */
 
-  const [systemName, setSystemName] = React.useState(getSystemName());
-  const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
-  const [Manufacturer, setManufacturer] = React.useState(
-    getManufacturer().then(manufacturer => {
-      setManufacturer(manufacturer);
-    }),
-  );
-  const [Product, setProduct] = React.useState(
-    getProduct().then(product => {
-      setProduct(product);
-    }),
-  );
-  const [Model, setModel] = React.useState(getModel());
-  const [appVersion, setAppVersion] = React.useState(getVersion());
+  const [systemName] = React.useState(getSystemName());
+  const [systemVersion] = React.useState(getSystemVersion());
+  const [Manufacturer] = React.useState(getManufacturer());
+  const [Product] = React.useState(getProduct());
+  const [Model] = React.useState(getModel());
+  const [appVersion] = React.useState(getVersion());
 
   async function addCodeObserver(text) {
     if (text?.length > 5) {
       try {
         Keyboard?.dismiss();
         setLoaderVisible(true);
-        const credential = auth?.PhoneAuthProvider?.credential(
-          verificationId,
-          text,
-        );
-        await auth()?.signInWithCredential(credential);
+        await ConfirmCode?.confirm(text);
+        setCodeCorrect(true);
         firestore()
           .collection('users')
           .doc(auth()?.currentUser?.uid)
@@ -265,53 +241,55 @@ const LoginScreen = () => {
               if (documentSnapshot?.data()?.uid) {
                 JwtKeyMMKV.set(
                   'currentUserJwtKey',
-                  documentSnapshot?.data().jwtKey,
+                  documentSnapshot?.data()?.jwtKey,
                 );
+                /**
+                 * pushing device information for later use in DeviceScreen.js
+                 */
+                firestore()
+                  .collection('users')
+                  .doc(auth()?.currentUser?.uid)
+                  .collection('devices')
+                  .add({
+                    manufacturer: Manufacturer,
+                    system_name: systemName,
+                    system_version: systemVersion,
+                    product: Product,
+                    model: Model,
+                    app_version: appVersion,
+                    time: firestore?.Timestamp?.fromDate(new Date()),
+                  })
+                  .catch(error => {
+                    if (__DEV__) {
+                      console.log('failed pushing device data');
+                      console.error(error);
+                    }
+                    setLoaderVisible(false);
+                  });
 
                 /**
                  * Saving data to to UserDataMMKV preference.
                  */
 
-                UserDataMMKV.set(
+                UserDataMMKV?.set(
                   'Me',
                   JSON?.stringify(documentSnapshot?.data()),
                 );
 
-                /**
-                 * pushing device information for later use in DeviceScreen.js
-                 */
-                if (!isWindows && !isWeb) {
-                  firestore()
-                    .collection('users')
-                    .doc(auth()?.currentUser?.uid)
-                    .collection('devices')
-                    .add({
-                      manufacturer: Manufacturer,
-                      system_name: systemName,
-                      system_version: systemVersion,
-                      product: Product,
-                      model: Model,
-                      app_version: appVersion,
-                      time: firestore?.Timestamp?.fromDate(new Date()),
-                    })
-                    .catch(error => {
-                      console.error(error);
-                      setLoaderVisible(false);
-                    });
-                }
-                setLoaderVisible(false);
                 navigation?.dispatch(
                   CommonActions?.reset({
                     index: 0,
                     routes: [{name: 'login'}],
                   }),
                 );
+
                 navigation?.navigate('home');
               }
             } else {
               const generatedUsername = auth()
                 ?.currentUser?.uid?.substring(0, 4)
-                .concat(getRandomInt(100000, 999999));
+                .concat(getRandomInt(10000, 99999))
+                ?.concat(getRandomString(5));
               navigation?.dispatch(
                 CommonActions?.reset({
                   index: 0,
@@ -334,22 +312,110 @@ const LoginScreen = () => {
       } catch (error) {
         setLoaderVisible(false);
         if (error !== null) {
-          if (error.code === 'auth/invalid-verification-code') {
-            ErrorToast(
-              'bottom',
-              'Invalid code',
-              'Please check the code again',
-              true,
-              2000,
-            );
+          if (auth()?.currentUser !== null) {
+            setCodeCorrect(true);
+            firestore()
+              .collection('users')
+              .doc(auth()?.currentUser?.uid)
+              .get()
+              .then(documentSnapshot => {
+                if (documentSnapshot?.exists) {
+                  if (documentSnapshot?.data()?.uid) {
+                    JwtKeyMMKV.set(
+                      'currentUserJwtKey',
+                      documentSnapshot?.data()?.jwtKey,
+                    );
+                    /**
+                     * pushing device information for later use in DeviceScreen.js
+                     */
+                    firestore()
+                      .collection('users')
+                      .doc(auth()?.currentUser?.uid)
+                      .collection('devices')
+                      .add({
+                        manufacturer: Manufacturer,
+                        system_name: systemName,
+                        system_version: systemVersion,
+                        product: Product,
+                        model: Model,
+                        app_version: appVersion,
+                        time: firestore?.Timestamp?.fromDate(new Date()),
+                      })
+                      .catch(error => {
+                        if (__DEV__) {
+                          console.log('failed pushing device data');
+                          console.error(error);
+                        }
+                        setLoaderVisible(false);
+                      });
+
+                    /**
+                     * Saving data to to UserDataMMKV preference.
+                     */
+
+                    UserDataMMKV?.set(
+                      'Me',
+                      JSON?.stringify(documentSnapshot?.data()),
+                    );
+
+                    navigation?.dispatch(
+                      CommonActions?.reset({
+                        index: 0,
+                        routes: [{name: 'login'}],
+                      }),
+                    );
+
+                    navigation?.navigate('home');
+                  }
+                } else {
+                  const generatedUsername = auth()
+                    ?.currentUser?.uid?.substring(0, 4)
+                    .concat(getRandomInt(10000, 99999))
+                    ?.concat(getRandomString(5));
+                  navigation?.dispatch(
+                    CommonActions?.reset({
+                      index: 0,
+                      routes: [{name: 'login'}],
+                    }),
+                  );
+                  navigation?.navigate('setup', {
+                    user: {
+                      uid: auth()?.currentUser?.uid,
+                      username: generatedUsername,
+                      phone: NumberText,
+                      phone_number: CountryText + ' ' + NumberText,
+                      phone_status: 'none',
+                      country_code: CountryText,
+                    },
+                  });
+                }
+              });
+            setLoaderVisible(false);
+            /**
+             * this code above should be responsable with 'auth/session-expired' if the user is already logged in and still showing invalid code
+             * in fact, the user was logged in
+             * the fucking auth#onAuthStateChanged triggering 10000 time so i'm using this for now until i found a solution.
+             */
           } else {
-            ErrorToast(
-              'bottom',
-              'Unexpected error occured',
-              `${error}`,
-              true,
-              2000,
-            );
+            if (error.code === 'auth/invalid-verification-code') {
+              setCodeCorrect(false);
+              ErrorToast(
+                'bottom',
+                'Invalid code',
+                'Please check the code again',
+                true,
+                2000,
+              );
+              waitForAnd(2000).then(() => setCodeCorrect(null));
+            } else {
+              ErrorToast(
+                'bottom',
+                'Unexpected error occured',
+                `${error}`,
+                true,
+                2000,
+              );
+            }
           }
         }
       }
@@ -578,7 +644,7 @@ const LoginScreen = () => {
                     const isConnected = await NetInfo?.fetch();
                     if (isConnected.isConnected) {
                       if (isSMSSendingAcceptable()) {
-                        verifyPhoneNumber(CountryText + NumberText);
+                        signInWithPhoneNumber(CountryText + NumberText);
                       } else {
                         setBottomMargin(heightPercentageToDP(7.5));
                         setErrorSnackbarText(
@@ -615,14 +681,26 @@ const LoginScreen = () => {
                 <OTPTextView
                   inputCount={6}
                   ref={phoneRef}
-                  tintColor={COLORS.accentLight}
-                  offTintColor={COLORS.controlHighlight}
+                  tintColor={
+                    codeCorrect === true
+                      ? COLORS.green
+                      : codeCorrect === false
+                      ? COLORS.redLightError
+                      : COLORS.accentLight
+                  }
+                  offTintColor={
+                    codeCorrect
+                      ? COLORS.green
+                      : codeCorrect === false
+                      ? COLORS.redLightError
+                      : COLORS.controlHighlight
+                  }
                   containerStyle={styles.TextInputContainer}
                   textInputStyle={styles.RoundedTextInput}
                   handleTextChange={text => {
                     addCodeObserver(text);
                   }}
-                  keyboardType={'numeric'}
+                  keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                 />
               </View>
               <View
