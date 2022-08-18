@@ -7,6 +7,7 @@ import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
+import {DecryptAES} from '../../utils/crypto/cryptoTools';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -23,11 +24,12 @@ const MessagesList = ({ListData}) => {
 
   const messageText = item => {
     if (item?.type === 'message') {
-      let messageLength = item?.to_message_text?.length;
+      let decryptedMessage = DecryptAES(item?.to_message_text);
+      let messageLength = decryptedMessage?.length;
       let message =
         item?.last_uid === auth()?.currentUser?.uid
-          ? `You: ${item?.to_message_text}`
-          : `${item?.to_message_text}`;
+          ? `You: ${decryptedMessage}`
+          : `${decryptedMessage}`;
       let modifiedtext =
         messageLength < 35 ? message : message?.substring(0, 35) + '...';
       return modifiedtext;
