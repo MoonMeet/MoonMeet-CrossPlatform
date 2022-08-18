@@ -9,9 +9,25 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    paths: 
+      - '**/github/workflows/gradle.yml'
+      - 'android/app/**'
+      - 'gradle/**'
+      - 'build.gradle'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'settings.gradle'
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - '**/github/workflows/gradle.yml'
+      - 'android/app/**'
+      - 'gradle/**'
+      - 'build.gradle'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'settings.gradle'
 
 permissions:
   contents: read
