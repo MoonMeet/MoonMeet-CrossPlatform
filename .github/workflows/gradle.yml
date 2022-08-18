@@ -30,7 +30,9 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     - name: Go to android folder
-      run: cd android   
+      run: cd android
+    - name: List directories
+      run: ls
     - name: Make Gradle executable
       run: chmod +x ./gradlew
     - name: Build Release APK
