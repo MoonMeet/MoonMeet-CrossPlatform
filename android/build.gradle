@@ -3,6 +3,10 @@
 
 buildscript {
     ext {
+        Compressor_compileSdkVersion = 33
+        Compressor_buildToolsVersion = "33.0.0"
+        Compressor_minSdkVersion = 24
+        
         buildToolsVersion = "33.0.0"
         minSdkVersion = 24
         compileSdkVersion = 33
