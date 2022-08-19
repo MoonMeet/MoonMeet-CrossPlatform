@@ -53,4 +53,4 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
     - name: Run Gradle Build for android/
-      run: cd android && ./gradlew assembleDebug --build-cache && cd ..
+      run: cd android && ./gradlew assembleRelease --build-cache -PkeystorePassword=${{secrets.KEYSTORE_PASSWORD}} -PkeyAliasPassword=${{secrets.KEY_ALIAS_PASSWORD}} && cd ..
