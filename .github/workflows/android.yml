@@ -55,4 +55,4 @@ jobs:
     - name: Setup secrets for gradle
       run: export keystorePass=${{ secrets.KEYSTORE_PASSWORD }} && export keystoreAlias=${{ secrets.KEYSTORE_ALIAS }} && export keystoreAliasPass=${{ secrets.KEY_ALIAS_PASSWORD }} && echo ${{ secrets.SENSITIVE_JS }} > src/sensitive.js && echo ${{ secrets.GOOGLE_SERVICES_JSON }} > android/app/google-services.json
     - name: Run Gradle Build for android/
-      run: cd android && ./gradlew assembleRelease --build-cache -PkeystorePassword=${{secrets.KEYSTORE_PASSWORD}} -PkeyAliasPassword=${{secrets.KEY_ALIAS_PASSWORD}} && cd ..
+      run: cd android && ./gradlew assembleRelease --build-cache --no-daemon && cd ..
