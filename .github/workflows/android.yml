@@ -52,5 +52,7 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
+    - name: Set keys for gradle
+      run: export keystorePass=${{ secrets.KEYSTORE_PASSWORD }} && export keystoreAlias=${{ secrets.KEYSTORE_ALIAS }} && export keystoreAliasPass=${{ secrets.KEY_Alias_PASSWORD }}
     - name: Run Gradle Build for android/
-      run: cd android && ./gradlew assembleDebug --build-cache && cd ..
+      run: cd android && ./gradlew assembleRelease --build-cache -PkeystorePassword=${{secrets.KEYSTORE_PASSWORD}} -PkeyAliasPassword=${{secrets.KEY_ALIAS_PASSWORD}} && cd ..
