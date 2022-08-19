@@ -6,7 +6,8 @@ buildscript {
         Compressor_compileSdkVersion = 33
         Compressor_buildToolsVersion = "33.0.0"
         Compressor_minSdkVersion = 24
-        
+        Compressor_targetSdkVersion = 33
+
         buildToolsVersion = "33.0.0"
         minSdkVersion = 24
         compileSdkVersion = 33
