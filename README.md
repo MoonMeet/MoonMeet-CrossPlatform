@@ -1,4 +1,4 @@
-## MoonMeet CrossPlatform 🎉️ 
+## MoonMeet CrossPlatform 🎉️
 
 <p>
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
@@ -48,6 +48,11 @@
   sudo make install
   ```
 - Your own `release.keystore, sensitive.js and google-service.json`.
+- Your sensitive.js file under /src folder must contain your encryption key for messages:
+
+  ```
+  export default 'your top secret encryption key';
+  ```
 
 ##### Troubleshooting:
 
@@ -58,7 +63,6 @@
 ---
 
 `[TASK] bundleReleaseJsAndAssets [FAILED]:`
-
 
 => fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
 
