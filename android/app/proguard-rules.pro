@@ -79,3 +79,7 @@
 -keepclassmembers class com.android.installreferrer.api.** {
   *;
 }
+
+# Svg
+
+-keep public class com.horcrux.svg.** {*;}
