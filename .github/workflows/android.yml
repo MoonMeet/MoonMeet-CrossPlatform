@@ -56,7 +56,7 @@ jobs:
       run: export keystorePass=${{ secrets.KEYSTORE_PASSWORD }} && export keystoreAlias=${{ secrets.KEYSTORE_ALIAS }} && export keystoreAliasPass=${{ secrets.KEY_ALIAS_PASSWORD }}
     - name: Decode Google Service JSON File.
       env:
-        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES.JSON }}
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
       run: echo $GOOGLE_SERVICES_JSON > android/app/google-services.json
     - name: Decode Sensitive JS File
       env:
