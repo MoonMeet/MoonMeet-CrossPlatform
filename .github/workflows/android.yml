@@ -34,8 +34,6 @@ jobs:
         distribution: 'temurin'
     - name: Install node_modules
       run: yarn install --frozen-lockfile
-    - name: Setup secrets
-      run: export KEYPASS=${{ secrets.KEYSTORE_PASSWORD }} && export KEYALIAS=${{ secrets.KEYSTORE_ALIAS }} && export KEYALIASPASS=${{ secrets.KEY_ALIAS_PASSWORD }}
     - name: Decode Google Service JSON File.
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -49,4 +47,8 @@ jobs:
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd .. 
     - name: Build release APK.
+      env:
+        KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+        KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
       run: cd android && ./gradlew assembleRelease && cd ..
