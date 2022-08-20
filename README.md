@@ -4,7 +4,6 @@
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
 <img src="https://img.shields.io/badge/license-GPL-blue.svg" />
 <img src="https://visitor-badge.laobi.icu/badge?page_id=MoonMeet.MoonMeet-CrossPlatform" />
-<img  src="https://img.shields.io/github/issues/MoonMeet/MoonMeet-CrossPlatform?color=0088ff" />
 </p>
 - We give people the closest distances
 
@@ -47,24 +46,12 @@
   make
   sudo make install
   ```
-- Your own `release.keystore, sensitive.js and google-service.json`.
-- Your sensitive.js file under /src folder must contain your encryption key for messages:
+- You need to add the following`:
 
-  ```
-  export default 'your top secret encryption key';
-  ```
-
-##### Troubleshooting:
-
-`[TASK] react-native-compressor-verifyReleaseRessources [FAILED]:`
-
-=> fix: Go to `node_modules/react-native-compressor/android/build.gradle` and change `compileSdkVersion to 33`,`targetSdkVersion to 24` and `buildToolVersion to "33.0.0"`.
-
----
-
-`[TASK] bundleReleaseJsAndAssets [FAILED]:`
-
-=> fix: use android studio and the following command `./gradlew clean && ./gradlew --stop && ./gradlew assembleRelease --no-daemon`.
+  - Your `release.keystore` and `google-services.json`
+  - Your `sensitive.js` file under /src folder must contain your encryption key for messages:
+  `export default "your top secret encryption key";`
+  - Your should add keystore credentails as environment variables: `**KEYPASS**`, `**KEYALIAS**` and `**KEYALIASPASS**`
 
 ### Commit message
 
@@ -93,6 +80,11 @@ And that summarized:
 - `chore: bump Moon Meet version from X.X.X to X.X.X `
 
 ### Thanks for contributing
+
+##### Thanks goes to these wonderful people:
+
+- [Pranav Parwar](https://github.com/PranavPurwar): for Android CI Workflow.
+- [Ahmed Sbai](https://github.com/sbaiahmed1): for Supporting us since my beginning.
 
 Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
