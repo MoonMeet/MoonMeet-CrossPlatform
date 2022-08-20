@@ -50,8 +50,8 @@
 
   - Your `release.keystore` and `google-services.json`
   - Your `sensitive.js` file under /src folder must contain your encryption key for messages:
-  `export default "your top secret encryption key";`
-  - Your should add keystore credentails as environment variables: `**KEYPASS**`, `**KEYALIAS**` and `**KEYALIASPASS**`
+    `export default "your top secret encryption key";`
+  - Your should add keystore credentails as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
 
 ### Commit message
 
