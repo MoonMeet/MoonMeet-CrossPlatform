@@ -259,7 +259,7 @@ android {
     }
 
     lintOptions {
-        isAbortOnError = false
+        abortOnError = false
     }
 
     // applicationVariants are e.g. debug, release
