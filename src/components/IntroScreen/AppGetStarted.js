@@ -17,7 +17,7 @@ const AppGetStarted = ({onPressButton}) => {
         style={IntroStyles.introduction_button}
         uppercase={false}
         color="#566193"
-        mode="contained"
+        mode="outlined"
         onPress={onPressButton}>
         Continue
       </Button>
