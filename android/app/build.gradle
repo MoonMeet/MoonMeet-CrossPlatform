@@ -230,16 +230,16 @@ android {
     signingConfigs {
         debug {
             storeFile file('config/release.keystore')
-            storePassword System.getenv('keystorePass')
-            keyAlias System.getenv('keystoreAlias')
-            keyPassword System.getenv('keystoreAliasPass')
+            storePassword System.getenv('KEYPASS')
+            keyAlias System.getenv('KEYALIAS')
+            keyPassword System.getenv('KEYALIASPASS')
             
         }
         release { 
             storeFile file('config/release.keystore')
-            storePassword System.getenv('keystorePass')
-            keyAlias System.getenv('keystoreAlias')
-            keyPassword System.getenv('keystoreAliasPass')
+            storePassword System.getenv('KEYPASS')
+            keyAlias System.getenv('KEYALIAS')
+            keyPassword System.getenv('KEYALIASPASS')
         } // I am using my own keystore for debugging and release, you SHOULD follow README.md for instructions.
     }
     buildTypes {
