@@ -63,4 +63,4 @@ jobs:
         SENSITIVE_JS: ${{ secrets.SENSITIVE_JS }}
       run: echo $SENSITIVE_JS > src/sensitive.js
     - name: Run Gradle Build for android/
-      run: cd android && ./gradlew assembleRelease --build-cache --no-daemon && cd ..
+      run: cd android && ./gradlew assembleRelease --build-cache && cd ..
