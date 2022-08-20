@@ -35,9 +35,7 @@ export const IntroStyles = StyleSheet.create({
   },
   introduction_button: {
     position: 'absolute',
-    textAlign: 'center',
-    fontSize: fontValue(20),
-    bottom: '2.5%',
+    bottom: '2%',
     fontFamily: FONTS.regular,
   },
 });
