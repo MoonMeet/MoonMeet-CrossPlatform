@@ -62,5 +62,7 @@ jobs:
       env:
         SENSITIVE_JS: ${{ secrets.SENSITIVE_JS }}
       run: echo $SENSITIVE_JS > src/sensitive.js
+    - name: Increase Gradle JVM max memory
+      run: sed -i 's/Xmx896/Xmx4096/g' android/gradle.properties
     - name: Run Gradle Build for android/
       run: cd android && ./gradlew assembleRelease --build-cache && cd ..
