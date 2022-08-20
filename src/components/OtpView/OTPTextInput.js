@@ -127,6 +127,11 @@ class OTPTextView extends Component {
     );
   };
 
+  getValue = () => {
+    const {otpText} = this.state;
+    return otpText?.toString()?.replace(/,/g, '');
+  };
+
   render() {
     const {
       inputCount,
