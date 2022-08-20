@@ -86,7 +86,7 @@ And that summarized:
 ##### Thanks goes to these wonderful people:
 
 - [Pranav Purwar](https://github.com/PranavPurwar): for Android CI Workflow.
-- [Ahmed Sbai](https://github.com/sbaiahmed1): for Supporting us since my beginning.
+- [Ahmed Sbai](https://github.com/sbaiahmed1): for Supporting me since the beginning of Moon Meet.
 
 Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
