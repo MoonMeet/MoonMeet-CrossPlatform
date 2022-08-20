@@ -4,6 +4,7 @@
 <img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
 <img src="https://img.shields.io/badge/license-GPL-blue.svg" />
 <img src="https://visitor-badge.laobi.icu/badge?page_id=MoonMeet.MoonMeet-CrossPlatform" />
+<img src="https://github.com/MoonMeet/MoonMeet-CrossPlatform/actions/workflows/android.yml/badge.svg" />
 </p>
 - We give people the closest distances
 
