@@ -1,11 +1,19 @@
+/*
+ * This is the source code of Moon Meet CrossPlatform.
+ * It is licensed under GNU GPL v. 3.
+ * You should have received a copy of the license in this archive (see LICENSE).
+ *
+ * Copyright Rayen sbai, 2021-2022.
+ */
+
 import {Platform, Dimensions} from 'react-native';
-// ? Screen Constants
+// Screen Constants
 const Screen = Dimensions.get('window');
 const ScreenWidth: number = Screen.width;
 const ScreenHeight: number = Screen.height;
 const ScreenScale: number = Screen.scale;
 const ScreenFontScale: number = Screen.fontScale;
-// ? Window Constants
+// Window Constants
 const Window = Dimensions.get('window');
 const WindowWidth: number = Window.width;
 const WindowHeight: number = Window.height;
