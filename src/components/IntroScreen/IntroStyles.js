@@ -18,14 +18,12 @@ export const IntroStyles = StyleSheet.create({
     position: 'relative',
   },
   introduction_top_text: {
-    position: 'relative',
     textAlign: 'center',
     fontSize: fontValue(20),
     color: COLORS.accentLight,
     fontFamily: FONTS.regular,
   },
   introduction_bottom_text: {
-    position: 'relative',
     textAlign: 'center',
     fontSize: fontValue(16),
     top: '2.5%',
