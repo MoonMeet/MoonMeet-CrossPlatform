@@ -8,8 +8,14 @@ const AppGetStarted = ({onPressButton}) => {
   return (
     <View style={IntroStyles.PagerRender} key="2">
       <Image style={IntroStyles.illustration} source={GetStarted} />
-      <Text style={IntroStyles.introduction_top_text}>Let's get started</Text>
-      <Text style={IntroStyles.introduction_bottom_text}>
+      <Text
+        adjustFontSizeToFit={true}
+        style={IntroStyles.introduction_top_text}>
+        Let's get started
+      </Text>
+      <Text
+        adjustFontSizeToFit={true}
+        style={IntroStyles.introduction_bottom_text}>
         Press the Continue button bellow to access to your Moon Meet Account or
         Sign Up
       </Text>
