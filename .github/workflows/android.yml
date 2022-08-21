@@ -46,6 +46,14 @@ jobs:
       run: sed -i 's/Xmx896/Xmx4096/g' android/gradle.properties && sed -i 's/256m/1024m/g' android/gradle.properties
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd .. 
+    - name: List gradle tasks (testing tasks)
+      run: cd android && ./gradlew tasks && cd ..
+    - name: Build debug APK (testing the build)
+      env:
+        KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+        KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
+      run: cd android && ./gradlew assembleDebug && cd ..
     - name: Build release APK.
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
