@@ -40,9 +40,10 @@ import {
   InfoToast,
   SuccessToast,
 } from '../ToastInitializer/ToastInitializer';
-import {useTheme} from 'react-native-paper';
+import {Button, Dialog, Paragraph, Portal, useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
+import {fontValue} from '../../config/Dimensions';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -109,8 +110,63 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
     ),
     default: () => undefined,
   });
+
+  const [LogoutDialogVisivle, setLogoutDialogVisible] = React.useState(false);
+
   return (
     <>
+      <Portal>
+        <Dialog
+          dismissable={true}
+          visible={LogoutDialogVisivle}
+          onDismiss={() => setLogoutDialogVisible(false)}>
+          <Dialog.Title style={{color: COLORS.black, opacity: 0.9}}>
+            Logout
+          </Dialog.Title>
+          <Dialog.Content>
+            <Paragraph
+              adjustsFontSizeToFit
+              style={{
+                fontSize: fontValue(14),
+                color: COLORS.black,
+                opacity: 0.8,
+              }}>
+              Are you sure you want to log out ?
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions style={{flexDirection: 'column'}}>
+            <Button
+              uppercase={false}
+              mode={'contained'}
+              color={COLORS.redLightError}
+              style={{margin: '0.5%', width: '100%'}}
+              onPress={() => {
+                try {
+                  auth()
+                    ?.signOut()
+                    .finally(() => {
+                      navigation?.navigate('login');
+                    });
+                } catch (e) {
+                  if (__DEV__) {
+                    console?.error(e);
+                  }
+                }
+                setLogoutDialogVisible(false);
+              }}>
+              Log out
+            </Button>
+            <Button
+              uppercase={false}
+              style={{margin: '0.5%', width: '100%'}}
+              mode={'outlined'}
+              color={COLORS.accentLight}
+              onPress={() => setLogoutDialogVisible(false)}>
+              Flip a coin
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       <DataItemTitle titleItem={'Miscellaneous'} />
       <DataItemCustom
         leftIcon={DarkModeIcon}
@@ -180,19 +236,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={LogoutIcon}
         leftIconColor={COLORS.redLightError}
         titleTextContainer={'Log out'}
-        onPressTrigger={() => {
-          try {
-            auth()
-              ?.signOut()
-              .finally(() => {
-                navigation?.navigate('login');
-              });
-          } catch (e) {
-            if (__DEV__) {
-              console.error(e);
-            }
-          }
-        }}
+        onPressTrigger={() => setLogoutDialogVisible(true)}
       />
       <DataItemTitle titleItem={'Profile'} />
       <DataItemCustom
