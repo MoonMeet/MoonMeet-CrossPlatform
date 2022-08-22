@@ -94,31 +94,6 @@ const LoginScreen = () => {
     };
   }, []);
 
-  const [existingFirstName, setExistingFirstName] = React.useState('');
-  const [existingLastName, setExistingLastName] = React.useState('');
-
-  useEffect(() => {
-    if (auth()?.currentUser !== null) {
-      const userInformation = firestore()
-        .collection('users')
-        .doc(auth()?.currentUser?.uid)
-        .onSnapshot(documentSnapshot => {
-          if (documentSnapshot?.exists) {
-            setExistingFirstName(documentSnapshot?.data()?.first_name);
-            setExistingLastName(documentSnapshot?.data()?.last_name);
-          } else {
-            setExistingFirstName('');
-            setExistingLastName('');
-          }
-        });
-      return () => {
-        if (userInformation) {
-          userInformation();
-        }
-      };
-    }
-  }, []);
-
   useEffect(() => {
     const netEventListener = NetInfo?.addEventListener(listenerState => {
       if (listenerState?.isConnected) {
@@ -374,8 +349,8 @@ const LoginScreen = () => {
                 color: COLORS.accentLight,
                 opacity: 0.9,
               }}>
-              {existingFirstName && existingLastName
-                ? `Welcome back, ${existingFirstName} ${existingLastName}`
+              {auth()?.currentUser?.displayName
+                ? `Welcome back, ${auth()?.currentUser?.displayName}`
                 : 'The moon is shining'}
             </Text>
             <Text
@@ -388,7 +363,7 @@ const LoginScreen = () => {
                 marginTop: 4,
                 opacity: 0.6,
               }}>
-              {existingFirstName && existingLastName
+              {auth()?.currentUser?.displayName
                 ? "The moon can't shine without you."
                 : 'Thank you for joining.'}
             </Text>
@@ -473,7 +448,7 @@ const LoginScreen = () => {
                 });
               setLoaderVisible(false);
             }}>
-            {existingFirstName && existingLastName
+            {auth()?.currentUser?.displayName
               ? "Let's go to your account"
               : "Let's setup your profile"}
           </Button>
@@ -531,8 +506,7 @@ const LoginScreen = () => {
                       opacity: 0.4,
                       fontFamily: FONTS.regular,
                     }}>
-                    You will receive a verification code, Carrier rates {'\n'}{' '}
-                    may apply.
+                    {`You will receive a verification code, Carrier rates ${'\n'} may apply.`}
                   </Text>
                 </View>
                 <View
@@ -627,7 +601,7 @@ const LoginScreen = () => {
                       opacity: 0.4,
                       fontFamily: FONTS.regular,
                     }}>
-                    You agree to the{' '}
+                    {'You agree to the '}
                   </Text>
                   <Text
                     style={{
@@ -639,7 +613,7 @@ const LoginScreen = () => {
                       dismissAll();
                       handlePresentTCModal();
                     }}>
-                    Termes & Conditions
+                    {'Terms & Conditions'}
                   </Text>
                 </View>
                 <Snackbar
@@ -705,8 +679,7 @@ const LoginScreen = () => {
               <MiniBaseView style={styles.container}>
                 <View style={styles.top_bar}>
                   <Text style={styles.top_text}>
-                    Enter the code that we sent {'\n'} to{' '}
-                    {CountryText + ' ' + NumberText}
+                    {`Enter the code that we sent ${'\n'} to ${CountryText} ${NumberText}`}
                   </Text>
                 </View>
                 <View style={styles.centredView}>
