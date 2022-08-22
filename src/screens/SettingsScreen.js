@@ -114,19 +114,21 @@ const SettingsScreen = () => {
         <View style={styles.under_header}>
           <Avatar.Image
             size={85}
-            source={avatarURL ? {uri: avatarURL} : PurpleBackground}
+            source={
+              auth()?.currentUser?.photoURL
+                ? {uri: auth()?.currentUser?.photoURL}
+                : avatarURL
+                ? {uri: avatarURL}
+                : PurpleBackground
+            }
           />
           <Text
-            adjustsFontSizeToFit={
-              firstName?.trim()?.length >= 10 && lastName?.trim()?.length >= 10
-            }
-            numberOfLines={
-              firstName?.trim()?.length >= 10 && lastName?.trim()?.length >= 10
-                ? 1
-                : 2
-            }
+            adjustsFontSizeToFit
+            numberOfLines={2}
             style={styles.under_header_text}>
-            {firstName + ' ' + lastName}
+            {auth()?.currentUser?.displayName
+              ? auth()?.currentUser?.displayName
+              : `${firstName} ${lastName}`}
           </Text>
           {userBio ? (
             <Text
