@@ -63,7 +63,7 @@ const MyInputToolbar = ({
       flexDirection: 'row',
       backgroundColor: COLORS.dimmed,
       flex: 3,
-      marginRight: 8 - 0.1 * 8,
+      marginRight: 10 - 0.1 * 10,
       paddingVertical: Platform.OS === 'ios' ? 10 : 0,
       borderRadius: 30 - 0.1 * 30,
       alignItems: 'center',
@@ -71,7 +71,7 @@ const MyInputToolbar = ({
     },
     input: {
       backgroundColor: 'transparent',
-      paddingLeft: 15 - 0.1 * 15,
+      marginLeft: 12.5 - 0.1 * 12.5,
       color: COLORS.controlHighlight,
       flex: 3,
       fontSize: fontValue(16),
@@ -83,7 +83,7 @@ const MyInputToolbar = ({
       alignItems: 'center',
       paddingRight: 15 - 0.1 * 15,
       paddingLeft: 5 - 0.1 * 5,
-      borderLeftWidth: 1,
+      borderLeftWidth: 0,
       borderLeftColor: COLORS.dimmed, // #fff
     },
     swipeToCancelView: {
@@ -98,7 +98,7 @@ const MyInputToolbar = ({
     emoticonButton: {
       justifyContent: 'center',
       alignItems: 'center',
-      paddingLeft: 10,
+      marginLeft: 15 - 0.1 * 15,
     },
     recordingActive: {
       flexDirection: 'row',
@@ -125,8 +125,8 @@ const MyInputToolbar = ({
       paddingTop: 20,
     },
     sendButton: {
+      borderRadius: 55 - 0.1 * 55,
       backgroundColor: COLORS.accentLight,
-      borderRadius: 50 - 0.1 * 50,
       height: 55 - 0.1 * 55,
       width: 55 - 0.1 * 55,
       alignItems: 'center',
@@ -140,6 +140,12 @@ const MyInputToolbar = ({
         <View style={styles.innerContainer}>
           <View style={styles.inputAndMicrophone}>
             <Pressable
+              android_ripple={{
+                color: COLORS.controlHighlight,
+                borderless: true,
+                foreground: true,
+                radius: 30 - 0.1 * 30,
+              }}
               style={styles.emoticonButton}
               onPress={() => emojiSetter(true)}>
               <MaterialCommunityIcons
@@ -157,6 +163,11 @@ const MyInputToolbar = ({
               onChangeText={text => messageSetter(text)}
             />
             <Pressable
+              android_ripple={{
+                color: COLORS.controlHighlight,
+                borderless: true,
+                radius: 30 - 0.1 * 30,
+              }}
               style={styles.rightIconButtonStyle}
               onPress={attachPressCallback}>
               <MaterialCommunityIcons
@@ -166,6 +177,12 @@ const MyInputToolbar = ({
               />
             </Pressable>
             <Pressable
+              hitSlop={10}
+              android_ripple={{
+                color: COLORS.controlHighlight,
+                borderless: true,
+                radius: 30 - 0.1 * 30,
+              }}
               style={styles.rightIconButtonStyle}
               onPress={cameraPressCallback}>
               <MaterialCommunityIcons
@@ -176,6 +193,12 @@ const MyInputToolbar = ({
             </Pressable>
           </View>
           <Pressable
+            hitSlop={10}
+            android_ripple={{
+              color: COLORS.controlHighlight,
+              borderless: true,
+              radius: 30 - 0.1 * 30,
+            }}
             style={styles.sendButton}
             onPress={() => {
               if (messageGetter?.trim()?.length > 0) {
@@ -185,6 +208,8 @@ const MyInputToolbar = ({
               }
             }}>
             <MaterialCommunityIcons
+              adjustsFontSizeToFit
+              allowFontScaling
               name={messageGetter?.trim()?.length ? 'send' : 'microphone'}
               size={23}
               color={COLORS.white}
