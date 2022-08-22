@@ -10,17 +10,23 @@ import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Pressable, StatusBar, Text, View} from 'react-native';
 import {
-  Actions,
+  Linking,
+  PermissionsAndroid,
+  Pressable,
+  StatusBar,
+  Text,
+  ToastAndroid,
+  View,
+} from 'react-native';
+import {
   GiftedChat,
   MessageImage,
-  Send,
   Bubble,
   MessageText,
   Composer,
 } from 'react-native-gifted-chat';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Divider} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
 import BaseView from '../components/BaseView/BaseView';
 import {
@@ -37,9 +43,7 @@ import {
   InfoToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import {bytesToSize} from '../utils/converters/bytesToSize';
-import MaterialIcons from 'react-native-vector-icons/FontAwesome5';
 import {Image} from 'react-native-compressor';
-import {MoonInputToolbar} from '../components/ChatScreen/MoonInputToolbar';
 import {PurpleBackground} from '../index.d';
 import {isEmpty, reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
@@ -48,6 +52,7 @@ import ImageView from 'react-native-image-viewing';
 import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
+import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -69,7 +74,13 @@ const ChatScreen = () => {
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
    */
 
-  const Me = JSON?.parse(UserDataMMKV?.getString('Me'));
+  const [Me, setMe] = React.useState([]);
+
+  useEffect(() => {
+    try {
+      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
+    } catch (error) {}
+  }, []);
 
   /**
    * Message Variables
@@ -457,7 +468,6 @@ const ChatScreen = () => {
       />
       <BaseView>
         <GiftedChat
-          text={mMessageText}
           isLoadingEarlier={isLoading}
           messageIdGenerator={() => uuidv4()}
           renderLoading={() => (
@@ -476,9 +486,6 @@ const ChatScreen = () => {
           )}
           showAvatarForEveryMessage={false}
           showUserAvatar={false}
-          onInputTextChanged={text => {
-            setMessageText(text);
-          }}
           messages={mChatData}
           renderMessageImage={props => {
             return (
@@ -523,7 +530,7 @@ const ChatScreen = () => {
               />
             );
           }}
-          renderInputToolbar={props => <MoonInputToolbar {...props} />}
+          renderInputToolbar={props => {}}
           renderComposer={props => <Composer {...props} />}
           parsePatterns={linkStyle => [
             {
@@ -536,99 +543,133 @@ const ChatScreen = () => {
             setImageViewVisible(true);
           }}
           maxInputLength={1500}
-          renderSend={props => {
-            if (mMessageText?.trim()?.length > 0) {
-              return (
-                <Send {...props} sendButtonProps={{hitSlop: 15}}>
-                  <MaterialIcons
-                    name="telegram-plane"
-                    color={COLORS.darkGrey}
-                    size={26}
-                    style={{
-                      margin: 3 - 0.1 * 3,
-                      right: widthPercentageToDP(1.5),
-                      bottom: heightPercentageToDP(0.5),
-                    }}
-                  />
-                </Send>
-              );
-            }
-          }}
-          onSend={messages => {
-            sendMessage(messages, '');
-            setMessageText('');
-          }}
-          renderActions={props => {
-            return (
-              <Actions
-                {...props}
-                options={{
-                  ['Open Emoji Keyboard']: props => {
-                    setIsOpen(true);
-                  },
-                  ['Open Camera']: props => {
-                    ImagePicker.openCamera({
-                      height: 1024,
-                      width: 1024,
-                      cropper: false,
-                    })
-                      .then(async image => {
-                        const compressingResult = await Image.compress(
-                          image?.path,
-                          {
-                            compressionMethod: 'auto',
-                          },
-                        );
-                        sendMessage([], compressingResult);
-                      })
-                      .catch(() => {});
-                  },
-                  ['Pick Image']: props => {
-                    ImagePicker.openPicker({
-                      height: 1024,
-                      width: 1024,
-                      cropper: false,
-                    })
-                      .then(async image => {
-                        const compressingResult = await Image.compress(
-                          image?.path,
-                          {
-                            compressionMethod: 'auto',
-                          },
-                        );
-                        sendMessage([], compressingResult);
-                      })
-                      .catch(() => {});
-                  },
-                  ['Cancel']: props => {
-                    // DO NOTHING.
-                  },
-                }}
-                icon={() => (
-                  <View
-                    style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <MaterialIcons
-                      name={'plus'}
-                      size={20}
-                      color={COLORS.black}
-                      light
-                      style={{
-                        top: 2.5 - 0.1 * 2.5,
-                        opacity: 0.4,
-                      }}
-                    />
-                  </View>
-                )}
-                optionTintColor={COLORS.black}
-              />
-            );
-          }}
           user={{
             _id: auth()?.currentUser?.uid,
             avatar: Me?.avatar,
             name: Me?.first_name + ' ' + Me?.last_name,
           }}
           scrollToBottom
+        />
+        <Divider inset={false} />
+        <MoonInputToolbar
+          messageGetter={mMessageText}
+          messageSetter={setMessageText}
+          attachPressCallback={async () => {
+            try {
+              const requestResult = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                {
+                  title: 'Storage Permission',
+                  message:
+                    'Moon Meet requires this permission to access your phone storage',
+                  buttonNegative: 'Deny',
+                  buttonPositive: 'Grant',
+                },
+              );
+              if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+                ImagePicker.openPicker({
+                  height: 1024,
+                  width: 1024,
+                  cropper: false,
+                })
+                  .then(async image => {
+                    const compressingResult = await Image.compress(
+                      image?.path,
+                      {
+                        compressionMethod: 'auto',
+                      },
+                    );
+                    sendMessage([], compressingResult);
+                  })
+                  .catch(err => {
+                    if (__DEV__) {
+                      console.warn(err);
+                    }
+                  });
+              } else if (
+                requestResult === PermissionsAndroid.RESULTS.DENY ||
+                PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+              ) {
+                try {
+                  Linking?.openSettings();
+                  ToastAndroid.show(
+                    'Please grant storage permission manually',
+                    ToastAndroid.SHORT,
+                  );
+                } catch (error) {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                }
+              }
+            } catch (err) {
+              // Maybe something weird or the app running on iOS.
+              if (__DEV__) {
+                console.warn(err);
+              }
+            }
+          }}
+          cameraPressCallback={async () => {
+            try {
+              const requestResult = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                {
+                  title: 'Camera Permission',
+                  message:
+                    'Moon Meet requires this permission to access your camera',
+                  buttonNegative: 'Deny',
+                  buttonPositive: 'Grant',
+                },
+              );
+              if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+                ImagePicker.openCamera({
+                  height: 1024,
+                  width: 1024,
+                  cropper: false,
+                })
+                  .then(async image => {
+                    const compressingResult = await Image.compress(
+                      image?.path,
+                      {
+                        compressionMethod: 'auto',
+                      },
+                    );
+                    sendMessage([], compressingResult);
+                  })
+                  .catch(err => {
+                    if (__DEV__) {
+                      console.warn(err);
+                    }
+                  });
+              } else if (
+                requestResult === PermissionsAndroid.RESULTS.DENY ||
+                PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+              ) {
+                try {
+                  Linking?.openSettings();
+                  ToastAndroid.show(
+                    'Please grant camera permission manually',
+                    ToastAndroid.SHORT,
+                  );
+                } catch (error) {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                }
+              }
+            } catch (err) {
+              // Maybe something weird or the app running on iOS.
+              if (__DEV__) {
+                console.warn(err);
+              }
+            }
+          }}
+          emojiGetter={isOpen}
+          emojiSetter={setIsOpen}
+          sendMessageCallback={() => {
+            sendMessage([], '');
+            setMessageText('');
+          }}
         />
         <EmojiPicker
           onEmojiSelected={handlePick}
