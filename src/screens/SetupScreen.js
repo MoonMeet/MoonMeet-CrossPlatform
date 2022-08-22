@@ -319,6 +319,15 @@ const SetupScreen = ({route}) => {
                       .getDownloadURL();
 
                     /**
+                     * Updating user profile.
+                     */
+
+                    await auth()?.currentUser?.updateProfile({
+                      displayName: firstName + ' ' + lastName,
+                      photoURL: avatarUrl,
+                    });
+
+                    /**
                      * pushing device information for later use in DeviceScreen.js
                      */
                     if (!isWindows && !isWeb) {
