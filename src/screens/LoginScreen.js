@@ -59,6 +59,7 @@ import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import axios from 'axios';
 import {waitForAnd} from '../utils/timers/delay';
 import getRandomString from '../utils/generators/getRandomString';
+import {EncryptAES} from '../utils/crypto/cryptoTools';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -98,7 +99,7 @@ const LoginScreen = () => {
 
   useEffect(() => {
     if (auth()?.currentUser !== null) {
-      firestore()
+      const userInformation = firestore()
         .collection('users')
         .doc(auth()?.currentUser?.uid)
         .onSnapshot(documentSnapshot => {
@@ -110,8 +111,13 @@ const LoginScreen = () => {
             setExistingLastName('');
           }
         });
+      return () => {
+        if (userInformation) {
+          userInformation();
+        }
+      };
     }
-  });
+  }, []);
 
   useEffect(() => {
     const netEventListener = NetInfo?.addEventListener(listenerState => {
@@ -455,10 +461,12 @@ const LoginScreen = () => {
                       user: {
                         uid: auth()?.currentUser?.uid,
                         username: generatedUsername,
-                        phone: NumberText,
-                        phone_number: CountryText + ' ' + NumberText,
+                        phone: EncryptAES(NumberText),
+                        phone_number: EncryptAES(
+                          CountryText + ' ' + NumberText,
+                        ),
                         phone_status: 'none',
-                        country_code: CountryText,
+                        country_code: EncryptAES(CountryText),
                       },
                     });
                   }
@@ -667,28 +675,24 @@ const LoginScreen = () => {
                     },
                   }}
                   onPress={async () => {
-                    try {
-                      Keyboard.dismiss();
-                      const isConnected = await NetInfo?.fetch();
-                      if (isConnected.isConnected) {
-                        if (isSMSSendingAcceptable()) {
-                          signInWithPhoneNumber(CountryText + NumberText);
-                        } else {
-                          setBottomMargin(heightPercentageToDP(7.5));
-                          setErrorSnackbarText(
-                            'Please enter a valid Country Code and Phone Number',
-                          );
-                          onToggleErrorSnackBar();
-                        }
+                    Keyboard.dismiss();
+                    const isConnected = await NetInfo?.fetch();
+                    if (isConnected.isConnected) {
+                      if (isSMSSendingAcceptable()) {
+                        signInWithPhoneNumber(CountryText + NumberText);
                       } else {
                         setBottomMargin(heightPercentageToDP(7.5));
                         setErrorSnackbarText(
-                          'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
+                          'Please enter a valid Country Code and Phone Number',
                         );
                         onToggleErrorSnackBar();
                       }
-                    } catch (e) {
-                      console.error(e);
+                    } else {
+                      setBottomMargin(heightPercentageToDP(7.5));
+                      setErrorSnackbarText(
+                        'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
+                      );
+                      onToggleErrorSnackBar();
                     }
                   }}
                 />
@@ -747,10 +751,9 @@ const LoginScreen = () => {
                     }}>
                     <Text
                       style={{
-                        position: 'relative',
-                        fontSize: fontValue(16),
+                        fontSize: fontValue(14),
                         color: COLORS.black,
-                        opacity: 0.4,
+                        opacity: 0.6,
                         textAlign: 'left',
                         fontFamily: FONTS.regular,
                       }}
@@ -767,10 +770,9 @@ const LoginScreen = () => {
                   </View>
                   <Text
                     style={{
-                      position: 'relative',
-                      fontSize: fontValue(16),
+                      fontSize: fontValue(14),
                       color: COLORS.black,
-                      opacity: 0.4,
+                      opacity: 0.6,
                       textAlign: 'right',
                       fontFamily: FONTS.regular,
                     }}
