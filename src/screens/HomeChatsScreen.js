@@ -105,7 +105,7 @@ const HomeChatsScreen = () => {
   }
 
   const deleteCurrentStory = useCallback(async sid => {
-    return await firestore().collection('stories').doc(sid).delete();
+    return await firestore().collection('stories')?.doc(sid)?.delete();
   }, []);
 
   useFocusEffect(
@@ -242,7 +242,13 @@ const HomeChatsScreen = () => {
             }}>
             <Avatar.Image
               size={35.5}
-              source={avatarURL ? {uri: avatarURL} : PurpleBackground}
+              source={
+                auth()?.currentUser?.photoURL
+                  ? {uri: auth()?.currentUser?.photoURL}
+                  : avatarURL
+                  ? {uri: avatarURL}
+                  : PurpleBackground
+              }
               style={{
                 overflow: 'hidden',
                 marginRight: '-1%',
