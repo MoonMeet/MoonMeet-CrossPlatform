@@ -24,7 +24,6 @@ import {
   MessageImage,
   Bubble,
   MessageText,
-  Composer,
 } from 'react-native-gifted-chat';
 import {Avatar, Divider} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
@@ -45,7 +44,7 @@ import {
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {Image} from 'react-native-compressor';
 import {PurpleBackground} from '../index.d';
-import {isEmpty, reverse, sortBy} from 'lodash';
+import {filter, isEmpty, reverse, sortBy} from 'lodash';
 import EmojiPicker from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
@@ -79,7 +78,9 @@ const ChatScreen = () => {
   useEffect(() => {
     try {
       setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
-    } catch (error) {}
+    } catch (error) {
+      setMe([]);
+    }
   }, []);
 
   /**
@@ -94,6 +95,103 @@ const ChatScreen = () => {
 
   const handlePick = emojiObject => {
     setMessageText(mMessageText + emojiObject?.emoji);
+  };
+
+  const mAttachPressCallback = async () => {
+    try {
+      const requestResult = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message:
+            'Moon Meet requires this permission to access your phone storage',
+          buttonNegative: 'Deny',
+          buttonPositive: 'Grant',
+        },
+      );
+      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+        ImagePicker.openPicker({
+          height: 1024,
+          width: 1024,
+          cropper: false,
+        })
+          .then(async image => {
+            const compressingResult = await Image.compress(image?.path, {
+              compressionMethod: 'auto',
+            });
+            sendMessage([], compressingResult);
+          })
+          .catch(err => {
+            if (__DEV__) {
+              console.warn(err);
+            }
+          });
+      } else if (
+        requestResult === PermissionsAndroid.RESULTS.DENY ||
+        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+      ) {
+        try {
+          Linking?.openSettings();
+          ToastAndroid.show(
+            'Please grant storage permission manually',
+            ToastAndroid.SHORT,
+          );
+        } catch (error) {}
+      }
+    } catch (err) {
+      // Maybe something weird or the app running on iOS.
+      if (__DEV__) {
+        console.warn(err);
+      }
+    }
+  };
+
+  const mCameraPressCallback = async () => {
+    try {
+      const requestResult = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Camera Permission',
+          message: 'Moon Meet requires this permission to access your camera',
+          buttonNegative: 'Deny',
+          buttonPositive: 'Grant',
+        },
+      );
+      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+        ImagePicker.openCamera({
+          height: 1024,
+          width: 1024,
+          cropper: false,
+        })
+          .then(async image => {
+            const compressingResult = await Image.compress(image?.path, {
+              compressionMethod: 'auto',
+            });
+            sendMessage([], compressingResult);
+          })
+          .catch(err => {});
+      } else if (
+        requestResult === PermissionsAndroid.RESULTS.DENY ||
+        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+      ) {
+        try {
+          Linking?.openSettings();
+          ToastAndroid.show(
+            'Please grant camera permission manually',
+            ToastAndroid.SHORT,
+          );
+        } catch (error) {
+          if (__DEV__) {
+            console.error(error);
+          }
+        }
+      }
+    } catch (err) {
+      // Maybe something weird or the app running on iOS.
+      if (__DEV__) {
+        console.warn(err);
+      }
+    }
   };
 
   useLayoutEffect(() => {
@@ -156,28 +254,56 @@ const ChatScreen = () => {
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
         if (!collectionSnapshot?.empty) {
-          let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
-            ...subMap?.data(),
-            id: subMap?.id,
-            text:
-              DecryptAES(subMap?.data()?.text) === ''
-                ? "We're sorry, we couldn't decrypt this message for you."
-                : DecryptAES(subMap?.data()?.text),
-            user: {
-              _id:
-                subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                  ? auth()?.currentUser?.uid
-                  : destinedUser,
-              name:
-                subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                  ? Me?.first_name + ' ' + Me?.last_name
-                  : userFirstName + ' ' + userLastName,
-              avatar:
-                subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                  ? Me?.avatar
-                  : userAvatar,
-            }, // we must complete the full object as it is destroyed when adding one or more item.
-          }));
+          let collectionDocs = collectionSnapshot?.docs?.map(subMap => {
+            if (subMap?.data()?.image) {
+              return {
+                ...subMap?.data(),
+                id: subMap?.id,
+
+                user: {
+                  _id:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.uid
+                      : destinedUser,
+                  name:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? Me?.first_name + ' ' + Me?.last_name
+                      : userFirstName + ' ' + userLastName,
+                  avatar:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? Me?.avatar
+                      : userAvatar,
+                },
+              };
+            } else {
+              return {
+                ...subMap?.data(),
+                id: subMap?.id,
+                text: DecryptAES(subMap?.data()?.text),
+                user: {
+                  _id:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.uid
+                      : destinedUser,
+                  name:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? Me?.first_name + ' ' + Me?.last_name
+                      : userFirstName + ' ' + userLastName,
+                  avatar:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? Me?.avatar
+                      : userAvatar,
+                },
+              };
+            }
+          });
+          filter(collectionDocs, [
+            (docs, index) => {
+              if (docs?.image) {
+                collectionDocs[index].text = '';
+              }
+            },
+          ]);
           collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
           collectionDocs = reverse(collectionDocs);
           setChatData(collectionDocs);
@@ -530,8 +656,8 @@ const ChatScreen = () => {
               />
             );
           }}
-          renderInputToolbar={props => {}}
-          renderComposer={props => <Composer {...props} />}
+          renderInputToolbar={props => undefined}
+          renderComposer={props => undefined}
           parsePatterns={linkStyle => [
             {
               pattern: /#(\w+)/,
@@ -542,7 +668,6 @@ const ChatScreen = () => {
           onPressAvatar={() => {
             setImageViewVisible(true);
           }}
-          maxInputLength={1500}
           user={{
             _id: auth()?.currentUser?.uid,
             avatar: Me?.avatar,
@@ -554,116 +679,8 @@ const ChatScreen = () => {
         <MoonInputToolbar
           messageGetter={mMessageText}
           messageSetter={setMessageText}
-          attachPressCallback={async () => {
-            try {
-              const requestResult = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                  title: 'Storage Permission',
-                  message:
-                    'Moon Meet requires this permission to access your phone storage',
-                  buttonNegative: 'Deny',
-                  buttonPositive: 'Grant',
-                },
-              );
-              if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
-                ImagePicker.openPicker({
-                  height: 1024,
-                  width: 1024,
-                  cropper: false,
-                })
-                  .then(async image => {
-                    const compressingResult = await Image.compress(
-                      image?.path,
-                      {
-                        compressionMethod: 'auto',
-                      },
-                    );
-                    sendMessage([], compressingResult);
-                  })
-                  .catch(err => {
-                    if (__DEV__) {
-                      console.warn(err);
-                    }
-                  });
-              } else if (
-                requestResult === PermissionsAndroid.RESULTS.DENY ||
-                PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-              ) {
-                try {
-                  Linking?.openSettings();
-                  ToastAndroid.show(
-                    'Please grant storage permission manually',
-                    ToastAndroid.SHORT,
-                  );
-                } catch (error) {
-                  if (__DEV__) {
-                    console.error(error);
-                  }
-                }
-              }
-            } catch (err) {
-              // Maybe something weird or the app running on iOS.
-              if (__DEV__) {
-                console.warn(err);
-              }
-            }
-          }}
-          cameraPressCallback={async () => {
-            try {
-              const requestResult = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                  title: 'Camera Permission',
-                  message:
-                    'Moon Meet requires this permission to access your camera',
-                  buttonNegative: 'Deny',
-                  buttonPositive: 'Grant',
-                },
-              );
-              if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
-                ImagePicker.openCamera({
-                  height: 1024,
-                  width: 1024,
-                  cropper: false,
-                })
-                  .then(async image => {
-                    const compressingResult = await Image.compress(
-                      image?.path,
-                      {
-                        compressionMethod: 'auto',
-                      },
-                    );
-                    sendMessage([], compressingResult);
-                  })
-                  .catch(err => {
-                    if (__DEV__) {
-                      console.warn(err);
-                    }
-                  });
-              } else if (
-                requestResult === PermissionsAndroid.RESULTS.DENY ||
-                PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-              ) {
-                try {
-                  Linking?.openSettings();
-                  ToastAndroid.show(
-                    'Please grant camera permission manually',
-                    ToastAndroid.SHORT,
-                  );
-                } catch (error) {
-                  if (__DEV__) {
-                    console.error(error);
-                  }
-                }
-              }
-            } catch (err) {
-              // Maybe something weird or the app running on iOS.
-              if (__DEV__) {
-                console.warn(err);
-              }
-            }
-          }}
+          attachPressCallback={mAttachPressCallback}
+          cameraPressCallback={mCameraPressCallback}
           emojiGetter={isOpen}
           emojiSetter={setIsOpen}
           sendMessageCallback={() => {
