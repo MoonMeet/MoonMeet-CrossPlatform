@@ -132,35 +132,23 @@ const HomePeopleScreen = () => {
         <MiniBaseView>
           <View style={styles.toolbar}>
             <View style={styles.left_side}>
-              {avatarURL ? (
-                <Pressable
-                  hitSlop={15}
-                  onPress={() => {
-                    navigation.navigate('settings');
-                  }}>
-                  <Avatar.Image
-                    size={35.5}
-                    source={avatarURL ? {uri: avatarURL} : PurpleBackground}
-                    style={{
-                      overflow: 'hidden',
-                      marginRight: '-1%',
-                    }}
-                    theme={{
-                      colors: {
-                        primary: COLORS.rippleColor,
-                      },
-                    }}
-                  />
-                </Pressable>
-              ) : (
-                <Avatar.Icon
-                  icon={PersonImage}
-                  size={40}
-                  color={COLORS.black}
+              <Pressable
+                hitSlop={15}
+                onPress={() => {
+                  navigation.navigate('settings');
+                }}>
+                <Avatar.Image
+                  size={35.5}
+                  source={
+                    auth()?.currentUser?.photoURL
+                      ? {uri: auth()?.currentUser?.photoURL}
+                      : avatarURL
+                      ? {uri: avatarURL}
+                      : PurpleBackground
+                  }
                   style={{
                     overflow: 'hidden',
                     marginRight: '-1%',
-                    opacity: 0.4,
                   }}
                   theme={{
                     colors: {
@@ -168,7 +156,7 @@ const HomePeopleScreen = () => {
                     },
                   }}
                 />
-              )}
+              </Pressable>
             </View>
             <View style={styles.mid_side}>
               <Text style={styles.top_text}>People</Text>
