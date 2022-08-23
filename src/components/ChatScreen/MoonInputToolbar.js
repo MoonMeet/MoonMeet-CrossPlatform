@@ -57,7 +57,7 @@ const MyInputToolbar = ({
       justifyContent: 'space-between',
       alignItems: 'center',
       flexDirection: 'row',
-      paddingVertical: 10,
+      marginVertical: 10 - 0.1 * 10,
     },
     inputAndMicrophone: {
       flexDirection: 'row',
@@ -72,7 +72,7 @@ const MyInputToolbar = ({
     input: {
       backgroundColor: 'transparent',
       marginLeft: 12.5 - 0.1 * 12.5,
-      color: COLORS.controlHighlight,
+      color: COLORS.black,
       flex: 3,
       fontSize: fontValue(16),
       height: 55 - 0.1 * 55,
@@ -81,8 +81,8 @@ const MyInputToolbar = ({
     rightIconButtonStyle: {
       justifyContent: 'center',
       alignItems: 'center',
-      paddingRight: 15 - 0.1 * 15,
-      paddingLeft: 5 - 0.1 * 5,
+      marginRight: 15 - 0.1 * 15,
+      marginLeft: 5 - 0.1 * 5,
       borderLeftWidth: 0,
       borderLeftColor: COLORS.dimmed, // #fff
     },
@@ -149,7 +149,7 @@ const MyInputToolbar = ({
               style={styles.emoticonButton}
               onPress={() => emojiSetter(true)}>
               <MaterialCommunityIcons
-                name={false ? 'close' : 'emoticon-outline'} // must be emojiGetter ? 'close' : 'emoticon-outline' but due to library showup, i did false :°
+                name={emojiGetter ? 'close' : 'emoticon-outline'}
                 size={23}
                 color={COLORS.darkGrey}
               />
