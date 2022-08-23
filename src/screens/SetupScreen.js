@@ -323,7 +323,7 @@ const SetupScreen = ({route}) => {
                      */
 
                     await auth()?.currentUser?.updateProfile({
-                      displayName: firstName + ' ' + lastName,
+                      displayName: `${firstName} ${lastName}`,
                       photoURL: avatarUrl,
                     });
 
