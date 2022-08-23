@@ -9,7 +9,6 @@ import {ThemeMMKV} from './src/config/MMKV/ThemeMMKV';
 import {MoonMeetDarkTheme} from './src/config/Theme/Theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import {enableFreeze} from 'react-native-screens';
@@ -24,10 +23,6 @@ enableFreeze(true);
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
   await analytics()?.setAnalyticsCollectionEnabled(true);
-}
-
-if (__DEV__) {
-  initializeMMKVFlipper({default: ThemeMMKV});
 }
 
 const App = () => {
