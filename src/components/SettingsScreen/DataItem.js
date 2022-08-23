@@ -8,9 +8,11 @@
 
 import React from 'react';
 import {Pressable, StyleSheet, Text} from 'react-native';
-import {Avatar} from 'react-native-paper';
+import {Avatar, useTheme} from 'react-native-paper';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {IconSource} from 'react-native-paper/lib/typescript/components/Icon';
+import {fontValue} from '../../config/Dimensions';
+import {ThemeContext} from '../../config/Theme/Context';
 
 interface DataItemInterface {
   leftIcon: IconSource;
@@ -20,6 +22,28 @@ interface DataItemInterface {
 }
 
 const DataItem = (props: DataItemInterface) => {
+  const theme = useTheme();
+  const {isThemeDark} = React.useContext(ThemeContext);
+  const styles = StyleSheet.create({
+    titleViewContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      paddingLeft: '4%',
+      paddingRight: '2%',
+      paddingBottom: '2%',
+      paddingTop: '2%',
+    },
+    titleTextContainer: {
+      fontSize: fontValue(17),
+      paddingLeft: '3%',
+      paddingRight: '3%',
+      textAlign: 'center',
+      color: isThemeDark ? COLORS.white : COLORS.black,
+      fontFamily: FONTS.regular,
+    },
+  });
+
   return (
     <Pressable
       android_ripple={{color: COLORS.rippleColor}}
@@ -43,25 +67,5 @@ const DataItem = (props: DataItemInterface) => {
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  titleViewContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingLeft: '4%',
-    paddingRight: '2%',
-    paddingBottom: '2%',
-    paddingTop: '2%',
-  },
-  titleTextContainer: {
-    fontSize: 17,
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-  },
-});
 
 export default DataItem;
