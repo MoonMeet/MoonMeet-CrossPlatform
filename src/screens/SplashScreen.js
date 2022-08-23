@@ -6,7 +6,13 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {
@@ -38,7 +44,6 @@ import Animated, {
 import {useTheme} from 'react-native-paper';
 import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
-import {initializeMMKVFlipper} from 'react-native-mmkv-flipper-plugin';
 import {isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
 import {
@@ -46,13 +51,11 @@ import {
   InfoToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
-
-if (__DEV__) {
-  initializeMMKVFlipper({default: OnboardingMMKV});
-}
+import {ThemeContext} from '../config/Theme/Context';
 
 const SplashScreen = () => {
   const theme = useTheme();
+  const {isThemeDark} = useContext(ThemeContext);
   const navigation = useNavigation();
 
   /**
@@ -276,15 +279,59 @@ const SplashScreen = () => {
     };
   }, []);
 
+  const styles = StyleSheet.create({
+    fill_screen: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignContent: 'center',
+      alignItems: 'center',
+    },
+    logo: {
+      height: heightPercentageToDP(300),
+      width: widthPercentageToDP(800),
+      bottom: heightPercentageToDP(13.5),
+    },
+    bottom_text: {
+      position: 'absolute',
+      textAlign: 'center',
+      fontSize: fontValue(20),
+      bottom: heightPercentageToDP(6.25),
+      fontFamily: FONTS.bold,
+    },
+    slogan_text: {
+      position: 'absolute',
+      textAlign: 'center',
+      fontSize: fontValue(16),
+      bottom: heightPercentageToDP(2.75),
+      color: isThemeDark ? COLORS.white : COLORS.black,
+      fontFamily: FONTS.regular,
+      opacity: 0.4,
+    },
+  });
+
   return (
     <SafeAreaView
-      style={[styles.fill_screen, {backgroundColor: COLORS.primaryLight}]}>
+      style={[
+        styles.fill_screen,
+        {
+          backgroundColor: isThemeDark
+            ? COLORS.primaryDark
+            : COLORS.primaryLight,
+        },
+      ]}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
           source={LogoImage}
         />
-        <Text style={[styles.bottom_text, {color: COLORS.accentLight}]}>
+        <Text
+          style={[
+            styles.bottom_text,
+            {color: isThemeDark ? COLORS.accentDark : COLORS.accentLight},
+          ]}>
           Moon Meet
         </Text>
         <Text style={styles.slogan_text}>
@@ -311,39 +358,5 @@ const SplashScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  fill_screen: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    height: heightPercentageToDP(300),
-    width: widthPercentageToDP(800),
-    position: 'relative',
-    bottom: heightPercentageToDP(13.5),
-  },
-  bottom_text: {
-    position: 'absolute',
-    textAlign: 'center',
-    fontSize: fontValue(20),
-    bottom: heightPercentageToDP(6.25),
-    fontFamily: FONTS.bold,
-  },
-  slogan_text: {
-    position: 'absolute',
-    textAlign: 'center',
-    fontSize: fontValue(16),
-    bottom: heightPercentageToDP(2.75),
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
-    opacity: 0.4,
-  },
-});
 
 export default SplashScreen;
