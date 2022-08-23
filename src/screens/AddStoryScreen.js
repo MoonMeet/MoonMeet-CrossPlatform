@@ -55,9 +55,21 @@ import getRandomString from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
+import Animated, {
+  useAnimatedKeyboard,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
+
+  const keyboard = useAnimatedKeyboard();
+
+  const translateStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: (-keyboard?.height.value / 10) * 1.75}],
+    };
+  });
 
   const pickerRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['20%', '30%'], []);
@@ -440,7 +452,7 @@ const AddStoryScreen = () => {
     return (
       <BaseView>
         <Spacer height={heightPercentageToDP(1)} />
-        <View style={styles.textInputFlexedView}>
+        <Animated.View style={[styles.textInputFlexedView, translateStyle]}>
           <TextInput
             style={{
               width: '100%',
@@ -473,7 +485,7 @@ const AddStoryScreen = () => {
               Story Text must be longer longer than 1 characters.
             </HelperText>
           ) : null}
-        </View>
+        </Animated.View>
       </BaseView>
     );
   } else if (userSelection === 'image') {
