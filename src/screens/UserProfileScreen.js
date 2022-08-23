@@ -25,6 +25,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import ImageView from 'react-native-image-viewing';
 import {ActivityIndicator} from 'react-native-paper';
+import {DecryptAES} from '../utils/crypto/cryptoTools';
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();
@@ -152,7 +153,7 @@ const UserProfileScreen = () => {
                     activeTime >
                   86400000
                   ? `active on ${moment(activeTime)?.format(
-                      'YYYY MMMM DD - hh:mm A',
+                      "YYYY 'MMMM DD - hh:mm A",
                     )}`
                   : `last seen on ${moment(activeTime)?.format('hh:mm A')}`
                 : 'Last seen recently'}
@@ -186,14 +187,14 @@ const UserProfileScreen = () => {
             enableDescription={true}
             descriptionColor={COLORS.black}
             descriptionText={
-              phoneNumberStatus === 'none' ? phoneNumber : 'Unknown'
+              phoneNumberStatus === 'none' ? DecryptAES(phoneNumber) : 'Unknown'
             }
             rippleColor={COLORS.rippleColor}
             titleColor={COLORS.accentLight}
             titleText={'Phone number'}
             onLongPressTrigger={() => {
               if (phoneNumberStatus === 'none') {
-                Clipboard.setString(phoneNumber);
+                Clipboard.setString(DecryptAES(phoneNumber));
                 InfoToast(
                   'bottom',
                   'Number copied!',
