@@ -133,6 +133,7 @@ const EditProfileScreen = () => {
     uploadImageTask.then(async () => {
       const _avatar = await storage().ref(_avatarRef).getDownloadURL();
       if (_avatar.length > 0) {
+        await auth()?.currentUser?.updateProfile({photoURL: _avatar});
         pushImage(_avatar);
       }
     });
@@ -176,6 +177,9 @@ const EditProfileScreen = () => {
   }
 
   async function pushNames() {
+    await auth()?.currentUser?.updateProfile({
+      displayName: `${firstName} ${lastName}`,
+    });
     await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
