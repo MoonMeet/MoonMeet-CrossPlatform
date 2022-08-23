@@ -44,13 +44,13 @@ import {Button, Dialog, Paragraph, Portal, useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
 import {fontValue} from '../../config/Dimensions';
+import {ScrollView} from 'react-native-gesture-handler';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
   lastName?: string | undefined;
   username?: string | undefined;
   avatar?: string | undefined;
-  userBio?: string | undefined;
   activeStatus?: string | undefined;
   activeTime?: any;
 }
@@ -114,13 +114,20 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const [LogoutDialogVisivle, setLogoutDialogVisible] = React.useState(false);
 
   return (
-    <>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled={true}
+      alwaysBounceVertical={true}>
       <Portal>
         <Dialog
           dismissable={true}
           visible={LogoutDialogVisivle}
           onDismiss={() => setLogoutDialogVisible(false)}>
-          <Dialog.Title style={{color: COLORS.black, opacity: 0.9}}>
+          <Dialog.Title
+            style={{
+              color: isThemeDark ? COLORS.white : COLORS.black,
+              opacity: 0.9,
+            }}>
             Logout
           </Dialog.Title>
           <Dialog.Content>
@@ -128,8 +135,8 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
               adjustsFontSizeToFit
               style={{
                 fontSize: fontValue(14),
-                color: COLORS.black,
-                opacity: 0.8,
+                color: isThemeDark ? COLORS.white : COLORS.black,
+                opacity: isThemeDark ? 0.8 : 0.6,
               }}>
               Are you sure you want to log out ?
             </Paragraph>
@@ -160,7 +167,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
               uppercase={false}
               style={{margin: '0.5%', width: '100%'}}
               mode={'outlined'}
-              color={COLORS.accentLight}
+              color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
               onPress={() => setLogoutDialogVisible(false)}>
               Flip a coin
             </Button>
@@ -246,10 +253,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         rippleColor={COLORS.rippleColor}
         imageSize={36.5}
         iconColor={COLORS.white}
-        titleColor={COLORS.black}
+        titleColor={isThemeDark ? COLORS.white : COLORS.black}
         enableDescription={true}
         descriptionText={props?.activeStatus === 'recently' ? 'Off' : 'On'}
-        descriptionColor={COLORS.black}
+        descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         onPressTrigger={() => {
           navigation?.navigate('activeStatus');
         }}
@@ -262,10 +269,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         rippleColor={COLORS.rippleColor}
         imageSize={36.5}
         iconColor={COLORS.white}
-        titleColor={COLORS.black}
+        titleColor={isThemeDark ? COLORS.white : COLORS.black}
         enableDescription={true}
         descriptionText={props?.username}
-        descriptionColor={COLORS.black}
+        descriptionColor={isThemeDark ? COLORS.white : COLORS.black}
         onPressTrigger={() => navigation?.navigate('changeUsername')}
         onLongPressTrigger={() => {
           try {
@@ -359,7 +366,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         index={0}
         snapPoints={sheetSnapPoints}
       />
-    </>
+    </ScrollView>
   );
 };
 
