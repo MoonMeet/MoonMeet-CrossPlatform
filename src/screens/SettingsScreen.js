@@ -49,7 +49,7 @@ const SettingsScreen = () => {
       paddingRight: '3%',
       paddingTop: '1%',
       textAlign: 'center',
-      color: COLORS.black,
+      color: isThemeDark ? COLORS.white : COLORS.black,
       fontFamily: FONTS.regular,
     },
     bioText: userBio => {
@@ -60,7 +60,7 @@ const SettingsScreen = () => {
         paddingRight: '2.5%',
         paddingTop: '1%',
         textAlign: 'center',
-        color: COLORS.black,
+        color: isThemeDark ? COLORS.white : COLORS.black,
         opacity: userBio ? 0.6 : 0.4,
         fontFamily: FONTS.regular,
       };
@@ -153,7 +153,6 @@ const SettingsScreen = () => {
           lastName={lastName}
           username={userName}
           avatar={avatarURL}
-          userbio={userBio}
           activeStatus={activeStatus}
           activeTime={activeTime}
         />
