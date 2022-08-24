@@ -259,7 +259,7 @@ const ChatScreen = () => {
               return {
                 ...subMap?.data(),
                 id: subMap?.id,
-
+                image: DecryptAES(subMap?.data()?.image),
                 user: {
                   _id:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
@@ -387,22 +387,121 @@ const ChatScreen = () => {
   const sendMessage = useCallback(async (mChatData = [], image) => {
     let connectionStatus = await NetInfo?.fetch();
     if (connectionStatus?.isConnected) {
-    } else {
-      ErrorToast(
-        'bottom',
-        'Intternet connection required',
-        'Please enable Wi-Fi or Mobile data to send messages',
-        true,
-        1000,
-      );
-    }
-    if (!image) {
-      if (mMessageText?.trim()?.length < 1) {
-        // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
+      if (!image) {
+        if (mMessageText?.trim()?.length < 1) {
+          // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
+        } else {
+          try {
+            // Send message to user logic goes here.
+            setMessageText(mMessageText?.trim()); // Message text already trimmed here!
+            firestore()
+              .collection('users')
+              .doc(auth()?.currentUser?.uid)
+              .collection('messages')
+              .doc(destinedUser)
+              .collection('discussions')
+              .add({
+                _id: _id,
+                text: EncryptAES(mMessageText),
+                createdAt: Date.now(),
+                user: {
+                  _id: auth()?.currentUser?.uid,
+                },
+              });
+            firestore()
+              .collection('users')
+              .doc(destinedUser)
+              .collection('messages')
+              .doc(auth()?.currentUser?.uid)
+              .collection('discussions')
+              .add({
+                _id: _id,
+                createdAt: Date.now(),
+                text: EncryptAES(mMessageText),
+                user: {
+                  _id: auth()?.currentUser?.uid,
+                },
+              });
+            setChatData(previousMessage =>
+              GiftedChat.append(previousMessage, mChatData),
+            );
+            // Chats messages on home screen goes here
+            firestore()
+              .collection('chats')
+              .doc(auth()?.currentUser?.uid)
+              .collection('discussions')
+              .doc(destinedUser)
+              .set({
+                to_first_name: userFirstName,
+                to_last_name: userLastName,
+                to_message_text: EncryptAES(mMessageText),
+                to_avatar: userAvatar,
+                time: firestore?.Timestamp?.fromDate(new Date()),
+                type: 'message',
+                last_uid: auth()?.currentUser?.uid,
+                sent_to_uid: destinedUser,
+              });
+            firestore()
+              .collection('chats')
+              .doc(destinedUser)
+              .collection('discussions')
+              .doc(auth()?.currentUser?.uid)
+              .set({
+                to_first_name: Me?.first_name,
+                to_last_name: Me?.last_name,
+                to_message_text: EncryptAES(mMessageText),
+                to_avatar: Me?.avatar,
+                time: firestore?.Timestamp?.fromDate(new Date()),
+                type: 'message',
+                last_uid: auth()?.currentUser?.uid,
+              });
+          } catch (e) {
+            ErrorToast(
+              'bottom',
+              'Failed to send message',
+              'a problem occured when sending a message',
+              true,
+              1000,
+            );
+          }
+        }
       } else {
-        try {
-          // Send message to user logic goes here.
-          setMessageText(mMessageText?.trim()); // Message text already trimmed here!
+        let pickedImage = `chats/images/${getRandomString(
+          18,
+        )}.${image?.substring(image?.lastIndexOf('.') + 1, 3)}`;
+
+        const storageRef = storage().ref(pickedImage);
+
+        /**
+         * Uploading image to Firebase Storage
+         * @type {FirebaseStorageTypes.Task}
+         */
+
+        const uploadImageTask = storageRef?.putFile(image);
+
+        /**
+         * Add observer to image uploading.
+         */
+
+        uploadImageTask.on('state_changed', taskSnapshot => {
+          InfoToast(
+            'bottom',
+            'Sending Image',
+            `${bytesToSize(
+              taskSnapshot?.bytesTransferred,
+            )} transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
+            true,
+            500,
+          );
+        });
+
+        /**
+         * an async function to get {avatarUrl} and upload all user data.
+         */
+        uploadImageTask.then(async () => {
+          const uploadedImageURL = await storage()
+            .ref(pickedImage)
+            .getDownloadURL();
           firestore()
             .collection('users')
             .doc(auth()?.currentUser?.uid)
@@ -411,7 +510,7 @@ const ChatScreen = () => {
             .collection('discussions')
             .add({
               _id: _id,
-              text: EncryptAES(mMessageText),
+              image: EncryptAES(uploadedImageURL),
               createdAt: Date.now(),
               user: {
                 _id: auth()?.currentUser?.uid,
@@ -426,7 +525,7 @@ const ChatScreen = () => {
             .add({
               _id: _id,
               createdAt: Date.now(),
-              text: EncryptAES(mMessageText),
+              image: EncryptAES(uploadedImageURL),
               user: {
                 _id: auth()?.currentUser?.uid,
               },
@@ -435,21 +534,27 @@ const ChatScreen = () => {
             GiftedChat.append(previousMessage, mChatData),
           );
           // Chats messages on home screen goes here
-          firestore()
-            .collection('chats')
-            .doc(auth()?.currentUser?.uid)
-            .collection('discussions')
-            .doc(destinedUser)
-            .set({
-              to_first_name: userFirstName,
-              to_last_name: userLastName,
-              to_message_text: EncryptAES(mMessageText),
-              to_avatar: userAvatar,
-              time: firestore?.Timestamp?.fromDate(new Date()),
-              type: 'message',
-              last_uid: auth()?.currentUser?.uid,
-              sent_to_uid: destinedUser,
-            });
+          if (
+            !isEmpty(userFirstName) &&
+            !isEmpty(userLastName) &&
+            isEmpty(userAvatar)
+          ) {
+            firestore()
+              .collection('chats')
+              .doc(auth()?.currentUser?.uid)
+              .collection('discussions')
+              .doc(destinedUser)
+              .set({
+                to_first_name: userFirstName,
+                to_last_name: userLastName,
+                to_message_image: EncryptAES(uploadedImageURL),
+                to_avatar: userAvatar,
+                time: firestore?.Timestamp?.fromDate(new Date()),
+                type: 'image',
+                last_uid: auth()?.currentUser?.uid,
+                sent_to_uid: destinedUser,
+              });
+          }
           firestore()
             .collection('chats')
             .doc(destinedUser)
@@ -458,128 +563,22 @@ const ChatScreen = () => {
             .set({
               to_first_name: Me?.first_name,
               to_last_name: Me?.last_name,
-              to_message_text: EncryptAES(mMessageText),
+              to_message_image: EncryptAES(uploadedImageURL),
               to_avatar: Me?.avatar,
-              time: firestore?.Timestamp?.fromDate(new Date()),
-              type: 'message',
-              last_uid: auth()?.currentUser?.uid,
-            });
-        } catch (e) {
-          ErrorToast(
-            'bottom',
-            'Failed to send message',
-            'a problem occured when sending a message',
-            true,
-            1000,
-          );
-        }
-      }
-    } else {
-      let pickedImage = `chats/images/${getRandomString(18)}.${image?.substring(
-        image?.lastIndexOf('.') + 1,
-        3,
-      )}`;
-
-      const storageRef = storage().ref(pickedImage);
-
-      /**
-       * Uploading image to Firebase Storage
-       * @type {FirebaseStorageTypes.Task}
-       */
-
-      const uploadImageTask = storageRef?.putFile(image);
-
-      /**
-       * Add observer to image uploading.
-       */
-
-      uploadImageTask.on('state_changed', taskSnapshot => {
-        InfoToast(
-          'bottom',
-          'Sending Image',
-          `${bytesToSize(
-            taskSnapshot?.bytesTransferred,
-          )} transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
-          true,
-          500,
-        );
-      });
-
-      /**
-       * an async function to get {avatarUrl} and upload all user data.
-       */
-      uploadImageTask.then(async () => {
-        const uploadedImageURL = await storage()
-          .ref(pickedImage)
-          .getDownloadURL();
-        firestore()
-          .collection('users')
-          .doc(auth()?.currentUser?.uid)
-          .collection('messages')
-          .doc(destinedUser)
-          .collection('discussions')
-          .add({
-            _id: _id,
-            image: uploadedImageURL,
-            createdAt: Date.now(),
-            user: {
-              _id: auth()?.currentUser?.uid,
-            },
-          });
-        firestore()
-          .collection('users')
-          .doc(destinedUser)
-          .collection('messages')
-          .doc(auth()?.currentUser?.uid)
-          .collection('discussions')
-          .add({
-            _id: _id,
-            createdAt: Date.now(),
-            image: uploadedImageURL,
-            user: {
-              _id: auth()?.currentUser?.uid,
-            },
-          });
-        setChatData(previousMessage =>
-          GiftedChat.append(previousMessage, mChatData),
-        );
-        // Chats messages on home screen goes here
-        if (
-          !isEmpty(userFirstName) &&
-          !isEmpty(userLastName) &&
-          isEmpty(userAvatar)
-        ) {
-          firestore()
-            .collection('chats')
-            .doc(auth()?.currentUser?.uid)
-            .collection('discussions')
-            .doc(destinedUser)
-            .set({
-              to_first_name: userFirstName,
-              to_last_name: userLastName,
-              to_message_image: uploadedImageURL,
-              to_avatar: userAvatar,
               time: firestore?.Timestamp?.fromDate(new Date()),
               type: 'image',
               last_uid: auth()?.currentUser?.uid,
-              sent_to_uid: destinedUser,
             });
-        }
-        firestore()
-          .collection('chats')
-          .doc(destinedUser)
-          .collection('discussions')
-          .doc(auth()?.currentUser?.uid)
-          .set({
-            to_first_name: Me?.first_name,
-            to_last_name: Me?.last_name,
-            to_message_image: uploadedImageURL,
-            to_avatar: Me?.avatar,
-            time: firestore?.Timestamp?.fromDate(new Date()),
-            type: 'image',
-            last_uid: auth()?.currentUser?.uid,
-          });
-      });
+        });
+      }
+    } else {
+      ErrorToast(
+        'bottom',
+        'Intternet connection required',
+        'Please enable Wi-Fi or Mobile data to send messages',
+        true,
+        1000,
+      );
     }
   });
 
@@ -656,6 +655,7 @@ const ChatScreen = () => {
               />
             );
           }}
+          minInputToolbarHeight={0}
           renderInputToolbar={props => undefined}
           renderComposer={props => undefined}
           parsePatterns={linkStyle => [
@@ -670,8 +670,8 @@ const ChatScreen = () => {
           }}
           user={{
             _id: auth()?.currentUser?.uid,
-            avatar: Me?.avatar,
-            name: Me?.first_name + ' ' + Me?.last_name,
+            avatar: auth()?.currentUser?.photoURL,
+            name: auth()?.currentUser?.displayName,
           }}
           scrollToBottom
         />
@@ -685,7 +685,6 @@ const ChatScreen = () => {
           emojiSetter={setIsOpen}
           sendMessageCallback={() => {
             sendMessage([], '');
-            setMessageText('');
           }}
         />
         <EmojiPicker
