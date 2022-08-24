@@ -3,6 +3,7 @@ import {Platform, Pressable, StyleSheet, TextInput, View} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  withSpring,
 } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {fontValue} from '../../config/Dimensions';
@@ -18,10 +19,24 @@ const MyInputToolbar = ({
   attachPressCallback,
 }) => {
   const height = useSharedValue(70);
+  const maxWidth = useSharedValue('100%');
+  const opacity = useSharedValue(0);
 
   const heightAnimatedStyle = useAnimatedStyle(() => {
     return {
-      height: height?.value,
+      height: withSpring(height?.value),
+    };
+  });
+
+  const widthAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      maxWidth: withSpring(maxWidth?.value),
+    };
+  });
+
+  const opacityAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withSpring(opacity?.value),
     };
   });
 
@@ -138,7 +153,8 @@ const MyInputToolbar = ({
     <>
       <Animated.View style={[styles.container, heightAnimatedStyle]}>
         <View style={styles.innerContainer}>
-          <View style={styles.inputAndMicrophone}>
+          <Animated.View
+            style={[styles.inputAndMicrophone, widthAnimatedStyle]}>
             <Pressable
               android_ripple={{
                 color: COLORS.controlHighlight,
@@ -160,7 +176,16 @@ const MyInputToolbar = ({
               placeholder={'Aa'}
               style={styles.input}
               value={messageGetter}
-              onChangeText={text => messageSetter(text)}
+              onChangeText={text => {
+                if (text?.trim()?.length > 0) {
+                  maxWidth.value = '85%';
+                  opacity.value = 1;
+                } else {
+                  maxWidth.value = '100%';
+                  opacity.value = 0;
+                }
+                messageSetter(text);
+              }}
             />
             <Pressable
               android_ripple={{
@@ -191,30 +216,37 @@ const MyInputToolbar = ({
                 color={COLORS.darkGrey}
               />
             </Pressable>
-          </View>
-          <Pressable
-            hitSlop={10}
-            android_ripple={{
-              color: COLORS.controlHighlight,
-              borderless: true,
-              radius: 30 - 0.1 * 30,
-            }}
-            style={styles.sendButton}
-            onPress={() => {
-              if (messageGetter?.trim()?.length > 0) {
-                sendMessageCallback();
-              } else {
-                // Do nothing for now
-              }
-            }}>
-            <MaterialCommunityIcons
-              adjustsFontSizeToFit
-              allowFontScaling
-              name={messageGetter?.trim()?.length ? 'send' : 'microphone'}
-              size={23}
-              color={COLORS.white}
-            />
-          </Pressable>
+          </Animated.View>
+          {messageGetter?.trim()?.length > 0 ? (
+            <Pressable
+              hitSlop={10}
+              android_ripple={{
+                color: COLORS.controlHighlight,
+                borderless: true,
+                radius: 30 - 0.1 * 30,
+              }}
+              style={styles.sendButton}
+              onPress={() => {
+                if (messageGetter?.trim()?.length > 0) {
+                  sendMessageCallback();
+                  messageSetter('');
+                } else {
+                  // Do nothing for now
+                }
+              }}>
+              <Animated.View style={[opacityAnimatedStyle]}>
+                <MaterialCommunityIcons
+                  adjustsFontSizeToFit
+                  allowFontScaling
+                  name={messageGetter?.trim()?.length ? 'send' : 'microphone'}
+                  size={23}
+                  color={COLORS.white}
+                />
+              </Animated.View>
+            </Pressable>
+          ) : (
+            <></>
+          )}
         </View>
       </Animated.View>
     </>
