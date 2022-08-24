@@ -65,9 +65,17 @@ const AddStoryScreen = () => {
 
   const keyboard = useAnimatedKeyboard();
 
-  const translateStyle = useAnimatedStyle(() => {
+  const textStoryTranslate = useAnimatedStyle(() => {
     return {
       transform: [{translateY: (-keyboard?.height.value / 10) * 1.75}],
+    };
+  });
+
+  const imageStoryTranslate = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {translateY: (-keyboard?.height?.value / 2) * (2.15 - 0.1 * 2.15)},
+      ],
     };
   });
 
@@ -452,7 +460,7 @@ const AddStoryScreen = () => {
     return (
       <BaseView>
         <Spacer height={heightPercentageToDP(1)} />
-        <Animated.View style={[styles.textInputFlexedView, translateStyle]}>
+        <Animated.View style={[styles.textInputFlexedView, textStoryTranslate]}>
           <TextInput
             style={{
               width: '100%',
@@ -517,34 +525,38 @@ const AddStoryScreen = () => {
           ) : null}
         </Pressable>
         {inputEnabledForImage ? (
-          <TextInput
-            style={{
-              width: '95%',
-              alignSelf: 'center',
-              paddingRight: '2%',
-              paddingLeft: '2%',
-            }}
-            mode="outlined"
-            label="What's on your mind?"
-            multiline={true}
-            maxLength={240}
-            right={
-              <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
-            }
-            value={SecondStoryTextInput}
-            theme={{
-              colors: {
-                text: COLORS.black,
-                primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
-              },
-            }}
-            onChangeText={onSecondStoryTextInputChange}
-          />
+          <Animated.View
+            style={[
+              {paddingRight: '2%', paddingLeft: '2%'},
+              imageStoryTranslate,
+            ]}>
+            <TextInput
+              style={{
+                width: '95%',
+                alignSelf: 'center',
+              }}
+              mode="outlined"
+              label="What's on your mind?"
+              multiline={true}
+              maxLength={240}
+              right={
+                <TextInput.Affix text={`${SecondStoryTextInput.length}/240`} />
+              }
+              value={SecondStoryTextInput}
+              theme={{
+                colors: {
+                  text: COLORS.black,
+                  primary: COLORS.accentLight,
+                  backgroundColor: COLORS.rippleColor,
+                  placeholder: COLORS.darkGrey,
+                  underlineColor: '#566193',
+                  selectionColor: '#DADADA',
+                  outlineColor: '#566193',
+                },
+              }}
+              onChangeText={onSecondStoryTextInputChange}
+            />
+          </Animated.View>
         ) : null}
         {secondTextInputHasLessLength() && inputEnabledForImage ? (
           <HelperText type="info" visible={textInputHasLessLength()}>
