@@ -6,15 +6,14 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-
 import React from 'react';
-import { StyleSheet, Platform, Pressable } from 'react-native';
-import Animated, { interpolateNode, Extrapolate } from 'react-native-reanimated';
-import { fontValue } from '../../config/Dimensions';
-import { COLORS, FONTS } from '../../config/Miscellaneous';
+import {StyleSheet, Platform, Pressable} from 'react-native';
+import Animated, {interpolateNode, Extrapolate} from 'react-native-reanimated';
+import {fontValue} from '../../config/Dimensions';
+import {COLORS, FONTS} from '../../config/Miscellaneous';
 // @ts-ignore
-import AddIconImage from '../../assets/images/add_24.png'
-import { useNavigation } from '@react-navigation/native';
+import AddIconImage from '../../assets/images/add_24.png';
+import {useNavigation} from '@react-navigation/native';
 
 const MoonStickyStoryView = ({
   x,
@@ -29,14 +28,14 @@ const MoonStickyStoryView = ({
   userAvatar,
   tempAvatar,
 }) => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const stickyItemX = itemWidth / 2 + (itemWidth / 2 - stickyItemWidth);
   const stickyItemY = itemHeight / 2 - stickyItemWidth / 2;
   const stickyItemWidthWithoutPadding = stickyItemWidth - separatorSize * 2;
   const separatorSizeToStickyWidthScale = Math.min(
     separatorSize / stickyItemWidth,
-    0.2
+    0.2,
   );
 
   // Thumbnail Animation
@@ -47,7 +46,7 @@ const MoonStickyStoryView = ({
     Math.abs(thumbnailWidth / 2 - (stickyItemX + stickyItemWidth / 2)) *
     (isRTL ? -1 : 1);
   const thumbnailTranslateY = Math.abs(
-    thumbnailHeight / 2 - (stickyItemY + stickyItemWidth / 2)
+    thumbnailHeight / 2 - (stickyItemY + stickyItemWidth / 2),
   );
 
   const thumbnailScale =
@@ -83,13 +82,13 @@ const MoonStickyStoryView = ({
       height: thumbnailHeight,
       borderRadius: animatedThumbnailBorderRadius,
       transform: [
-        { translateX: (thumbnailWidth / 2) * -1 },
-        { translateY: (thumbnailHeight / 2) * -1 },
-        { translateX: animatedThumbnailTranslateX },
-        { translateY: animatedThumbnailTranslateY },
-        { translateX: thumbnailWidth / 2 },
-        { translateY: thumbnailHeight / 2 },
-        { scale: animatedThumbnailScale },
+        {translateX: (thumbnailWidth / 2) * -1},
+        {translateY: (thumbnailHeight / 2) * -1},
+        {translateX: animatedThumbnailTranslateX},
+        {translateY: animatedThumbnailTranslateY},
+        {translateX: thumbnailWidth / 2},
+        {translateY: thumbnailHeight / 2},
+        {scale: animatedThumbnailScale},
       ],
     },
   ];
@@ -131,15 +130,15 @@ const MoonStickyStoryView = ({
       borderRadius: addIconWidth,
       borderWidth: animatedAddIconBorderWidth,
       transform: [
-        { translateX: (addIconWidth / 2) * -1 },
-        { translateY: (addIconHeight / 2) * -1 },
-        { translateX: thumbnailWidth / 2 },
-        { translateY: thumbnailHeight / 2 },
-        { translateX: animatedThumbnailTranslateX },
-        { translateY: animatedThumbnailTranslateY },
-        { translateX: animatedAddIconTranslateX },
-        { translateY: animatedAddIconTranslateY },
-        { scale: animatedAddIconScale },
+        {translateX: (addIconWidth / 2) * -1},
+        {translateY: (addIconHeight / 2) * -1},
+        {translateX: thumbnailWidth / 2},
+        {translateY: thumbnailHeight / 2},
+        {translateX: animatedThumbnailTranslateX},
+        {translateY: animatedThumbnailTranslateY},
+        {translateX: animatedAddIconTranslateX},
+        {translateY: animatedAddIconTranslateY},
+        {scale: animatedAddIconScale},
       ],
     },
   ];
@@ -172,14 +171,18 @@ const MoonStickyStoryView = ({
   // End Text animation.
 
   return (
-    <Pressable style={{ flex: 1 }} hitSlop={15} onPress={() => {
-      // @ts-ignore
-      navigation?.navigate('addStory')
-    }}>
-      <Animated.Image source={userAvatar ? { uri: userAvatar } : tempAvatar} style={thumbnailStyle} />
-      <Animated.Text style={textStyle}>
-        {`Create a story`}
-      </Animated.Text>
+    <Pressable
+      style={{flex: 1}}
+      hitSlop={15}
+      onPress={() => {
+        // @ts-ignore
+        navigation?.navigate('addStory');
+      }}>
+      <Animated.Image
+        source={userAvatar ? {uri: userAvatar} : tempAvatar}
+        style={thumbnailStyle}
+      />
+      <Animated.Text style={textStyle}>{'Create a story'}</Animated.Text>
       <Animated.View style={addIconStyle}>
         <Animated.Image source={AddIconImage} style={styles.icon} />
       </Animated.View>
@@ -196,7 +199,7 @@ const findPointOnCircle = ({
 }) => {
   var newX = radius * Math.cos(degrees * (Math.PI / 180));
   var newY = radius * Math.sin(degrees * (Math.PI / 180));
-  return { x: newX, y: newY };
+  return {x: newX, y: newY};
 };
 
 const styles = StyleSheet.create({
@@ -221,8 +224,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: 'center',
     tintColor: COLORS.white,
-    resizeMode: 'contain'
-  }
+    resizeMode: 'contain',
+  },
 });
 
 export default MoonStickyStoryView;
