@@ -3,6 +3,8 @@
 
 buildscript {
     ext {
+
+        // Required by react-native-compressor, idk why tf they don't use `buildToolsVersion` instead of `Compressor_buildToolsVersion = "33.0.0"`.
         Compressor_compileSdkVersion = 33
         Compressor_buildToolsVersion = "33.0.0"
         Compressor_minSdkVersion = 24
