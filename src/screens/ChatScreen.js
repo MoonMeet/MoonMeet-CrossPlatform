@@ -52,6 +52,12 @@ import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
+import Animated, {
+  enableLayoutAnimations,
+  FadeInDown,
+} from 'react-native-reanimated';
+
+enableLayoutAnimations(true);
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -121,11 +127,7 @@ const ChatScreen = () => {
             });
             sendMessage([], compressingResult);
           })
-          .catch(err => {
-            if (__DEV__) {
-              console.warn(err);
-            }
-          });
+          .catch(err => {});
       } else if (
         requestResult === PermissionsAndroid.RESULTS.DENY ||
         PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
@@ -136,7 +138,11 @@ const ChatScreen = () => {
             'Please grant storage permission manually',
             ToastAndroid.SHORT,
           );
-        } catch (error) {}
+        } catch (error) {
+          if (__DEV__) {
+            console.error(error);
+          }
+        }
       }
     } catch (err) {
       // Maybe something weird or the app running on iOS.
@@ -267,11 +273,11 @@ const ChatScreen = () => {
                       : destinedUser,
                   name:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? Me?.first_name + ' ' + Me?.last_name
+                      ? auth()?.currentUser?.displayName
                       : userFirstName + ' ' + userLastName,
                   avatar:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? Me?.avatar
+                      ? auth()?.currentUser?.photoURL
                       : userAvatar,
                 },
               };
@@ -287,11 +293,11 @@ const ChatScreen = () => {
                       : destinedUser,
                   name:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? Me?.first_name + ' ' + Me?.last_name
+                      ? auth()?.currentUser?.displayName
                       : userFirstName + ' ' + userLastName,
                   avatar:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? Me?.avatar
+                      ? auth()?.currentUser?.photoURL
                       : userAvatar,
                 },
               };
@@ -339,7 +345,7 @@ const ChatScreen = () => {
         }}>
         <Avatar.Image
           source={avatar ? {uri: avatar} : PurpleBackground}
-          size={38}
+          size={40 - 0.1 * 40}
           style={{
             alignSelf: 'center',
           }}
@@ -354,7 +360,7 @@ const ChatScreen = () => {
             adjustsFontSizeToFit
             numberOfLines={1}
             style={{
-              fontSize: fontValue(16),
+              fontSize: fontValue(17),
               fontFamily: FONTS.regular,
               color: COLORS.black,
               opacity: 0.9,
@@ -365,7 +371,7 @@ const ChatScreen = () => {
             adjustsFontSizeToFit
             numberOfLines={1}
             style={{
-              fontSize: fontValue(14),
+              fontSize: fontValue(15),
               fontFamily: FONTS.regular,
               color: COLORS.black,
               opacity: 0.4,
@@ -642,17 +648,19 @@ const ChatScreen = () => {
           }}
           renderBubble={props => {
             return (
-              <Bubble
-                {...props}
-                wrapperStyle={{
-                  right: {
-                    backgroundColor: COLORS.accentLight,
-                  },
-                  left: {
-                    backgroundColor: COLORS.chats.leftBubble,
-                  },
-                }}
-              />
+              <Animated.View entering={FadeInDown}>
+                <Bubble
+                  {...props}
+                  wrapperStyle={{
+                    right: {
+                      backgroundColor: COLORS.accentLight,
+                    },
+                    left: {
+                      backgroundColor: COLORS.chats.leftBubble,
+                    },
+                  }}
+                />
+              </Animated.View>
             );
           }}
           minInputToolbarHeight={0}
