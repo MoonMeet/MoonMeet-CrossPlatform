@@ -12,7 +12,6 @@ import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import {enableFreeze} from 'react-native-screens';
-
 /**
  * Enabling the experimental freeze of react-native-screens
  * Will enable this soon
@@ -28,16 +27,11 @@ async function enableFirebaseTools() {
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
 
-  const styles = StyleSheet.create({
-    GHRV: {
-      flex: 1,
-      flexGrow: 1,
-      backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-    },
-  });
-
   useEffect(() => {
     enableFirebaseTools();
+  }, []);
+
+  useEffect(() => {
     if (ThemeMMKV.contains('isThemeDark')) {
       if (ThemeMMKV.getBoolean('isThemeDark')) {
         if (!isThemeDark) {
@@ -67,6 +61,15 @@ const App = () => {
     }),
     [toggleTheme, isThemeDark],
   );
+
+  const styles = StyleSheet.create({
+    GHRV: {
+      flex: 1,
+      flexGrow: 1,
+      backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
+    },
+  });
+
   return (
     <>
       <StatusBar
