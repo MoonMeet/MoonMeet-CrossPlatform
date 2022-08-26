@@ -44,6 +44,8 @@ jobs:
       run: echo $SENSITIVE_JS > src/secrets/sensitive.js
     - name: Increase Gradle JVM max memory
       run: sed -i 's/Xmx896/Xmx4096/g' android/gradle.properties && sed -i 's/256m/1024/g' android/gradle.properties
+    - name: Debug echo of gradle properties
+      run: cat android/gradle.properties
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd .. 
     - name: Build release APK.
