@@ -26,6 +26,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  ToastAndroid,
 } from 'react-native';
 import LogoImage from '../assets/images/logo.png';
 import {
@@ -41,7 +42,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {useTheme} from 'react-native-paper';
 import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
 import {isEmpty, isNull} from 'lodash';
@@ -54,7 +54,6 @@ import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {ThemeContext} from '../config/Theme/Context';
 
 const SplashScreen = () => {
-  const theme = useTheme();
   const {isThemeDark} = useContext(ThemeContext);
   const navigation = useNavigation();
 
@@ -181,14 +180,28 @@ const SplashScreen = () => {
 
   useEffect(() => {
     firestore()
-      .collection('updates')
+      .collection('update')
       .doc('releasedUpdate')
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
-          setUpdateRequired(documentSnapshot?.data()?.isRequired);
-          setUpdateVersion(documentSnapshot?.data()?.version);
-          setUpdateURL(documentSnapshot?.data()?.updateURL);
+          if (documentSnapshot?.data().server_status === 'running') {
+            setUpdateRequired(documentSnapshot?.data()?.isRequired);
+            setUpdateVersion(documentSnapshot?.data()?.version);
+            setUpdateURL(documentSnapshot?.data()?.updateURL);
+          } else if (documentSnapshot?.data()?.server_status === 'stopped') {
+            ToastAndroid.show(
+              'Server maintenace, try again later.',
+              ToastAndroid.LONG,
+            );
+            BackHandler.exitApp();
+          }
+        } else {
+          if (__DEV__) {
+            console.warn(
+              `if you are a DEV, please open your firestore database and create the following: ${'\n'} collection: "update" ${'\n'} document: "releasedUpdate' ${'\n'} then, create the following: isRequired, updateURL, server_status and version.`,
+            );
+          }
         }
       })
       .finally(() => {
