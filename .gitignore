@@ -67,4 +67,4 @@ debug.keystore
 *.lock
 
 # Sensitive Information
-src/sensitive.js
+src/secrets/sensitive.js
