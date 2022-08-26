@@ -5,6 +5,7 @@
     "crashlytics_auto_collection_enabled": true,
     "analytics_auto_collection_enabled": true,
     "crashlytics_debug_enabled": false,
-    "crashlytics_ndk_enabled": true
+    "crashlytics_ndk_enabled": true,
+    "perf_auto_collection_enabled": true
   }
 }
