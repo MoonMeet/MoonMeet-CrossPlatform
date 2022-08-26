@@ -80,7 +80,7 @@ const AddStoryScreen = () => {
   });
 
   const pickerRef = useRef(null);
-  const sheetSnapPoints = useMemo(() => ['20%', '30%'], []);
+  const sheetSnapPoints = useMemo(() => ['20%'], []);
 
   const handlePresentModal = useCallback(() => {
     Keyboard.dismiss();
@@ -108,7 +108,15 @@ const AddStoryScreen = () => {
 
   const {dismissAll} = useBottomSheetModal();
 
-  const Me = JSON?.parse(UserDataMMKV?.getString('Me'));
+  const [Me, setMe] = React.useState([]);
+
+  useEffect(() => {
+    try {
+      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
+    } catch {
+      setMe([]);
+    }
+  }, []);
 
   const onSecondStoryTextInputChange = _secondStoryText =>
     setSecondStoryTextInput(_secondStoryText);
@@ -319,7 +327,7 @@ const AddStoryScreen = () => {
         .collection('stories')
         .add({
           time: firestore.Timestamp.fromDate(new Date()),
-          image: storyImageURL,
+          image: EncryptAES(storyImageURL),
           text: EncryptAES(SecondStoryTextInput),
           first_name: Me?.first_name,
           last_name: Me?.last_name,
@@ -572,7 +580,6 @@ const AddStoryScreen = () => {
               .then(image => {
                 setUserPhoto(image);
                 setImageVisible(true);
-                dismissAll();
               })
               .catch(e => {
                 ErrorToast(
@@ -583,13 +590,13 @@ const AddStoryScreen = () => {
                   1000,
                 );
               });
+            dismissAll();
           }}
           onFilePicker={() => {
             openImagePicker()
               .then(image => {
                 setUserPhoto(image);
                 setImageVisible(true);
-                dismissAll();
               })
               .catch(e => {
                 ErrorToast(
@@ -600,6 +607,7 @@ const AddStoryScreen = () => {
                   1000,
                 );
               });
+            dismissAll();
           }}
         />
       </BaseView>
