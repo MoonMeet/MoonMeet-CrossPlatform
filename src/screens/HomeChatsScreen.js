@@ -32,6 +32,7 @@ import StickyItemFlatList from '@gorhom/sticky-item';
 import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {DecryptAES} from '../utils/crypto/cryptoTools';
 
 const HomeChatsScreen = () => {
   // Sticky-Item Config
@@ -174,6 +175,8 @@ const HomeChatsScreen = () => {
           ]);
           collectionDocs = reverse(collectionDocs);
           setChatsData(collectionDocs);
+        } else {
+          setChatsData([]);
         }
       });
     return () => {
@@ -212,6 +215,7 @@ const HomeChatsScreen = () => {
         if (!collectionSnapshot?.empty) {
           let collectionDocs = collectionSnapshot?.docs?.map(element => ({
             ...element?.data(),
+            image: DecryptAES(element?.data()?.image),
             id: element?.id,
           }));
 

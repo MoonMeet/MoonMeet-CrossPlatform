@@ -88,10 +88,8 @@ const StoryScreen = () => {
         let collectionDocs = [];
         collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
           ...subMap?.data(),
-          text:
-            DecryptAES(subMap?.data()?.text) === ''
-              ? "We're sorry, we couldn't decrypt this story for you."
-              : DecryptAES(subMap?.data()?.text),
+          image: DecryptAES(subMap?.data()?.image),
+          text: DecryptAES(subMap?.data()?.text), // sometimes if the story text is empty, it recognize an empty string, Just a tip!
           sid: subMap?.id,
         }));
         collectionDocs = sortBy(collectionDocs, [docs => docs?.time?.toDate()]);
@@ -137,7 +135,7 @@ const StoryScreen = () => {
       });
 
     return () => {};
-  }, []);
+  }, [userStoryUID]);
 
   if (Loading) {
     return (
