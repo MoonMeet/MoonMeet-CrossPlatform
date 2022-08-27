@@ -50,11 +50,7 @@
 - You need to add the following`:
 
   - Your `release.keystore` and `google-services.json`
-  - Your `sensitive.js` file under /src folder must contain your encryption key for messages:
-
-  ```
-  export default "your top secret encryption key";
-  ```
+  - Your `sensitive.js` file, [see more info here](/src/secrets/info.md)
   
   - Your should add keystore credentails as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
 
