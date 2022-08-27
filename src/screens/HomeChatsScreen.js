@@ -14,6 +14,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  ToastAndroid,
   View,
 } from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -33,6 +34,7 @@ import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
+import OneSignal from 'react-native-onesignal';
 
 const HomeChatsScreen = () => {
   // Sticky-Item Config
@@ -57,6 +59,30 @@ const HomeChatsScreen = () => {
   const [storiesData, setStoriesData] = React.useState([]);
 
   const [myUID, setMyUID] = React.useState('');
+
+  useEffect(() => {
+    OneSignal.getDeviceState().then(deviceState => {
+      console.log(deviceState.userId);
+      const notificationObj = {
+        contents: {en: 'New Message'},
+        include_player_ids: [deviceState.userId],
+      };
+      const jsonString = JSON.stringify(notificationObj);
+      OneSignal.postNotification(
+        jsonString,
+        success => {
+          if (__DEV__) {
+            ToastAndroid.show('Notification sent', ToastAndroid.SHORT);
+          }
+        },
+        error => {
+          if (__DEV__) {
+            console.error(error);
+          }
+        },
+      );
+    });
+  }, []);
 
   const checkJwtKey = useCallback(
     currentJwtKey => {
