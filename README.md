@@ -51,8 +51,14 @@
 
   - Your `release.keystore` and `google-services.json`
   - Your `sensitive.js` file, [see more info here](/src/secrets/info.md)
-  
   - Your should add keystore credentails as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
+  
+  ```
+  export KEYALIAS=YOURKEYALIAS
+  export KEYPASS=YOURKEYPASS
+  export KEYALIASPASS=YOURKEYALIASPASS
+  ```
+
 
 ### Commit message
 
