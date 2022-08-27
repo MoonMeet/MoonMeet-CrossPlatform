@@ -60,6 +60,7 @@ import axios from 'axios';
 import {waitForAnd} from '../utils/timers/delay';
 import getRandomString from '../utils/generators/getRandomString';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
+import OneSignal from 'react-native-onesignal';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -84,6 +85,38 @@ const LoginScreen = () => {
       setCodeCorrect(true);
     }
   }
+
+  const [pushToken, setPushToken] = React.useState();
+  const [userId, setUserId] = React.useState();
+  const [isSubscribed, setSubscribed] = React.useState();
+
+  const initializeDevice = useCallback(async () => {
+    try {
+      const deviceState = await OneSignal.getDeviceState();
+      setPushToken(deviceState?.pushToken);
+      setUserId(deviceState?.userId);
+      setSubscribed(deviceState?.isSubscribed);
+      console.log(pushToken, isSubscribed, userId);
+    } catch (e) {
+      if (__DEV__) {
+        console.error('OneSignal: ', e);
+      }
+    }
+  }, [isSubscribed, pushToken, userId]);
+
+  async function updateOneSignalValues() {
+    firestore()?.collection('users')?.doc(auth()?.currentUser?.uid)?.update({
+      pushToken: pushToken,
+      OneSignalID: userId,
+    });
+  }
+
+  useEffect(() => {
+    initializeDevice();
+    return () => {
+      initializeDevice();
+    };
+  }, [initializeDevice]);
 
   useEffect(() => {
     const authStateChanges = auth()?.onAuthStateChanged(onAuthStateChanged);
@@ -425,6 +458,12 @@ const LoginScreen = () => {
                         JSON?.stringify(documentSnapshot?.data()),
                       );
 
+                      // Due to OneSignal limitations, pushToken and UserID may change sometimes.
+
+                      if (userId && pushToken && isSubscribed) {
+                        updateOneSignalValues();
+                      }
+
                       navigation?.navigate('home');
                     }
                   } else {
@@ -442,6 +481,8 @@ const LoginScreen = () => {
                         ),
                         phone_status: 'none',
                         country_code: EncryptAES(CountryText),
+                        pushToken: pushToken,
+                        OneSignalID: userId,
                       },
                     });
                   }
