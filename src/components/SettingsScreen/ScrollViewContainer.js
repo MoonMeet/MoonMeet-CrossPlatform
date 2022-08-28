@@ -45,6 +45,7 @@ import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
 import {fontValue} from '../../config/Dimensions';
 import {ScrollView} from 'react-native-gesture-handler';
+import notifee from '@notifee/react-native';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -300,18 +301,8 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         leftIcon={NotificationsIcon}
         leftIconColor={COLORS.yellowDarkWarning}
         titleTextContainer={'Notifications Settings'}
-        onPressTrigger={() => {
-          if (__DEV__) {
-            Linking?.openSettings();
-          } else {
-            InfoToast(
-              'bottom',
-              'Feature will be available soon',
-              'stay tuned for Moon Meet new updates.',
-              true,
-              2000,
-            );
-          }
+        onPressTrigger={async () => {
+          await notifee.openNotificationSettings();
         }}
       />
       <DataItem
