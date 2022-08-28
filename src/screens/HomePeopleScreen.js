@@ -128,62 +128,60 @@ const HomePeopleScreen = () => {
     );
   } else {
     return (
-      <Provider>
-        <MiniBaseView>
-          <View style={styles.toolbar}>
-            <View style={styles.left_side}>
-              <Pressable
-                hitSlop={15}
-                onPress={() => {
-                  navigation.navigate('settings');
-                }}>
-                <Avatar.Image
-                  size={35.5}
-                  source={
-                    auth()?.currentUser?.photoURL
-                      ? {uri: auth()?.currentUser?.photoURL}
-                      : avatarURL
-                      ? {uri: avatarURL}
-                      : PurpleBackground
-                  }
-                  style={{
-                    overflow: 'hidden',
-                    marginRight: '-1%',
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
-              </Pressable>
-            </View>
-            <View style={styles.mid_side}>
-              <Text style={styles.top_text}>People</Text>
-            </View>
-            <View style={styles.right_side}>
-              <Pressable
-                onPress={() => {
-                  navigation?.navigate('discover');
-                  updateUserActiveStatus();
-                }}>
-                <Avatar.Icon
-                  icon={CreateImage}
-                  size={37.5}
-                  color={COLORS.black}
-                  style={styles.right_icon}
-                  theme={{
-                    colors: {
-                      primary: COLORS.rippleColor,
-                    },
-                  }}
-                />
-              </Pressable>
-            </View>
+      <MiniBaseView>
+        <View style={styles.toolbar}>
+          <View style={styles.left_side}>
+            <Pressable
+              hitSlop={15}
+              onPress={() => {
+                navigation.navigate('settings');
+              }}>
+              <Avatar.Image
+                size={35.5}
+                source={
+                  auth()?.currentUser?.photoURL
+                    ? {uri: auth()?.currentUser?.photoURL}
+                    : avatarURL
+                    ? {uri: avatarURL}
+                    : PurpleBackground
+                }
+                style={{
+                  overflow: 'hidden',
+                  marginRight: '-1%',
+                }}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            </Pressable>
           </View>
-          <ActivePeopleList ListData={masterData} />
-        </MiniBaseView>
-      </Provider>
+          <View style={styles.mid_side}>
+            <Text style={styles.top_text}>People</Text>
+          </View>
+          <View style={styles.right_side}>
+            <Pressable
+              onPress={() => {
+                navigation?.navigate('discover');
+                updateUserActiveStatus();
+              }}>
+              <Avatar.Icon
+                icon={CreateImage}
+                size={37.5}
+                color={COLORS.black}
+                style={styles.right_icon}
+                theme={{
+                  colors: {
+                    primary: COLORS.rippleColor,
+                  },
+                }}
+              />
+            </Pressable>
+          </View>
+        </View>
+        <ActivePeopleList ListData={masterData} />
+      </MiniBaseView>
     );
   }
 };
