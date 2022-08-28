@@ -56,6 +56,7 @@ import Animated, {
   enableLayoutAnimations,
   FadeInDown,
 } from 'react-native-reanimated';
+import OneSignal from 'react-native-onesignal';
 
 enableLayoutAnimations(true);
 
@@ -74,6 +75,7 @@ const ChatScreen = () => {
   const [userAvatar, setUserAvatar] = React.useState('');
   const [userActiveStatus, setUserActiveStatus] = React.useState('');
   const [userActiveTime, setUserActiveTime] = React.useState('');
+  const [userPlayerID, setUserPlayerID] = React.useState();
 
   /**
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
@@ -97,6 +99,7 @@ const ChatScreen = () => {
   const [isLoading, setLoading] = React.useState(true);
 
   let _id = uuidv4() + getRandomString(3);
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handlePick = emojiObject => {
@@ -199,6 +202,25 @@ const ChatScreen = () => {
       }
     }
   };
+  const [playerID, setPlayerID] = React.useState();
+  const [isSubscribed, setSubscribed] = React.useState();
+
+  const getDeviceState = useCallback(async () => {
+    try {
+      const deviceState = await OneSignal.getDeviceState();
+      setPlayerID(deviceState?.userId);
+      setSubscribed(deviceState?.isSubscribed);
+    } catch (e) {
+      if (__DEV__) {
+        console.log(e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    getDeviceState();
+    return () => getDeviceState();
+  }, [getDeviceState]);
 
   useLayoutEffect(() => {
     navigation?.setOptions({
@@ -239,6 +261,7 @@ const ChatScreen = () => {
             setUserLastName(userSnapshot?.data()?.last_name);
             setUserAvatar(userSnapshot?.data()?.avatar);
             setUserActiveStatus(userSnapshot?.data()?.active_status);
+            setUserPlayerID(userSnapshot?.data()?.OneSignalID);
             if (userSnapshot?.data()?.active_time === 'Last seen recently') {
               setUserActiveTime(userSnapshot?.data()?.active_time);
             } else {
@@ -468,6 +491,30 @@ const ChatScreen = () => {
               'a problem occured when sending a message',
               true,
               1000,
+            );
+          }
+          if (isSubscribed && playerID !== userPlayerID) {
+            const toSendNotification = {
+              contents: {en: 'New Message'},
+              include_player_ids: [userPlayerID],
+            };
+            const stringifiedJSON = JSON.stringify(toSendNotification);
+            OneSignal.postNotification(
+              stringifiedJSON,
+              success => {
+                if (__DEV__) {
+                  ToastAndroid.show(
+                    'Message notification sent',
+                    ToastAndroid.SHORT,
+                  );
+                  console.log(success);
+                }
+              },
+              error => {
+                if (__DEV__) {
+                  console.error(error);
+                }
+              },
             );
           }
         }
