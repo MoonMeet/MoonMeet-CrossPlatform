@@ -63,13 +63,13 @@ const HomeChatsScreen = () => {
   useEffect(() => {
     OneSignal.getDeviceState().then(deviceState => {
       console.log(deviceState.userId);
-      const notificationObj = {
+      const toSendNotification = {
         contents: {en: 'New Message'},
         include_player_ids: [deviceState.userId],
       };
-      const jsonString = JSON.stringify(notificationObj);
+      const stringifiedJSON = JSON.stringify(toSendNotification);
       OneSignal.postNotification(
-        jsonString,
+        stringifiedJSON,
         success => {
           if (__DEV__) {
             ToastAndroid.show('Notification sent', ToastAndroid.SHORT);
