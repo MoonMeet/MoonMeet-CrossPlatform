@@ -739,7 +739,7 @@ const ChatScreen = () => {
           emojiGetter={isOpen}
           emojiSetter={setIsOpen}
           sendMessageCallback={() => {
-            sendMessage([], '').finally(_ => setMessageText(''));
+            sendMessage([], '').finally(() => setMessageText(''));
           }}
         />
         <EmojiPicker
