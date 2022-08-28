@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/android.yml'
+      - '.github/workflows/android-ci-windows.yml'
       - 'android/**'
       - 'src/**'
       - 'yarn.lock'
@@ -14,7 +14,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/android.yml'
+      - '.github/workflows/android-ci-windows.yml'
       - 'android/**'
       - 'src/**'
       - 'yarn.lock'
