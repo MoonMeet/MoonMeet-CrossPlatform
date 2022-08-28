@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Platform, Pressable, StyleSheet, TextInput, View} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  withSpring, withTiming, Easing,
 } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {fontValue} from '../../config/Dimensions';
@@ -30,7 +30,7 @@ const MyInputToolbar = ({
 
   const widthAnimatedStyle = useAnimatedStyle(() => {
     return {
-      maxWidth: withSpring(maxWidth?.value),
+      maxWidth: withTiming(maxWidth?.value, {duration:250, easing: Easing.ease}),
     };
   });
 
@@ -40,8 +40,18 @@ const MyInputToolbar = ({
     };
   });
 
+  useEffect(()=> {
+    if (messageGetter?.trim()?.length > 0) {
+      maxWidth.value = '85%';
+      opacity.value = 1;
+    } else {
+      maxWidth.value = '100%';
+      opacity.value = 0;
+    }
+  }, [messageGetter])
+
   /**
-   * Some styles are tested and not shiped, we will use them soon.
+   * Some styles are tested and not shipped, we will use them soon.
    */
   const styles = StyleSheet.create({
     container: {
@@ -177,13 +187,6 @@ const MyInputToolbar = ({
               style={styles.input}
               value={messageGetter}
               onChangeText={text => {
-                if (text?.trim()?.length > 0) {
-                  maxWidth.value = '85%';
-                  opacity.value = 1;
-                } else {
-                  maxWidth.value = '100%';
-                  opacity.value = 0;
-                }
                 messageSetter(text);
               }}
             />
@@ -229,7 +232,6 @@ const MyInputToolbar = ({
               onPress={() => {
                 if (messageGetter?.trim()?.length > 0) {
                   sendMessageCallback();
-                  messageSetter('');
                 } else {
                   // Do nothing for now
                 }

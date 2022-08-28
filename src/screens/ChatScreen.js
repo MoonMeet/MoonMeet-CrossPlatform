@@ -130,7 +130,7 @@ const ChatScreen = () => {
             });
             sendMessage([], compressingResult);
           })
-          .catch(err => {});
+          .catch(_ => {});
       } else if (
         requestResult === PermissionsAndroid.RESULTS.DENY ||
         PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
@@ -178,7 +178,7 @@ const ChatScreen = () => {
             });
             sendMessage([], compressingResult);
           })
-          .catch(err => {});
+          .catch(_ => {});
       } else if (
         requestResult === PermissionsAndroid.RESULTS.DENY ||
         PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
@@ -711,8 +711,8 @@ const ChatScreen = () => {
             );
           }}
           minInputToolbarHeight={0}
-          renderInputToolbar={props => undefined}
-          renderComposer={props => undefined}
+          renderInputToolbar={_ => undefined}
+          renderComposer={_ => undefined}
           parsePatterns={linkStyle => [
             {
               pattern: /#(\w+)/,
@@ -739,7 +739,7 @@ const ChatScreen = () => {
           emojiGetter={isOpen}
           emojiSetter={setIsOpen}
           sendMessageCallback={() => {
-            sendMessage([], '');
+            sendMessage([], '').finally(_ => setMessageText(''));
           }}
         />
         <EmojiPicker
