@@ -98,10 +98,16 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}>
-            <Text numberOfLines={1} style={styles.heading('left', false)}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={styles.heading('left', false)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
-            <Text numberOfLines={1} style={styles.subheading('left', true)}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={styles.subheading('left', true)}>
               {messageText(item)}
             </Text>
           </View>
@@ -111,7 +117,10 @@ const MessagesList = ({ListData}) => {
               justifyContent: 'center',
               alignItems: 'flex-end',
             }}>
-            <Text numberOfLines={1} style={styles.subheading('right', false)}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={styles.subheading('right', false)}>
               {moment(item.time?.toDate())?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
