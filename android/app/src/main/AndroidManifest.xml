@@ -45,6 +45,9 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <meta-data 
+          android:name="com.onesignal.NotificationServiceExtension"
+          android:value="org.moon.moonmeet.notification.NotificationServiceExtension" />
       <service
 	        android:name="app.notifee.core.ForegroundService"
 	        android:foregroundServiceType="mediaProjection|camera|microphone" />
