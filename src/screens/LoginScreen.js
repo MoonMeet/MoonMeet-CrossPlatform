@@ -460,7 +460,7 @@ const LoginScreen = () => {
 
                       // Due to OneSignal limitations, pushToken and UserID may change sometimes.
 
-                      if (userId && pushToken && isSubscribed) {
+                      if (userId && pushToken) {
                         updateOneSignalValues();
                       }
 
