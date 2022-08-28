@@ -19,11 +19,13 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
+import perf from '@react-native-firebase/perf';
 import OneSignal from 'react-native-onesignal';
 
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
   await analytics()?.setAnalyticsCollectionEnabled(true);
+  await perf()?.setPerformanceCollectionEnabled(true);
 }
 
 const App = () => {
@@ -38,9 +40,9 @@ const App = () => {
       if (deviceState !== null) {
         let {isSubscribed} = deviceState;
         if (isSubscribed) {
-          OneSignal.addTrigger('unsubscribed', false);
+          OneSignal.addTrigger('unsubscribed', 'false');
         } else {
-          OneSignal.addTrigger('unsubscribed', true);
+          OneSignal.addTrigger('unsubscribed', 'true');
           OneSignal.promptForPushNotificationsWithUserResponse(true);
         }
         if (__DEV__) {
@@ -49,7 +51,6 @@ const App = () => {
         }
       }
     });
-    return () => {};
   }, []);
 
   useEffect(() => {
