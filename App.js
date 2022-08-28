@@ -1,3 +1,11 @@
+/*
+ * This is the source code of Moon Meet CrossPlatform.
+ * It is licensed under GNU GPL v. 3.
+ * You should have received a copy of the license in this archive (see LICENSE).
+ *
+ * Copyright Rayen sbai, 2021-2022.
+ */
+
 import React, {useEffect} from 'react';
 import StackNavigator from './src/config/Stack';
 import {StatusBar, StyleSheet} from 'react-native';
@@ -11,13 +19,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
-import {enableFreeze} from 'react-native-screens';
-/**
- * Enabling the experimental freeze of react-native-screens
- * Will enable this soon
- **/
-
-enableFreeze(true);
+import OneSignal from 'react-native-onesignal';
 
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
@@ -29,6 +31,25 @@ const App = () => {
 
   useEffect(() => {
     enableFirebaseTools();
+  }, []);
+
+  useEffect(() => {
+    OneSignal.getDeviceState().then(deviceState => {
+      if (deviceState !== null) {
+        let {isSubscribed} = deviceState;
+        if (isSubscribed) {
+          OneSignal.addTrigger('unsubscribed', false);
+        } else {
+          OneSignal.addTrigger('unsubscribed', true);
+          OneSignal.promptForPushNotificationsWithUserResponse(true);
+        }
+        if (__DEV__) {
+          console.warn('OneSignal: isSubscribed ', deviceState.isSubscribed);
+          console.warn('OneSignal: userId ', deviceState.userId);
+        }
+      }
+    });
+    return () => {};
   }, []);
 
   useEffect(() => {
