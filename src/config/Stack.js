@@ -172,7 +172,6 @@ const StackNavigator = () => {
               fontSize: fontValue(20.5),
               color: isThemeDark ? COLORS.white : COLORS.black,
             },
-            headerBackTitleVisible: true,
             headerShadowVisible: false,
             headerTintColor: isThemeDark ? COLORS.white : COLORS.black,
             headerStyle: {
