@@ -3,7 +3,9 @@ import {Platform, Pressable, StyleSheet, TextInput, View} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withSpring, withTiming, Easing,
+  withSpring,
+  withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {fontValue} from '../../config/Dimensions';
@@ -30,17 +32,23 @@ const MyInputToolbar = ({
 
   const widthAnimatedStyle = useAnimatedStyle(() => {
     return {
-      maxWidth: withTiming(maxWidth?.value, {duration:250, easing: Easing.ease}),
+      maxWidth: withTiming(maxWidth?.value, {
+        duration: 250,
+        easing: Easing.linear,
+      }),
     };
   });
 
   const opacityAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: withSpring(opacity?.value),
+      opacity: withTiming(opacity?.value, {
+        duration: 250,
+        easing: Easing.circle,
+      }),
     };
   });
 
-  useEffect(()=> {
+  useEffect(() => {
     if (messageGetter?.trim()?.length > 0) {
       maxWidth.value = '85%';
       opacity.value = 1;
@@ -48,7 +56,8 @@ const MyInputToolbar = ({
       maxWidth.value = '100%';
       opacity.value = 0;
     }
-  }, [messageGetter])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageGetter]);
 
   /**
    * Some styles are tested and not shipped, we will use them soon.
