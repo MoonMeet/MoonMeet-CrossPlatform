@@ -182,7 +182,9 @@ const MoonStickyStoryView = ({
         source={userAvatar ? {uri: userAvatar} : tempAvatar}
         style={thumbnailStyle}
       />
-      <Animated.Text style={textStyle}>{'Create a story'}</Animated.Text>
+      <Animated.Text adjustsFontSizeToFit style={textStyle}>
+        {'Create a story'}
+      </Animated.Text>
       <Animated.View style={addIconStyle}>
         <Animated.Image source={AddIconImage} style={styles.icon} />
       </Animated.View>
