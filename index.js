@@ -1,7 +1,10 @@
-/**
- * @format
+/*
+ * This is the source code of Moon Meet CrossPlatform.
+ * It is licensed under GNU GPL v. 3.
+ * You should have received a copy of the license in this archive (see LICENSE).
+ *
+ * Copyright Rayen sbai, 2021-2022.
  */
-
 import {AppRegistry} from 'react-native';
 import OneSignal from 'react-native-onesignal';
 import App from './App';
@@ -9,8 +12,20 @@ import {name as MoonMeet} from './app.json';
 import {ONESIGNAL_APP_ID} from './src/secrets/sensitive';
 import notifee, {AndroidImportance} from '@notifee/react-native';
 import {COLORS} from './src/config/Miscellaneous';
+import {enableFreeze} from 'react-native-screens';
 
+/**
+ * Enabling the experimental freeze of react-native-screens
+ * Will enable this soon
+ **/
+
+enableFreeze(true);
+
+/**
+ *Initialize OneSignal
+ */
 OneSignal.setAppId(ONESIGNAL_APP_ID);
+OneSignal.setLanguage('en');
 
 notifee.createChannel({
   id: 'messages',
@@ -23,12 +38,6 @@ notifee.createChannel({
 if (__DEV__) {
   OneSignal.setLogLevel(6, 0);
 }
-
-OneSignal.addPermissionObserver(event => {
-  console.log('OneSignal: permission changed:', event);
-});
-
-OneSignal.setLanguage('en');
 
 OneSignal.setNotificationWillShowInForegroundHandler(
   notificationReceivedEvent => {
