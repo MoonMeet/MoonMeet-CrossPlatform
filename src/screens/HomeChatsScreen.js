@@ -14,7 +14,6 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  //ToastAndroid,
   View,
 } from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
@@ -216,7 +215,10 @@ const HomeChatsScreen = () => {
         if (!collectionSnapshot?.empty) {
           let collectionDocs = collectionSnapshot?.docs?.map(element => ({
             ...element?.data(),
-            image: DecryptAES(element?.data()?.image),
+            image:
+              element.data()?.image === undefined
+                ? ''
+                : DecryptAES(element?.data()?.image),
             id: element?.id,
           }));
 
@@ -286,7 +288,7 @@ const HomeChatsScreen = () => {
           stickyItemContent={props => (
             <MoonStickyStoryView
               {...props}
-              userAvatar={avatarURL}
+              userAvatar={auth()?.currentUser?.photoURL}
               tempAvatar={PurpleBackground}
             />
           )}
