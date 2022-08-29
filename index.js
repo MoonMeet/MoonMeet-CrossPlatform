@@ -12,14 +12,6 @@ import {name as MoonMeet} from './app.json';
 import {ONESIGNAL_APP_ID} from './src/secrets/sensitive';
 // import notifee, {AndroidImportance} from '@notifee/react-native';
 // import {COLORS} from './src/config/Miscellaneous';
-import {enableFreeze} from 'react-native-screens';
-
-/**
- * Enabling the experimental freeze of react-native-screens
- * Will enable this soon
- **/
-
-enableFreeze(true);
 
 /**
  *Initialize OneSignal
