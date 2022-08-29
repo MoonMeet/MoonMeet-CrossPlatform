@@ -90,21 +90,21 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 3: Why Moon Meet?</Text>
           <Text style={styles.subText}>
-            Because there is only few apps like it.
+            The developer have been choosen Moon Meet from an inspiration.
           </Text>
           <Text style={styles.subText}>Q&A: How i can get Moon Meet ?</Text>
           <Text style={styles.subText}>
-            You can get Moon Meet by downloading the app from Play Store or
-            Github Release.
+            You can get Moon Meet by downloading the app from Play Store (maybe)
+            or Github Release.
           </Text>
           <Text style={styles.subText}>
             Q&A 5: does Moon Meet has end-to-end Encryption ?
           </Text>
           <Text style={styles.subText}>
-            No, Future updates going to include this feature.
+            Yes, Moon Meet have an end-to-end Encrypted
           </Text>
           <Text style={styles.subText}>
-            Q&A 6: Is my information changeable ?
+            Q&A 6: Can i change my information ?
           </Text>
           <Text style={styles.subText}>
             Sure, You can change your informations at any time.
@@ -147,11 +147,11 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
             Q&A 13: Which information can Moon Meet gather about me ?
           </Text>
           <Text style={styles.subText}>
-            Moon Meet collects public information about you like First Name,
-            Last Name, Birth Date, Username, Bio, in shortly, the information
-            that you enter while and after doing the registration, but keep in
-            mind that we don't share or sell any of your data, you can check our
-            source code for that.
+            Moon Meet collects public information about you like First name,
+            Last name, Birth date, Username, Biography, in shortly, the
+            information that you enter while and after doing the registration,
+            but keep in mind that we don't share or sell any of your data, you
+            can check our source code for that.
           </Text>
           <Text style={styles.subText}>
             Q&A 14: My phone has been stolen. Can support help me secure my
