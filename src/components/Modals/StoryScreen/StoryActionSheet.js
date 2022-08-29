@@ -6,146 +6,184 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React from 'react';
-import Modal from 'react-native-modal';
+import React, {useCallback, useMemo} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
-import CopyImage from '../../../assets/images/copy.png';
-import DeleteImage from '../../../assets/images/delete.png';
 import Downloadimage from '../../../assets/images/download.png';
+import {fontValue} from '../../../config/Dimensions';
 import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../../../config/Dimensions';
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetDynamicSnapPoints,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface StoryActionSheetInterface {
-  hideModal: Function;
-  onCopySelected: Function;
-  onDeleteSelected: Function;
-  onSaveSelected: Function;
-  showSave: Boolean;
-  currentStoryUID: String;
-  isVisible: boolean;
+  sheetRef?: Ref | undefined;
+  snapPoints?:
+    | Array<string | number>
+    | SharedValue<Array<string | number>>
+    | undefined;
+  index?: number | undefined;
+  hideModal: () => void;
+  onCopySelected: () => void | undefined;
+  onDeleteSelected: () => void | undefined;
+  onSaveSelected: () => void | undefined;
+  showSave: boolean;
+  currentStoryUID: string;
 }
 
 const StoryActionSheet = (props: StoryActionSheetInterface) => {
+  const {animatedHandleHeight, handleContentLayout} =
+    useBottomSheetDynamicSnapPoints(props.snapPoints);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const sheetStyle = useMemo(
+    () => ({
+      ...styles.sheetContainer,
+      shadowColor: COLORS.black,
+      padding: '2.5%',
+    }),
+    [],
+  );
+
+  const renderBackdrop = useCallback(
+    props => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    [],
+  );
   return (
-    <Modal
-      swipeDirection={'down'}
-      onBackdropPress={props.hideModal}
-      onSwipeComplete={props.hideModal}
-      useNativeDriverForBackdrop
-      style={{margin: 0}}
-      animationOut={'slideOutDown'}
-      animationIn={'slideInUp'}
-      backdropOpacity={0.5}
-      isVisible={props.isVisible}>
-      <View
-        style={{
-          backgroundColor: 'white',
-          flex: 1,
-          top: '70%',
-          padding: '3%',
-          borderTopLeftRadius: 25,
-          borderTopRightRadius: 25,
-        }}>
-        <View
+    <BottomSheetModal
+      ref={props?.sheetRef}
+      index={props?.index}
+      snapPoints={props?.snapPoints}
+      handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
+      enablePanDownToClose={true}
+      handleHeight={animatedHandleHeight}
+      animationConfigs={animationConfigs}
+      backdropComponent={renderBackdrop}
+      animateOnMount={true}
+      style={sheetStyle}>
+      <BottomSheetView
+        style={{flex: 1, backgroundColor: COLORS.primaryLight}}
+        onLayout={handleContentLayout}>
+        <Text
           style={{
-            backgroundColor: COLORS.white,
-            marginTop: '1%',
+            fontSize: fontValue(22.5),
+            fontFamily: FONTS.regular,
+            color: COLORS.accentLight,
+            textAlign: 'center',
           }}>
-          <View style={styles.greyPiece} />
+          Story Actions
+        </Text>
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          onPress={() => {
+            props?.onCopySelected();
+          }}
+          style={styles.optionContainer}>
+          <MaterialCommunityIcons
+            name="content-copy"
+            size={25 - 0.1 * 25}
+            style={styles.arrowStyle}
+          />
+          <Text
+            style={{
+              fontSize: fontValue(20),
+              fontFamily: FONTS.regular,
+              color: COLORS.black,
+              opacity: 0.9,
+            }}>
+            Copy Text
+          </Text>
+        </Pressable>
+        {props?.showSave ? (
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
             onPress={() => {
-              props.onCopySelected();
-              props.hideModal();
+              props?.onSaveSelected();
             }}
             style={styles.optionContainer}>
-            <Image source={CopyImage} style={styles.arrowStyle} />
+            <Image source={Downloadimage} style={styles.arrowStyle} />
             <Text
               style={{
-                fontSize: fontValue(18),
+                fontSize: fontValue(20),
                 fontFamily: FONTS.regular,
                 color: COLORS.black,
-                opacity: 0.4,
+                opacity: 0.9,
               }}>
-              Copy Text
+              Save Image
             </Text>
           </Pressable>
-          {props.showSave ? (
-            <Pressable
-              android_ripple={{color: COLORS.rippleColor}}
-              onPress={() => {
-                props.onSaveSelected();
-                props.hideModal();
-              }}
-              style={styles.optionContainer}>
-              <Image source={Downloadimage} style={styles.arrowStyle} />
-              <Text
-                style={{
-                  fontSize: fontValue(18),
-                  fontFamily: FONTS.regular,
-                  color: COLORS.black,
-                  opacity: 0.4,
-                }}>
-                Save Image
-              </Text>
-            </Pressable>
-          ) : (
-            <View />
-          )}
-          {auth()?.currentUser.uid == props.currentStoryUID ? (
-            <Pressable
-              android_ripple={{color: COLORS.rippleColor}}
-              onPress={() => {
-                props.onDeleteSelected();
-                props.hideModal();
-              }}
-              style={styles.optionContainer}>
-              <Image source={DeleteImage} style={styles.arrowStyle} />
-              <Text
-                style={{
-                  fontSize: fontValue(18),
-                  fontFamily: FONTS.regular,
-                  color: COLORS.black,
-                  opacity: 0.4,
-                }}>
-                Delete Story
-              </Text>
-            </Pressable>
-          ) : (
-            <View />
-          )}
-        </View>
-      </View>
-    </Modal>
+        ) : (
+          <></>
+        )}
+        {auth()?.currentUser?.uid === props?.currentStoryUID ? (
+          <Pressable
+            android_ripple={{color: COLORS.rippleColor}}
+            onPress={() => {
+              props?.onDeleteSelected();
+            }}
+            style={styles.optionContainer}>
+            <MaterialCommunityIcons
+              name="delete-outline"
+              size={25}
+              style={styles.arrowStyle}
+            />
+            <Text
+              style={{
+                fontSize: fontValue(20),
+                fontFamily: FONTS.regular,
+                color: COLORS.black,
+                opacity: 0.9,
+              }}>
+              Delete Story
+            </Text>
+          </Pressable>
+        ) : (
+          <></>
+        )}
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 };
 
 const styles = StyleSheet.create({
-  greyPiece: {
-    height: heightPercentageToDP(0.4),
-    borderRadius: 2.5,
-    alignSelf: 'center',
-    width: widthPercentageToDP(12.5),
-    backgroundColor: COLORS.controlNormal,
-    marginBottom: heightPercentageToDP(2.5),
-  },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignContent: 'center',
-    padding: heightPercentageToDP(0.5),
+    padding: '2.25%',
   },
   arrowStyle: {
-    marginRight: heightPercentageToDP(0.5),
-    tintColor: COLORS.black,
-    opacity: 0.4,
-    height: 24,
-    width: 24,
+    marginRight: '2%',
+    opacity: 0.6,
+  },
+  sheetContainer: {
+    backgroundColor: COLORS.white,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+    elevation: 24,
   },
 });
 
