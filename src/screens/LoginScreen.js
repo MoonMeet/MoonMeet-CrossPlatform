@@ -746,7 +746,7 @@ const LoginScreen = () => {
                     handleTextChange={text => {
                       addCodeObserver(text);
                     }}
-                    editable={!codeCorrect}
+                    editable={!codeCorrect === true}
                     keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                   />
                 </View>
