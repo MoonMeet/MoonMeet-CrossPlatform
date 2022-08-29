@@ -33,8 +33,6 @@ import NetInfo from '@react-native-community/netinfo';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 
 const DevicesScreen = () => {
-  const navigation = useNavigation();
-
   const [masterData, setMasterData] = React.useState([]);
 
   const [Loading, setLoading] = React.useState(true);
