@@ -8,10 +8,9 @@
 
 import React, {useCallback, useEffect} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
-import {ActivityIndicator, Avatar, Provider} from 'react-native-paper';
+import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import PersonImage from '../assets/images/person.png';
 import CreateImage from '../assets/images/create.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
@@ -83,7 +82,7 @@ const HomePeopleScreen = () => {
             }
           }
           if (
-            documentSnapshot?.data()?.active_status == 'normal' &&
+            documentSnapshot?.data()?.active_status === 'normal' &&
             firestore?.Timestamp?.fromDate(new Date())?.toDate() -
               documentSnapshot?.data()?.active_time?.toDate() <
               180000
@@ -134,6 +133,7 @@ const HomePeopleScreen = () => {
             <Pressable
               hitSlop={15}
               onPress={() => {
+                updateUserActiveStatus();
                 navigation.navigate('settings');
               }}>
               <Avatar.Image
