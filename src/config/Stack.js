@@ -8,7 +8,6 @@
 
 import React from 'react';
 
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {
   DefaultTheme,
   NavigationContainer,
@@ -34,74 +33,71 @@ import SplashScreen from '../screens/SplashScreen';
 import StoryScreen from '../screens/StoryScreen';
 import ChatScreen from '../screens/ChatScreen';
 import UserProfileScreen from '../screens/UserProfileScreen';
-import {Avatar} from 'react-native-paper';
+import {BottomNavigation} from 'react-native-paper';
 import analytics from '@react-native-firebase/analytics';
 
 import {COLORS, FONTS} from './Miscellaneous';
 
-import ChatIcon from '../assets/images/chat.png';
-import PeopleIcon from '../assets/images/two_people.png';
-
 import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
-import {fontValue, heightPercentageToDP} from './Dimensions';
-import {MoonMeetDarkTheme, MoonMeetLightTheme} from './Theme/Theme';
+import {fontValue} from './Dimensions';
+import {MoonMeetDarkTheme} from './Theme/Theme';
 import {useTheme} from 'react-native-paper';
 import {ThemeContext} from './Theme/Context';
 import DarkModeSettings from '../screens/DarkModeScreen';
 import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
 import ChatSettingsScreen from '../screens/ChatSettingsScreen';
+import {StyleSheet} from 'react-native';
 
 const Stack = createNativeStackNavigator();
-const Tab = createMaterialBottomTabNavigator();
 
 function HomeScreen() {
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState([
+    {
+      key: 'chats',
+      title: 'Chats',
+      icon: 'chat',
+    },
+    {
+      key: 'people',
+      title: 'People',
+      icon: 'account',
+    },
+  ]);
+
+  const renderScene = BottomNavigation.SceneMap({
+    chats: HomeChats,
+    people: HomePeople,
+  });
+
   return (
-    <Tab.Navigator
-      shifting={false}
-      initialRouteName={'Chats'}
+    <BottomNavigation
+      navigationState={{index, routes}}
+      onIndexChange={setIndex}
+      renderScene={renderScene}
+      style={styles.navStyle}
+      barStyle={{backgroundColor: COLORS.white}}
       activeColor={COLORS.accentLight}
-      inactiveColor={COLORS.darkGrey}
-      barStyle={{backgroundColor: COLORS.primaryLight}}>
-      <Tab.Screen
-        name="Chats"
-        component={HomeChats}
-        options={{
-          tabBarLabel: 'Chats',
-          tabBarIcon: ({color}) => (
-            <Avatar.Icon
-              icon={ChatIcon}
-              color={color}
-              size={36.5}
-              style={{
-                margin: heightPercentageToDP(-0.75),
-              }}
-              theme={{colors: {primary: COLORS.transparent}}}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="People"
-        component={HomePeople}
-        options={{
-          tabBarLabel: 'People',
-          tabBarIcon: ({color}) => (
-            <Avatar.Icon
-              icon={PeopleIcon}
-              color={color}
-              size={42.5}
-              style={{
-                margin: heightPercentageToDP(-1.25),
-              }}
-              theme={{colors: {primary: COLORS.transparent}}}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      inactiveColor={COLORS.lightGrey}
+    />
   );
 }
+
+export const styles = StyleSheet.create({
+  navStyle: {
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.redDarkError,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+
+    elevation: 24,
+  },
+});
 
 const StackNavigator = () => {
   const theme = useTheme();
@@ -130,7 +126,7 @@ const StackNavigator = () => {
         routeNameRef.current = currentRouteName;
       }}
       theme={isThemeDark ? MoonMeetDarkTheme : DefaultTheme}>
-      <Stack.Navigator options={{headerShown: false}}>
+      <Stack.Navigator>
         <Stack.Screen
           name={'splash'}
           component={SplashScreen}
