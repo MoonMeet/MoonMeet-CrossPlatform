@@ -7,10 +7,9 @@
  */
 
 import React, {useCallback, useMemo} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text} from 'react-native';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
-import Downloadimage from '../../../assets/images/download.png';
 import {fontValue} from '../../../config/Dimensions';
 import {
   BottomSheetBackdrop,
@@ -119,7 +118,11 @@ const StoryActionSheet = (props: StoryActionSheetInterface) => {
               props?.onSaveSelected();
             }}
             style={styles.optionContainer}>
-            <Image source={Downloadimage} style={styles.arrowStyle} />
+            <MaterialCommunityIcons
+              name="file-download-outline"
+              size={25}
+              style={styles.arrowStyle}
+            />
             <Text
               style={{
                 fontSize: fontValue(20),
