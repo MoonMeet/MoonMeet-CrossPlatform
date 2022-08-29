@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useEffect, useCallback, useRef} from 'react';
+import React, {useEffect, useCallback, useRef, useMemo} from 'react';
 import {
   StyleSheet,
   Text,
@@ -36,6 +36,7 @@ import moment from 'moment';
 import {filter, sortBy} from 'lodash';
 import {PurpleBackground} from '../index.d';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
+import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -52,8 +53,11 @@ const StoryScreen = () => {
   const [viewsData, setViewsData] = React.useState([]);
 
   const [Loading, setLoading] = React.useState(true);
-  const [ActionSheetVisible, setActionSheetVisible] = React.useState(false);
   const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
+
+  const storySheetRef = useRef(null);
+  const sheetSnapPoints = useMemo(() => ['30%'], []);
+  const {dismissAll} = useBottomSheetModal(); // will be used soon.
 
   const deleteCurrentStory = useCallback(async sid => {
     return await firestore().collection('stories').doc(sid).delete();
@@ -157,56 +161,57 @@ const StoryScreen = () => {
   } else {
     return (
       <MiniBaseView>
-        <View style={styles.container}>
-          <View style={styles.toolbar}>
-            <View style={styles.left_side}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => navigation.goBack()}>
-                <Avatar.Icon
-                  icon={BackImage}
-                  size={37.5}
-                  color={COLORS.black}
-                  style={{
-                    marginRight: '-1%',
-                    opacity: 0.4,
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
-            <View style={styles.mid_side}>
-              <Avatar.Image
-                size={40}
-                source={storyAvatar ? {uri: storyAvatar} : PurpleBackground}
-              />
-              <View
-                style={{
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  fontSize: fontValue(16),
-                }}>
-                <Text style={styles.toolbar_text}>
-                  {storyFirstName + ' ' + storyLastName}
-                </Text>
-                <Text style={styles.timeText}>
-                  {moment(
-                    Object.values(allCurrentUserStories)?.length > 0
-                      ? allCurrentUserStories[current]?.time?.toDate()
-                      : Date.now(),
-                  ).fromNow()}
-                </Text>
+        <Pressable style={{flex: 1}} onPress={() => dismissAll()}>
+          <View style={styles.container}>
+            <View style={styles.toolbar}>
+              <View style={styles.left_side}>
+                <TouchableRipple
+                  rippleColor={COLORS.rippleColor}
+                  borderless={false}
+                  onPress={() => navigation.goBack()}>
+                  <Avatar.Icon
+                    icon={BackImage}
+                    size={37.5}
+                    color={COLORS.black}
+                    style={{
+                      marginRight: '-1%',
+                      opacity: 0.4,
+                    }}
+                    theme={{
+                      colors: {
+                        primary: COLORS.transparent,
+                      },
+                    }}
+                  />
+                </TouchableRipple>
               </View>
-            </View>
-            {
-              /**!storyText !== null || auth?.currentUser.uid !== userStoryUID*/ true ? (
-                <View style={styles.right_side}>
-                  {/**
+              <View style={styles.mid_side}>
+                <Avatar.Image
+                  size={40}
+                  source={storyAvatar ? {uri: storyAvatar} : PurpleBackground}
+                />
+                <View
+                  style={{
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    fontSize: fontValue(16),
+                  }}>
+                  <Text style={styles.toolbar_text}>
+                    {storyFirstName + ' ' + storyLastName}
+                  </Text>
+                  <Text style={styles.timeText}>
+                    {moment(
+                      Object.values(allCurrentUserStories)?.length > 0
+                        ? allCurrentUserStories[current]?.time?.toDate()
+                        : Date.now(),
+                    ).fromNow()}
+                  </Text>
+                </View>
+              </View>
+              {
+                /**!storyText !== null || auth?.currentUser.uid !== userStoryUID*/ true ? (
+                  <View style={styles.right_side}>
+                    {/**
                   <Pressable
                     style={{
                       flexDirection: 'row',
@@ -238,162 +243,166 @@ const StoryScreen = () => {
                   </Pressable>
                   <View style={{width: widthPercentageToDP(2.5)}} />
             */}
-                  <Pressable
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'flex-end',
-                      alignItems: 'flex-start',
-                    }}
-                    onPress={() => setActionSheetVisible(!ActionSheetVisible)}>
-                    <Avatar.Icon
-                      icon={DotsImage}
-                      size={37.5}
-                      color={COLORS.black}
+                    <Pressable
                       style={{
-                        marginRight: '-1%',
-                        opacity: 0.4,
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: 'flex-start',
                       }}
-                      theme={{
-                        colors: {
-                          primary: COLORS.transparent,
-                        },
+                      onPress={() => storySheetRef?.current?.present()}>
+                      <Avatar.Icon
+                        icon={DotsImage}
+                        size={37.5}
+                        color={COLORS.black}
+                        style={{
+                          marginRight: '-1%',
+                          opacity: 0.4,
+                        }}
+                        theme={{
+                          colors: {
+                            primary: COLORS.transparent,
+                          },
+                        }}
+                      />
+                    </Pressable>
+                  </View>
+                ) : (
+                  <></>
+                )
+              }
+            </View>
+            <FlatList
+              ref={storiesRef}
+              pagingEnabled
+              horizontal
+              viewabilityConfig={viewAbilityConfig.current}
+              onViewableItemsChanged={onViewableItemsChanged.current}
+              showsHorizontalScrollIndicator={false}
+              ListEmptyComponent={
+                <ActivityIndicator
+                  size={'large'}
+                  color={COLORS.accentLight}
+                  animating={true}
+                />
+              }
+              data={Object.values(allCurrentUserStories)}
+              renderItem={({item}) => {
+                return (
+                  <View style={styles.imageWrapper}>
+                    <ImageBackground
+                      style={styles.storyImage}
+                      source={{
+                        uri: item?.image,
                       }}
                     />
-                  </Pressable>
-                </View>
-              ) : null
-            }
+                    {item?.text ? (
+                      <View style={styles.bandView}>
+                        <Text style={styles.bandText}>{item?.text}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                );
+              }}
+            />
           </View>
-          <FlatList
-            ref={storiesRef}
-            pagingEnabled
-            horizontal
-            viewabilityConfig={viewAbilityConfig.current}
-            onViewableItemsChanged={onViewableItemsChanged.current}
-            showsHorizontalScrollIndicator={false}
-            ListEmptyComponent={
-              <ActivityIndicator
-                size={'large'}
-                color={COLORS.accentLight}
-                animating={true}
-              />
-            }
-            data={Object.values(allCurrentUserStories)}
-            renderItem={({item}) => {
-              return (
-                <View style={styles.imageWrapper}>
-                  <ImageBackground
-                    style={styles.storyImage}
-                    source={{
-                      uri: item?.image,
-                    }}
-                  />
-                  {item?.text ? (
-                    <View style={styles.bandView}>
-                      <Text style={styles.bandText}>{item?.text}</Text>
-                    </View>
-                  ) : null}
-                </View>
+          <View style={styles.footer}>
+            <View style={styles.footer_left}>
+              <TouchableRipple
+                rippleColor={COLORS.rippleColor}
+                borderless={false}
+                onPress={() => {
+                  if (current > 0) {
+                    storiesRef?.current?.scrollToIndex({
+                      index: current - 1,
+                    });
+                  }
+                }}>
+                <Avatar.Icon
+                  icon={ArrowIcon}
+                  size={36.5}
+                  color={COLORS.black}
+                  style={{
+                    opacity: 0.6,
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.transparent,
+                    },
+                  }}
+                />
+              </TouchableRipple>
+            </View>
+            <View style={styles.footer_mid}>
+              <Text style={styles.footer_text}>
+                {current + 1} /
+                {Object?.values?.(allCurrentUserStories)?.length > 1
+                  ? Object?.values?.(allCurrentUserStories)?.length
+                  : 1}
+              </Text>
+            </View>
+            <View style={styles.footer_right}>
+              <TouchableRipple
+                rippleColor={COLORS.rippleColor}
+                borderless={false}
+                onPress={() => {
+                  if (
+                    current <
+                    Object?.values?.(allCurrentUserStories)?.length - 1
+                  ) {
+                    storiesRef?.current?.scrollToIndex({
+                      index: current + 1,
+                    });
+                  }
+                }}>
+                <Avatar.Icon
+                  icon={ArrowIcon}
+                  size={36.5}
+                  color={COLORS.black}
+                  style={{
+                    opacity: 0.6,
+                    transform: [{rotate: '180deg'}],
+                  }}
+                  theme={{
+                    colors: {
+                      primary: COLORS.transparent,
+                    },
+                  }}
+                />
+              </TouchableRipple>
+            </View>
+          </View>
+          <StoryViewsActionSheet
+            hideModal={() => {
+              setStoryViewsVisible(!storyViewsVisible);
+            }}
+            isVisible={storyViewsVisible}
+            ViewsData={viewsData}
+          />
+          <StoryActionSheet
+            sheetRef={storySheetRef}
+            index={0}
+            snapPoints={sheetSnapPoints}
+            onCopySelected={() => {
+              Clipboard.setString(allCurrentUserStories[current]?.text);
+              dismissAll();
+            }}
+            onDeleteSelected={() => {
+              deleteCurrentStory(allCurrentUserStories[current]?.sid).finally(
+                () => {
+                  dismissAll();
+                  if (navigation?.canGoBack()) {
+                    navigation?.goBack();
+                  }
+                },
               );
             }}
+            showSave={
+              false // TODO: Will be enabled soon.
+            }
+            onSaveSelected={undefined}
+            currentStoryUID={userStoryUID}
           />
-        </View>
-        <View style={styles.footer}>
-          <View style={styles.footer_left}>
-            <TouchableRipple
-              rippleColor={COLORS.rippleColor}
-              borderless={false}
-              onPress={() => {
-                if (current > 0) {
-                  storiesRef?.current?.scrollToIndex({
-                    index: current - 1,
-                  });
-                }
-              }}>
-              <Avatar.Icon
-                icon={ArrowIcon}
-                size={36.5}
-                color={COLORS.black}
-                style={{
-                  opacity: 0.6,
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            </TouchableRipple>
-          </View>
-          <View style={styles.footer_mid}>
-            <Text style={styles.footer_text}>
-              {current + 1} /
-              {Object?.values?.(allCurrentUserStories)?.length > 1
-                ? Object?.values?.(allCurrentUserStories)?.length
-                : 1}
-            </Text>
-          </View>
-          <View style={styles.footer_right}>
-            <TouchableRipple
-              rippleColor={COLORS.rippleColor}
-              borderless={false}
-              onPress={() => {
-                if (
-                  current <
-                  Object?.values?.(allCurrentUserStories)?.length - 1
-                ) {
-                  storiesRef?.current?.scrollToIndex({
-                    index: current + 1,
-                  });
-                }
-              }}>
-              <Avatar.Icon
-                icon={ArrowIcon}
-                size={36.5}
-                color={COLORS.black}
-                style={{
-                  opacity: 0.6,
-                  transform: [{rotate: '180deg'}],
-                }}
-                theme={{
-                  colors: {
-                    primary: COLORS.transparent,
-                  },
-                }}
-              />
-            </TouchableRipple>
-          </View>
-        </View>
-        <StoryViewsActionSheet
-          hideModal={() => {
-            setStoryViewsVisible(!storyViewsVisible);
-          }}
-          isVisible={storyViewsVisible}
-          ViewsData={viewsData}
-        />
-        <StoryActionSheet
-          hideModal={() => {
-            setActionSheetVisible(!ActionSheetVisible);
-          }}
-          onCopySelected={() => {
-            Clipboard.setString(allCurrentUserStories[current]?.text);
-          }}
-          onDeleteSelected={() => {
-            deleteCurrentStory(allCurrentUserStories[current]?.sid).finally(
-              () => {
-                if (navigation?.canGoBack()) {
-                  navigation?.goBack();
-                }
-              },
-            );
-          }}
-          showSave={
-            false // TODO: Will be enabled soon.
-          }
-          onSaveSelected={undefined}
-          currentStoryUID={userStoryUID}
-          isVisible={ActionSheetVisible}
-        />
+        </Pressable>
       </MiniBaseView>
     );
   }
