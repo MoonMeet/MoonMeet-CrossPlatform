@@ -14,12 +14,16 @@ import {
   ImageBackground,
   FlatList,
   Pressable,
+  BackHandler,
 } from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {ActivityIndicator, Avatar, TouchableRipple} from 'react-native-paper';
-import ArrowIcon from '../assets/images/back.png';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {ActivityIndicator, Avatar} from 'react-native-paper';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import BackImage from '../assets/images/back.png';
 import firestore from '@react-native-firebase/firestore';
 import {
@@ -27,16 +31,17 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import DotsImage from '../assets/images/dots.png';
 // import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
-import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
+// import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
 import moment from 'moment';
 import {filter, sortBy} from 'lodash';
 import {PurpleBackground} from '../index.d';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const StoryScreen = () => {
   const navigation = useNavigation();
@@ -48,12 +53,12 @@ const StoryScreen = () => {
   const [storyFirstName, setStoryFirstName] = React.useState('');
   const [storyLastName, setStoryLastName] = React.useState('');
   const [storyAvatar, setStoryAvatar] = React.useState('');
-  const [allCurrentUserStories, setAllCurrentUserStories] = React.useState({});
-  const [current, setCurrent] = React.useState({});
-  const [viewsData, setViewsData] = React.useState([]);
+  const [allCurrentUserStories, setAllCurrentUserStories] = React.useState([]);
+  const [current, setCurrent] = React.useState([]);
+  // const [viewsData, setViewsData] = React.useState([]);
 
   const [Loading, setLoading] = React.useState(true);
-  const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
+  // const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
   const storySheetRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['30%'], []);
@@ -71,6 +76,20 @@ const StoryScreen = () => {
     setCurrent(changed?.[0]?.index);
   });
   const viewAbilityConfig = useRef({viewAreaCoveragePercentThreshold: 100});
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        dismissAll();
+        return false;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [dismissAll]),
+  );
 
   useEffect(() => {
     firestore()
@@ -92,53 +111,25 @@ const StoryScreen = () => {
         let collectionDocs = [];
         collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
           ...subMap?.data(),
-          image: DecryptAES(subMap?.data()?.image),
-          text: DecryptAES(subMap?.data()?.text), // sometimes if the story text is empty, it recognize an empty string, Just a tip!
+          image:
+            subMap?.data().image === undefined
+              ? ''
+              : DecryptAES(subMap?.data()?.image),
+          text:
+            subMap?.data()?.text === undefined
+              ? ''
+              : DecryptAES(subMap?.data()?.text),
           sid: subMap?.id,
         }));
         collectionDocs = sortBy(collectionDocs, [docs => docs?.time?.toDate()]);
-        setAllCurrentUserStories(
-          filter(
-            collectionDocs,
-            documentCols => documentCols?.uid === userStoryUID,
-          ),
+        filter(
+          collectionDocs,
+          documentCols => documentCols?.uid === userStoryUID,
         );
+        setAllCurrentUserStories(collectionDocs);
+        console.log('rerender');
         setLoading(false);
-        /**
-                if (!Loading) {
-                if (auth()?.currentUser?.uid == userStoryUID) {
-                  firestore()
-                    .collection('users')
-                    .doc(auth()?.currentUser?.uid)
-                    .collection('story_views')
-                    .get()
-                    .then(collectionSnapshot => {
-                      if (!collectionSnapshot?.empty) {
-                        collectionSnapshot?.forEach(documentSnapshot => {
-                          const storyViewsData = collectionSnapshot?.docs?.map(
-                            subMap => ({
-                              ...subMap?.data(),
-                            }),
-                          );
-                          setViewsData(storyViewsData);
-                        });
-                      }
-                    });
-                } else {
-                  firestore()
-                    .collection('users')
-                    .doc(userStoryUID)
-                    .collection('story_views')
-                    .doc(myUID)
-                    .set({
-                      uid: myUID,
-                    });
-                }
-              }
-               */
       });
-
-    return () => {};
   }, [userStoryUID]);
 
   if (Loading) {
@@ -161,57 +152,55 @@ const StoryScreen = () => {
   } else {
     return (
       <MiniBaseView>
-        <Pressable style={{flex: 1}} onPress={() => dismissAll()}>
-          <View style={styles.container}>
-            <View style={styles.toolbar}>
-              <View style={styles.left_side}>
-                <TouchableRipple
-                  rippleColor={COLORS.rippleColor}
-                  borderless={false}
-                  onPress={() => navigation.goBack()}>
-                  <Avatar.Icon
-                    icon={BackImage}
-                    size={37.5}
-                    color={COLORS.black}
-                    style={{
-                      marginRight: '-1%',
-                      opacity: 0.4,
-                    }}
-                    theme={{
-                      colors: {
-                        primary: COLORS.transparent,
-                      },
-                    }}
-                  />
-                </TouchableRipple>
-              </View>
-              <View style={styles.mid_side}>
-                <Avatar.Image
-                  size={40}
-                  source={storyAvatar ? {uri: storyAvatar} : PurpleBackground}
-                />
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    fontSize: fontValue(16),
-                  }}>
-                  <Text style={styles.toolbar_text}>
-                    {storyFirstName + ' ' + storyLastName}
-                  </Text>
-                  <Text style={styles.timeText}>
-                    {moment(
-                      Object.values(allCurrentUserStories)?.length > 0
-                        ? allCurrentUserStories[current]?.time?.toDate()
-                        : Date.now(),
-                    ).fromNow()}
-                  </Text>
-                </View>
-              </View>
-              {
-                /**!storyText !== null || auth?.currentUser.uid !== userStoryUID*/ true ? (
-                  <View style={styles.right_side}>
-                    {/**
+        <View style={styles.toolbar}>
+          <View style={styles.left_side}>
+            <Pressable
+              android_ripple={{
+                color: COLORS.rippleColor,
+                radius: 25 - 0.1 * 25,
+                borderless: true,
+              }}
+              onPress={() => navigation.goBack()}>
+              <MaterialIcons
+                name="arrow-back"
+                size={30 - 0.1 * 30}
+                style={{opacity: 0.6, marginRight: '-1%', marginLeft: '1%'}}
+              />
+            </Pressable>
+          </View>
+          <View style={styles.mid_side}>
+            <Avatar.Image
+              size={40}
+              source={
+                Loading
+                  ? PurpleBackground
+                  : storyAvatar
+                  ? {uri: storyAvatar}
+                  : PurpleBackground
+              }
+            />
+            <View
+              style={{
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                fontSize: fontValue(16),
+              }}>
+              <Text style={styles.toolbar_text}>
+                {storyFirstName + ' ' + storyLastName}
+              </Text>
+              <Text style={styles.timeText}>
+                {moment(
+                  Object.values(allCurrentUserStories)?.length > 0
+                    ? allCurrentUserStories[current]?.time?.toDate()
+                    : Date.now(),
+                )?.fromNow()}
+              </Text>
+            </View>
+          </View>
+          {
+            /**!storyText !== null || auth?.currentUser.uid !== userStoryUID*/ true ? (
+              <View style={styles.right_side}>
+                {/**
                   <Pressable
                     style={{
                       flexDirection: 'row',
@@ -243,176 +232,160 @@ const StoryScreen = () => {
                   </Pressable>
                   <View style={{width: widthPercentageToDP(2.5)}} />
             */}
-                    <Pressable
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        alignItems: 'flex-start',
-                      }}
-                      onPress={() => storySheetRef?.current?.present()}>
-                      <Avatar.Icon
-                        icon={DotsImage}
-                        size={37.5}
-                        color={COLORS.black}
-                        style={{
-                          marginRight: '-1%',
-                          opacity: 0.4,
-                        }}
-                        theme={{
-                          colors: {
-                            primary: COLORS.transparent,
-                          },
-                        }}
-                      />
-                    </Pressable>
+                <Pressable
+                  android_ripple={{
+                    color: COLORS.rippleColor,
+                    radius: 25 - 0.1 * 25,
+                    borderless: true,
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-evenly',
+                    alignItems: 'center',
+                  }}
+                  onPress={() => storySheetRef?.current?.present()}>
+                  <MaterialCommunityIcons
+                    name="dots-vertical"
+                    size={30 - 0.1 * 30}
+                    style={{opacity: 0.6}}
+                  />
+                </Pressable>
+              </View>
+            ) : (
+              <></>
+            )
+          }
+        </View>
+        <FlatList
+          ref={storiesRef}
+          pagingEnabled
+          horizontal
+          viewabilityConfig={viewAbilityConfig?.current}
+          onViewableItemsChanged={onViewableItemsChanged?.current}
+          showsHorizontalScrollIndicator={false}
+          ListEmptyComponent={
+            <ActivityIndicator
+              size={'large'}
+              color={COLORS.accentLight}
+              animating={true}
+            />
+          }
+          data={Object.values(allCurrentUserStories)}
+          renderItem={({item}) => {
+            return (
+              <View style={styles.imageWrapper}>
+                <ImageBackground
+                  style={styles.storyImage}
+                  source={{
+                    uri: item?.image,
+                  }}
+                />
+                {item?.text ? (
+                  <View style={styles.bandView}>
+                    <Text style={styles.bandText}>{item?.text}</Text>
                   </View>
                 ) : (
                   <></>
-                )
-              }
-            </View>
-            <FlatList
-              ref={storiesRef}
-              pagingEnabled
-              horizontal
-              viewabilityConfig={viewAbilityConfig.current}
-              onViewableItemsChanged={onViewableItemsChanged.current}
-              showsHorizontalScrollIndicator={false}
-              ListEmptyComponent={
-                <ActivityIndicator
-                  size={'large'}
-                  color={COLORS.accentLight}
-                  animating={true}
-                />
-              }
-              data={Object.values(allCurrentUserStories)}
-              renderItem={({item}) => {
-                return (
-                  <View style={styles.imageWrapper}>
-                    <ImageBackground
-                      style={styles.storyImage}
-                      source={{
-                        uri: item?.image,
-                      }}
-                    />
-                    {item?.text ? (
-                      <View style={styles.bandView}>
-                        <Text style={styles.bandText}>{item?.text}</Text>
-                      </View>
-                    ) : null}
-                  </View>
-                );
+                )}
+              </View>
+            );
+          }}
+        />
+        <View style={styles.footer}>
+          <View style={styles.footer_left}>
+            <Pressable
+              android_ripple={{
+                color: COLORS.rippleColor,
+                radius: 25,
+                borderless: true,
               }}
-            />
+              onPress={() => {
+                if (current > 0) {
+                  storiesRef?.current?.scrollToIndex({
+                    index: current - 1,
+                  });
+                }
+              }}>
+              <MaterialIcons
+                name="arrow-back"
+                size={30 - 0.1 * 30}
+                style={{opacity: 0.6}}
+              />
+            </Pressable>
           </View>
-          <View style={styles.footer}>
-            <View style={styles.footer_left}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  if (current > 0) {
-                    storiesRef?.current?.scrollToIndex({
-                      index: current - 1,
-                    });
-                  }
-                }}>
-                <Avatar.Icon
-                  icon={ArrowIcon}
-                  size={36.5}
-                  color={COLORS.black}
-                  style={{
-                    opacity: 0.6,
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
-            <View style={styles.footer_mid}>
-              <Text style={styles.footer_text}>
-                {current + 1} /
-                {Object?.values?.(allCurrentUserStories)?.length > 1
-                  ? Object?.values?.(allCurrentUserStories)?.length
-                  : 1}
-              </Text>
-            </View>
-            <View style={styles.footer_right}>
-              <TouchableRipple
-                rippleColor={COLORS.rippleColor}
-                borderless={false}
-                onPress={() => {
-                  if (
-                    current <
-                    Object?.values?.(allCurrentUserStories)?.length - 1
-                  ) {
-                    storiesRef?.current?.scrollToIndex({
-                      index: current + 1,
-                    });
-                  }
-                }}>
-                <Avatar.Icon
-                  icon={ArrowIcon}
-                  size={36.5}
-                  color={COLORS.black}
-                  style={{
-                    opacity: 0.6,
-                    transform: [{rotate: '180deg'}],
-                  }}
-                  theme={{
-                    colors: {
-                      primary: COLORS.transparent,
-                    },
-                  }}
-                />
-              </TouchableRipple>
-            </View>
+          <View style={styles.footer_mid}>
+            <Text style={styles.footer_text}>
+              {`${current + 1} / ${
+                Object.values(allCurrentUserStories)?.length > 0
+                  ? Object.values(allCurrentUserStories)?.length
+                  : 1
+              }`}
+            </Text>
           </View>
-          <StoryViewsActionSheet
+          <View style={styles.footer_right}>
+            <Pressable
+              android_ripple={{
+                color: COLORS.rippleColor,
+                radius: 25 - 0.1 * 25,
+                borderless: true,
+              }}
+              onPress={() => {
+                if (
+                  current <
+                  Object.values(allCurrentUserStories)?.length - 1
+                ) {
+                  storiesRef?.current?.scrollToIndex({
+                    index: current + 1,
+                  });
+                }
+              }}>
+              <MaterialIcons
+                name="arrow-forward"
+                size={30 - 0.1 * 30}
+                style={{opacity: 0.6}}
+              />
+            </Pressable>
+          </View>
+        </View>
+        {/**
+           <StoryViewsActionSheet
             hideModal={() => {
               setStoryViewsVisible(!storyViewsVisible);
             }}
             isVisible={storyViewsVisible}
             ViewsData={viewsData}
           />
-          <StoryActionSheet
-            sheetRef={storySheetRef}
-            index={0}
-            snapPoints={sheetSnapPoints}
-            onCopySelected={() => {
-              Clipboard.setString(allCurrentUserStories[current]?.text);
-              dismissAll();
-            }}
-            onDeleteSelected={() => {
-              deleteCurrentStory(allCurrentUserStories[current]?.sid).finally(
-                () => {
-                  dismissAll();
-                  if (navigation?.canGoBack()) {
-                    navigation?.goBack();
-                  }
-                },
-              );
-            }}
-            showSave={
-              false // TODO: Will be enabled soon.
-            }
-            onSaveSelected={undefined}
-            currentStoryUID={userStoryUID}
-          />
-        </Pressable>
+           */}
+        <StoryActionSheet
+          sheetRef={storySheetRef}
+          index={0}
+          snapPoints={sheetSnapPoints}
+          onCopySelected={() => {
+            Clipboard.setString(allCurrentUserStories[current]?.text);
+            dismissAll();
+          }}
+          onDeleteSelected={() => {
+            dismissAll();
+            deleteCurrentStory(allCurrentUserStories[current]?.sid).finally(
+              () => {
+                if (navigation?.canGoBack()) {
+                  navigation?.goBack();
+                }
+              },
+            );
+          }}
+          showSave={
+            false // TODO: Will be enabled soon.
+          }
+          onSaveSelected={undefined}
+          currentStoryUID={userStoryUID}
+        />
       </MiniBaseView>
     );
   }
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-  },
   under_header: {
     padding: '2%',
     justifyContent: 'center',
@@ -426,7 +399,6 @@ const styles = StyleSheet.create({
   mid_side: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    fontSize: 16,
     marginLeft: '2.5%',
     marginRight: '2.5%',
   },
@@ -446,7 +418,7 @@ const styles = StyleSheet.create({
     paddingLeft: widthPercentageToDP(1.5),
     textAlign: 'left',
     color: COLORS.black,
-    opacity: 0.4,
+    opacity: 0.6,
     fontFamily: FONTS.regular,
   },
   imageHolder: {
@@ -466,7 +438,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   footer: {
     padding: '2%',
@@ -493,10 +465,10 @@ const styles = StyleSheet.create({
     paddingRight: '1%',
   },
   footer_text: {
-    fontSize: 14,
+    fontSize: fontValue(16),
     textAlign: 'center',
     color: COLORS.black,
-    opacity: 0.4,
+    opacity: 0.6,
     fontFamily: FONTS.regular,
   },
   bandView: {
