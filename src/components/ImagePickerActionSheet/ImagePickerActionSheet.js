@@ -76,51 +76,49 @@ const ImagePickerActionSheet = ({
           backgroundColor: COLORS.primaryLight,
           flex: 1,
         }}>
-        <View>
+        <Text
+          style={{
+            fontSize: fontValue(22.5),
+            fontFamily: FONTS.regular,
+            color: COLORS.accentLight,
+            textAlign: 'center',
+          }}>
+          Choose Photo
+        </Text>
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          onPress={() => {
+            onCameraPress();
+          }}
+          style={styles.optionContainer}>
+          <Image source={CameraImage} style={styles.arrowStyle} />
           <Text
             style={{
-              fontSize: fontValue(22.5),
+              fontSize: fontValue(20),
               fontFamily: FONTS.regular,
-              color: COLORS.accentLight,
-              textAlign: 'center',
+              color: COLORS.black,
+              opacity: 0.9,
             }}>
-            Choose Photo
+            Take Photo
           </Text>
-          <Pressable
-            android_ripple={{color: COLORS.rippleColor}}
-            onPress={() => {
-              onCameraPress();
-            }}
-            style={styles.optionContainer}>
-            <Image source={CameraImage} style={styles.arrowStyle} />
-            <Text
-              style={{
-                fontSize: fontValue(20),
-                fontFamily: FONTS.regular,
-                color: COLORS.black,
-                opacity: 0.9,
-              }}>
-              Take Photo
-            </Text>
-          </Pressable>
-          <Pressable
-            android_ripple={{color: COLORS.rippleColor}}
-            onPress={() => {
-              onFilePicker();
-            }}
-            style={styles.optionContainer}>
-            <Image source={GalleryImage} style={styles.arrowStyle} />
-            <Text
-              style={{
-                fontSize: fontValue(20),
-                fontFamily: FONTS.regular,
-                color: COLORS.black,
-                opacity: 0.9,
-              }}>
-              Upload from Gallery
-            </Text>
-          </Pressable>
-        </View>
+        </Pressable>
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          onPress={() => {
+            onFilePicker();
+          }}
+          style={styles.optionContainer}>
+          <Image source={GalleryImage} style={styles.arrowStyle} />
+          <Text
+            style={{
+              fontSize: fontValue(20),
+              fontFamily: FONTS.regular,
+              color: COLORS.black,
+              opacity: 0.9,
+            }}>
+            Upload from Gallery
+          </Text>
+        </Pressable>
       </BottomSheetView>
     </BottomSheetModal>
   );
