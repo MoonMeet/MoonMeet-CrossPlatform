@@ -412,7 +412,6 @@ const ChatScreen = () => {
     );
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const sendMessage = useCallback(async (mChatData = [], image) => {
     let connectionStatus = await NetInfo?.fetch();
     if (connectionStatus?.isConnected) {
@@ -495,7 +494,9 @@ const ChatScreen = () => {
           }
           if (isSubscribed && playerID !== userPlayerID) {
             const toSendNotification = {
-              contents: {en: 'New Message'},
+              contents: {
+                en: `New message from ${auth()?.currentUser?.displayName}`,
+              },
               include_player_ids: [userPlayerID],
             };
             const stringifiedJSON = JSON.stringify(toSendNotification);
@@ -633,7 +634,8 @@ const ChatScreen = () => {
         1000,
       );
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
