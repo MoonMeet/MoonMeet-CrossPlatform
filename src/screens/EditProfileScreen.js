@@ -133,7 +133,6 @@ const EditProfileScreen = () => {
     uploadImageTask.then(async () => {
       const _avatar = await storage().ref(_avatarRef).getDownloadURL();
       if (_avatar.length > 0) {
-        await auth()?.currentUser?.updateProfile({photoURL: _avatar});
         pushImage(_avatar);
       }
     });
@@ -146,10 +145,11 @@ const EditProfileScreen = () => {
       .update({
         avatar: pureImageUrl,
       })
-      .finally(() => {
+      .finally(async () => {
         if (firstName !== oldFirstname && lastName !== oldLastname) {
           // Keep showing loader and FAB
         } else {
+          await auth()?.currentUser?.updateProfile({photoURL: pureImageUrl});
           setLoaderVisible(false);
           setSendingData(false);
           SuccessToast(
@@ -177,9 +177,6 @@ const EditProfileScreen = () => {
   }
 
   async function pushNames() {
-    await auth()?.currentUser?.updateProfile({
-      displayName: `${firstName} ${lastName}`,
-    });
     await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -187,7 +184,10 @@ const EditProfileScreen = () => {
         first_name: lowerToUppercase(firstName),
         last_name: lowerToUppercase(lastName),
       })
-      .finally(() => {
+      .finally(async () => {
+        await auth()?.currentUser?.updateProfile({
+          displayName: `${firstName} ${lastName}`,
+        });
         setLoaderVisible(false);
         setOldFirstname(firstName);
         setOldLastName(lastName);
