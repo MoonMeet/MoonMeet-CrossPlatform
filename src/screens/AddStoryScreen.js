@@ -254,7 +254,6 @@ const AddStoryScreen = () => {
         headerRight: props => <ImageTitle {...props} />,
       });
     }
-    return () => {};
   }, [
     hideMainScreen,
     inputEnabledForImage,
@@ -312,6 +311,7 @@ const AddStoryScreen = () => {
           }
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     StoryTextInput,
     Loading,
@@ -319,6 +319,7 @@ const AddStoryScreen = () => {
     Me?.last_name,
     Me?.avatar,
     navigation,
+    pushTextStory,
   ]);
 
   const pushImageData = useCallback(
