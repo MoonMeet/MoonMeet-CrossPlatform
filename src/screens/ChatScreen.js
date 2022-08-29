@@ -6,7 +6,13 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -57,6 +63,7 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import OneSignal from 'react-native-onesignal';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 enableLayoutAnimations(true);
 
@@ -96,6 +103,7 @@ const ChatScreen = () => {
    */
   const [mMessageText, setMessageText] = React.useState('');
   const [mChatData, setChatData] = React.useState([]);
+  let giftedRef = useRef();
   const [isLoading, setLoading] = React.useState(true);
 
   let _id = uuidv4() + getRandomString(3);
@@ -634,8 +642,78 @@ const ChatScreen = () => {
         1000,
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
+
+  function onLongPress(context, message) {
+    const options =
+      message?.user?._id === auth()?.currentUser?.uid
+        ? ['Copy Message', 'Delete For Me', 'Cancel']
+        : ['Copy Message', 'Cancel'];
+    const cancelButtonIndex = options?.length - 1;
+    context?.actionSheet()?.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      buttonIndex => {
+        if (options?.length === 3) {
+          switch (buttonIndex) {
+            case 0:
+              try {
+                Clipboard?.setString(message?.text);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexcpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+            case 1:
+              deleteMessage(message?.id);
+              break;
+          }
+        } else {
+          switch (buttonIndex) {
+            case 0:
+              try {
+                Clipboard?.setString(message?.text);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexcpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+          }
+        }
+      },
+    );
+  }
+
+  async function deleteMessage(id) {
+    const meMessageRef = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('messages')
+      .doc(destinedUser)
+      .collection('discussions');
+    await meMessageRef?.get()?.then(collectionSnapshot => {
+      collectionSnapshot?.docs?.map(documentSnapshot => {
+        if (documentSnapshot?.id === id) {
+          documentSnapshot?.ref?.delete();
+          filter(mChatData, element => {
+            element?.id === id;
+          });
+        }
+      });
+    });
+  }
 
   return (
     <>
@@ -648,6 +726,7 @@ const ChatScreen = () => {
       />
       <BaseView>
         <GiftedChat
+          ref={ref => (giftedRef = ref)}
           isLoadingEarlier={isLoading}
           messageIdGenerator={() => uuidv4()}
           renderLoading={() => (
@@ -667,6 +746,7 @@ const ChatScreen = () => {
           showAvatarForEveryMessage={false}
           showUserAvatar={false}
           messages={mChatData}
+          onLongPress={onLongPress}
           renderMessageImage={props => {
             return (
               <MessageImage
