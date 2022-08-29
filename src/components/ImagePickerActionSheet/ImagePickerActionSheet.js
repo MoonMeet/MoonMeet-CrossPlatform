@@ -7,7 +7,7 @@
  */
 
 import React, {useCallback, useMemo} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Image, Pressable, StyleSheet, Text} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import CameraImage from '../../assets/images/photo-camera.png';
 import GalleryImage from '../../assets/images/photo-library.png';
