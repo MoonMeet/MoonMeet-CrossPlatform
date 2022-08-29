@@ -34,7 +34,6 @@ import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
-// import OneSignal from 'react-native-onesignal';
 
 const HomeChatsScreen = () => {
   // Sticky-Item Config
@@ -59,32 +58,6 @@ const HomeChatsScreen = () => {
   const [storiesData, setStoriesData] = React.useState([]);
 
   const [myUID, setMyUID] = React.useState('');
-
-  /**
-    useEffect(() => {
-    OneSignal.getDeviceState().then(deviceState => {
-      console.log(deviceState.userId);
-      const toSendNotification = {
-        contents: {en: 'New Message'},
-        include_player_ids: [deviceState.userId],
-      };
-      const stringifiedJSON = JSON.stringify(toSendNotification);
-      OneSignal.postNotification(
-        stringifiedJSON,
-        success => {
-          if (__DEV__) {
-            ToastAndroid.show('Notification sent', ToastAndroid.SHORT);
-          }
-        },
-        error => {
-          if (__DEV__) {
-            console.error(error);
-          }
-        },
-      );
-    });
-  }, []);
-   */
 
   const checkJwtKey = useCallback(
     currentJwtKey => {
@@ -341,7 +314,9 @@ const HomeChatsScreen = () => {
                   borderRadius: BORDER_RADIUS,
                   resizeMode: 'contain',
                 }}
-                source={{uri: item.image ? item?.image : item?.avatar}}
+                source={{
+                  uri: item?.image ? item?.image : item?.avatar,
+                }}
               />
               <Text
                 style={{
