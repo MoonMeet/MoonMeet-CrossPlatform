@@ -100,8 +100,7 @@ export const styles = StyleSheet.create({
 });
 
 const StackNavigator = () => {
-  const theme = useTheme();
-  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+  const {isThemeDark} = React.useContext(ThemeContext);
 
   const routeNameRef = React.useRef();
   const navigationRef = useNavigationContainerRef();
