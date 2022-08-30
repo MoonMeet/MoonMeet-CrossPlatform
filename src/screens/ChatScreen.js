@@ -6,13 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -51,21 +45,16 @@ import {bytesToSize} from '../utils/converters/bytesToSize';
 import {Image} from 'react-native-compressor';
 import {PurpleBackground} from '../index.d';
 import {filter, isEmpty, reverse, sortBy} from 'lodash';
-import EmojiPicker from 'rn-emoji-keyboard';
+import {EmojiKeyboard} from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
 import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
-import Animated, {
-  enableLayoutAnimations,
-  FadeInDown,
-} from 'react-native-reanimated';
+import Animated, {FadeInDown} from 'react-native-reanimated';
 import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
-
-enableLayoutAnimations(true);
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -103,12 +92,11 @@ const ChatScreen = () => {
    */
   const [mMessageText, setMessageText] = React.useState('');
   const [mChatData, setChatData] = React.useState([]);
-  let giftedRef = useRef();
   const [isLoading, setLoading] = React.useState(true);
 
   let _id = uuidv4() + getRandomString(3);
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [emojiKeyboardOpened, setEmojiKeyboardOpened] = React.useState(false);
 
   const handlePick = emojiObject => {
     setMessageText(mMessageText + emojiObject?.emoji);
@@ -726,7 +714,6 @@ const ChatScreen = () => {
       />
       <BaseView>
         <GiftedChat
-          ref={ref => (giftedRef = ref)}
           isLoadingEarlier={isLoading}
           messageIdGenerator={() => uuidv4()}
           renderLoading={() => (
@@ -818,17 +805,23 @@ const ChatScreen = () => {
           messageSetter={setMessageText}
           attachPressCallback={mAttachPressCallback}
           cameraPressCallback={mCameraPressCallback}
-          emojiGetter={isOpen}
-          emojiSetter={setIsOpen}
+          emojiGetter={emojiKeyboardOpened}
+          emojiSetter={setEmojiKeyboardOpened}
           sendMessageCallback={() => {
             sendMessage([], '').finally(() => setMessageText(''));
           }}
         />
-        <EmojiPicker
-          onEmojiSelected={handlePick}
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
+        {emojiKeyboardOpened ? (
+          <EmojiKeyboard
+            emojiSize={28 - 0.1 * 28}
+            onEmojiSelected={handlePick}
+            enableRecentlyUsed
+            containerStyles={{borderRadius: 0}}
+          />
+        ) : (
+          <></>
+        )}
+
         <ImageView
           images={[{uri: userAvatar}]}
           imageIndex={0}
