@@ -21,12 +21,18 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import perf from '@react-native-firebase/perf';
 import OneSignal from 'react-native-onesignal';
+import {enableLayoutAnimations} from 'react-native-reanimated';
 
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
   await analytics()?.setAnalyticsCollectionEnabled(true);
   await perf()?.setPerformanceCollectionEnabled(true);
 }
+
+/**
+ * Disabling layoutAnimations fixes React Navigation Header.
+ */
+enableLayoutAnimations(false);
 
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
@@ -46,8 +52,8 @@ const App = () => {
           OneSignal.promptForPushNotificationsWithUserResponse(true);
         }
         if (__DEV__) {
-          console.warn('OneSignal: isSubscribed ', deviceState.isSubscribed);
-          console.warn('OneSignal: userId ', deviceState.userId);
+          console.warn('OneSignal: isSubscribed ', deviceState?.isSubscribed);
+          console.warn('OneSignal: userId ', deviceState?.userId);
         }
       }
     });
@@ -99,6 +105,7 @@ const App = () => {
         animated={true}
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
       />
+
       <ThemeContext.Provider value={themePrefernces}>
         <PaperProvider theme={theme}>
           <GestureHandlerRootView style={styles.GHRV}>
