@@ -8,14 +8,13 @@
 
 import React, {useEffect} from 'react';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
-import {useTheme} from 'react-native-paper';
 import {ThemeContext} from '../config/Theme/Context';
 import {PurpleBackground} from '../index.d';
 import {fontValue} from '../config/Dimensions';
@@ -33,8 +32,7 @@ const SettingsScreen = () => {
   const [activeStatus, setActiveStatus] = React.useState('');
   const [activeTime, setActiveTime] = React.useState('');
 
-  const theme = useTheme();
-  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+  const {isThemeDark} = React.useContext(ThemeContext);
 
   const styles = StyleSheet.create({
     under_header: {
@@ -110,53 +108,51 @@ const SettingsScreen = () => {
   }
   return (
     <MiniBaseView>
-      <ScrollView>
-        <View style={styles.under_header}>
-          <Avatar.Image
-            size={85}
-            source={
-              auth()?.currentUser?.photoURL
-                ? {uri: auth()?.currentUser?.photoURL}
-                : avatarURL
-                ? {uri: avatarURL}
-                : PurpleBackground
-            }
-          />
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={2}
-            style={styles.under_header_text}>
-            {auth()?.currentUser?.displayName
-              ? auth()?.currentUser?.displayName
-              : `${firstName} ${lastName}`}
-          </Text>
-          {userBio ? (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              onPress={() => navigation?.navigate('addBio')}
-              style={styles.bioText(userBio)}>
-              {userBio}
-            </Text>
-          ) : (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              style={styles.bioText(userBio)}
-              onPress={() => navigation?.navigate('addBio')}>
-              Tap to add a bio
-            </Text>
-          )}
-        </View>
-        <ScrollViewData
-          firstName={firstName}
-          lastName={lastName}
-          username={userName}
-          avatar={avatarURL}
-          activeStatus={activeStatus}
-          activeTime={activeTime}
+      <View style={styles.under_header}>
+        <Avatar.Image
+          size={85}
+          source={
+            auth()?.currentUser?.photoURL
+              ? {uri: auth()?.currentUser?.photoURL}
+              : avatarURL
+              ? {uri: avatarURL}
+              : PurpleBackground
+          }
         />
-      </ScrollView>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={2}
+          style={styles.under_header_text}>
+          {auth()?.currentUser?.displayName
+            ? auth()?.currentUser?.displayName
+            : `${firstName} ${lastName}`}
+        </Text>
+        {userBio ? (
+          <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            onPress={() => navigation?.navigate('addBio')}
+            style={styles.bioText(userBio)}>
+            {userBio}
+          </Text>
+        ) : (
+          <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={styles.bioText(userBio)}
+            onPress={() => navigation?.navigate('addBio')}>
+            Tap to add a bio
+          </Text>
+        )}
+      </View>
+      <ScrollViewData
+        firstName={firstName}
+        lastName={lastName}
+        username={userName}
+        avatar={avatarURL}
+        activeStatus={activeStatus}
+        activeTime={activeTime}
+      />
     </MiniBaseView>
   );
 };
