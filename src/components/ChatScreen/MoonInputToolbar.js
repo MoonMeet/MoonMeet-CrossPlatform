@@ -48,6 +48,16 @@ const MyInputToolbar = ({
     };
   });
 
+  /**
+  const keyboard = useAnimatedKeyboard();
+
+  const messageInputTranslate = useAnimatedStyle(() => {
+    return {
+      transform: [{translateY: -keyboard?.height?.value}],
+    };
+  });
+   */
+
   useEffect(() => {
     if (messageGetter?.trim()?.length > 0) {
       maxWidth.value = '85%';
@@ -170,7 +180,11 @@ const MyInputToolbar = ({
 
   return (
     <>
-      <Animated.View style={[styles.container, heightAnimatedStyle]}>
+      <Animated.View
+        style={[
+          styles.container,
+          heightAnimatedStyle /*messageInputTranslate*/,
+        ]}>
         <View style={styles.innerContainer}>
           <Animated.View
             style={[styles.inputAndMicrophone, widthAnimatedStyle]}>
@@ -182,7 +196,9 @@ const MyInputToolbar = ({
                 radius: 30 - 0.1 * 30,
               }}
               style={styles.emoticonButton}
-              onPress={() => emojiSetter(true)}>
+              onPress={() =>
+                emojiGetter ? emojiSetter(false) : emojiSetter(true)
+              }>
               <MaterialCommunityIcons
                 name={emojiGetter ? 'close' : 'emoticon-outline'}
                 size={23}
@@ -193,6 +209,14 @@ const MyInputToolbar = ({
               multiline
               numberOfLines={3}
               placeholder={'Aa'}
+              onFocus={() => {
+                if (emojiGetter) {
+                  emojiSetter(false);
+                } else {
+                  console.log('opened');
+                  // TODO: implement something about dismissing the keyboard
+                }
+              }}
               style={styles.input}
               value={messageGetter}
               onChangeText={text => {
@@ -242,7 +266,7 @@ const MyInputToolbar = ({
                 if (messageGetter?.trim()?.length > 0) {
                   sendMessageCallback();
                 } else {
-                  // Do nothing for now
+                  // TODO: implement send voice message.
                 }
               }}>
               <Animated.View style={[opacityAnimatedStyle]}>
