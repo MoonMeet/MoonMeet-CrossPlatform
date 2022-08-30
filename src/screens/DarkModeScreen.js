@@ -57,7 +57,7 @@ const DarkModeSettings = () => {
           }}
         />
         <SpacerHorizontal width={2.5} />
-        <Text style={styles.textStyle}>On</Text>
+        <Text style={styles.textStyle}>Dark</Text>
       </View>
       <View style={styles.radioView}>
         <RadioButton
@@ -72,7 +72,7 @@ const DarkModeSettings = () => {
           }}
         />
         <SpacerHorizontal width={2.5} />
-        <Text style={styles.textStyle}>Off</Text>
+        <Text style={styles.textStyle}>Light</Text>
       </View>
     </MiniBaseView>
   );
