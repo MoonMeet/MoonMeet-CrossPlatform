@@ -8,17 +8,8 @@
         <item name="colorControlHighlight">@color/colorControlHighlight</item>
         <item name="colorControlNormal">@color/colorControlNormal</item>
 
-        <item name="android:navigationBarColor">
-            @android:color/transparent
-        </item>
-
-        <!-- Optional, if your app is drawing behind the status bar also. -->
-        <item name="android:statusBarColor">
-            @android:color/transparent
-        </item>
-
         <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
-        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowDisablePreview">false</item>
     </style>
 
 </resources>
