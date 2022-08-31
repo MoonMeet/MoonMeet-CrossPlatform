@@ -18,6 +18,7 @@ import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
 import {ThemeContext} from '../config/Theme/Context';
 import {PurpleBackground} from '../index.d';
 import {fontValue} from '../config/Dimensions';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const SettingsScreen = () => {
   const [Loading, setLoading] = React.useState(true);
@@ -108,51 +109,53 @@ const SettingsScreen = () => {
   }
   return (
     <MiniBaseView>
-      <View style={styles.under_header}>
-        <Avatar.Image
-          size={85}
-          source={
-            auth()?.currentUser?.photoURL
-              ? {uri: auth()?.currentUser?.photoURL}
-              : avatarURL
-              ? {uri: avatarURL}
-              : PurpleBackground
-          }
+      <ScrollView alwaysBounceVertical nestedScrollEnabled>
+        <View style={styles.under_header}>
+          <Avatar.Image
+            size={85}
+            source={
+              auth()?.currentUser?.photoURL
+                ? {uri: auth()?.currentUser?.photoURL}
+                : avatarURL
+                ? {uri: avatarURL}
+                : PurpleBackground
+            }
+          />
+          <Text
+            adjustsFontSizeToFit
+            numberOfLines={2}
+            style={styles.under_header_text}>
+            {auth()?.currentUser?.displayName
+              ? auth()?.currentUser?.displayName
+              : `${firstName} ${lastName}`}
+          </Text>
+          {userBio ? (
+            <Text
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
+              onPress={() => navigation?.navigate('addBio')}
+              style={styles.bioText(userBio)}>
+              {userBio}
+            </Text>
+          ) : (
+            <Text
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
+              style={styles.bioText(userBio)}
+              onPress={() => navigation?.navigate('addBio')}>
+              Tap to add a bio
+            </Text>
+          )}
+        </View>
+        <ScrollViewData
+          firstName={firstName}
+          lastName={lastName}
+          username={userName}
+          avatar={avatarURL}
+          activeStatus={activeStatus}
+          activeTime={activeTime}
         />
-        <Text
-          adjustsFontSizeToFit
-          numberOfLines={2}
-          style={styles.under_header_text}>
-          {auth()?.currentUser?.displayName
-            ? auth()?.currentUser?.displayName
-            : `${firstName} ${lastName}`}
-        </Text>
-        {userBio ? (
-          <Text
-            adjustsFontSizeToFit={true}
-            numberOfLines={1}
-            onPress={() => navigation?.navigate('addBio')}
-            style={styles.bioText(userBio)}>
-            {userBio}
-          </Text>
-        ) : (
-          <Text
-            adjustsFontSizeToFit={true}
-            numberOfLines={1}
-            style={styles.bioText(userBio)}
-            onPress={() => navigation?.navigate('addBio')}>
-            Tap to add a bio
-          </Text>
-        )}
-      </View>
-      <ScrollViewData
-        firstName={firstName}
-        lastName={lastName}
-        username={userName}
-        avatar={avatarURL}
-        activeStatus={activeStatus}
-        activeTime={activeTime}
-      />
+      </ScrollView>
     </MiniBaseView>
   );
 };
