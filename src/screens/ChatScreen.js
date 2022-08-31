@@ -491,9 +491,22 @@ const ChatScreen = () => {
           if (isSubscribed && playerID !== userPlayerID) {
             const toSendNotification = {
               contents: {
-                en: `New message from ${auth()?.currentUser?.displayName}`,
+                en: `${
+                  auth()?.currentUser?.displayName
+                }: You have a new message from ${userFirstName} ${userLastName}.`,
               },
-              include_player_ids: [userPlayerID],
+              include_player_ids: [playerID],
+              data: {
+                isChat: 'chat',
+                senderName: `${auth()?.currentUser?.displayName}`,
+                senderUID: `${auth()?.currentUser?.uid}`,
+                senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                receiverName: `${userFirstName} ${userLastName}`,
+                receiverUID: `${destinedUser}`,
+                receiverPhoto: `${auth()?.currentUser?.photoURL}`,
+                messageDelivered: `${mMessageText?.trim()}`,
+                messageTime: Date.now(),
+              }, // some values aint't unsed,yet, but they will be used soon.
             };
             const stringifiedJSON = JSON.stringify(toSendNotification);
             OneSignal.postNotification(
@@ -660,7 +673,17 @@ const ChatScreen = () => {
               }
               break;
             case 1:
-              deleteMessage(message?.id);
+              try {
+                deleteMessage(message?.id);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexcpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
               break;
           }
         } else {
@@ -691,7 +714,7 @@ const ChatScreen = () => {
       .collection('messages')
       .doc(destinedUser)
       .collection('discussions');
-    await meMessageRef?.get()?.then(collectionSnapshot => {
+    return await meMessageRef?.get()?.then(collectionSnapshot => {
       collectionSnapshot?.docs?.map(documentSnapshot => {
         if (documentSnapshot?.id === id) {
           documentSnapshot?.ref?.delete();
