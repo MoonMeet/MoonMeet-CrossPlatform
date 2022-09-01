@@ -10,45 +10,54 @@ import OneSignal from 'react-native-onesignal';
 import App from './App';
 import {name as MoonMeet} from './app.json';
 import {ONESIGNAL_APP_ID} from './src/secrets/sensitive';
-// import notifee, {AndroidImportance} from '@notifee/react-native';
-// import {COLORS} from './src/config/Miscellaneous';
+import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
+
+/**
+ * Notifee message channel
+ */
+
+notifee.createChannel({
+  id: 'messages',
+  name: 'Messages',
+  lights: true,
+  vibration: true,
+  importance: AndroidImportance.HIGH,
+});
 
 /**
  *Initialize OneSignal
  */
+
 OneSignal.setAppId(ONESIGNAL_APP_ID);
 OneSignal.setLanguage('en');
 
-/**notifee.createChannel({
-  id: 'messages',
-  name: 'New Messages',
-  lights: true,
-  vibration: true,
-  importance: AndroidImportance.HIGH,
-});*/
-
-if (__DEV__) {
-  OneSignal.setLogLevel(6, 0);
-}
-
 OneSignal.setNotificationWillShowInForegroundHandler(
-  notificationReceivedEvent => {
-    if (__DEV__) {
-      console.log(
-        'OneSignal: notification will show in foreground:',
-        notificationReceivedEvent,
-      );
-    }
-    let notification = notificationReceivedEvent.getNotification();
-    /**notifee.displayNotification({
-        title: 'New Message',
-        body: 'A new message has been arrived.',
+  async notificationReceivedEvent => {
+    let NotificationAdditiionalData =
+      notificationReceivedEvent?.getNotification()?.additionalData;
+    console.log(NotificationAdditiionalData);
+    if (NotificationAdditiionalData?.type === 'chat') {
+      await notifee.displayNotification({
+        title: 'Bilel Aifa',
+        body: `New message from ${NotificationAdditiionalData?.senderName}`,
         android: {
           channelId: 'messages',
-          color: COLORS.accentLight,
+          largeIcon: NotificationAdditiionalData?.senderPhoto,
+          timestamp: NotificationAdditiionalData?.messageTime,
+          showTimestamp: true,
+          smallIcon: 'moon_icon',
+          style: {
+            type: AndroidStyle.BIGTEXT,
+            text: `${NotificationAdditiionalData?.messageDelivered}`,
+          },
         },
-      });*/
-    notificationReceivedEvent.complete(notification);
+      });
+      notificationReceivedEvent.complete(null);
+    } else {
+      notificationReceivedEvent.complete(
+        notificationReceivedEvent?.getNotification(),
+      );
+    }
   },
 );
 
