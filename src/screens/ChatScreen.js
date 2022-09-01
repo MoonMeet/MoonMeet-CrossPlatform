@@ -847,7 +847,7 @@ const ChatScreen = () => {
                     senderPhoto: `${auth()?.currentUser?.photoURL}`,
                     receiverName: `${userFirstName} ${userLastName}`,
                     receiverUID: `${destinedUser}`,
-                    receiverPhoto: `${auth()?.currentUser?.photoURL}`,
+                    receiverPhoto: `${userAvatar}`,
                     messageDelivered: `${mMessageText?.trim()}`,
                     messageTime: Date.now(),
                   }, // some values aint't unsed,yet, but they will be used soon.
