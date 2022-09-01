@@ -832,7 +832,7 @@ const ChatScreen = () => {
           emojiSetter={setEmojiKeyboardOpened}
           sendMessageCallback={() => {
             sendMessage([], '').finally(() => {
-              if (isSubscribed && playerID !== userPlayerID) {
+              if (playerID !== userPlayerID) {
                 const toSendNotification = {
                   contents: {
                     en: `${
@@ -850,7 +850,7 @@ const ChatScreen = () => {
                     receiverPhoto: `${userAvatar}`,
                     messageDelivered: `${mMessageText?.trim()}`,
                     messageTime: Date.now(),
-                  }, // some values aint't unsed,yet, but they will be used soon.
+                  }, // some values ain't unsed, yet, but they will be used soon.
                 };
                 const stringifiedJSON = JSON.stringify(toSendNotification);
                 OneSignal.postNotification(
