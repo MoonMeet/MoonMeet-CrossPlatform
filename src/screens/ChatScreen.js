@@ -495,9 +495,9 @@ const ChatScreen = () => {
                   auth()?.currentUser?.displayName
                 }: You have a new message from ${userFirstName} ${userLastName}.`,
               },
-              include_player_ids: [playerID],
+              include_player_ids: [userPlayerID],
               data: {
-                isChat: 'chat',
+                type: 'chat',
                 senderName: `${auth()?.currentUser?.displayName}`,
                 senderUID: `${auth()?.currentUser?.uid}`,
                 senderPhoto: `${auth()?.currentUser?.photoURL}`,
