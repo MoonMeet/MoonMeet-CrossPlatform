@@ -52,7 +52,11 @@ import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
-import Animated, {FadeInDown} from 'react-native-reanimated';
+import Animated, {
+  FadeInDown,
+  FadeOutDown,
+  Layout,
+} from 'react-native-reanimated';
 import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -278,7 +282,9 @@ const ChatScreen = () => {
       .doc(destinedUser)
       .collection('discussions')
       .onSnapshot(collectionSnapshot => {
-        if (!collectionSnapshot?.empty) {
+        if (collectionSnapshot?.empty) {
+          setChatData([]);
+        } else {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => {
             if (subMap?.data()?.image) {
               return {
@@ -787,7 +793,10 @@ const ChatScreen = () => {
           }}
           renderBubble={props => {
             return (
-              <Animated.View entering={FadeInDown}>
+              <Animated.View
+                layout={Layout.springify()}
+                entering={FadeInDown}
+                exiting={FadeOutDown}>
                 <Bubble
                   {...props}
                   wrapperStyle={{
