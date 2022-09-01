@@ -35,10 +35,9 @@ OneSignal.setNotificationWillShowInForegroundHandler(
   async notificationReceivedEvent => {
     let NotificationAdditiionalData =
       notificationReceivedEvent?.getNotification()?.additionalData;
-    console.log(NotificationAdditiionalData);
     if (NotificationAdditiionalData?.type === 'chat') {
       await notifee.displayNotification({
-        title: 'Bilel Aifa',
+        title: `${NotificationAdditiionalData?.senderName}`,
         body: `New message from ${NotificationAdditiionalData?.senderName}`,
         android: {
           channelId: 'messages',
