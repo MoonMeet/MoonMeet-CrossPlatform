@@ -59,6 +59,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const ChatScreen = () => {
   const navigation = useNavigation();
@@ -311,6 +312,8 @@ const ChatScreen = () => {
                 ...subMap?.data(),
                 id: subMap?.id,
                 text: DecryptAES(subMap?.data()?.text),
+                received: true,
+                sent: true,
                 user: {
                   _id:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
@@ -414,16 +417,125 @@ const ChatScreen = () => {
     );
   };
 
-  const sendMessage = useCallback(async (mChatData = [], image) => {
-    let connectionStatus = await NetInfo?.fetch();
-    if (connectionStatus?.isConnected) {
-      if (!image) {
-        if (mMessageText?.trim()?.length < 1) {
-          // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
+  const sendMessage = useCallback(
+    async (mChatData = [], image) => {
+      let connectionStatus = await NetInfo?.fetch();
+      if (connectionStatus?.isConnected) {
+        if (!image) {
+          if (mMessageText?.trim()?.length < 1) {
+            // simply don't send an empty message to database, 'cause that's how mafia works :sunglasses:
+          } else {
+            try {
+              // Send message to user logic goes here.
+              setMessageText(mMessageText?.trim()); // Message text already trimmed here!
+              firestore()
+                .collection('users')
+                .doc(auth()?.currentUser?.uid)
+                .collection('messages')
+                .doc(destinedUser)
+                .collection('discussions')
+                .add({
+                  _id: _id,
+                  text: EncryptAES(mMessageText),
+                  createdAt: Date.now(),
+                  user: {
+                    _id: auth()?.currentUser?.uid,
+                  },
+                });
+              firestore()
+                .collection('users')
+                .doc(destinedUser)
+                .collection('messages')
+                .doc(auth()?.currentUser?.uid)
+                .collection('discussions')
+                .add({
+                  _id: _id,
+                  createdAt: Date.now(),
+                  text: EncryptAES(mMessageText),
+                  user: {
+                    _id: auth()?.currentUser?.uid,
+                  },
+                });
+              setChatData(previousMessage =>
+                GiftedChat.append(previousMessage, mChatData),
+              );
+              // Chats messages on home screen goes here
+              firestore()
+                .collection('chats')
+                .doc(auth()?.currentUser?.uid)
+                .collection('discussions')
+                .doc(destinedUser)
+                .set({
+                  to_first_name: userFirstName,
+                  to_last_name: userLastName,
+                  to_message_text: EncryptAES(mMessageText),
+                  to_avatar: userAvatar,
+                  time: firestore?.Timestamp?.fromDate(new Date()),
+                  type: 'message',
+                  last_uid: auth()?.currentUser?.uid,
+                  sent_to_uid: destinedUser,
+                });
+              firestore()
+                .collection('chats')
+                .doc(destinedUser)
+                .collection('discussions')
+                .doc(auth()?.currentUser?.uid)
+                .set({
+                  to_first_name: Me?.first_name,
+                  to_last_name: Me?.last_name,
+                  to_message_text: EncryptAES(mMessageText),
+                  to_avatar: Me?.avatar,
+                  time: firestore?.Timestamp?.fromDate(new Date()),
+                  type: 'message',
+                  last_uid: auth()?.currentUser?.uid,
+                });
+            } catch (e) {
+              ErrorToast(
+                'bottom',
+                'Failed to send message',
+                'a problem occured when sending a message',
+                true,
+                1000,
+              );
+            }
+          }
         } else {
-          try {
-            // Send message to user logic goes here.
-            setMessageText(mMessageText?.trim()); // Message text already trimmed here!
+          let pickedImage = `chats/images/${getRandomString(
+            18,
+          )}.${image?.substring(image?.lastIndexOf('.') + 1, 3)}`;
+
+          const storageRef = storage().ref(pickedImage);
+
+          /**
+           * Uploading image to Firebase Storage
+           * @type {FirebaseStorageTypes.Task}
+           */
+
+          const uploadImageTask = storageRef?.putFile(image);
+
+          /**
+           * Add observer to image uploading.
+           */
+
+          uploadImageTask.on('state_changed', taskSnapshot => {
+            InfoToast(
+              'bottom',
+              'Sending Image',
+              `${bytesToSize(
+                taskSnapshot?.bytesTransferred,
+              )} transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
+              true,
+              500,
+            );
+          });
+
+          /**
+           * an async function to get {avatarUrl} and upload all user data.
+           */
+          uploadImageTask.then(async () => {
+            const uploadedImageURL = await storage()
+              .ref(pickedImage)
+              .getDownloadURL();
             firestore()
               .collection('users')
               .doc(auth()?.currentUser?.uid)
@@ -432,7 +544,7 @@ const ChatScreen = () => {
               .collection('discussions')
               .add({
                 _id: _id,
-                text: EncryptAES(mMessageText),
+                image: EncryptAES(uploadedImageURL),
                 createdAt: Date.now(),
                 user: {
                   _id: auth()?.currentUser?.uid,
@@ -447,7 +559,7 @@ const ChatScreen = () => {
               .add({
                 _id: _id,
                 createdAt: Date.now(),
-                text: EncryptAES(mMessageText),
+                image: EncryptAES(uploadedImageURL),
                 user: {
                   _id: auth()?.currentUser?.uid,
                 },
@@ -456,21 +568,27 @@ const ChatScreen = () => {
               GiftedChat.append(previousMessage, mChatData),
             );
             // Chats messages on home screen goes here
-            firestore()
-              .collection('chats')
-              .doc(auth()?.currentUser?.uid)
-              .collection('discussions')
-              .doc(destinedUser)
-              .set({
-                to_first_name: userFirstName,
-                to_last_name: userLastName,
-                to_message_text: EncryptAES(mMessageText),
-                to_avatar: userAvatar,
-                time: firestore?.Timestamp?.fromDate(new Date()),
-                type: 'message',
-                last_uid: auth()?.currentUser?.uid,
-                sent_to_uid: destinedUser,
-              });
+            if (
+              !isEmpty(userFirstName) &&
+              !isEmpty(userLastName) &&
+              isEmpty(userAvatar)
+            ) {
+              firestore()
+                .collection('chats')
+                .doc(auth()?.currentUser?.uid)
+                .collection('discussions')
+                .doc(destinedUser)
+                .set({
+                  to_first_name: userFirstName,
+                  to_last_name: userLastName,
+                  to_message_image: EncryptAES(uploadedImageURL),
+                  to_avatar: userAvatar,
+                  time: firestore?.Timestamp?.fromDate(new Date()),
+                  type: 'image',
+                  last_uid: auth()?.currentUser?.uid,
+                  sent_to_uid: destinedUser,
+                });
+            }
             firestore()
               .collection('chats')
               .doc(destinedUser)
@@ -479,177 +597,36 @@ const ChatScreen = () => {
               .set({
                 to_first_name: Me?.first_name,
                 to_last_name: Me?.last_name,
-                to_message_text: EncryptAES(mMessageText),
-                to_avatar: Me?.avatar,
-                time: firestore?.Timestamp?.fromDate(new Date()),
-                type: 'message',
-                last_uid: auth()?.currentUser?.uid,
-              });
-          } catch (e) {
-            ErrorToast(
-              'bottom',
-              'Failed to send message',
-              'a problem occured when sending a message',
-              true,
-              1000,
-            );
-          }
-          if (isSubscribed && playerID !== userPlayerID) {
-            const toSendNotification = {
-              contents: {
-                en: `${
-                  auth()?.currentUser?.displayName
-                }: You have a new message from ${userFirstName} ${userLastName}.`,
-              },
-              include_player_ids: [userPlayerID],
-              data: {
-                type: 'chat',
-                senderName: `${auth()?.currentUser?.displayName}`,
-                senderUID: `${auth()?.currentUser?.uid}`,
-                senderPhoto: `${auth()?.currentUser?.photoURL}`,
-                receiverName: `${userFirstName} ${userLastName}`,
-                receiverUID: `${destinedUser}`,
-                receiverPhoto: `${auth()?.currentUser?.photoURL}`,
-                messageDelivered: `${mMessageText?.trim()}`,
-                messageTime: Date.now(),
-              }, // some values aint't unsed,yet, but they will be used soon.
-            };
-            const stringifiedJSON = JSON.stringify(toSendNotification);
-            OneSignal.postNotification(
-              stringifiedJSON,
-              success => {
-                if (__DEV__) {
-                  ToastAndroid.show(
-                    'Message notification sent',
-                    ToastAndroid.SHORT,
-                  );
-                  console.log(success);
-                }
-              },
-              error => {
-                if (__DEV__) {
-                  console.error(error);
-                }
-              },
-            );
-          }
-        }
-      } else {
-        let pickedImage = `chats/images/${getRandomString(
-          18,
-        )}.${image?.substring(image?.lastIndexOf('.') + 1, 3)}`;
-
-        const storageRef = storage().ref(pickedImage);
-
-        /**
-         * Uploading image to Firebase Storage
-         * @type {FirebaseStorageTypes.Task}
-         */
-
-        const uploadImageTask = storageRef?.putFile(image);
-
-        /**
-         * Add observer to image uploading.
-         */
-
-        uploadImageTask.on('state_changed', taskSnapshot => {
-          InfoToast(
-            'bottom',
-            'Sending Image',
-            `${bytesToSize(
-              taskSnapshot?.bytesTransferred,
-            )} transferred out of ${bytesToSize(taskSnapshot?.totalBytes)}`,
-            true,
-            500,
-          );
-        });
-
-        /**
-         * an async function to get {avatarUrl} and upload all user data.
-         */
-        uploadImageTask.then(async () => {
-          const uploadedImageURL = await storage()
-            .ref(pickedImage)
-            .getDownloadURL();
-          firestore()
-            .collection('users')
-            .doc(auth()?.currentUser?.uid)
-            .collection('messages')
-            .doc(destinedUser)
-            .collection('discussions')
-            .add({
-              _id: _id,
-              image: EncryptAES(uploadedImageURL),
-              createdAt: Date.now(),
-              user: {
-                _id: auth()?.currentUser?.uid,
-              },
-            });
-          firestore()
-            .collection('users')
-            .doc(destinedUser)
-            .collection('messages')
-            .doc(auth()?.currentUser?.uid)
-            .collection('discussions')
-            .add({
-              _id: _id,
-              createdAt: Date.now(),
-              image: EncryptAES(uploadedImageURL),
-              user: {
-                _id: auth()?.currentUser?.uid,
-              },
-            });
-          setChatData(previousMessage =>
-            GiftedChat.append(previousMessage, mChatData),
-          );
-          // Chats messages on home screen goes here
-          if (
-            !isEmpty(userFirstName) &&
-            !isEmpty(userLastName) &&
-            isEmpty(userAvatar)
-          ) {
-            firestore()
-              .collection('chats')
-              .doc(auth()?.currentUser?.uid)
-              .collection('discussions')
-              .doc(destinedUser)
-              .set({
-                to_first_name: userFirstName,
-                to_last_name: userLastName,
                 to_message_image: EncryptAES(uploadedImageURL),
-                to_avatar: userAvatar,
+                to_avatar: Me?.avatar,
                 time: firestore?.Timestamp?.fromDate(new Date()),
                 type: 'image',
                 last_uid: auth()?.currentUser?.uid,
-                sent_to_uid: destinedUser,
               });
-          }
-          firestore()
-            .collection('chats')
-            .doc(destinedUser)
-            .collection('discussions')
-            .doc(auth()?.currentUser?.uid)
-            .set({
-              to_first_name: Me?.first_name,
-              to_last_name: Me?.last_name,
-              to_message_image: EncryptAES(uploadedImageURL),
-              to_avatar: Me?.avatar,
-              time: firestore?.Timestamp?.fromDate(new Date()),
-              type: 'image',
-              last_uid: auth()?.currentUser?.uid,
-            });
-        });
+          });
+        }
+      } else {
+        ErrorToast(
+          'bottom',
+          'Intternet connection required',
+          'Please enable Wi-Fi or Mobile data to send messages',
+          true,
+          1000,
+        );
       }
-    } else {
-      ErrorToast(
-        'bottom',
-        'Intternet connection required',
-        'Please enable Wi-Fi or Mobile data to send messages',
-        true,
-        1000,
-      );
-    }
-  });
+    },
+    [
+      Me?.avatar,
+      Me?.first_name,
+      Me?.last_name,
+      _id,
+      destinedUser,
+      mMessageText,
+      userAvatar,
+      userFirstName,
+      userLastName,
+    ],
+  );
 
   function onLongPress(context, message) {
     const options =
@@ -763,6 +740,20 @@ const ChatScreen = () => {
           showUserAvatar={false}
           messages={mChatData}
           onLongPress={onLongPress}
+          renderTicks={message => {
+            return (
+              <MaterialCommunityIcons
+                name={message?.received === undefined ? 'check' : 'check-all'}
+                size={16}
+                style={{paddingRight: widthPercentageToDP(1)}}
+                color={
+                  message?.user._id === auth()?.currentUser?.uid
+                    ? COLORS.white
+                    : COLORS.black
+                }
+              />
+            );
+          }}
           renderMessageImage={props => {
             return (
               <MessageImage
@@ -818,7 +809,7 @@ const ChatScreen = () => {
             {
               pattern: /#(\w+)/,
               style: {...linkStyle, color: COLORS.yellowLightWarning},
-              onPress: this.onPressHashtag,
+              onPress: undefined,
             },
           ]}
           onPressAvatar={() => {
@@ -840,7 +831,48 @@ const ChatScreen = () => {
           emojiGetter={emojiKeyboardOpened}
           emojiSetter={setEmojiKeyboardOpened}
           sendMessageCallback={() => {
-            sendMessage([], '').finally(() => setMessageText(''));
+            sendMessage([], '').finally(() => {
+              if (isSubscribed && playerID !== userPlayerID) {
+                const toSendNotification = {
+                  contents: {
+                    en: `${
+                      auth()?.currentUser?.displayName
+                    }: You have a new message from ${userFirstName} ${userLastName}.`,
+                  },
+                  include_player_ids: [userPlayerID],
+                  data: {
+                    type: 'chat',
+                    senderName: `${auth()?.currentUser?.displayName}`,
+                    senderUID: `${auth()?.currentUser?.uid}`,
+                    senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                    receiverName: `${userFirstName} ${userLastName}`,
+                    receiverUID: `${destinedUser}`,
+                    receiverPhoto: `${auth()?.currentUser?.photoURL}`,
+                    messageDelivered: `${mMessageText?.trim()}`,
+                    messageTime: Date.now(),
+                  }, // some values aint't unsed,yet, but they will be used soon.
+                };
+                const stringifiedJSON = JSON.stringify(toSendNotification);
+                OneSignal.postNotification(
+                  stringifiedJSON,
+                  success => {
+                    if (__DEV__) {
+                      ToastAndroid.show(
+                        'Message notification sent',
+                        ToastAndroid.SHORT,
+                      );
+                      console.log(success);
+                    }
+                  },
+                  error => {
+                    if (__DEV__) {
+                      console.error(error);
+                    }
+                  },
+                );
+              }
+              setMessageText('');
+            });
           }}
         />
         {emojiKeyboardOpened ? (
