@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Moon Meet</string>
     <string name="onesignal_notification_accent_color">FF566193</string>
+    <string name="messages_channel_name">Messages</string>
+    <string name="messages_channel_description">Messages Notification Channel</string>
 </resources>
