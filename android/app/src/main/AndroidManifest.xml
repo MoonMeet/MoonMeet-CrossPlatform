@@ -7,7 +7,7 @@
             android:normalScreens="true"
             android:resizeable="true"
             android:smallScreens="true"
-            android:xlargeScreens="true" />
+            android:xlargeScreens="false" />
 
 
     <uses-feature android:name="android.hardware.camera" />
