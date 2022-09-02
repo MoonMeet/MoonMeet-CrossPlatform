@@ -68,3 +68,4 @@ debug.keystore
 
 # Sensitive Information
 src/secrets/sensitive.js
+.vscode/settings.json
