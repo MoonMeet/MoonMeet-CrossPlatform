@@ -24,14 +24,12 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import BackImage from '../assets/images/back.png';
 import firestore from '@react-native-firebase/firestore';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-// import EyeImage from '../assets/images/eye.png';
 import StoryActionSheet from '../components/Modals/StoryScreen/StoryActionSheet';
 // import StoryViewsActionSheet from '../components/Modals/StoryScreen/StoryViewsActionSheet';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -127,7 +125,6 @@ const StoryScreen = () => {
           documentCols => documentCols?.uid === userStoryUID,
         );
         setAllCurrentUserStories(collectionDocs);
-        console.log('rerender');
         setLoading(false);
       });
   }, [userStoryUID]);
@@ -164,7 +161,7 @@ const StoryScreen = () => {
               <MaterialIcons
                 name="arrow-back"
                 size={30 - 0.1 * 30}
-                style={{opacity: 0.6, marginRight: '-1%', marginLeft: '1%'}}
+                style={{opacity: 0.9, marginRight: '-1%', marginLeft: '1%'}}
               />
             </Pressable>
           </View>
@@ -247,7 +244,7 @@ const StoryScreen = () => {
                   <MaterialCommunityIcons
                     name="dots-vertical"
                     size={30 - 0.1 * 30}
-                    style={{opacity: 0.6}}
+                    style={{opacity: 0.9}}
                   />
                 </Pressable>
               </View>
