@@ -429,7 +429,10 @@ const AddStoryScreen = () => {
         <Spacer height={'2%'} />
         <View style={styles.userChoice}>
           <Pressable
-            android_ripple={{color: COLORS.rippleColor, borderless: false}}
+            android_ripple={{
+              color: COLORS.rippleColor,
+              borderless: false,
+            }}
             style={styles.storyChoiceView}
             onPress={() => {
               setHideMainScreen(true);
