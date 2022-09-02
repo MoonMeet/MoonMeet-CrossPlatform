@@ -109,6 +109,13 @@ const HomeChatsScreen = () => {
       });
   }
 
+  /**
+   *
+   * @function
+   * @name deleteCurrentStory
+   * @param {any} sid
+   * @returns {Promise<void>}
+   */
   const deleteCurrentStory = useCallback(async sid => {
     return await firestore().collection('stories')?.doc(sid)?.delete();
   }, []);
