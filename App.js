@@ -23,6 +23,14 @@ import perf from '@react-native-firebase/perf';
 import OneSignal from 'react-native-onesignal';
 import {enableLayoutAnimations} from 'react-native-reanimated';
 
+/**
+ * It enables the firebase tools.
+ *
+ * @async
+ * @function
+ * @kind function
+ * @returns {Promise<void>}
+ */
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(true);
   await analytics()?.setAnalyticsCollectionEnabled(true);
