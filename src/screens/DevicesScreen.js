@@ -6,15 +6,12 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
+import NetInfo from '@react-native-community/netinfo';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {reverse, sortBy} from 'lodash';
 import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {ActivityIndicator} from 'react-native-paper';
-import {COLORS, FONTS} from '../config/Miscellaneous';
-import Spacer from '../components/Spacer/Spacer';
-import {useNavigation} from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import {
   getManufacturer,
   getModel,
@@ -23,14 +20,16 @@ import {
   getSystemVersion,
   getVersion,
 } from 'react-native-device-info';
+import {ActivityIndicator} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
 import DevicesList from '../components/DevicesScreen/DevicesList';
-import {isWeb, isWindows} from '../utils/device/DeviceInfo';
-import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
-import {reverse, sortBy} from 'lodash';
-import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
-import NetInfo from '@react-native-community/netinfo';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import Spacer from '../components/Spacer/Spacer';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
+import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
+import {COLORS, FONTS} from '../config/Miscellaneous';
+import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 const DevicesScreen = () => {
   const [masterData, setMasterData] = React.useState([]);
@@ -90,37 +89,33 @@ const DevicesScreen = () => {
 
   async function resendCurrentDevice() {
     if (!isWindows && !isWeb) {
-      const allDevicesRef = firestore()
+      const allDevicesRef = await firestore()
         .collection('users')
         .doc(auth()?.currentUser?.uid)
-        .collection('devices');
-      await allDevicesRef
-        .get()
-        .then(allDevicesDocs => {
-          Promise.all(
-            allDevicesDocs?.docs?.map(subMap => subMap?.ref?.delete()),
-          ).catch(() => {
-            Promise.reject('cannot delete devices sessions!');
+        .collection('devices')
+        .get();
+      const batchTask = firestore().batch();
+      allDevicesRef?.forEach(documentSnapshot => {
+        batchTask?.delete(documentSnapshot?.ref);
+      });
+      return batchTask?.commit()?.then(async () => {
+        await firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .collection('devices')
+          .add({
+            manufacturer: Manufacturer,
+            system_name: systemName,
+            system_version: systemVersion,
+            product: Product,
+            model: Model,
+            app_version: appVersion,
+            time: firestore?.Timestamp?.fromDate(new Date()),
+          })
+          .catch(error => {
+            console.error(error);
           });
-        })
-        .finally(async () => {
-          await firestore()
-            .collection('users')
-            .doc(auth()?.currentUser?.uid)
-            .collection('devices')
-            .add({
-              manufacturer: Manufacturer,
-              system_name: systemName,
-              system_version: systemVersion,
-              product: Product,
-              model: Model,
-              app_version: appVersion,
-              time: firestore?.Timestamp?.fromDate(new Date()),
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        });
+      });
     }
   }
 
