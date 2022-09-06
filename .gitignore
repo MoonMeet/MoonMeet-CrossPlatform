@@ -65,6 +65,7 @@ debug.keystore
 /ios/Pods/
 *.hprof
 *.lock
+.cxx/
 
 # Sensitive Information
 src/secrets/sensitive.js
