@@ -24,6 +24,8 @@ import {
   MessageImage,
   Bubble,
   MessageText,
+  Time,
+  SystemMessage,
 } from 'react-native-gifted-chat';
 import {Avatar, Divider} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
@@ -44,7 +46,7 @@ import {
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {Image} from 'react-native-compressor';
 import {PurpleBackground} from '../index.d';
-import {filter, isEmpty, reverse, sortBy} from 'lodash';
+import {filter, isEmpty, isEqual, reverse, sortBy} from 'lodash';
 import {EmojiKeyboard} from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
@@ -61,9 +63,62 @@ import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
+  return (
+    <Pressable
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        marginLeft: -10 - 0.1 * -10,
+      }}>
+      <Avatar.Image
+        source={avatar ? {uri: avatar} : PurpleBackground}
+        size={42.5 - 0.1 * 42.5}
+        style={{
+          alignSelf: 'center',
+        }}
+        theme={{
+          colors: {
+            primary: COLORS.rippleColor,
+          },
+        }}
+      />
+      <View style={{flexDirection: 'column', marginLeft: 5 - 0.1 * 5}}>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          style={{
+            fontSize: fontValue(17),
+            fontFamily: FONTS.regular,
+            color: COLORS.black,
+            opacity: 0.9,
+          }}>
+          {`${firstName}${' '}${lastName}`}
+        </Text>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          style={{
+            fontSize: fontValue(15),
+            fontFamily: FONTS.regular,
+            color: COLORS.black,
+            opacity: 0.4,
+          }}>
+          {activeStatus === 'normal'
+            ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                activeTime >
+              86400000
+              ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
+              : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
+            : 'Last seen recently'}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
+
 const ChatScreen = () => {
   const navigation = useNavigation();
-
   const stackRoute = useRoute();
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
@@ -204,13 +259,11 @@ const ChatScreen = () => {
     }
   };
   const [playerID, setPlayerID] = React.useState();
-  const [isSubscribed, setSubscribed] = React.useState();
 
   const getDeviceState = useCallback(async () => {
     try {
       const deviceState = await OneSignal.getDeviceState();
       setPlayerID(deviceState?.userId);
-      setSubscribed(deviceState?.isSubscribed);
     } catch (e) {
       if (__DEV__) {
         console.log(e);
@@ -236,8 +289,6 @@ const ChatScreen = () => {
         />
       ),
     });
-
-    return () => {};
   }, [
     navigation,
     userActiveStatus,
@@ -291,6 +342,8 @@ const ChatScreen = () => {
               return {
                 ...subMap?.data(),
                 id: subMap?.id,
+                seen: subMap?.data()?.seen,
+                sent: subMap?.data()?.sent,
                 image: DecryptAES(subMap?.data()?.image),
                 user: {
                   _id:
@@ -312,8 +365,8 @@ const ChatScreen = () => {
                 ...subMap?.data(),
                 id: subMap?.id,
                 text: DecryptAES(subMap?.data()?.text),
-                received: true,
-                sent: true,
+                seen: subMap?.data()?.seen,
+                sent: subMap?.data()?.sent,
                 user: {
                   _id:
                     subMap?.data()?.user?._id === auth()?.currentUser?.uid
@@ -357,65 +410,77 @@ const ChatScreen = () => {
     userLastName,
   ]);
 
-  const ChatTitle = ({
-    firstName,
-    lastName,
-    avatar,
-    activeTime,
-    activeStatus,
-  }) => {
-    return (
-      <Pressable
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          marginLeft: -10 - 0.1 * -10,
-        }}>
-        <Avatar.Image
-          source={avatar ? {uri: avatar} : PurpleBackground}
-          size={40 - 0.1 * 40}
-          style={{
-            alignSelf: 'center',
-          }}
-          theme={{
-            colors: {
-              primary: COLORS.rippleColor,
-            },
-          }}
-        />
-        <View style={{flexDirection: 'column', marginLeft: 5 - 0.1 * 5}}>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{
-              fontSize: fontValue(17),
-              fontFamily: FONTS.regular,
-              color: COLORS.black,
-              opacity: 0.9,
-            }}>
-            {`${firstName}${' '}${lastName}`}
-          </Text>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{
-              fontSize: fontValue(15),
-              fontFamily: FONTS.regular,
-              color: COLORS.black,
-              opacity: 0.4,
-            }}>
-            {activeStatus === 'normal'
-              ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                  activeTime >
-                86400000
-                ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
-                : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
-              : 'Last seen recently'}
-          </Text>
-        </View>
-      </Pressable>
-    );
-  };
+  const updateUserSeenStatus = useCallback(async () => {
+    const userMessageRef = await firestore()
+      .collection('users')
+      .doc(destinedUser)
+      .collection('messages')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    userMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.seen === false) {
+        batchUpdate?.update(change?.doc?.ref, {
+          seen: true,
+        });
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
+
+  useEffect(() => {
+    updateUserSeenStatus();
+    return () => updateUserSeenStatus();
+  }, [updateUserSeenStatus]);
+
+  const updateMySentStatus = useCallback(async () => {
+    const userMessageRef = await firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('messages')
+      .doc(destinedUser)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    userMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.sent === false) {
+        batchUpdate?.update(change?.doc?.ref, {
+          sent: true,
+        });
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
+
+  useEffect(() => {
+    updateMySentStatus();
+    return () => updateMySentStatus();
+  }, [updateMySentStatus]);
+
+  const updateMyLastChatsRead = useCallback(async () => {
+    const lastChatsMessageRef = await firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    lastChatsMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.sent_to_uid === destinedUser) {
+        if (change?.doc?.data()?.read === false) {
+          batchUpdate?.update(change?.doc?.ref, {
+            read: true,
+          });
+        }
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
+
+  useEffect(() => {
+    updateMyLastChatsRead();
+    return () => updateMyLastChatsRead;
+  }, [updateMyLastChatsRead]);
 
   const sendMessage = useCallback(
     async (mChatData = [], image) => {
@@ -438,6 +503,8 @@ const ChatScreen = () => {
                   _id: _id,
                   text: EncryptAES(mMessageText),
                   createdAt: Date.now(),
+                  sent: false,
+                  seen: false,
                   user: {
                     _id: auth()?.currentUser?.uid,
                   },
@@ -452,6 +519,8 @@ const ChatScreen = () => {
                   _id: _id,
                   createdAt: Date.now(),
                   text: EncryptAES(mMessageText),
+                  sent: false,
+                  seen: false,
                   user: {
                     _id: auth()?.currentUser?.uid,
                   },
@@ -459,7 +528,8 @@ const ChatScreen = () => {
               setChatData(previousMessage =>
                 GiftedChat.append(previousMessage, mChatData),
               );
-              // Chats messages on home screen goes here
+              // HomeScreen recent chats.
+
               firestore()
                 .collection('chats')
                 .doc(auth()?.currentUser?.uid)
@@ -474,6 +544,7 @@ const ChatScreen = () => {
                   type: 'message',
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
+                  read: false,
                 });
               firestore()
                 .collection('chats')
@@ -488,6 +559,7 @@ const ChatScreen = () => {
                   time: firestore?.Timestamp?.fromDate(new Date()),
                   type: 'message',
                   last_uid: auth()?.currentUser?.uid,
+                  read: false,
                 });
             } catch (e) {
               ErrorToast(
@@ -545,6 +617,8 @@ const ChatScreen = () => {
               .add({
                 _id: _id,
                 image: EncryptAES(uploadedImageURL),
+                seen: false,
+                sent: false,
                 createdAt: Date.now(),
                 user: {
                   _id: auth()?.currentUser?.uid,
@@ -560,6 +634,8 @@ const ChatScreen = () => {
                 _id: _id,
                 createdAt: Date.now(),
                 image: EncryptAES(uploadedImageURL),
+                seen: false,
+                sent: false,
                 user: {
                   _id: auth()?.currentUser?.uid,
                 },
@@ -587,6 +663,7 @@ const ChatScreen = () => {
                   type: 'image',
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
+                  read: false,
                 });
             }
             firestore()
@@ -602,13 +679,14 @@ const ChatScreen = () => {
                 time: firestore?.Timestamp?.fromDate(new Date()),
                 type: 'image',
                 last_uid: auth()?.currentUser?.uid,
+                read: false,
               });
           });
         }
       } else {
         ErrorToast(
           'bottom',
-          'Intternet connection required',
+          'Internet connection required',
           'Please enable Wi-Fi or Mobile data to send messages',
           true,
           1000,
@@ -648,7 +726,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexcpected Error Occured',
+                  'Unexpected Error Occured',
                   `${e}`,
                   true,
                   1500,
@@ -661,7 +739,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexcpected Error Occured',
+                  'Unexpected Error Occured',
                   `${e}`,
                   true,
                   1500,
@@ -709,14 +787,16 @@ const ChatScreen = () => {
     });
   }
 
+  const [statusBarColor, setStatusBarColor] = React.useState('light');
+
   return (
     <>
       <StatusBar
         backgroundColor={
-          imageViewVisible ? COLORS.primaryDark : COLORS.primaryLight
+          statusBarColor === 'dark' ? COLORS.primaryDark : COLORS.primaryLight
         }
         animated={true}
-        barStyle={imageViewVisible ? 'light-content' : 'dark-content'}
+        barStyle={statusBarColor === 'dark' ? 'light-content' : 'dark-content'}
       />
       <BaseView>
         <GiftedChat
@@ -741,18 +821,26 @@ const ChatScreen = () => {
           messages={mChatData}
           onLongPress={onLongPress}
           renderTicks={message => {
-            return (
-              <MaterialCommunityIcons
-                name={message?.received === undefined ? 'check' : 'check-all'}
-                size={16}
-                style={{paddingRight: widthPercentageToDP(1)}}
-                color={
-                  message?.user._id === auth()?.currentUser?.uid
-                    ? COLORS.white
-                    : COLORS.black
-                }
-              />
-            );
+            if (message?.user?._id === auth()?.currentUser?.uid) {
+              return (
+                <MaterialCommunityIcons
+                  name={message?.seen ? 'check-all' : 'check'}
+                  size={16}
+                  style={{
+                    paddingRight: widthPercentageToDP(1),
+                  }}
+                  color={COLORS.white}
+                />
+              );
+            }
+          }}
+          lightboxProps={{
+            onOpen: () => {
+              setStatusBarColor('dark');
+            },
+            onClose: () => {
+              setStatusBarColor('light');
+            },
           }}
           renderMessageImage={props => {
             return (
@@ -776,8 +864,18 @@ const ChatScreen = () => {
               <MessageText
                 {...props}
                 textStyle={{
-                  left: {color: COLORS.black},
-                  right: {color: COLORS.white},
+                  left: {
+                    ...props?.textStyle?.left,
+                    color: COLORS.black,
+                    textAlign: 'right',
+                    fontFamily: FONTS.regular,
+                  },
+                  right: {
+                    ...props?.textStyle?.right,
+                    color: COLORS.white,
+                    textAlign: 'left',
+                    fontFamily: FONTS.regular,
+                  },
                 }}
               />
             );
@@ -792,9 +890,11 @@ const ChatScreen = () => {
                   {...props}
                   wrapperStyle={{
                     right: {
+                      ...props?.wrapperStyle?.right,
                       backgroundColor: COLORS.accentLight,
                     },
                     left: {
+                      ...props?.wrapperStyle?.left,
                       backgroundColor: COLORS.chats.leftBubble,
                     },
                   }}
@@ -805,6 +905,50 @@ const ChatScreen = () => {
           minInputToolbarHeight={0}
           renderInputToolbar={_ => undefined}
           renderComposer={_ => undefined}
+          renderSystemMessage={props => {
+            return (
+              <SystemMessage
+                {...props}
+                textStyle={{...props?.textStyle, fontFamily: FONTS.regular}}
+              />
+            );
+          }}
+          renderTime={props => {
+            return (
+              <Time
+                {...props}
+                containerStyle={{
+                  right: {
+                    marginLeft: 10,
+                    marginRight: 10,
+                    marginBottom: 5,
+                    paddingTop: 2.5,
+                  },
+                  left: {
+                    marginLeft: 10,
+                    marginRight: 10,
+                    marginBottom: 5,
+                    paddingTop: 2.5,
+                  },
+                }}
+                timeTextStyle={{
+                  left: {
+                    ...props?.timeTextStyle?.left,
+                    fontSize: 11,
+                    fontFamily: FONTS.regular,
+                  },
+                  right: {
+                    ...props?.timeTextStyle?.right,
+                    fontSize: 11,
+                    fontFamily: FONTS.regular,
+                  },
+                }}
+              />
+            );
+          }}
+          shouldUpdateMessage={(prevProps, nextProps) => {
+            return !isEqual(prevProps, nextProps);
+          }}
           parsePatterns={linkStyle => [
             {
               pattern: /#(\w+)/,
@@ -813,6 +957,7 @@ const ChatScreen = () => {
             },
           ]}
           onPressAvatar={() => {
+            setStatusBarColor('dark');
             setImageViewVisible(true);
           }}
           user={{
@@ -832,45 +977,44 @@ const ChatScreen = () => {
           emojiSetter={setEmojiKeyboardOpened}
           sendMessageCallback={() => {
             sendMessage([], '').finally(() => {
-              if (playerID !== userPlayerID) {
-                const toSendNotification = {
-                  contents: {
-                    en: `${
-                      auth()?.currentUser?.displayName
-                    }: You have a new message from ${userFirstName} ${userLastName}.`,
-                  },
-                  include_player_ids: [userPlayerID],
-                  data: {
-                    type: 'chat',
-                    senderName: `${auth()?.currentUser?.displayName}`,
-                    senderUID: `${auth()?.currentUser?.uid}`,
-                    senderPhoto: `${auth()?.currentUser?.photoURL}`,
-                    receiverName: `${userFirstName} ${userLastName}`,
-                    receiverUID: `${destinedUser}`,
-                    receiverPhoto: `${userAvatar}`,
-                    messageDelivered: `${mMessageText?.trim()}`,
-                    messageTime: Date.now(),
-                  }, // some values ain't unsed, yet, but they will be used soon.
-                };
-                const stringifiedJSON = JSON.stringify(toSendNotification);
-                OneSignal.postNotification(
-                  stringifiedJSON,
-                  success => {
-                    if (__DEV__) {
-                      ToastAndroid.show(
-                        'Message notification sent',
-                        ToastAndroid.SHORT,
-                      );
-                      console.log(success);
-                    }
-                  },
-                  error => {
-                    if (__DEV__) {
-                      console.error(error);
-                    }
-                  },
-                );
-              }
+              updateMyLastChatsRead();
+              const toSendNotification = {
+                contents: {
+                  en: `${
+                    auth()?.currentUser?.displayName
+                  }: You have a new message from ${userFirstName} ${userLastName}.`,
+                },
+                include_player_ids: [userPlayerID],
+                data: {
+                  type: 'chat',
+                  senderName: `${auth()?.currentUser?.displayName}`,
+                  senderUID: `${auth()?.currentUser?.uid}`,
+                  senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                  receiverName: `${userFirstName} ${userLastName}`,
+                  receiverUID: `${destinedUser}`,
+                  receiverPhoto: `${userAvatar}`,
+                  messageDelivered: `${mMessageText?.trim()}`,
+                  messageTime: Date.now(),
+                }, // some values ain't unsed, yet, but they will be used soon.
+              };
+              const stringifiedJSON = JSON.stringify(toSendNotification);
+              OneSignal.postNotification(
+                stringifiedJSON,
+                success => {
+                  if (__DEV__) {
+                    ToastAndroid.show(
+                      'Message notification sent',
+                      ToastAndroid.SHORT,
+                    );
+                    console.log(success);
+                  }
+                },
+                error => {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                },
+              );
               setMessageText('');
             });
           }}
@@ -887,11 +1031,14 @@ const ChatScreen = () => {
         )}
 
         <ImageView
-          images={[{uri: userAvatar}]}
+          images={[userAvatar ? {uri: userAvatar} : PurpleBackground]}
           imageIndex={0}
           visible={imageViewVisible}
           animationType={'slide'}
-          onRequestClose={() => setImageViewVisible(false)}
+          onRequestClose={() => {
+            setStatusBarColor('light');
+            setImageViewVisible(false);
+          }}
           presentationStyle={'fullScreen'}
         />
       </BaseView>
