@@ -181,6 +181,10 @@ const HomeChatsScreen = () => {
         } else {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
+            typing:
+              subMap?.data()?.typing === undefined
+                ? undefined
+                : subMap?.data()?.typing,
             id: subMap?.id,
           }));
           collectionDocs = sortBy(collectionDocs, [
