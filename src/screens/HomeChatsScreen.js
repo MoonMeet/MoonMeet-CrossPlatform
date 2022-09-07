@@ -250,7 +250,7 @@ const HomeChatsScreen = () => {
     };
   }, []);
 
-  if (storyLoading && chatsData) {
+  if (storyLoading && chatsLoading) {
     return (
       <MiniBaseView>
         <View
