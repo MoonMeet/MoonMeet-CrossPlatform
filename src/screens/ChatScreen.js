@@ -46,7 +46,7 @@ import {
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {Image} from 'react-native-compressor';
 import {PurpleBackground} from '../index.d';
-import {filter, isEmpty, isEqual, reverse, sortBy} from 'lodash';
+import {filter, isEmpty, reverse, sortBy} from 'lodash';
 import {EmojiKeyboard} from 'rn-emoji-keyboard';
 import moment from 'moment';
 import ImageView from 'react-native-image-viewing';
@@ -62,6 +62,7 @@ import Animated, {
 import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import TypingIndicator from 'react-native-gifted-chat/lib/TypingIndicator';
 
 const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
   return (
@@ -258,23 +259,6 @@ const ChatScreen = () => {
       }
     }
   };
-  const [playerID, setPlayerID] = React.useState();
-
-  const getDeviceState = useCallback(async () => {
-    try {
-      const deviceState = await OneSignal.getDeviceState();
-      setPlayerID(deviceState?.userId);
-    } catch (e) {
-      if (__DEV__) {
-        console.log(e);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    getDeviceState();
-    return () => getDeviceState();
-  }, [getDeviceState]);
 
   useLayoutEffect(() => {
     navigation?.setOptions({
@@ -325,6 +309,30 @@ const ChatScreen = () => {
     return () => userSubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchUserIsTyping = useCallback(() => {
+    firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .doc(destinedUser)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot?.data()?.typing) {
+          if (Date.now() - documentSnapshot?.data()?.typing?.toDate() < 10000) {
+            setIsTyping(true);
+          }
+        } else {
+          setIsTyping(false);
+        }
+      });
+  }, [destinedUser]);
+
+  useEffect(() => {
+    fetchUserIsTyping();
+    return () => {
+      fetchUserIsTyping();
+    };
+  }, [fetchUserIsTyping]);
 
   useEffect(() => {
     const messagesSubscribe = firestore()
@@ -789,6 +797,8 @@ const ChatScreen = () => {
 
   const [statusBarColor, setStatusBarColor] = React.useState('light');
 
+  const [isTyping, setIsTyping] = React.useState();
+
   return (
     <>
       <StatusBar
@@ -905,6 +915,10 @@ const ChatScreen = () => {
           minInputToolbarHeight={0}
           renderInputToolbar={_ => undefined}
           renderComposer={_ => undefined}
+          isTyping={isTyping}
+          renderFooter={props => {
+            return <TypingIndicator isTyping={isTyping} />;
+          }}
           renderSystemMessage={props => {
             return (
               <SystemMessage
@@ -947,7 +961,7 @@ const ChatScreen = () => {
             );
           }}
           shouldUpdateMessage={(prevProps, nextProps) => {
-            return !isEqual(prevProps, nextProps);
+            return true;
           }}
           parsePatterns={linkStyle => [
             {
@@ -1018,6 +1032,7 @@ const ChatScreen = () => {
               setMessageText('');
             });
           }}
+          userUID={destinedUser}
         />
         {emojiKeyboardOpened ? (
           <EmojiKeyboard
