@@ -238,17 +238,21 @@ const MyInputToolbar = ({
                     lastLength === 0 ||
                     text?.trim()?.length - 15 > lastLength
                   ) {
-                    firestore()
+                    const myTypingRef = firestore()
                       .collection('chats')
                       .doc(userUID)
                       .collection('discussions')
-                      .doc(auth()?.currentUser?.uid)
-                      .set(
-                        {
-                          typing: firestore?.Timestamp?.fromDate(new Date()),
-                        },
-                        {merge: true},
-                      );
+                      .doc(auth()?.currentUser?.uid);
+                    myTypingRef?.onSnapshot(documentSnapshot => {
+                      if (documentSnapshot?.exists) {
+                        documentSnapshot?.ref?.set(
+                          {
+                            typing: firestore?.Timestamp?.fromDate(new Date()),
+                          },
+                          {merge: true},
+                        );
+                      }
+                    });
                   }
                 }
                 setLastLength(text?.length);
