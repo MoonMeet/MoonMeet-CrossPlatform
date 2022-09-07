@@ -31,22 +31,26 @@ const MessagesList = ({ListData}) => {
   };
 
   const messageText = item => {
-    if (item?.type === 'message') {
-      let decryptedMessage = DecryptAES(item?.to_message_text);
-      let messageLength = decryptedMessage?.length;
-      let message =
-        item?.last_uid === auth()?.currentUser?.uid
-          ? `You: ${decryptedMessage}`
-          : `${decryptedMessage}`;
-      let modifiedtext =
-        messageLength < 35 ? message : message?.substring(0, 35) + '...';
-      return modifiedtext;
+    if (item?.typing) {
+      return 'typing...';
     } else {
-      let message =
-        item?.last_uid === auth()?.currentUser?.uid
-          ? 'You sent an image'
-          : 'Sent an image';
-      return message;
+      if (item?.type === 'message') {
+        let decryptedMessage = DecryptAES(item?.to_message_text);
+        let messageLength = decryptedMessage?.length;
+        let message =
+          item?.last_uid === auth()?.currentUser?.uid
+            ? `You: ${decryptedMessage}`
+            : `${decryptedMessage}`;
+        let modifiedtext =
+          messageLength < 35 ? message : message?.substring(0, 35) + '...';
+        return modifiedtext;
+      } else {
+        let message =
+          item?.last_uid === auth()?.currentUser?.uid
+            ? 'You sent an image'
+            : 'Sent an image';
+        return message;
+      }
     }
   };
 
