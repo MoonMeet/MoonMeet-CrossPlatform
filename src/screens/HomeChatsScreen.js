@@ -113,7 +113,7 @@ const HomeChatsScreen = () => {
    *
    * @function
    * @name deleteCurrentStory
-   * @param {any} sid
+   * @param {string} sid
    * @returns {Promise<void>}
    */
   const deleteCurrentStory = useCallback(async sid => {
