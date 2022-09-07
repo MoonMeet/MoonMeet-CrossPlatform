@@ -1,3 +1,5 @@
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import React, {useEffect} from 'react';
 import {Platform, Pressable, StyleSheet, TextInput, View} from 'react-native';
 import Animated, {
@@ -19,6 +21,7 @@ const MyInputToolbar = ({
   sendMessageCallback,
   cameraPressCallback,
   attachPressCallback,
+  userUID,
 }) => {
   const height = useSharedValue(70);
   const maxWidth = useSharedValue('100%');
@@ -57,6 +60,8 @@ const MyInputToolbar = ({
     };
   });
    */
+
+  const [lastLength, setLastLength] = React.useState(0);
 
   useEffect(() => {
     if (messageGetter?.trim()?.length > 0) {
@@ -213,14 +218,40 @@ const MyInputToolbar = ({
                 if (emojiGetter) {
                   emojiSetter(false);
                 } else {
-                  console.log('opened');
-                  // TODO: implement something about dismissing the keyboard
                 }
               }}
               style={styles.input}
               value={messageGetter}
               onChangeText={text => {
                 messageSetter(text);
+                if (text?.trim() === '') {
+                  firestore()
+                    .collection('chats')
+                    .doc(userUID)
+                    .collection('discussions')
+                    .doc(auth()?.currentUser?.uid)
+                    .update({
+                      typing: firestore?.FieldValue?.delete(),
+                    });
+                } else {
+                  if (
+                    lastLength === 0 ||
+                    text?.trim()?.length - 15 > lastLength
+                  ) {
+                    firestore()
+                      .collection('chats')
+                      .doc(userUID)
+                      .collection('discussions')
+                      .doc(auth()?.currentUser?.uid)
+                      .set(
+                        {
+                          typing: firestore?.Timestamp?.fromDate(new Date()),
+                        },
+                        {merge: true},
+                      );
+                  }
+                }
+                setLastLength(text?.length);
               }}
             />
             <Pressable
