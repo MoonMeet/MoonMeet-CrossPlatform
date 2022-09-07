@@ -16,6 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
 import {DecryptAES} from '../../utils/crypto/cryptoTools';
+import {PurpleBackground} from '../../index.d';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -91,9 +92,13 @@ const MessagesList = ({ListData}) => {
             <Avatar.Image
               style={styles.userHaveStory}
               size={52.5}
-              source={{
-                uri: item?.to_avatar ? item?.to_avatar : null,
-              }}
+              source={
+                item?.to_avatar
+                  ? {
+                      uri: item?.to_avatar,
+                    }
+                  : PurpleBackground
+              }
             />
           </View>
           <View
@@ -105,13 +110,13 @@ const MessagesList = ({ListData}) => {
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.heading('left', false)}>
+              style={styles.heading('left', false, item?.read)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.subheading('left', true)}>
+              style={styles.subheading('left', true, item?.read)}>
               {messageText(item)}
             </Text>
           </View>
@@ -140,22 +145,22 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accentLight,
     overflow: 'hidden',
   },
-  heading: align => {
+  heading: (align, isRead) => {
     return {
       fontSize: 16,
       textAlign: align,
       color: COLORS.black,
-      opacity: 0.6,
+      opacity: isRead ? 0.6 : 1,
       fontFamily: FONTS.regular,
     };
   },
-  subheading: (align, isMessage) => {
+  subheading: (align, isMessage, isRead) => {
     return {
       fontSize: isMessage ? fontValue(14) : fontValue(11.5),
       paddingTop: '1%',
       textAlign: align,
       color: COLORS.black,
-      opacity: 0.6,
+      opacity: isRead ? 0.6 : 1,
       fontFamily: FONTS.regular,
     };
   },
