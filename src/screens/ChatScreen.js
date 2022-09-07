@@ -9,8 +9,13 @@
 import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useNavigation, useRoute} from '@react-navigation/native';
 import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import {
+  BackHandler,
   Linking,
   PermissionsAndroid,
   Pressable,
@@ -63,6 +68,7 @@ import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import TypingIndicator from 'react-native-gifted-chat/lib/TypingIndicator';
+import {useAppInactive} from '../hooks/useAppInactive';
 
 const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
   return (
@@ -162,6 +168,49 @@ const ChatScreen = () => {
   const handlePick = emojiObject => {
     setMessageText(mMessageText + emojiObject?.emoji);
   };
+
+  useAppInactive(() => {
+    const myTypingRef = firestore()
+      .collection('chats')
+      .doc(destinedUser)
+      .collection('discussions')
+      .doc(auth()?.currentUser?.uid);
+    myTypingRef?.onSnapshot(documentSnapshot => {
+      if (documentSnapshot?.exists) {
+        if (documentSnapshot?.data()?.typing) {
+          documentSnapshot?.ref?.update({
+            typing: firestore?.FieldValue?.delete(),
+          });
+        }
+      }
+    });
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        const myTypingRef = firestore()
+          .collection('chats')
+          .doc(destinedUser)
+          .collection('discussions')
+          .doc(auth()?.currentUser?.uid);
+        myTypingRef?.onSnapshot(documentSnapshot => {
+          if (documentSnapshot?.exists) {
+            if (documentSnapshot?.data()?.typing) {
+              documentSnapshot?.ref?.update({
+                typing: firestore?.FieldValue?.delete(),
+              });
+            }
+          }
+        });
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [destinedUser]),
+  );
 
   const mAttachPressCallback = async () => {
     try {
