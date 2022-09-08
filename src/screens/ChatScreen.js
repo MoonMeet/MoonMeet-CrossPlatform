@@ -129,6 +129,8 @@ const ChatScreen = () => {
   const stackRoute = useRoute();
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
+  const [statusBarColor, setStatusBarColor] = React.useState('light');
+  const [isTyping, setIsTyping] = React.useState();
   const [imageViewVisible, setImageViewVisible] = React.useState(false);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
@@ -169,47 +171,38 @@ const ChatScreen = () => {
     setMessageText(mMessageText + emojiObject?.emoji);
   };
 
-  useAppInactive(() => {
+  const deleteMyTypingRef = useCallback(async () => {
     const myTypingRef = firestore()
       .collection('chats')
       .doc(destinedUser)
       .collection('discussions')
       .doc(auth()?.currentUser?.uid);
-    myTypingRef?.onSnapshot(documentSnapshot => {
+    return await myTypingRef?.get()?.then(documentSnapshot => {
       if (documentSnapshot?.exists) {
         if (documentSnapshot?.data()?.typing) {
           documentSnapshot?.ref?.update({
-            typing: firestore?.FieldValue?.delete(),
+            typing: firestore.FieldValue.delete(),
           });
         }
       }
     });
+  }, [destinedUser]);
+
+  useAppInactive(() => {
+    deleteMyTypingRef();
   });
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        const myTypingRef = firestore()
-          .collection('chats')
-          .doc(destinedUser)
-          .collection('discussions')
-          .doc(auth()?.currentUser?.uid);
-        myTypingRef?.onSnapshot(documentSnapshot => {
-          if (documentSnapshot?.exists) {
-            if (documentSnapshot?.data()?.typing) {
-              documentSnapshot?.ref?.update({
-                typing: firestore?.FieldValue?.delete(),
-              });
-            }
-          }
-        });
-        return true;
+        deleteMyTypingRef();
+        return false;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [destinedUser]),
+    }, [deleteMyTypingRef]),
   );
 
   const mAttachPressCallback = async () => {
@@ -234,7 +227,9 @@ const ChatScreen = () => {
             const compressingResult = await Image.compress(image?.path, {
               compressionMethod: 'auto',
             });
-            sendMessage([], compressingResult);
+            sendMessage([], compressingResult).finally(() =>
+              updateMyLastChatsRead(),
+            );
           })
           .catch(_ => {});
       } else if (
@@ -282,7 +277,9 @@ const ChatScreen = () => {
             const compressingResult = await Image.compress(image?.path, {
               compressionMethod: 'auto',
             });
-            sendMessage([], compressingResult);
+            sendMessage([], compressingResult).finally(() =>
+              updateMyLastChatsRead(),
+            );
           })
           .catch(_ => {});
       } else if (
@@ -360,20 +357,27 @@ const ChatScreen = () => {
   }, []);
 
   const fetchUserIsTyping = useCallback(() => {
-    firestore()
+    const userTypingRef = firestore()
       .collection('chats')
       .doc(auth()?.currentUser?.uid)
       .collection('discussions')
-      .doc(destinedUser)
-      .onSnapshot(documentSnapshot => {
-        if (documentSnapshot?.data()?.typing) {
-          if (Date.now() - documentSnapshot?.data()?.typing?.toDate() < 10000) {
-            setIsTyping(true);
-          }
+      .doc(destinedUser);
+
+    return userTypingRef?.onSnapshot(documentSnapshot => {
+      if (documentSnapshot?.data()?.typing) {
+        if (
+          firestore.Timestamp.fromDate(new Date())?.toDate() -
+            documentSnapshot?.data()?.typing?.toDate() <
+          10000
+        ) {
+          setIsTyping(true);
         } else {
           setIsTyping(false);
         }
-      });
+      } else {
+        setIsTyping(false);
+      }
+    });
   }, [destinedUser]);
 
   useEffect(() => {
@@ -844,10 +848,6 @@ const ChatScreen = () => {
     });
   }
 
-  const [statusBarColor, setStatusBarColor] = React.useState('light');
-
-  const [isTyping, setIsTyping] = React.useState();
-
   return (
     <>
       <StatusBar
@@ -965,9 +965,6 @@ const ChatScreen = () => {
           renderInputToolbar={_ => undefined}
           renderComposer={_ => undefined}
           isTyping={isTyping}
-          renderFooter={props => {
-            return <TypingIndicator isTyping={isTyping} />;
-          }}
           renderSystemMessage={props => {
             return (
               <SystemMessage
@@ -1009,7 +1006,7 @@ const ChatScreen = () => {
               />
             );
           }}
-          shouldUpdateMessage={(prevProps, nextProps) => {
+          shouldUpdateMessage={() => {
             return true;
           }}
           parsePatterns={linkStyle => [
