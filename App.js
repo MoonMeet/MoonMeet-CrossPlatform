@@ -32,9 +32,9 @@ import {enableLayoutAnimations} from 'react-native-reanimated';
  * @returns {Promise<void>}
  */
 async function enableFirebaseTools() {
-  await crashlytics()?.setCrashlyticsCollectionEnabled(true);
-  await analytics()?.setAnalyticsCollectionEnabled(true);
-  await perf()?.setPerformanceCollectionEnabled(true);
+  await crashlytics()?.setCrashlyticsCollectionEnabled(__DEV__ === false);
+  await analytics()?.setAnalyticsCollectionEnabled(__DEV__ === false);
+  await perf()?.setPerformanceCollectionEnabled(__DEV__ === false);
 }
 
 /**
