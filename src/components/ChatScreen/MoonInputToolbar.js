@@ -224,35 +224,31 @@ const MyInputToolbar = ({
               value={messageGetter}
               onChangeText={text => {
                 messageSetter(text);
-                if (text?.trim() === '') {
+                if (text?.trim()?.length === 0) {
                   firestore()
                     .collection('chats')
                     .doc(userUID)
                     .collection('discussions')
                     .doc(auth()?.currentUser?.uid)
                     .update({
-                      typing: firestore?.FieldValue?.delete(),
+                      typing: firestore.FieldValue.delete(),
                     });
                 } else {
                   if (
                     lastLength === 0 ||
-                    text?.trim()?.length - 15 > lastLength
+                    text?.trim()?.length - lastLength > lastLength
                   ) {
-                    const myTypingRef = firestore()
+                    firestore()
                       .collection('chats')
                       .doc(userUID)
                       .collection('discussions')
-                      .doc(auth()?.currentUser?.uid);
-                    myTypingRef?.onSnapshot(documentSnapshot => {
-                      if (documentSnapshot?.exists) {
-                        documentSnapshot?.ref?.set(
-                          {
-                            typing: firestore?.Timestamp?.fromDate(new Date()),
-                          },
-                          {merge: true},
-                        );
-                      }
-                    });
+                      .doc(auth()?.currentUser?.uid)
+                      .set(
+                        {
+                          typing: firestore?.Timestamp?.fromDate(new Date()),
+                        },
+                        {merge: true},
+                      );
                   }
                 }
                 setLastLength(text?.length);
