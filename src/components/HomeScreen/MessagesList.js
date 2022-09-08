@@ -110,7 +110,7 @@ const MessagesList = ({ListData}) => {
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.heading('left', false, item?.read)}>
+              style={styles.heading('left', item?.read)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text
@@ -129,7 +129,7 @@ const MessagesList = ({ListData}) => {
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.subheading('right', false)}>
+              style={styles.subheading('right', false, item?.read)}>
               {moment(item.time?.toDate())?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
