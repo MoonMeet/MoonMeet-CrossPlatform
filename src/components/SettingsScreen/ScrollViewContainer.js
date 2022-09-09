@@ -28,7 +28,11 @@ import FAQIcon from '../../assets/images/quiz.png';
 import ReportIcon from '../../assets/images/bug.png';
 
 import {COLORS} from '../../config/Miscellaneous';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 import PrivacyPolicy from '../Modals/PrivacyPolicy/PrivacyPolicy';
@@ -56,30 +60,30 @@ interface ScrollViewContainerInterface {
   activeTime?: any;
 }
 
-const DevicesScreen = Platform.select({
-  ios: () => (
-    <DataItem
-      leftIcon={DevicesIcon}
-      leftIconColor={COLORS.amazingPurple}
-      titleTextContainer={'Devices'}
-      onPressTrigger={() => useNavigation()?.navigate('devices')}
-    />
-  ),
-  android: () => (
-    <DataItem
-      leftIcon={DevicesIcon}
-      leftIconColor={COLORS.amazingPurple}
-      titleTextContainer={'Devices'}
-      onPressTrigger={() => useNavigation()?.navigate('devices')}
-    />
-  ),
-  default: () => undefined,
-});
-
 const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const privacyRef = useRef(null);
   const faqRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['80%', '100%'], []);
+
+  const DevicesScreen = Platform.select({
+    ios: () => (
+      <DataItem
+        leftIcon={DevicesIcon}
+        leftIconColor={COLORS.amazingPurple}
+        titleTextContainer={'Devices'}
+        onPressTrigger={() => navigation?.navigate('devices')}
+      />
+    ),
+    android: () => (
+      <DataItem
+        leftIcon={DevicesIcon}
+        leftIconColor={COLORS.amazingPurple}
+        titleTextContainer={'Devices'}
+        onPressTrigger={() => navigation?.navigate('devices')}
+      />
+    ),
+    default: () => undefined,
+  });
 
   const handlePresentPrivacyModal = useCallback(() => {
     faqRef?.current?.forceClose();
@@ -159,6 +163,16 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
                   auth()
                     ?.signOut()
                     .then(() => {
+                      navigation.dispatch(
+                        CommonActions.reset({
+                          index: 3,
+                          routes: [
+                            {name: 'login'},
+                            {name: 'setup'},
+                            {name: 'home'},
+                          ],
+                        }),
+                      );
                       navigation?.navigate('login');
                     });
                 } catch (e) {
