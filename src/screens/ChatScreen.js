@@ -945,27 +945,18 @@ const ChatScreen = () => {
     return () => updateUserMessageSentStatus();
   }, [updateUserMessageSentStatus]);
 
-  useLayoutEffect(() => {
-    navigation?.setOptions({
-      headerTitle: props => (
-        <ChatTitle
-          {...props}
-          firstName={userFirstName}
-          lastName={userLastName}
-          avatar={userAvatar}
-          activeStatus={userActiveStatus}
-          activeTime={userActiveTime}
-        />
-      ),
-    });
-  }, [
-    navigation,
-    userActiveStatus,
-    userActiveTime,
-    userAvatar,
-    userFirstName,
-    userLastName,
-  ]);
+  useNavigation()?.setOptions({
+    headerTitle: props => (
+      <ChatTitle
+        {...props}
+        firstName={userFirstName}
+        lastName={userLastName}
+        avatar={userAvatar}
+        activeStatus={userActiveStatus}
+        activeTime={userActiveTime}
+      />
+    ),
+  });
 
   return (
     <>
