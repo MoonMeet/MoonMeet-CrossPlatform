@@ -84,7 +84,9 @@ const TermsConditions = ({sheetRef, snapPoints, index}) => {
             other intellectual property rights related to it, still belong to
             Rayen sbai.
           </Text>
-          <Text style={styles.lastUpdate}>last updated: September 2, 2022</Text>
+          <Text style={styles.lastUpdate}>
+            last updated: September 10, 2022
+          </Text>
           <Text style={styles.subText}>
             The owner is committed to ensuring that the app is as useful and
             efficient as possible. For that reason, we reserve the right to make
