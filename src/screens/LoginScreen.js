@@ -37,14 +37,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import TermsConditions from '../components/Modals/TermsConditions/TermsConditions';
 
-import {
-  getManufacturer,
-  getModel,
-  getProduct,
-  getSystemName,
-  getSystemVersion,
-  getVersion,
-} from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
 
 import ArrowForward from '../assets/images/arrow-forward.png';
 import DotsImage from '../assets/images/dots.png';
@@ -284,17 +277,6 @@ const LoginScreen = () => {
     handlePresentCountriesModal();
   };
 
-  /**
-   * Used for getting Device Information, useful for DeviceScreen.js
-   */
-
-  const [systemName] = React.useState(getSystemName());
-  const [systemVersion] = React.useState(getSystemVersion());
-  const [Manufacturer] = React.useState(getManufacturer());
-  const [Product] = React.useState(getProduct());
-  const [Model] = React.useState(getModel());
-  const [appVersion] = React.useState(getVersion());
-
   async function addCodeObserver(text) {
     if (text?.length > 5) {
       try {
@@ -418,17 +400,28 @@ const LoginScreen = () => {
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
                 .get()
-                .then(documentSnapshot => {
+                .then(async documentSnapshot => {
                   if (documentSnapshot?.exists) {
                     if (documentSnapshot?.data()?.uid) {
                       JwtKeyMMKV.set(
                         'currentUserJwtKey',
                         documentSnapshot?.data()?.jwtKey,
                       );
+
                       /**
-                       * pushing device information for later use in DeviceScreen.js
+                       * Used for getting Device Information.
                        */
-                      firestore()
+
+                      let Manufacturer = await DeviceInfo?.getManufacturer();
+                      let Product = await DeviceInfo?.getProduct();
+                      let systemName = DeviceInfo.getSystemName();
+                      let systemVersion = DeviceInfo.getSystemVersion();
+                      let Model = DeviceInfo.getModel();
+                      let appVersion = DeviceInfo.getVersion();
+                      /**
+                       * Pushing device information.
+                       */
+                      await firestore()
                         .collection('users')
                         .doc(auth()?.currentUser?.uid)
                         .collection('devices')
@@ -440,13 +433,6 @@ const LoginScreen = () => {
                           model: Model,
                           app_version: appVersion,
                           time: firestore?.Timestamp?.fromDate(new Date()),
-                        })
-                        .catch(error => {
-                          if (__DEV__) {
-                            console.log('failed pushing device data');
-                            console.error(error);
-                          }
-                          setLoaderVisible(false);
                         });
 
                       /**
