@@ -33,24 +33,38 @@ OneSignal.setLanguage('en');
 
 OneSignal.setNotificationWillShowInForegroundHandler(
   async notificationReceivedEvent => {
-    let NotificationAdditiionalData =
+    let NotificationAdditionalData =
       notificationReceivedEvent?.getNotification()?.additionalData;
-    if (NotificationAdditiionalData?.type === 'chat') {
-      await notifee.displayNotification({
-        title: `${NotificationAdditiionalData?.senderName}`,
-        body: `New message from ${NotificationAdditiionalData?.senderName}`,
-        android: {
-          channelId: 'messages',
-          largeIcon: NotificationAdditiionalData?.senderPhoto,
-          timestamp: NotificationAdditiionalData?.messageTime,
-          showTimestamp: true,
-          smallIcon: 'moon_icon',
-          style: {
-            type: AndroidStyle.BIGTEXT,
-            text: `${NotificationAdditiionalData?.messageDelivered}`,
+    if (NotificationAdditionalData?.type === 'chat') {
+      if (NotificationAdditionalData?.messageDelivered) {
+        await notifee.displayNotification({
+          title: `${NotificationAdditionalData?.senderName}`,
+          body: `New message from ${NotificationAdditionalData?.senderName}`,
+          android: {
+            channelId: 'messages',
+            largeIcon: NotificationAdditionalData?.senderPhoto,
+            timestamp: NotificationAdditionalData?.messageTime,
+            showTimestamp: true,
+            smallIcon: 'moon_icon',
+            style: {
+              type: AndroidStyle.BIGTEXT,
+              text: `${NotificationAdditionalData?.messageDelivered}`,
+            },
           },
-        },
-      });
+        });
+      } else if (NotificationAdditionalData?.imageDelivered) {
+        await notifee.displayNotification({
+          title: `${NotificationAdditionalData?.senderName}`,
+          body: `${NotificationAdditionalData?.imageDelivered}`,
+          android: {
+            channelId: 'messages',
+            largeIcon: NotificationAdditionalData?.senderPhoto,
+            timestamp: NotificationAdditionalData?.messageTime,
+            showTimestamp: true,
+            smallIcon: 'moon_icon',
+          },
+        });
+      }
       notificationReceivedEvent.complete(null);
     } else {
       notificationReceivedEvent.complete(
