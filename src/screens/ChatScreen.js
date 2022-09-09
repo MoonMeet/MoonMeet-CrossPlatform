@@ -169,7 +169,6 @@ const ChatScreen = () => {
    * but not marked as sent.
    */
   const updateUserMessageSentStatus = useCallback(async () => {
-    // OK
     const userMessageRef = await firestore()
       .collection('users')
       .doc(destinedUser)
@@ -193,7 +192,6 @@ const ChatScreen = () => {
    * but not marked as sent.
    */
   const updateMySentStatus = useCallback(async () => {
-    //OK
     const userMessageRef = await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -217,7 +215,6 @@ const ChatScreen = () => {
    * And we will need to mark messages as seen by `Me`
    */
   const updateSeenForHisMessages = useCallback(async () => {
-    // OK
     const mySeenMessageRef = await firestore()
       .collection('users')
       .doc(destinedUser)
