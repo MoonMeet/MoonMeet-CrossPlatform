@@ -7,7 +7,7 @@
  */
 
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Linking, Platform, BackHandler} from 'react-native';
+import {Platform, BackHandler} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -43,9 +43,9 @@ import {
 import {Button, Dialog, Paragraph, Portal, useTheme} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
-import {fontValue} from '../../config/Dimensions';
-import {ScrollView} from 'react-native-gesture-handler';
+import {fontValue, widthPercentageToDP} from '../../config/Dimensions';
 import notifee from '@notifee/react-native';
+import SpacerHorizontal from '../Spacer/SpacerHorizontal';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -55,6 +55,26 @@ interface ScrollViewContainerInterface {
   activeStatus?: string | undefined;
   activeTime?: any;
 }
+
+const DevicesScreen = Platform.select({
+  ios: () => (
+    <DataItem
+      leftIcon={DevicesIcon}
+      leftIconColor={COLORS.amazingPurple}
+      titleTextContainer={'Devices'}
+      onPressTrigger={() => useNavigation()?.navigate('devices')}
+    />
+  ),
+  android: () => (
+    <DataItem
+      leftIcon={DevicesIcon}
+      leftIconColor={COLORS.amazingPurple}
+      titleTextContainer={'Devices'}
+      onPressTrigger={() => useNavigation()?.navigate('devices')}
+    />
+  ),
+  default: () => undefined,
+});
 
 const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
   const privacyRef = useRef(null);
@@ -92,33 +112,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
     }, [navigation]),
   );
 
-  const DevicesScreen = Platform.select({
-    ios: () => (
-      <DataItem
-        leftIcon={DevicesIcon}
-        leftIconColor={COLORS.amazingPurple}
-        titleTextContainer={'Devices'}
-        onPressTrigger={() => navigation?.navigate('devices')}
-      />
-    ),
-    android: () => (
-      <DataItem
-        leftIcon={DevicesIcon}
-        leftIconColor={COLORS.amazingPurple}
-        titleTextContainer={'Devices'}
-        onPressTrigger={() => navigation?.navigate('devices')}
-      />
-    ),
-    default: () => undefined,
-  });
-
   const [LogoutDialogVisivle, setLogoutDialogVisible] = React.useState(false);
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      nestedScrollEnabled={true}
-      alwaysBounceVertical={true}>
+    <>
       <Portal>
         <Dialog
           dismissable={true}
@@ -142,17 +139,26 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
               Are you sure you want to log out ?
             </Paragraph>
           </Dialog.Content>
-          <Dialog.Actions style={{flexDirection: 'column'}}>
+          <Dialog.Actions>
             <Button
               uppercase={false}
-              mode={'contained'}
-              color={COLORS.redLightError}
-              style={{margin: '0.5%', width: '100%'}}
+              style={{margin: '0.5%'}}
+              mode={'outlined'}
+              color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
+              onPress={() => setLogoutDialogVisible(false)}>
+              Flip a coin
+            </Button>
+            <SpacerHorizontal width={widthPercentageToDP(0.5)} />
+            <Button
+              uppercase={false}
+              mode={'outlined'}
+              color={isThemeDark ? COLORS.redDarkError : COLORS.redLightError}
+              style={{margin: '0.5%'}}
               onPress={() => {
                 try {
                   auth()
                     ?.signOut()
-                    .finally(() => {
+                    .then(() => {
                       navigation?.navigate('login');
                     });
                 } catch (e) {
@@ -163,14 +169,6 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
                 setLogoutDialogVisible(false);
               }}>
               Log out
-            </Button>
-            <Button
-              uppercase={false}
-              style={{margin: '0.5%', width: '100%'}}
-              mode={'outlined'}
-              color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
-              onPress={() => setLogoutDialogVisible(false)}>
-              Flip a coin
             </Button>
           </Dialog.Actions>
         </Dialog>
@@ -357,7 +355,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         index={0}
         snapPoints={sheetSnapPoints}
       />
-    </ScrollView>
+    </>
   );
 };
 

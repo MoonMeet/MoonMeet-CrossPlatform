@@ -24,6 +24,8 @@ import {
   MessageImage,
   Bubble,
   MessageText,
+  Time,
+  SystemMessage,
 } from 'react-native-gifted-chat';
 import {Avatar, Divider} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
@@ -60,13 +62,71 @@ import Animated, {
 import OneSignal from 'react-native-onesignal';
 import Clipboard from '@react-native-clipboard/clipboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useAppInactive} from '../hooks/useAppInactive';
+import {useBackHandler} from '@react-native-community/hooks';
+
+const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
+  return (
+    <Pressable
+      style={{
+        flex: 1,
+        flexDirection: 'row',
+        marginLeft: -10 - 0.1 * -10,
+      }}>
+      <Avatar.Image
+        source={avatar ? {uri: avatar} : PurpleBackground}
+        size={42.5 - 0.1 * 42.5}
+        style={{
+          alignSelf: 'center',
+        }}
+        theme={{
+          colors: {
+            primary: COLORS.rippleColor,
+          },
+        }}
+      />
+      <View style={{flexDirection: 'column', marginLeft: 5 - 0.1 * 5}}>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          style={{
+            fontSize: fontValue(17),
+            fontFamily: FONTS.regular,
+            color: COLORS.black,
+            opacity: 0.9,
+          }}>
+          {`${firstName}${' '}${lastName}`}
+        </Text>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          style={{
+            fontSize: fontValue(15),
+            fontFamily: FONTS.regular,
+            color: COLORS.black,
+            opacity: 0.4,
+          }}>
+          {activeStatus === 'normal'
+            ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                activeTime >
+              86400000
+              ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
+              : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
+            : 'Last seen recently'}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
 
 const ChatScreen = () => {
+  /* V A R I A B L E S */
   const navigation = useNavigation();
-
   const stackRoute = useRoute();
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
+  const [statusBarColor, setStatusBarColor] = React.useState('light');
+  const [isTyping, setIsTyping] = React.useState();
   const [imageViewVisible, setImageViewVisible] = React.useState(false);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
@@ -103,319 +163,230 @@ const ChatScreen = () => {
 
   const [emojiKeyboardOpened, setEmojiKeyboardOpened] = React.useState(false);
 
-  const handlePick = emojiObject => {
-    setMessageText(mMessageText + emojiObject?.emoji);
-  };
+  /* F U N C T I O N S */
 
-  const mAttachPressCallback = async () => {
-    try {
-      const requestResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        {
-          title: 'Storage Permission',
-          message:
-            'Moon Meet requires this permission to access your phone storage',
-          buttonNegative: 'Deny',
-          buttonPositive: 'Grant',
-        },
-      );
-      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
-        ImagePicker.openPicker({
-          height: 1024,
-          width: 1024,
-          cropper: false,
-        })
-          .then(async image => {
-            const compressingResult = await Image.compress(image?.path, {
-              compressionMethod: 'auto',
-            });
-            sendMessage([], compressingResult);
-          })
-          .catch(_ => {});
-      } else if (
-        requestResult === PermissionsAndroid.RESULTS.DENY ||
-        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-      ) {
-        try {
-          Linking?.openSettings();
-          ToastAndroid.show(
-            'Please grant storage permission manually',
-            ToastAndroid.SHORT,
-          );
-        } catch (error) {
-          if (__DEV__) {
-            console.error(error);
-          }
-        }
-      }
-    } catch (err) {
-      // Maybe something weird or the app running on iOS.
-      if (__DEV__) {
-        console.warn(err);
-      }
-    }
-  };
-
-  const mCameraPressCallback = async () => {
-    try {
-      const requestResult = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        {
-          title: 'Camera Permission',
-          message: 'Moon Meet requires this permission to access your camera',
-          buttonNegative: 'Deny',
-          buttonPositive: 'Grant',
-        },
-      );
-      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
-        ImagePicker.openCamera({
-          height: 1024,
-          width: 1024,
-          cropper: false,
-        })
-          .then(async image => {
-            const compressingResult = await Image.compress(image?.path, {
-              compressionMethod: 'auto',
-            });
-            sendMessage([], compressingResult);
-          })
-          .catch(_ => {});
-      } else if (
-        requestResult === PermissionsAndroid.RESULTS.DENY ||
-        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
-      ) {
-        try {
-          Linking?.openSettings();
-          ToastAndroid.show(
-            'Please grant camera permission manually',
-            ToastAndroid.SHORT,
-          );
-        } catch (error) {
-          if (__DEV__) {
-            console.error(error);
-          }
-        }
-      }
-    } catch (err) {
-      // Maybe something weird or the app running on iOS.
-      if (__DEV__) {
-        console.warn(err);
-      }
-    }
-  };
-  const [playerID, setPlayerID] = React.useState();
-  const [isSubscribed, setSubscribed] = React.useState();
-
-  const getDeviceState = useCallback(async () => {
-    try {
-      const deviceState = await OneSignal.getDeviceState();
-      setPlayerID(deviceState?.userId);
-      setSubscribed(deviceState?.isSubscribed);
-    } catch (e) {
-      if (__DEV__) {
-        console.log(e);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    getDeviceState();
-    return () => getDeviceState();
-  }, [getDeviceState]);
-
-  useLayoutEffect(() => {
-    navigation?.setOptions({
-      headerTitle: props => (
-        <ChatTitle
-          {...props}
-          firstName={userFirstName}
-          lastName={userLastName}
-          avatar={userAvatar}
-          activeStatus={userActiveStatus}
-          activeTime={userActiveTime}
-        />
-      ),
-    });
-
-    return () => {};
-  }, [
-    navigation,
-    userActiveStatus,
-    userActiveTime,
-    userAvatar,
-    userFirstName,
-    userLastName,
-  ]);
-
-  useEffect(() => {
-    const userSubscribe = firestore()
+  /**
+   * Called when new message from `destinedUser` in the database are avaialable
+   * but not marked as sent.
+   */
+  const updateUserMessageSentStatus = useCallback(async () => {
+    // OK
+    const userMessageRef = await firestore()
       .collection('users')
       .doc(destinedUser)
-      .onSnapshot(userSnapshot => {
-        if (userSnapshot?.exists) {
-          if (
-            userSnapshot?.data()?.avatar &&
-            userSnapshot?.data().first_name &&
-            userSnapshot?.data()?.last_name
-          ) {
-            setUserFirstName(userSnapshot?.data()?.first_name);
-            setUserLastName(userSnapshot?.data()?.last_name);
-            setUserAvatar(userSnapshot?.data()?.avatar);
-            setUserActiveStatus(userSnapshot?.data()?.active_status);
-            setUserPlayerID(userSnapshot?.data()?.OneSignalID);
-            if (userSnapshot?.data()?.active_time === 'Last seen recently') {
-              setUserActiveTime(userSnapshot?.data()?.active_time);
-            } else {
-              setUserActiveTime(userSnapshot?.data()?.active_time?.toDate());
-            }
-          }
-        }
-      });
-    return () => userSubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      .collection('messages')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    userMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.sent === false) {
+        batchUpdate?.update(change?.doc?.ref, {
+          sent: true,
+        });
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
 
-  useEffect(() => {
-    const messagesSubscribe = firestore()
+  /**
+   * Called when new message from `Me` in the database are avaialable
+   * but not marked as sent.
+   */
+  const updateMySentStatus = useCallback(async () => {
+    //OK
+    const userMessageRef = await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .collection('messages')
       .doc(destinedUser)
       .collection('discussions')
-      .onSnapshot(collectionSnapshot => {
-        if (collectionSnapshot?.empty) {
-          setChatData([]);
-        } else {
-          let collectionDocs = collectionSnapshot?.docs?.map(subMap => {
-            if (subMap?.data()?.image) {
-              return {
-                ...subMap?.data(),
-                id: subMap?.id,
-                image: DecryptAES(subMap?.data()?.image),
-                user: {
-                  _id:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.uid
-                      : destinedUser,
-                  name:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.displayName
-                      : userFirstName + ' ' + userLastName,
-                  avatar:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.photoURL
-                      : userAvatar,
-                },
-              };
-            } else {
-              return {
-                ...subMap?.data(),
-                id: subMap?.id,
-                text: DecryptAES(subMap?.data()?.text),
-                received: true,
-                sent: true,
-                user: {
-                  _id:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.uid
-                      : destinedUser,
-                  name:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.displayName
-                      : userFirstName + ' ' + userLastName,
-                  avatar:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.photoURL
-                      : userAvatar,
-                },
-              };
-            }
-          });
-          filter(collectionDocs, [
-            (docs, index) => {
-              if (docs?.image) {
-                collectionDocs[index].text = '';
-              }
-            },
-          ]);
-          collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
-          collectionDocs = reverse(collectionDocs);
-          setChatData(collectionDocs);
-        }
-        setLoading(false);
-      });
-    return () => {
-      messagesSubscribe();
-    };
-  }, [
-    Me?.avatar,
-    Me?.first_name,
-    Me?.last_name,
-    destinedUser,
-    userAvatar,
-    userFirstName,
-    userLastName,
-  ]);
+      .get();
+    const batchUpdate = firestore().batch();
+    userMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.sent === false) {
+        batchUpdate?.update(change?.doc?.ref, {
+          sent: true,
+        });
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
 
-  const ChatTitle = ({
-    firstName,
-    lastName,
-    avatar,
-    activeTime,
-    activeStatus,
-  }) => {
-    return (
-      <Pressable
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          marginLeft: -10 - 0.1 * -10,
-        }}>
-        <Avatar.Image
-          source={avatar ? {uri: avatar} : PurpleBackground}
-          size={40 - 0.1 * 40}
-          style={{
-            alignSelf: 'center',
-          }}
-          theme={{
-            colors: {
-              primary: COLORS.rippleColor,
-            },
-          }}
-        />
-        <View style={{flexDirection: 'column', marginLeft: 5 - 0.1 * 5}}>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{
-              fontSize: fontValue(17),
-              fontFamily: FONTS.regular,
-              color: COLORS.black,
-              opacity: 0.9,
-            }}>
-            {`${firstName}${' '}${lastName}`}
-          </Text>
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            style={{
-              fontSize: fontValue(15),
-              fontFamily: FONTS.regular,
-              color: COLORS.black,
-              opacity: 0.4,
-            }}>
-            {activeStatus === 'normal'
-              ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                  activeTime >
-                86400000
-                ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
-                : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
-              : 'Last seen recently'}
-          </Text>
-        </View>
-      </Pressable>
+  /**
+   * Called when `Me` enter `destinedUser` conversation
+   * And we will need to mark messages as seen by `Me`
+   */
+  const updateSeenForHisMessages = useCallback(async () => {
+    // OK
+    const mySeenMessageRef = await firestore()
+      .collection('users')
+      .doc(destinedUser)
+      .collection('messages')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    mySeenMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.data()?.seen === false) {
+        batchUpdate?.update(change?.doc?.ref, {
+          seen: true,
+        });
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
+
+  /**
+   * If you are in a conversation, we must mark it as it have readed.
+   */
+  const updateMyLastChatsRead = useCallback(async () => {
+    const lastChatsMessageRef = await firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const batchUpdate = firestore().batch();
+    lastChatsMessageRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.id === destinedUser) {
+        if (change?.doc?.data()?.read === false) {
+          batchUpdate?.update(change?.doc?.ref, {
+            read: true,
+          });
+        }
+      }
+    });
+    return batchUpdate?.commit();
+  }, [destinedUser]);
+
+  /**
+   * Delete `typing` status from database.
+   */
+  const deleteMyTypingRef = useCallback(async () => {
+    const fieldDelete = firestore.FieldValue.delete();
+    const myTypingRef = firestore()
+      .collection('chats')
+      .doc(destinedUser)
+      .collection('discussions')
+      .doc(auth()?.currentUser?.uid);
+    return await myTypingRef?.get()?.then(documentSnapshot => {
+      if (documentSnapshot?.exists) {
+        if (documentSnapshot?.data()?.typing) {
+          documentSnapshot?.ref?.update({
+            typing: fieldDelete,
+          });
+        }
+      }
+    });
+  }, [destinedUser]);
+  /**
+   * Fetch `typing` status from database..
+   */
+  const fetchUserIsTyping = useCallback(async () => {
+    const userTypingRef = await firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    userTypingRef?.docChanges()?.forEach(change => {
+      if (change?.doc?.id === destinedUser) {
+        if (
+          change?.doc?.data()?.typing &&
+          firestore.Timestamp.fromDate(new Date())?.toDate() -
+            change?.doc?.data()?.typing?.toDate() <
+            10000
+        ) {
+          setIsTyping(true);
+        } else {
+          setIsTyping(false);
+        }
+      }
+    });
+  }, [destinedUser]);
+  /**
+   * Delete message from database using param `id`
+   * @param {string} id
+   */
+  async function deleteMessage(id) {
+    const meMessageRef = firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .collection('messages')
+      .doc(destinedUser)
+      .collection('discussions');
+    return await meMessageRef?.get()?.then(collectionSnapshot => {
+      collectionSnapshot?.docs?.map(documentSnapshot => {
+        if (documentSnapshot?.id === id) {
+          documentSnapshot?.ref?.delete();
+          filter(mChatData, element => {
+            element?.id === id;
+          });
+        }
+      });
+    });
+  }
+
+  function onLongPress(context, message) {
+    const options =
+      message?.user?._id === auth()?.currentUser?.uid
+        ? ['Copy Message', 'Delete For Me', 'Cancel']
+        : ['Copy Message', 'Cancel'];
+    const cancelButtonIndex = options?.length - 1;
+    context?.actionSheet()?.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      buttonIndex => {
+        if (options?.length === 3) {
+          switch (buttonIndex) {
+            case 0:
+              try {
+                Clipboard?.setString(message?.text);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+            case 1:
+              try {
+                deleteMessage(message?.id);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+          }
+        } else {
+          switch (buttonIndex) {
+            case 0:
+              try {
+                Clipboard?.setString(message?.text);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexcpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+          }
+        }
+      },
     );
-  };
+  }
 
   const sendMessage = useCallback(
     async (mChatData = [], image) => {
@@ -438,6 +409,8 @@ const ChatScreen = () => {
                   _id: _id,
                   text: EncryptAES(mMessageText),
                   createdAt: Date.now(),
+                  sent: false,
+                  seen: false,
                   user: {
                     _id: auth()?.currentUser?.uid,
                   },
@@ -452,6 +425,8 @@ const ChatScreen = () => {
                   _id: _id,
                   createdAt: Date.now(),
                   text: EncryptAES(mMessageText),
+                  sent: false,
+                  seen: false,
                   user: {
                     _id: auth()?.currentUser?.uid,
                   },
@@ -459,7 +434,8 @@ const ChatScreen = () => {
               setChatData(previousMessage =>
                 GiftedChat.append(previousMessage, mChatData),
               );
-              // Chats messages on home screen goes here
+              // HomeScreen recent chats.
+
               firestore()
                 .collection('chats')
                 .doc(auth()?.currentUser?.uid)
@@ -474,6 +450,7 @@ const ChatScreen = () => {
                   type: 'message',
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
+                  read: false,
                 });
               firestore()
                 .collection('chats')
@@ -488,6 +465,7 @@ const ChatScreen = () => {
                   time: firestore?.Timestamp?.fromDate(new Date()),
                   type: 'message',
                   last_uid: auth()?.currentUser?.uid,
+                  read: false,
                 });
             } catch (e) {
               ErrorToast(
@@ -545,6 +523,8 @@ const ChatScreen = () => {
               .add({
                 _id: _id,
                 image: EncryptAES(uploadedImageURL),
+                seen: false,
+                sent: false,
                 createdAt: Date.now(),
                 user: {
                   _id: auth()?.currentUser?.uid,
@@ -560,6 +540,8 @@ const ChatScreen = () => {
                 _id: _id,
                 createdAt: Date.now(),
                 image: EncryptAES(uploadedImageURL),
+                seen: false,
+                sent: false,
                 user: {
                   _id: auth()?.currentUser?.uid,
                 },
@@ -587,6 +569,7 @@ const ChatScreen = () => {
                   type: 'image',
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
+                  read: false,
                 });
             }
             firestore()
@@ -602,13 +585,14 @@ const ChatScreen = () => {
                 time: firestore?.Timestamp?.fromDate(new Date()),
                 type: 'image',
                 last_uid: auth()?.currentUser?.uid,
+                read: false,
               });
           });
         }
       } else {
         ErrorToast(
           'bottom',
-          'Intternet connection required',
+          'Internet connection required',
           'Please enable Wi-Fi or Mobile data to send messages',
           true,
           1000,
@@ -628,95 +612,369 @@ const ChatScreen = () => {
     ],
   );
 
-  function onLongPress(context, message) {
-    const options =
-      message?.user?._id === auth()?.currentUser?.uid
-        ? ['Copy Message', 'Delete For Me', 'Cancel']
-        : ['Copy Message', 'Cancel'];
-    const cancelButtonIndex = options?.length - 1;
-    context?.actionSheet()?.showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-      },
-      buttonIndex => {
-        if (options?.length === 3) {
-          switch (buttonIndex) {
-            case 0:
-              try {
-                Clipboard?.setString(message?.text);
-              } catch (e) {
-                ErrorToast(
-                  'bottom',
-                  'Unexcpected Error Occured',
-                  `${e}`,
-                  true,
-                  1500,
-                );
-              }
-              break;
-            case 1:
-              try {
-                deleteMessage(message?.id);
-              } catch (e) {
-                ErrorToast(
-                  'bottom',
-                  'Unexcpected Error Occured',
-                  `${e}`,
-                  true,
-                  1500,
-                );
-              }
-              break;
-          }
-        } else {
-          switch (buttonIndex) {
-            case 0:
-              try {
-                Clipboard?.setString(message?.text);
-              } catch (e) {
-                ErrorToast(
-                  'bottom',
-                  'Unexcpected Error Occured',
-                  `${e}`,
-                  true,
-                  1500,
-                );
-              }
-              break;
+  const handlePick = emojiObject => {
+    setMessageText(mMessageText + emojiObject?.emoji);
+  };
+
+  const mAttachPressCallback = async () => {
+    try {
+      const requestResult = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message:
+            'Moon Meet requires this permission to access your phone storage',
+          buttonNegative: 'Deny',
+          buttonPositive: 'Grant',
+        },
+      );
+      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+        ImagePicker.openPicker({
+          height: 1024,
+          width: 1024,
+          cropper: false,
+          mediaType: 'photo',
+        })
+          .then(async image => {
+            const compressingResult = await Image.compress(image?.path, {
+              compressionMethod: 'auto',
+            });
+            sendMessage([], compressingResult).finally(() => {
+              updateMySentStatus();
+              updateUserMessageSentStatus();
+              updateMyLastChatsRead();
+              const toSendNotification = {
+                contents: {
+                  en: `${
+                    auth()?.currentUser?.displayName
+                  }: You have a new message from ${userFirstName} ${userLastName}.`,
+                },
+                include_player_ids: [userPlayerID],
+                data: {
+                  type: 'chat',
+                  senderName: `${auth()?.currentUser?.displayName}`,
+                  senderUID: `${auth()?.currentUser?.uid}`,
+                  senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                  receiverName: `${userFirstName} ${userLastName}`,
+                  receiverUID: `${destinedUser}`,
+                  receiverPhoto: `${userAvatar}`,
+                  imageDelivered: 'Sent a photo.',
+                  messageTime: Date.now(),
+                }, // some values ain't unsed, yet, but they will be used soon.
+              };
+              const stringifiedJSON = JSON.stringify(toSendNotification);
+              OneSignal.postNotification(
+                stringifiedJSON,
+                success => {
+                  if (__DEV__) {
+                    ToastAndroid.show(
+                      'Message notification sent',
+                      ToastAndroid.SHORT,
+                    );
+                    console.log(success);
+                  }
+                },
+                error => {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                },
+              );
+            });
+          })
+          .catch(_ => {});
+      } else if (
+        requestResult === PermissionsAndroid.RESULTS.DENY ||
+        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+      ) {
+        try {
+          Linking?.openSettings();
+          ToastAndroid.show(
+            'Please grant storage permission manually',
+            ToastAndroid.SHORT,
+          );
+        } catch (error) {
+          if (__DEV__) {
+            console.error(error);
           }
         }
-      },
-    );
-  }
+      }
+    } catch (err) {
+      // Maybe something weird or the app running on iOS.
+      if (__DEV__) {
+        console.warn(err);
+      }
+    }
+  };
 
-  async function deleteMessage(id) {
-    const meMessageRef = firestore()
+  const mCameraPressCallback = async () => {
+    try {
+      const requestResult = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Camera Permission',
+          message: 'Moon Meet requires this permission to access your camera',
+          buttonNegative: 'Deny',
+          buttonPositive: 'Grant',
+        },
+      );
+      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+        ImagePicker.openCamera({
+          height: 1024,
+          width: 1024,
+          cropper: false,
+          mediaType: 'photo',
+        })
+          .then(async image => {
+            const compressingResult = await Image.compress(image?.path, {
+              compressionMethod: 'auto',
+            });
+            sendMessage([], compressingResult).finally(() => {
+              updateMySentStatus();
+              updateUserMessageSentStatus();
+              updateMyLastChatsRead();
+              const toSendNotification = {
+                contents: {
+                  en: `${
+                    auth()?.currentUser?.displayName
+                  }: You have a new message from ${userFirstName} ${userLastName}.`,
+                },
+                include_player_ids: [userPlayerID],
+                data: {
+                  type: 'chat',
+                  senderName: `${auth()?.currentUser?.displayName}`,
+                  senderUID: `${auth()?.currentUser?.uid}`,
+                  senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                  receiverName: `${userFirstName} ${userLastName}`,
+                  receiverUID: `${destinedUser}`,
+                  receiverPhoto: `${userAvatar}`,
+                  imageDelivered: 'Sent a photo.',
+                  messageTime: Date.now(),
+                }, // some values ain't unsed, yet, but they will be used soon.
+              };
+              const stringifiedJSON = JSON.stringify(toSendNotification);
+              OneSignal.postNotification(
+                stringifiedJSON,
+                success => {
+                  if (__DEV__) {
+                    ToastAndroid.show(
+                      'Message notification sent',
+                      ToastAndroid.SHORT,
+                    );
+                    console.log(success);
+                  }
+                },
+                error => {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                },
+              );
+            });
+          })
+          .catch(_ => {});
+      } else if (
+        requestResult === PermissionsAndroid.RESULTS.DENY ||
+        PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+      ) {
+        try {
+          Linking?.openSettings();
+          ToastAndroid.show(
+            'Please grant camera permission manually',
+            ToastAndroid.SHORT,
+          );
+        } catch (error) {
+          if (__DEV__) {
+            console.error(error);
+          }
+        }
+      }
+    } catch (err) {
+      // Maybe something weird or the app running on iOS.
+      if (__DEV__) {
+        console.warn(err);
+      }
+    }
+  };
+
+  /* H O O K S */
+
+  useEffect(() => {
+    const userSubscribe = firestore()
+      .collection('users')
+      .doc(destinedUser)
+      .onSnapshot(userSnapshot => {
+        if (userSnapshot?.exists) {
+          if (
+            userSnapshot?.data()?.avatar &&
+            userSnapshot?.data().first_name &&
+            userSnapshot?.data()?.last_name
+          ) {
+            setUserFirstName(userSnapshot?.data()?.first_name);
+            setUserLastName(userSnapshot?.data()?.last_name);
+            setUserAvatar(userSnapshot?.data()?.avatar);
+            setUserActiveStatus(userSnapshot?.data()?.active_status);
+            setUserPlayerID(userSnapshot?.data()?.OneSignalID);
+            if (userSnapshot?.data()?.active_time === 'Last seen recently') {
+              setUserActiveTime(userSnapshot?.data()?.active_time);
+            } else {
+              setUserActiveTime(userSnapshot?.data()?.active_time?.toDate());
+            }
+          }
+        }
+      });
+    return () => userSubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const messagesSubscribe = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .collection('messages')
       .doc(destinedUser)
-      .collection('discussions');
-    return await meMessageRef?.get()?.then(collectionSnapshot => {
-      collectionSnapshot?.docs?.map(documentSnapshot => {
-        if (documentSnapshot?.id === id) {
-          documentSnapshot?.ref?.delete();
-          filter(mChatData, element => {
-            element?.id === id;
+      .collection('discussions')
+      .onSnapshot(collectionSnapshot => {
+        if (collectionSnapshot?.empty) {
+          setChatData([]);
+        } else {
+          let collectionDocs = collectionSnapshot?.docs?.map(subMap => {
+            if (subMap?.data()?.image) {
+              return {
+                ...subMap?.data(),
+                id: subMap?.id,
+                seen: subMap?.data()?.seen,
+                sent: subMap?.data()?.sent,
+                image: DecryptAES(subMap?.data()?.image),
+                user: {
+                  _id:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.uid
+                      : destinedUser,
+                  name:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.displayName
+                      : userFirstName + ' ' + userLastName,
+                  avatar:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.photoURL
+                      : userAvatar,
+                },
+              };
+            } else {
+              return {
+                ...subMap?.data(),
+                id: subMap?.id,
+                text: DecryptAES(subMap?.data()?.text),
+                seen: subMap?.data()?.seen,
+                sent: subMap?.data()?.sent,
+                user: {
+                  _id:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.uid
+                      : destinedUser,
+                  name:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.displayName
+                      : userFirstName + ' ' + userLastName,
+                  avatar:
+                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                      ? auth()?.currentUser?.photoURL
+                      : userAvatar,
+                },
+              };
+            }
           });
+          filter(collectionDocs, [
+            (docs, index) => {
+              if (docs?.image) {
+                collectionDocs[index].text = '';
+              }
+            },
+          ]);
+          collectionDocs = sortBy(collectionDocs, [docs => docs?.createdAt]);
+          collectionDocs = reverse(collectionDocs);
+          setChatData(collectionDocs);
         }
+        setLoading(false);
       });
+    return () => {
+      messagesSubscribe();
+    };
+  }, [
+    Me?.avatar,
+    Me?.first_name,
+    Me?.last_name,
+    destinedUser,
+    userAvatar,
+    userFirstName,
+    userLastName,
+  ]);
+
+  useAppInactive(() => {
+    deleteMyTypingRef();
+  });
+
+  useBackHandler(() => {
+    deleteMyTypingRef();
+    return false;
+  });
+
+  useEffect(() => {
+    fetchUserIsTyping();
+    return () => fetchUserIsTyping();
+  }, [fetchUserIsTyping]);
+
+  useEffect(() => {
+    updateMySentStatus();
+    return () => updateMySentStatus();
+  }, [updateMySentStatus]);
+
+  useEffect(() => {
+    updateMyLastChatsRead();
+    return () => updateMyLastChatsRead();
+  }, [updateMyLastChatsRead]);
+
+  useEffect(() => {
+    updateSeenForHisMessages();
+    return () => updateSeenForHisMessages();
+  }, [updateSeenForHisMessages]);
+
+  useEffect(() => {
+    updateUserMessageSentStatus();
+    return () => updateUserMessageSentStatus();
+  }, [updateUserMessageSentStatus]);
+
+  useLayoutEffect(() => {
+    navigation?.setOptions({
+      headerTitle: props => (
+        <ChatTitle
+          {...props}
+          firstName={userFirstName}
+          lastName={userLastName}
+          avatar={userAvatar}
+          activeStatus={userActiveStatus}
+          activeTime={userActiveTime}
+        />
+      ),
     });
-  }
+  }, [
+    navigation,
+    userActiveStatus,
+    userActiveTime,
+    userAvatar,
+    userFirstName,
+    userLastName,
+  ]);
 
   return (
     <>
       <StatusBar
         backgroundColor={
-          imageViewVisible ? COLORS.primaryDark : COLORS.primaryLight
+          statusBarColor === 'dark' ? COLORS.primaryDark : COLORS.primaryLight
         }
         animated={true}
-        barStyle={imageViewVisible ? 'light-content' : 'dark-content'}
+        barStyle={statusBarColor === 'dark' ? 'light-content' : 'dark-content'}
       />
       <BaseView>
         <GiftedChat
@@ -741,18 +999,26 @@ const ChatScreen = () => {
           messages={mChatData}
           onLongPress={onLongPress}
           renderTicks={message => {
-            return (
-              <MaterialCommunityIcons
-                name={message?.received === undefined ? 'check' : 'check-all'}
-                size={16}
-                style={{paddingRight: widthPercentageToDP(1)}}
-                color={
-                  message?.user._id === auth()?.currentUser?.uid
-                    ? COLORS.white
-                    : COLORS.black
-                }
-              />
-            );
+            if (message?.user?._id === auth()?.currentUser?.uid) {
+              return (
+                <MaterialCommunityIcons
+                  name={message?.seen ? 'check-all' : 'check'}
+                  size={16}
+                  style={{
+                    paddingRight: widthPercentageToDP(1),
+                  }}
+                  color={COLORS.white}
+                />
+              );
+            }
+          }}
+          lightboxProps={{
+            onOpen: () => {
+              setStatusBarColor('dark');
+            },
+            onClose: () => {
+              setStatusBarColor('light');
+            },
           }}
           renderMessageImage={props => {
             return (
@@ -776,8 +1042,18 @@ const ChatScreen = () => {
               <MessageText
                 {...props}
                 textStyle={{
-                  left: {color: COLORS.black},
-                  right: {color: COLORS.white},
+                  left: {
+                    ...props?.textStyle?.left,
+                    color: COLORS.black,
+                    textAlign: 'right',
+                    fontFamily: FONTS.regular,
+                  },
+                  right: {
+                    ...props?.textStyle?.right,
+                    color: COLORS.white,
+                    textAlign: 'left',
+                    fontFamily: FONTS.regular,
+                  },
                 }}
               />
             );
@@ -792,9 +1068,11 @@ const ChatScreen = () => {
                   {...props}
                   wrapperStyle={{
                     right: {
+                      ...props?.wrapperStyle?.right,
                       backgroundColor: COLORS.accentLight,
                     },
                     left: {
+                      ...props?.wrapperStyle?.left,
                       backgroundColor: COLORS.chats.leftBubble,
                     },
                   }}
@@ -805,6 +1083,51 @@ const ChatScreen = () => {
           minInputToolbarHeight={0}
           renderInputToolbar={_ => undefined}
           renderComposer={_ => undefined}
+          isTyping={isTyping}
+          renderSystemMessage={props => {
+            return (
+              <SystemMessage
+                {...props}
+                textStyle={{...props?.textStyle, fontFamily: FONTS.regular}}
+              />
+            );
+          }}
+          renderTime={props => {
+            return (
+              <Time
+                {...props}
+                containerStyle={{
+                  right: {
+                    marginLeft: 10,
+                    marginRight: 10,
+                    marginBottom: 5,
+                    paddingTop: 2.5,
+                  },
+                  left: {
+                    marginLeft: 10,
+                    marginRight: 10,
+                    marginBottom: 5,
+                    paddingTop: 2.5,
+                  },
+                }}
+                timeTextStyle={{
+                  left: {
+                    ...props?.timeTextStyle?.left,
+                    fontSize: 11,
+                    fontFamily: FONTS.regular,
+                  },
+                  right: {
+                    ...props?.timeTextStyle?.right,
+                    fontSize: 11,
+                    fontFamily: FONTS.regular,
+                  },
+                }}
+              />
+            );
+          }}
+          shouldUpdateMessage={() => {
+            return true;
+          }}
           parsePatterns={linkStyle => [
             {
               pattern: /#(\w+)/,
@@ -813,6 +1136,7 @@ const ChatScreen = () => {
             },
           ]}
           onPressAvatar={() => {
+            setStatusBarColor('dark');
             setImageViewVisible(true);
           }}
           user={{
@@ -832,48 +1156,50 @@ const ChatScreen = () => {
           emojiSetter={setEmojiKeyboardOpened}
           sendMessageCallback={() => {
             sendMessage([], '').finally(() => {
-              if (playerID !== userPlayerID) {
-                const toSendNotification = {
-                  contents: {
-                    en: `${
-                      auth()?.currentUser?.displayName
-                    }: You have a new message from ${userFirstName} ${userLastName}.`,
-                  },
-                  include_player_ids: [userPlayerID],
-                  data: {
-                    type: 'chat',
-                    senderName: `${auth()?.currentUser?.displayName}`,
-                    senderUID: `${auth()?.currentUser?.uid}`,
-                    senderPhoto: `${auth()?.currentUser?.photoURL}`,
-                    receiverName: `${userFirstName} ${userLastName}`,
-                    receiverUID: `${destinedUser}`,
-                    receiverPhoto: `${userAvatar}`,
-                    messageDelivered: `${mMessageText?.trim()}`,
-                    messageTime: Date.now(),
-                  }, // some values ain't unsed, yet, but they will be used soon.
-                };
-                const stringifiedJSON = JSON.stringify(toSendNotification);
-                OneSignal.postNotification(
-                  stringifiedJSON,
-                  success => {
-                    if (__DEV__) {
-                      ToastAndroid.show(
-                        'Message notification sent',
-                        ToastAndroid.SHORT,
-                      );
-                      console.log(success);
-                    }
-                  },
-                  error => {
-                    if (__DEV__) {
-                      console.error(error);
-                    }
-                  },
-                );
-              }
+              updateMySentStatus();
+              updateUserMessageSentStatus();
+              updateMyLastChatsRead();
+              const toSendNotification = {
+                contents: {
+                  en: `${
+                    auth()?.currentUser?.displayName
+                  }: You have a new message from ${userFirstName} ${userLastName}.`,
+                },
+                include_player_ids: [userPlayerID],
+                data: {
+                  type: 'chat',
+                  senderName: `${auth()?.currentUser?.displayName}`,
+                  senderUID: `${auth()?.currentUser?.uid}`,
+                  senderPhoto: `${auth()?.currentUser?.photoURL}`,
+                  receiverName: `${userFirstName} ${userLastName}`,
+                  receiverUID: `${destinedUser}`,
+                  receiverPhoto: `${userAvatar}`,
+                  messageDelivered: `${mMessageText?.trim()}`,
+                  messageTime: Date.now(),
+                }, // some values ain't unsed, yet, but they will be used soon.
+              };
+              const stringifiedJSON = JSON.stringify(toSendNotification);
+              OneSignal.postNotification(
+                stringifiedJSON,
+                success => {
+                  if (__DEV__) {
+                    ToastAndroid.show(
+                      'Message notification sent',
+                      ToastAndroid.SHORT,
+                    );
+                    console.log(success);
+                  }
+                },
+                error => {
+                  if (__DEV__) {
+                    console.error(error);
+                  }
+                },
+              );
               setMessageText('');
             });
           }}
+          userUID={destinedUser}
         />
         {emojiKeyboardOpened ? (
           <EmojiKeyboard
@@ -887,11 +1213,14 @@ const ChatScreen = () => {
         )}
 
         <ImageView
-          images={[{uri: userAvatar}]}
+          images={[userAvatar ? {uri: userAvatar} : PurpleBackground]}
           imageIndex={0}
           visible={imageViewVisible}
           animationType={'slide'}
-          onRequestClose={() => setImageViewVisible(false)}
+          onRequestClose={() => {
+            setStatusBarColor('light');
+            setImageViewVisible(false);
+          }}
           presentationStyle={'fullScreen'}
         />
       </BaseView>

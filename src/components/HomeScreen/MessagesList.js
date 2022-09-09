@@ -16,6 +16,8 @@ import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
 import {DecryptAES} from '../../utils/crypto/cryptoTools';
+import {PurpleBackground} from '../../index.d';
+import firestore from '@react-native-firebase/firestore';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -31,22 +33,31 @@ const MessagesList = ({ListData}) => {
   };
 
   const messageText = item => {
-    if (item?.type === 'message') {
-      let decryptedMessage = DecryptAES(item?.to_message_text);
-      let messageLength = decryptedMessage?.length;
-      let message =
-        item?.last_uid === auth()?.currentUser?.uid
-          ? `You: ${decryptedMessage}`
-          : `${decryptedMessage}`;
-      let modifiedtext =
-        messageLength < 35 ? message : message?.substring(0, 35) + '...';
-      return modifiedtext;
+    if (
+      item?.typing &&
+      firestore?.Timestamp.fromDate(new Date())?.toDate -
+        item?.typing?.toDate() <
+        10000
+    ) {
+      return 'typing...';
     } else {
-      let message =
-        item?.last_uid === auth()?.currentUser?.uid
-          ? 'You sent an image'
-          : 'Sent an image';
-      return message;
+      if (item?.type === 'message') {
+        let decryptedMessage = DecryptAES(item?.to_message_text);
+        let messageLength = decryptedMessage?.length;
+        let message =
+          item?.last_uid === auth()?.currentUser?.uid
+            ? `You: ${decryptedMessage}`
+            : `${decryptedMessage}`;
+        let modifiedtext =
+          messageLength < 35 ? message : message?.substring(0, 35) + '...';
+        return modifiedtext;
+      } else {
+        let message =
+          item?.last_uid === auth()?.currentUser?.uid
+            ? 'You sent an image'
+            : 'Sent an image';
+        return message;
+      }
     }
   };
 
@@ -87,9 +98,13 @@ const MessagesList = ({ListData}) => {
             <Avatar.Image
               style={styles.userHaveStory}
               size={52.5}
-              source={{
-                uri: item?.to_avatar ? item?.to_avatar : null,
-              }}
+              source={
+                item?.to_avatar
+                  ? {
+                      uri: item?.to_avatar,
+                    }
+                  : PurpleBackground
+              }
             />
           </View>
           <View
@@ -101,13 +116,13 @@ const MessagesList = ({ListData}) => {
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.heading('left', false)}>
+              style={styles.heading('left', item?.read)}>
               {item?.to_first_name + ' ' + item?.to_last_name}
             </Text>
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.subheading('left', true)}>
+              style={styles.subheading('left', true, item?.read)}>
               {messageText(item)}
             </Text>
           </View>
@@ -120,7 +135,7 @@ const MessagesList = ({ListData}) => {
             <Text
               adjustsFontSizeToFit
               numberOfLines={1}
-              style={styles.subheading('right', false)}>
+              style={styles.subheading('right', false, item?.read)}>
               {moment(item.time?.toDate())?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
@@ -136,22 +151,22 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accentLight,
     overflow: 'hidden',
   },
-  heading: align => {
+  heading: (align, isRead) => {
     return {
       fontSize: 16,
       textAlign: align,
       color: COLORS.black,
-      opacity: 0.6,
+      opacity: isRead ? 0.6 : 1,
       fontFamily: FONTS.regular,
     };
   },
-  subheading: (align, isMessage) => {
+  subheading: (align, isMessage, isRead) => {
     return {
       fontSize: isMessage ? fontValue(14) : fontValue(11.5),
       paddingTop: '1%',
       textAlign: align,
       color: COLORS.black,
-      opacity: 0.6,
+      opacity: isRead ? 0.6 : 1,
       fontFamily: FONTS.regular,
     };
   },

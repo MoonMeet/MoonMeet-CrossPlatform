@@ -113,7 +113,7 @@ const HomeChatsScreen = () => {
    *
    * @function
    * @name deleteCurrentStory
-   * @param {any} sid
+   * @param {string} sid
    * @returns {Promise<void>}
    */
   const deleteCurrentStory = useCallback(async sid => {
@@ -181,6 +181,7 @@ const HomeChatsScreen = () => {
         } else {
           let collectionDocs = collectionSnapshot?.docs?.map(subMap => ({
             ...subMap?.data(),
+            typing: subMap?.data()?.typing,
             id: subMap?.id,
           }));
           collectionDocs = sortBy(collectionDocs, [
@@ -250,7 +251,7 @@ const HomeChatsScreen = () => {
     };
   }, []);
 
-  if (storyLoading && chatsData) {
+  if (storyLoading && chatsLoading) {
     return (
       <MiniBaseView>
         <View
