@@ -6,10 +6,16 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
+import Clipboard from '@react-native-clipboard/clipboard';
+import {useBackHandler} from '@react-native-community/hooks';
+import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {filter, isEmpty, reverse, sortBy} from 'lodash';
+import moment from 'moment';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   Linking,
   PermissionsAndroid,
@@ -19,51 +25,45 @@ import {
   ToastAndroid,
   View,
 } from 'react-native';
+import {Image} from 'react-native-compressor';
 import {
+  Bubble,
   GiftedChat,
   MessageImage,
-  Bubble,
   MessageText,
-  Time,
   SystemMessage,
+  Time,
 } from 'react-native-gifted-chat';
+import ImagePicker from 'react-native-image-crop-picker';
+import ImageView from 'react-native-image-viewing';
+import OneSignal from 'react-native-onesignal';
 import {Avatar, Divider} from 'react-native-paper';
+import Animated, {
+  FadeInDown,
+  FadeOutDown,
+  Layout,
+} from 'react-native-reanimated';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {EmojiKeyboard} from 'rn-emoji-keyboard';
 import {v4 as uuidv4} from 'uuid';
 import BaseView from '../components/BaseView/BaseView';
+import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
+import {
+  ErrorToast,
+  InfoToast,
+} from '../components/ToastInitializer/ToastInitializer';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import ImagePicker from 'react-native-image-crop-picker';
-import storage from '@react-native-firebase/storage';
-import getRandomString from '../utils/generators/getRandomString';
-import {
-  ErrorToast,
-  InfoToast,
-} from '../components/ToastInitializer/ToastInitializer';
-import {bytesToSize} from '../utils/converters/bytesToSize';
-import {Image} from 'react-native-compressor';
-import {PurpleBackground} from '../index.d';
-import {filter, isEmpty, reverse, sortBy} from 'lodash';
-import {EmojiKeyboard} from 'rn-emoji-keyboard';
-import moment from 'moment';
-import ImageView from 'react-native-image-viewing';
-import NetInfo from '@react-native-community/netinfo';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
-import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
-import MoonInputToolbar from '../components/ChatScreen/MoonInputToolbar';
-import Animated, {
-  FadeInDown,
-  FadeOutDown,
-  Layout,
-} from 'react-native-reanimated';
-import OneSignal from 'react-native-onesignal';
-import Clipboard from '@react-native-clipboard/clipboard';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAppInactive} from '../hooks/useAppInactive';
-import {useBackHandler} from '@react-native-community/hooks';
+import {PurpleBackground} from '../index.d';
+import {bytesToSize} from '../utils/converters/bytesToSize';
+import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
+import getRandomString from '../utils/generators/getRandomString';
 
 const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
   return (
@@ -121,7 +121,6 @@ const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
 
 const ChatScreen = () => {
   /* V A R I A B L E S */
-  const navigation = useNavigation();
   const stackRoute = useRoute();
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
