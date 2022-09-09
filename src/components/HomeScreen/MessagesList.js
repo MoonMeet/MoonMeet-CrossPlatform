@@ -17,6 +17,7 @@ import moment from 'moment';
 import {uniqBy} from 'lodash';
 import {DecryptAES} from '../../utils/crypto/cryptoTools';
 import {PurpleBackground} from '../../index.d';
+import firestore from '@react-native-firebase/firestore';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -32,7 +33,12 @@ const MessagesList = ({ListData}) => {
   };
 
   const messageText = item => {
-    if (item?.typing) {
+    if (
+      item?.typing &&
+      firestore?.Timestamp.fromDate(new Date())?.toDate -
+        item?.typing?.toDate() <
+        10000
+    ) {
       return 'typing...';
     } else {
       if (item?.type === 'message') {
