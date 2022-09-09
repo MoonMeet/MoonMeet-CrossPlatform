@@ -246,12 +246,14 @@ const AddStoryScreen = () => {
     } else if (userSelection === 'text') {
       navigation?.setOptions({
         headerTitle: 'Text story',
-        headerRight: props => <TitleText {...props} />,
+        headerRight:
+          Loading === false ? props => <TitleText {...props} /> : null,
       });
     } else {
       navigation?.setOptions({
         headerTitle: 'Image story',
-        headerRight: props => <ImageTitle {...props} />,
+        headerRight:
+          Loading === false ? props => <ImageTitle {...props} /> : null,
       });
     }
   }, [
