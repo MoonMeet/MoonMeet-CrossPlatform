@@ -121,6 +121,7 @@ const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
 
 const ChatScreen = () => {
   /* V A R I A B L E S */
+  const navigation = useNavigation();
   const stackRoute = useRoute();
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
@@ -941,18 +942,32 @@ const ChatScreen = () => {
     return () => updateUserMessageSentStatus();
   }, [updateUserMessageSentStatus]);
 
-  useNavigation()?.setOptions({
-    headerTitle: props => (
-      <ChatTitle
-        {...props}
-        firstName={userFirstName}
-        lastName={userLastName}
-        avatar={userAvatar}
-        activeStatus={userActiveStatus}
-        activeTime={userActiveTime}
-      />
-    ),
-  });
+  useEffect(() => {
+    navigation?.setOptions({
+      headerTitle: props => (
+        <ChatTitle
+          {...props}
+          firstName={userFirstName}
+          lastName={userLastName}
+          avatar={userAvatar}
+          activeStatus={userActiveStatus}
+          activeTime={userActiveTime}
+        />
+      ),
+    });
+    return () => {
+      navigation?.setOptions({
+        headerTitle: null,
+      });
+    };
+  }, [
+    navigation,
+    userActiveStatus,
+    userActiveTime,
+    userAvatar,
+    userFirstName,
+    userLastName,
+  ]);
 
   return (
     <>
