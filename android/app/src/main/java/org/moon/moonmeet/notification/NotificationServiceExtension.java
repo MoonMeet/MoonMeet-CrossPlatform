@@ -13,6 +13,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.onesignal.OSMutableNotification;
@@ -34,6 +36,7 @@ import java.net.URL;
 public class NotificationServiceExtension implements OSRemoteNotificationReceivedHandler {
     private static final String TAG = "NotificationServiceExtension";
 
+    @Nullable
     private Bitmap getBitmapFromURL(String src) {
         try {
             URL url = new URL(src);
@@ -49,7 +52,7 @@ public class NotificationServiceExtension implements OSRemoteNotificationReceive
     }
 
     @Override
-    public void remoteNotificationReceived(Context context, OSNotificationReceivedEvent notificationReceivedEvent) {
+    public void remoteNotificationReceived(Context context, @NonNull OSNotificationReceivedEvent notificationReceivedEvent) {
         OSNotification osNotification = notificationReceivedEvent.getNotification();
         JSONObject NotificationAdditionalData = osNotification.getAdditionalData();
         Log.i(TAG, NotificationAdditionalData.toString());
@@ -57,19 +60,35 @@ public class NotificationServiceExtension implements OSRemoteNotificationReceive
         try {
             if (NotificationAdditionalData.getString("type").equals("chat")) {
                 mutableNotification.setExtender(builder -> {
-                    try {
-                        builder.setChannelId("messages");
-                        builder.setSmallIcon(R.drawable.moon_icon);
-                        builder.setStyle(new NotificationCompat.BigTextStyle().bigText(NotificationAdditionalData.getString("messageDelivered")));
-                        builder.setColor(new BigInteger("FF566193", 16).intValue());
-                        builder.setContentTitle(NotificationAdditionalData.getString("senderName"));
-                        builder.setContentText("New message from " + NotificationAdditionalData.getString("senderName"));
-                        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-                        builder.setWhen(Long.parseLong(NotificationAdditionalData.getString("messageTime")));
-                        builder.setLargeIcon(getBitmapFromURL(NotificationAdditionalData.getString("senderPhoto")));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        notificationReceivedEvent.complete(null);
+                    if (NotificationAdditionalData.has("imageDelivered")) {
+                        try {
+                            builder.setChannelId("messages");
+                            builder.setSmallIcon(R.drawable.moon_icon);
+                            builder.setColor(new BigInteger("FF566193", 16).intValue());
+                            builder.setContentTitle(NotificationAdditionalData.getString("senderName"));
+                            builder.setContentText(NotificationAdditionalData.getString("imageDelivered"));
+                            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                            builder.setWhen(Long.parseLong(NotificationAdditionalData.getString("messageTime")));
+                            builder.setLargeIcon(getBitmapFromURL(NotificationAdditionalData.getString("senderPhoto")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            notificationReceivedEvent.complete(null);
+                        }
+                    } else if (NotificationAdditionalData.has("messageDelivered")) {
+                        try {
+                            builder.setChannelId("messages");
+                            builder.setSmallIcon(R.drawable.moon_icon);
+                            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(NotificationAdditionalData.getString("messageDelivered")));
+                            builder.setColor(new BigInteger("FF566193", 16).intValue());
+                            builder.setContentTitle(NotificationAdditionalData.getString("senderName"));
+                            builder.setContentText("New message from " + NotificationAdditionalData.getString("senderName"));
+                            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                            builder.setWhen(Long.parseLong(NotificationAdditionalData.getString("messageTime")));
+                            builder.setLargeIcon(getBitmapFromURL(NotificationAdditionalData.getString("senderPhoto")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            notificationReceivedEvent.complete(null);
+                        }
                     }
                     Log.i(TAG, "returning a builder from notification chat type.");
                     return builder;
