@@ -1,0 +1,8 @@
+{
+    "schedule": "weekly",
+    "ignoredFiles": [
+        "src/assets/images/*",
+        "android/**",
+    ],
+    "aggressiveCompression": true
+}
