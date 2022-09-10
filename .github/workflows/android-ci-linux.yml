@@ -56,4 +56,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
        name: apk-universal-release
-       path: app/build/outputs/apk/release/app-universal-release.apk
+       path: android/app/build/outputs/apk/release/app-universal-release.apk
