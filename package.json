@@ -1,6 +1,6 @@
 {
   "name": "moonmeet",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": "false",
   "scripts": {
     "android": "react-native run-android",
