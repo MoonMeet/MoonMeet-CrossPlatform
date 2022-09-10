@@ -32,28 +32,28 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-    - name: Install node_modules
+    - name: Install node_modules.
       run: yarn install --frozen-lockfile
     - name: Decode Google Service JSON File.
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
       run: echo $GOOGLE_SERVICES_JSON > android/app/google-services.json
-    - name: Decode Sensitive JS File
+    - name: Decode Sensitive JS File.
       env:
         SENSITIVE_JS: ${{ secrets.SENSITIVE_JS }}
       run: echo $SENSITIVE_JS > src/secrets/sensitive.js
-    - name: Increase Gradle JVM max memory
+    - name: Increase Gradle JVM max memory.
       run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd .. 
     - name: Build release APK.
-    - name: Upload release APK
-      uses: actions/upload-artifact@v3
-       with:
-        name: apk-universal-release
-        path: app/build/outputs/apk/release/app-universal-release.apk
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
         KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
       run: cd android && ./gradlew assembleRelease && cd ..
+    - name: Upload release APK.
+      uses: actions/upload-artifact@v3
+      with:
+       name: apk-universal-release
+       path: app/build/outputs/apk/release/app-universal-release.apk
