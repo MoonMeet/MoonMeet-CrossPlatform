@@ -18,17 +18,17 @@
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
 ### Screenshots
-
+<details><summary>Click to expand</summary>
 <p float="left">
-<img src="assets/splash.png" alt="Splash Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
-<img src="assets/login.png" alt="Login Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
-<img src="assets/home.png" alt="Home Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/splash.png" alt="Splash Screen" width=325  height=800>
+<img src="assets/login.png" alt="Login Screen" width=325 height=800>
+<img src="assets/home.png" alt="Home Screen" width=325 height=800>
 <p>
 <p float="right">
-<img src="assets/me.png" alt="Settings Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
-<img src="assets/privacy.png" alt="Privacy Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
-<img src="assets/chat.png" alt="Chat Screen" width=260 - 0.1 * 260  height=500 - 0.1 * 500>
+<img src="assets/me.png" alt="Settings Screen" width=325 height=800>
+<img src="assets/chat.png" alt="Chat Screen" width=325 height=800>
 <p>
+</details>
 
 ### Contributing
 
