@@ -186,7 +186,9 @@ const EditProfileScreen = () => {
       })
       .finally(async () => {
         await auth()?.currentUser?.updateProfile({
-          displayName: `${firstName} ${lastName}`,
+          displayName: `${lowerToUppercase(firstName)} ${lowerToUppercase(
+            lastName,
+          )}`,
         });
         setLoaderVisible(false);
         setOldFirstname(firstName);
