@@ -381,7 +381,9 @@ const SetupScreen = ({route}) => {
                          */
 
                         await auth()?.currentUser?.updateProfile({
-                          displayName: `${firstName} ${lastName}`,
+                          displayName: `${lowerToUppercase(
+                            firstName,
+                          )} ${lowerToUppercase(lastName)}`,
                           photoURL: avatarUrl,
                         });
                         navigation?.dispatch(
