@@ -35,7 +35,7 @@ const MessagesList = ({ListData}) => {
   const messageText = item => {
     if (
       item?.typing &&
-      firestore?.Timestamp.fromDate(new Date())?.toDate -
+      firestore?.Timestamp.fromDate(new Date())?.toDate() -
         item?.typing?.toDate() <
         10000
     ) {
@@ -49,7 +49,7 @@ const MessagesList = ({ListData}) => {
             ? `You: ${decryptedMessage}`
             : `${decryptedMessage}`;
         let modifiedtext =
-          messageLength < 35 ? message : message?.substring(0, 35) + '...';
+          messageLength < 30 ? message : message?.substring(0, 30) + '...';
         return modifiedtext;
       } else {
         let message =
