@@ -35,29 +35,29 @@ const MessagesList = ({ListData}) => {
   const messageText = item => {
     if (
       item?.typing &&
-      firestore?.Timestamp.fromDate(new Date())?.toDate() -
+      firestore.Timestamp.fromDate(new Date())?.toDate() -
         item?.typing?.toDate() <
         10000
     ) {
       return 'typing...';
+    } else if (item?.type === 'message') {
+      let decryptedMessage = DecryptAES(item?.to_message_text);
+      let messageLength = decryptedMessage?.length;
+      let message =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? `You: ${decryptedMessage}`
+          : `${decryptedMessage}`;
+      let modifiedtext =
+        messageLength < 30 ? message : message?.substring(0, 30) + '...';
+      return modifiedtext;
+    } else if (item?.type === 'image') {
+      let message =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? 'You sent an image'
+          : 'Sent an image';
+      return message;
     } else {
-      if (item?.type === 'message') {
-        let decryptedMessage = DecryptAES(item?.to_message_text);
-        let messageLength = decryptedMessage?.length;
-        let message =
-          item?.last_uid === auth()?.currentUser?.uid
-            ? `You: ${decryptedMessage}`
-            : `${decryptedMessage}`;
-        let modifiedtext =
-          messageLength < 30 ? message : message?.substring(0, 30) + '...';
-        return modifiedtext;
-      } else {
-        let message =
-          item?.last_uid === auth()?.currentUser?.uid
-            ? 'You sent an image'
-            : 'Sent an image';
-        return message;
-      }
+      return `Start chatting with ${item?.to_first_name}.`;
     }
   };
 
