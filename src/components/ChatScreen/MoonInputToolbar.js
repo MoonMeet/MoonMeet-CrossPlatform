@@ -234,10 +234,7 @@ const MyInputToolbar = ({
                       typing: firestore.FieldValue.delete(),
                     });
                 } else {
-                  if (
-                    lastLength === 0 ||
-                    text?.trim()?.length - lastLength > lastLength
-                  ) {
+                  if (text?.trim()?.length - lastLength > lastLength) {
                     firestore()
                       .collection('chats')
                       .doc(userUID)
