@@ -120,7 +120,7 @@ const StoryScreen = () => {
           sid: subMap?.id,
         }));
         collectionDocs = sortBy(collectionDocs, [docs => docs?.time?.toDate()]);
-        filter(
+        collectionDocs = filter(
           collectionDocs,
           documentCols => documentCols?.uid === userStoryUID,
         );
@@ -277,12 +277,10 @@ const StoryScreen = () => {
                     uri: item?.image,
                   }}
                 />
-                {item?.text ? (
+                {item?.text && (
                   <View style={styles.bandView}>
                     <Text style={styles.bandText}>{item?.text}</Text>
                   </View>
-                ) : (
-                  <></>
                 )}
               </View>
             );
@@ -477,7 +475,8 @@ const styles = StyleSheet.create({
     bottom: heightPercentageToDP(20),
   },
   bandText: {
-    fontSize: 15,
+    fontSize: fontValue(15),
+    zIndex: 1,
     textAlign: 'center',
     color: COLORS.white,
     fontFamily: FONTS.regular,
