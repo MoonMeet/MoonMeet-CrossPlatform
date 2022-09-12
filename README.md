@@ -11,7 +11,7 @@
 
 ### Description
 
-- **Moon Meet** is a social media platform including chatting feature.
+- **Moon Meet** is a social media platform including a chatting feature.
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
 - **Moon Meet** is an Open Source Project means that anyone can see, change, get the source code and can contribute to make this project more better.
@@ -52,7 +52,7 @@
 
   - Your `release.keystore` and `google-services.json`
   - Your `sensitive.js` file, [see more info here](/src/secrets/info.md)
-  - Your should add keystore credentails as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
+  - You should add keystore  credentials as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
   
   ```
   export KEYALIAS=YOURKEYALIAS
@@ -94,7 +94,7 @@ And that summarized:
 - [Pranav Purwar](https://github.com/PranavPurwar): for Android CI Workflow.
 - [Ahmed Sbai](https://github.com/sbaiahmed1): for Supporting me since the beginning of Moon Meet.
 
-Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, less bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
+Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, fewer bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
 
 ### Social
 
@@ -107,12 +107,12 @@ Thanks, they help to keep **Moon Meet** alive. It's better to have multiple peop
 Copyright (C) 2022  SectionTN
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
+it is under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, 
 or any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 ```
