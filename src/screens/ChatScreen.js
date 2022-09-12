@@ -1085,7 +1085,6 @@ const ChatScreen = () => {
           minInputToolbarHeight={0}
           renderInputToolbar={_ => undefined}
           renderComposer={_ => undefined}
-          isTyping={isTyping}
           renderSystemMessage={props => {
             return (
               <SystemMessage
@@ -1148,6 +1147,24 @@ const ChatScreen = () => {
           }}
           scrollToBottom
         />
+        {isTyping ? (
+          <View
+            style={{
+              marginLeft: '2%',
+              marginRight: '0.5%',
+              marginBottom: '0.25%',
+            }}>
+            <Text
+              style={{
+                fontSize: fontValue(14),
+                fontFamily: FONTS.regular,
+                color: COLORS.black,
+                opacity: 0.5,
+              }}>{`${userFirstName} is typing...`}</Text>
+          </View>
+        ) : (
+          <></>
+        )}
         <Divider inset={false} />
         <MoonInputToolbar
           messageGetter={mMessageText}
@@ -1213,7 +1230,6 @@ const ChatScreen = () => {
         ) : (
           <></>
         )}
-
         <ImageView
           images={[userAvatar ? {uri: userAvatar} : PurpleBackground]}
           imageIndex={0}
