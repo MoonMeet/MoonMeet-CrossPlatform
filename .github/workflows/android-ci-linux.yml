@@ -55,7 +55,7 @@ jobs:
       run: cd android && ./gradlew assembleRelease && cd ..
     - name: Upload release APK.
       uses: actions/upload-artifact@v3
-      if: ${{ github.event_name == "workflow_dispatch" }}
+      if: ${{ github.event_name == 'workflow_dispatch' }}
       with:
        name: apk-universal-release
        path: android/app/build/outputs/apk/release/app-universal-release.apk
