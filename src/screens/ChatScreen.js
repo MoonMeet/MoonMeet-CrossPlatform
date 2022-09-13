@@ -13,7 +13,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {filter, isEmpty, reverse, sortBy} from 'lodash';
+import {filter, isEmpty, isNull, reverse, sortBy} from 'lodash';
 import moment from 'moment';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
@@ -25,7 +25,6 @@ import {
   ToastAndroid,
   View,
 } from 'react-native';
-import {Image} from 'react-native-compressor';
 import {
   Bubble,
   GiftedChat,
@@ -260,7 +259,6 @@ const ChatScreen = () => {
    * Delete `typing` status from database.
    */
   const deleteMyTypingRef = useCallback(async () => {
-    const fieldDelete = firestore.FieldValue.delete();
     const myTypingRef = firestore()
       .collection('chats')
       .doc(destinedUser)
@@ -268,9 +266,9 @@ const ChatScreen = () => {
       .doc(auth()?.currentUser?.uid);
     return await myTypingRef?.get()?.then(documentSnapshot => {
       if (documentSnapshot?.exists) {
-        if (documentSnapshot?.data()?.typing) {
+        if (isNull(documentSnapshot?.data()?.typing) === false) {
           documentSnapshot?.ref?.update({
-            typing: fieldDelete,
+            typing: null,
           });
         }
       }
@@ -287,13 +285,16 @@ const ChatScreen = () => {
       .get();
     userTypingRef?.docChanges()?.forEach(change => {
       if (change?.doc?.id === destinedUser) {
-        if (
-          change?.doc?.data()?.typing &&
-          firestore.Timestamp.fromDate(new Date())?.toDate() -
-            change?.doc?.data()?.typing?.toDate() <
+        if (isNull(change?.doc?.data()?.typing) === false) {
+          if (
+            firestore.Timestamp.fromDate(new Date())?.toDate() -
+              change?.doc?.data()?.typing?.toDate() <
             10000
-        ) {
-          setIsTyping(true);
+          ) {
+            setIsTyping(true);
+          } else {
+            setIsTyping(false);
+          }
         } else {
           setIsTyping(false);
         }
@@ -448,6 +449,7 @@ const ChatScreen = () => {
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
                   read: false,
+                  typing: null,
                 });
               firestore()
                 .collection('chats')
@@ -463,6 +465,7 @@ const ChatScreen = () => {
                   type: 'message',
                   last_uid: auth()?.currentUser?.uid,
                   read: false,
+                  typing: null,
                 });
             } catch (e) {
               ErrorToast(
@@ -550,7 +553,7 @@ const ChatScreen = () => {
             if (
               !isEmpty(userFirstName) &&
               !isEmpty(userLastName) &&
-              isEmpty(userAvatar)
+              !isEmpty(userAvatar)
             ) {
               firestore()
                 .collection('chats')
@@ -567,6 +570,7 @@ const ChatScreen = () => {
                   last_uid: auth()?.currentUser?.uid,
                   sent_to_uid: destinedUser,
                   read: false,
+                  typing: null,
                 });
             }
             firestore()
@@ -583,6 +587,7 @@ const ChatScreen = () => {
                 type: 'image',
                 last_uid: auth()?.currentUser?.uid,
                 read: false,
+                typing: null,
               });
           });
         }
@@ -633,10 +638,7 @@ const ChatScreen = () => {
           mediaType: 'photo',
         })
           .then(async image => {
-            const compressingResult = await Image.compress(image?.path, {
-              compressionMethod: 'auto',
-            });
-            sendMessage([], compressingResult).finally(() => {
+            sendMessage([], image?.path).finally(() => {
               updateMySentStatus();
               updateUserMessageSentStatus();
               updateMyLastChatsRead();
@@ -723,10 +725,7 @@ const ChatScreen = () => {
           mediaType: 'photo',
         })
           .then(async image => {
-            const compressingResult = await Image.compress(image?.path, {
-              compressionMethod: 'auto',
-            });
-            sendMessage([], compressingResult).finally(() => {
+            sendMessage([], image?.path).finally(() => {
               updateMySentStatus();
               updateUserMessageSentStatus();
               updateMyLastChatsRead();
@@ -821,7 +820,6 @@ const ChatScreen = () => {
         }
       });
     return () => userSubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
