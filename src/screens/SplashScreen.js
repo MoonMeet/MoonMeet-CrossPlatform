@@ -15,11 +15,7 @@ import React, {
 } from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {
-  CommonActions,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {
   BackHandler,
   Linking,
@@ -52,6 +48,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {ThemeContext} from '../config/Theme/Context';
+import {useBackHandler} from '@react-native-community/hooks';
 
 const SplashScreen = () => {
   const {isThemeDark} = useContext(ThemeContext);
@@ -62,25 +59,30 @@ const SplashScreen = () => {
    */
 
   const [havePasscode, setHavePasscode] = React.useState(null);
-
+  /**
+   * Bottom Sheet
+   */
   const {dismissAll} = useBottomSheetModal();
+  const updateSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['45%'], []);
+  const handleModalShow = useCallback(() => {
+    updateSheetRef?.current?.present();
+  }, []);
 
   /**
    * Update variables, used in to check for required updates.
    */
-
-  const updateSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['45%'], []);
-
-  const handleModalShow = useCallback(() => {
-    updateSheetRef?.current?.present();
-  }, []);
 
   const [updatedRequired, setUpdateRequired] = React.useState(false);
   const [updateVersion, setUpdateVersion] = React.useState('');
   const [updateURL, setUpdateURL] = React.useState('');
 
   const [currentAppVersion] = React.useState(getVersion());
+
+  useBackHandler(() => {
+    BackHandler.exitApp();
+    return true;
+  });
 
   const ManualFetchForDoItLater = useCallback(() => {
     if (isViewPagerCompleted()) {
@@ -155,28 +157,25 @@ const SplashScreen = () => {
       OnboardingMMKV?.getBoolean('onboardingComplete')
     );
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      const AnimateSceneTimerTask = setTimeout(() => {
-        scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
-        scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
-        opacity.value = withTiming(0, {duration: 275});
-        translateY.value = withDelay(0, withTiming(375, {duration: 500}));
-        translateY.value = withDelay(300, withTiming(0, {duration: 750}));
-        scaleX.value = withSpring(0.09);
-        scaleY.value = withSpring(0.09);
-        scaleX.value = withSpring(0);
-        scaleY.value = withSpring(0);
-        opacity.value = withSpring(1);
-        scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
-        scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
-      }, 1000);
-      return () => {
-        clearTimeout(AnimateSceneTimerTask);
-      };
-    }, [opacity, scaleX, scaleY, translateY]),
-  );
+  useEffect(() => {
+    const AnimateSceneTimerTask = setTimeout(() => {
+      scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
+      scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
+      opacity.value = withTiming(0, {duration: 275});
+      translateY.value = withDelay(0, withTiming(375, {duration: 500}));
+      translateY.value = withDelay(300, withTiming(0, {duration: 750}));
+      scaleX.value = withSpring(0.09);
+      scaleY.value = withSpring(0.09);
+      scaleX.value = withSpring(0);
+      scaleY.value = withSpring(0);
+      opacity.value = withSpring(1);
+      scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
+      scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
+    }, 1000);
+    return () => {
+      clearTimeout(AnimateSceneTimerTask);
+    };
+  }, [opacity, scaleX, scaleY, translateY]);
 
   useEffect(() => {
     firestore()
