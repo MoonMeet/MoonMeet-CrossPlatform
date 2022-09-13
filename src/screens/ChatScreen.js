@@ -12,11 +12,16 @@ import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {filter, isEmpty, isNull, reverse, sortBy} from 'lodash';
 import moment from 'moment';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
+  BackHandler,
   Linking,
   PermissionsAndroid,
   Pressable,
@@ -906,13 +911,22 @@ const ChatScreen = () => {
     userLastName,
   ]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        deleteMyTypingRef();
+        return false;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+
   useAppInactive(() => {
     deleteMyTypingRef();
-  });
-
-  useBackHandler(() => {
-    deleteMyTypingRef();
-    return false;
   });
 
   useEffect(() => {

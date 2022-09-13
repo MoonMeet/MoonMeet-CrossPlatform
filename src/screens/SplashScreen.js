@@ -15,7 +15,11 @@ import React, {
 } from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {CommonActions, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {
   BackHandler,
   Linking,
@@ -48,7 +52,6 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {ThemeContext} from '../config/Theme/Context';
-import {useBackHandler} from '@react-native-community/hooks';
 
 const SplashScreen = () => {
   const {isThemeDark} = useContext(ThemeContext);
@@ -79,10 +82,19 @@ const SplashScreen = () => {
 
   const [currentAppVersion] = React.useState(getVersion());
 
-  useBackHandler(() => {
-    BackHandler.exitApp();
-    return true;
-  });
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   const ManualFetchForDoItLater = useCallback(() => {
     if (isViewPagerCompleted()) {
