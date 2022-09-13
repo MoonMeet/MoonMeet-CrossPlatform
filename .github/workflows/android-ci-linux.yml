@@ -52,10 +52,10 @@ jobs:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
         KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
-      run: cd android && ./gradlew assembleRelease && cd ..
-    - name: Upload release APK.
+      run: cd android && ./gradlew bundleRelease && cd ..
+    - name: Upload build outputs.
       uses: actions/upload-artifact@v3
       if: ${{ github.event_name == 'workflow_dispatch' }}
       with:
-       name: apk-universal-release
-       path: android/app/build/outputs/apk/release/app-universal-release.apk
+       name: Build Outputs
+       path: android/app/build/outputs/
