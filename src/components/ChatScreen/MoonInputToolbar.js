@@ -1,7 +1,14 @@
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import React, {useEffect} from 'react';
-import {Platform, Pressable, StyleSheet, TextInput, View} from 'react-native';
+import {
+  Keyboard,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -214,10 +221,10 @@ const MyInputToolbar = ({
               multiline
               numberOfLines={3}
               placeholder={'Aa'}
+              onBlur={() => Keyboard.dismiss()}
               onFocus={() => {
                 if (emojiGetter) {
                   emojiSetter(false);
-                } else {
                 }
               }}
               style={styles.input}
@@ -231,24 +238,18 @@ const MyInputToolbar = ({
                     .collection('discussions')
                     .doc(auth()?.currentUser?.uid)
                     .update({
-                      typing: firestore.FieldValue.delete(),
+                      typing: null,
                     });
                 } else {
-                  if (
-                    lastLength === 0 ||
-                    text?.trim()?.length - lastLength > lastLength
-                  ) {
+                  if (text?.trim()?.length - lastLength > lastLength) {
                     firestore()
                       .collection('chats')
                       .doc(userUID)
                       .collection('discussions')
                       .doc(auth()?.currentUser?.uid)
-                      .set(
-                        {
-                          typing: firestore?.Timestamp?.fromDate(new Date()),
-                        },
-                        {merge: true},
-                      );
+                      .update({
+                        typing: firestore?.Timestamp?.fromDate(new Date()),
+                      });
                   }
                 }
                 setLastLength(text?.length);

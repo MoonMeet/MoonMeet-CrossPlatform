@@ -14,7 +14,7 @@ import {FONTS, COLORS} from '../../config/Miscellaneous';
 import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
-import {uniqBy} from 'lodash';
+import {isNull, uniqBy} from 'lodash';
 import {DecryptAES} from '../../utils/crypto/cryptoTools';
 import {PurpleBackground} from '../../index.d';
 import firestore from '@react-native-firebase/firestore';
@@ -24,8 +24,8 @@ const MessagesList = ({ListData}) => {
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading('center')}>No Chats, yet.</Text>
-        <Text style={styles.subheading('center')}>
+        <Text style={styles.heading('center', false)}>No Chats, yet.</Text>
+        <Text style={styles.subheading('center', false, true)}>
           Discover new people to chat with them.
         </Text>
       </View>
@@ -34,30 +34,30 @@ const MessagesList = ({ListData}) => {
 
   const messageText = item => {
     if (
-      item?.typing &&
-      firestore?.Timestamp.fromDate(new Date())?.toDate -
+      isNull(item?.typing) === false &&
+      firestore.Timestamp.fromDate(new Date())?.toDate() -
         item?.typing?.toDate() <
         10000
     ) {
       return 'typing...';
+    } else if (item?.type === 'message') {
+      let decryptedMessage = DecryptAES(item?.to_message_text);
+      let messageLength = decryptedMessage?.length;
+      let message =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? `You: ${decryptedMessage}`
+          : `${decryptedMessage}`;
+      let modifiedtext =
+        messageLength < 30 ? message : message?.substring(0, 30) + '...';
+      return modifiedtext;
+    } else if (item?.type === 'image') {
+      let messageImage =
+        item?.last_uid === auth()?.currentUser?.uid
+          ? 'You sent an image'
+          : 'Sent an image';
+      return messageImage;
     } else {
-      if (item?.type === 'message') {
-        let decryptedMessage = DecryptAES(item?.to_message_text);
-        let messageLength = decryptedMessage?.length;
-        let message =
-          item?.last_uid === auth()?.currentUser?.uid
-            ? `You: ${decryptedMessage}`
-            : `${decryptedMessage}`;
-        let modifiedtext =
-          messageLength < 35 ? message : message?.substring(0, 35) + '...';
-        return modifiedtext;
-      } else {
-        let message =
-          item?.last_uid === auth()?.currentUser?.uid
-            ? 'You sent an image'
-            : 'Sent an image';
-        return message;
-      }
+      return `Start chatting with ${item?.to_first_name}.`;
     }
   };
 
@@ -128,7 +128,7 @@ const MessagesList = ({ListData}) => {
           </View>
           <View
             style={{
-              flex: 1,
+              flexGrow: 1,
               justifyContent: 'center',
               alignItems: 'flex-end',
             }}>
