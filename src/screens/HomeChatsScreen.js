@@ -19,7 +19,7 @@ import {
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import MessagesList from '../components/HomeScreen/MessagesList';
 import firestore from '@react-native-firebase/firestore';
@@ -33,6 +33,7 @@ import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
+import {useBackHandler} from '@react-native-community/hooks';
 
 const HomeChatsScreen = () => {
   // Sticky-Item Config
@@ -120,19 +121,10 @@ const HomeChatsScreen = () => {
     return await firestore().collection('stories')?.doc(sid)?.delete();
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        BackHandler.exitApp();
-        return true;
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
-  );
+  useBackHandler(() => {
+    BackHandler.exitApp();
+    return true;
+  });
 
   useEffect(() => {
     const userSusbcribe = firestore()
