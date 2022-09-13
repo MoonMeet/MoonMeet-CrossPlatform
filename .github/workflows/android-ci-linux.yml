@@ -47,7 +47,7 @@ jobs:
       run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd .. 
-    - name: Build bundle APK.
+    - name: Build bundle.
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
