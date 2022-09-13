@@ -46,8 +46,14 @@ jobs:
     - name: Increase Gradle JVM max memory.
       run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
     - name: Clean the build.
-      run: cd android && ./gradlew clean && cd .. 
-    - name: Build bundle.
+      run: cd android && ./gradlew clean && cd ..
+    - name: Build release APK.
+      env:
+        KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+        KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
+      run: cd android && ./gradlew assembleRelease && cd .. 
+    - name: Build release BUNDLE.
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
