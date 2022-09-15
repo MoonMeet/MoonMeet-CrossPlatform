@@ -6,26 +6,25 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {BackHandler, Pressable, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, Text} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
+import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
 import ViewItem from '../components/PrivacySecurityScreen/ViewItem';
 import ViewItemTitle from '../components/PrivacySecurityScreen/ViewItemTitle';
 import Spacer from '../components/Spacer/Spacer';
+import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {ActivityIndicator, Text} from 'react-native-paper';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
-import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {InfoToast} from 'react-native-toast-message';
 
 const PrivacySecurityScreen = () => {
   const navigation = useNavigation();
@@ -70,7 +69,12 @@ const PrivacySecurityScreen = () => {
           setLoading(false);
         }
       });
-    return () => UserSubscribe();
+    return () => {
+      UserSubscribe();
+      setPhoneNumberStatus('');
+      setLastSeenNOnline('');
+      setLoading(true);
+    };
   });
 
   if (loading) {
@@ -178,4 +182,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default gestureHandlerRootHOC(PrivacySecurityScreen);
+export default PrivacySecurityScreen;
