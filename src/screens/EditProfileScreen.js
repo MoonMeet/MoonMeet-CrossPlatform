@@ -73,7 +73,6 @@ const EditProfileScreen = () => {
 
   const [Loading, setLoading] = React.useState(true);
   const [loaderVisible, setLoaderVisible] = React.useState(false);
-  const [sendingData, setSendingData] = React.useState(false);
 
   useEffect(() => {
     firestore()
@@ -146,12 +145,14 @@ const EditProfileScreen = () => {
         avatar: pureImageUrl,
       })
       .finally(async () => {
-        if (firstName !== oldFirstname && lastName !== oldLastname) {
+        if (
+          firstName?.trim() !== oldFirstname?.trim() &&
+          lastName?.trim() !== oldLastname?.trim()
+        ) {
           // Keep showing loader and FAB
         } else {
           await auth()?.currentUser?.updateProfile({photoURL: pureImageUrl});
           setLoaderVisible(false);
-          setSendingData(false);
           SuccessToast(
             'bottom',
             'Profile Updated',
@@ -181,19 +182,18 @@ const EditProfileScreen = () => {
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
-        first_name: lowerToUppercase(firstName),
-        last_name: lowerToUppercase(lastName),
+        first_name: lowerToUppercase(firstName?.trim()),
+        last_name: lowerToUppercase(lastName?.trim()),
       })
       .finally(async () => {
         await auth()?.currentUser?.updateProfile({
-          displayName: `${lowerToUppercase(firstName)} ${lowerToUppercase(
-            lastName,
-          )}`,
+          displayName: `${lowerToUppercase(
+            firstName?.trim(),
+          )} ${lowerToUppercase(lastName?.trim())}`,
         });
         setLoaderVisible(false);
         setOldFirstname(firstName);
         setOldLastName(lastName);
-        setSendingData(false);
         SuccessToast(
           'bottom',
           'Profile Updated',
@@ -380,7 +380,7 @@ const EditProfileScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        visible={!sendingData}
+        visible={loaderVisible}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -390,21 +390,22 @@ const EditProfileScreen = () => {
           if (isConnected) {
             if (!firstnameHasLessLength() && !lastnameHasLessLength()) {
               if (
-                firstName === oldFirstname &&
-                lastName === oldLastname &&
+                firstName?.trim() === oldFirstname?.trim() &&
+                lastName?.trim() === oldLastname?.trim() &&
                 !UserPhoto
               ) {
                 navigation?.goBack();
               } else {
-                setSendingData(true);
                 setLoaderVisible(true);
                 if (UserPhoto) {
                   pushUserData();
                 }
-                if (firstName !== oldFirstname || lastName !== oldLastname) {
+                if (
+                  firstName?.trim() !== oldFirstname?.trim() ||
+                  lastName?.trim() !== oldLastname?.trim()
+                ) {
                   pushNames()?.finally(() => {
                     setLoaderVisible(false);
-                    setSendingData(false);
                   });
                 }
               }
