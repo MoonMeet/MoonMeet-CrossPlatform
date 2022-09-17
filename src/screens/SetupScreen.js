@@ -354,8 +354,8 @@ const SetupScreen = ({route}) => {
                       .doc(auth()?.currentUser?.uid)
                       .set({
                         ...user,
-                        first_name: lowerToUppercase(firstName),
-                        last_name: lowerToUppercase(lastName),
+                        first_name: lowerToUppercase(firstName?.trim()),
+                        last_name: lowerToUppercase(lastName?.trim()),
                         avatar: avatarUrl,
                         active_status: 'normal',
                         info: {
@@ -382,8 +382,8 @@ const SetupScreen = ({route}) => {
 
                         await auth()?.currentUser?.updateProfile({
                           displayName: `${lowerToUppercase(
-                            firstName,
-                          )} ${lowerToUppercase(lastName)}`,
+                            firstName?.trim(),
+                          )} ${lowerToUppercase(lastName?.trim())}`,
                           photoURL: avatarUrl,
                         });
                         navigation?.dispatch(
