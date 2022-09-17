@@ -7,7 +7,6 @@
  */
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import {useBackHandler} from '@react-native-community/hooks';
 import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -154,6 +153,7 @@ const ChatScreen = () => {
     } catch (error) {
       setMe([]);
     }
+    return () => setMe([]);
   }, []);
 
   /**
@@ -900,6 +900,7 @@ const ChatScreen = () => {
       });
     return () => {
       messagesSubscribe();
+      setLoading(true);
     };
   }, [
     Me?.avatar,
