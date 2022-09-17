@@ -47,17 +47,12 @@ const CountriesList = (props: CountriesListInterface) => {
 
   const sheetStyle = useMemo(
     () => ({
-      ...styles.sheetContainer,
+      ...styles.sheetContainer(props?.index),
       shadowColor: COLORS.black,
       padding: '3%',
     }),
     [],
   );
-
-  useEffect(() => {
-    ResetListData('');
-    return () => {};
-  }, [ResetListData]);
 
   const [SearchData, setSearchData] = React.useState('');
 
@@ -107,6 +102,13 @@ const CountriesList = (props: CountriesListInterface) => {
       setSearchData('');
     }
   };
+
+  useEffect(() => {
+    ResetListData('');
+    return () => {
+      ResetListData('');
+    };
+  }, [ResetListData]);
 
   /**
    * Seperated Render Item for FlatList.
@@ -198,14 +200,16 @@ const CountriesList = (props: CountriesListInterface) => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={unionBy(sortBy(FilteredData, [data => data?.name]), 'code')}
-          disableVirtualization
           removeClippedSubviews={true}
-          initialNumToRender={50}
           keyExtractor={item => item?.code}
           contentContainerStyle={[
             {flexGrow: 1},
             FilteredData.length > 0 ? null : {justifyContent: 'center'},
           ]}
+          initialNumToRender={
+            unionBy(sortBy(FilteredData, [data => data?.name]), 'code').length /
+            2
+          }
           ListEmptyComponent={listEmptyComponent}
           renderItem={({item}) => renderItem(item)}
         />
@@ -245,17 +249,19 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     opacity: 0.4,
   },
-  sheetContainer: {
-    backgroundColor: COLORS.white,
-    borderTopStartRadius: 25,
-    borderTopEndRadius: 25,
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.75,
-    shadowRadius: 16.0,
-    elevation: 25,
+  sheetContainer: index => {
+    return {
+      backgroundColor: COLORS.white,
+      borderTopStartRadius: index === 1 ? 0 : 25,
+      borderTopEndRadius: index === 1 ? 0 : 25,
+      shadowOffset: {
+        width: 0,
+        height: 12,
+      },
+      shadowOpacity: 0.75,
+      shadowRadius: 16.0,
+      elevation: 25,
+    };
   },
   heading: {
     fontSize: fontValue(20),
