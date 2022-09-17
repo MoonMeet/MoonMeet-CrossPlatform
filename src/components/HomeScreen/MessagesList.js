@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React from 'react';
+import React, {useCallback, useMemo, useRef} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
@@ -18,9 +18,18 @@ import {isNull, uniqBy} from 'lodash';
 import {DecryptAES} from '../../utils/crypto/cryptoTools';
 import {PurpleBackground} from '../../index.d';
 import firestore from '@react-native-firebase/firestore';
+import ChatOptionsBottomSheet from './BottomSheet/ChatOptionsBottomSheet';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
+
+  const chatOptionsRef = useRef(null);
+  const sheetSnapPoints = useMemo(() => ['20%'], []);
+
+  const handlePresentModal = useCallback(() => {
+    chatOptionsRef?.current?.present();
+  }, []);
+
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
@@ -75,72 +84,81 @@ const MessagesList = ({ListData}) => {
       removeClippedSubviews={true}
       initialNumToRender={10}
       keyExtractor={item => item?.id}
-      renderItem={({item}) => (
-        <Pressable
-          android_ripple={{color: COLORS.rippleColor}}
-          onPress={() => {
-            navigation?.navigate('chat', {
-              item:
-                item?.last_uid === auth()?.currentUser?.uid
-                  ? item?.sent_to_uid
-                  : item?.last_uid,
-            });
-          }}
-          style={{
-            flexDirection: 'row',
-            padding: '2%',
-          }}>
-          <View
+      renderItem={({item, index}) => {
+        return (
+          <Pressable
+            android_ripple={{color: COLORS.rippleColor}}
+            onPress={() => {
+              navigation?.navigate('chat', {
+                item:
+                  item?.last_uid === auth()?.currentUser?.uid
+                    ? item?.sent_to_uid
+                    : item?.last_uid,
+              });
+            }}
+            onLongPress={() => handlePresentModal()}
             style={{
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-            }}>
-            <Avatar.Image
-              style={styles.userHaveStory}
-              size={52.5}
-              source={
-                item?.to_avatar
-                  ? {
-                      uri: item?.to_avatar,
-                    }
-                  : PurpleBackground
-              }
-            />
-          </View>
-          <View
-            style={{
+              flexDirection: 'row',
               padding: '2%',
-              justifyContent: 'center',
-              alignItems: 'flex-start',
             }}>
-            <Text
-              adjustsFontSizeToFit
-              numberOfLines={1}
-              style={styles.heading('left', item?.read)}>
-              {item?.to_first_name + ' ' + item?.to_last_name}
-            </Text>
-            <Text
-              adjustsFontSizeToFit
-              numberOfLines={1}
-              style={styles.subheading('left', true, item?.read)}>
-              {messageText(item)}
-            </Text>
-          </View>
-          <View
-            style={{
-              flexGrow: 1,
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-            }}>
-            <Text
-              adjustsFontSizeToFit
-              numberOfLines={1}
-              style={styles.subheading('right', false, item?.read)}>
-              {moment(item.time?.toDate())?.format('MMM ddd HH:MM A')}
-            </Text>
-          </View>
-        </Pressable>
-      )}
+            <View
+              style={{
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}>
+              <Avatar.Image
+                style={styles.userHaveStory}
+                size={52.5}
+                source={
+                  item?.to_avatar
+                    ? {
+                        uri: item?.to_avatar,
+                      }
+                    : PurpleBackground
+                }
+              />
+            </View>
+            <View
+              style={{
+                padding: '2%',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+              }}>
+              <Text
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={styles.heading('left', item?.read)}>
+                {item?.to_first_name + ' ' + item?.to_last_name}
+              </Text>
+              <Text
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={styles.subheading('left', true, item?.read)}>
+                {messageText(item)}
+              </Text>
+            </View>
+            <View
+              style={{
+                flexGrow: 1,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}>
+              <Text
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={styles.subheading('right', false, item?.read)}>
+                {moment(item?.time?.toDate())?.format('MMM ddd HH:MM A')}
+              </Text>
+            </View>
+            <ChatOptionsBottomSheet
+              sheetRef={chatOptionsRef}
+              index={0}
+              snapPoints={sheetSnapPoints}
+              currentMessage={item}
+            />
+          </Pressable>
+        );
+      }}
     />
   );
 };
