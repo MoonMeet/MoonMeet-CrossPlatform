@@ -71,9 +71,6 @@ const PrivacySecurityScreen = () => {
       });
     return () => {
       UserSubscribe();
-      setPhoneNumberStatus('');
-      setLastSeenNOnline('');
-      setLoading(true);
     };
   });
 
