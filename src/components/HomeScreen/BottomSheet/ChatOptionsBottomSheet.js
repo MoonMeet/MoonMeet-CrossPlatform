@@ -13,17 +13,21 @@ import {
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
+  useBottomSheetModal,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 import {FONTS, COLORS} from '../../../config/Miscellaneous';
 import {fontValue} from '../../../config/Dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const ChatOptionsBottomSheet = ({
   sheetRef,
   snapPoints,
   index,
   currentMessage,
+  deleteConversationAlert,
 }) => {
   const {animatedHandleHeight, handleContentLayout} =
     useBottomSheetDynamicSnapPoints(snapPoints);
@@ -56,11 +60,37 @@ const ChatOptionsBottomSheet = ({
     [],
   );
 
-  const [alertDialogVisible, setAlertDialogVisible] = React.useState(false);
+  const {dismissAll} = useBottomSheetModal();
 
-  const updateCurrentMessageAsUnread = useCallback(() => {}, []);
+  const updateCurrentMessageAsUnread = useCallback(() => {
+    const messageRef = firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    return messageRef?.then(collectionSnapshot => {
+      collectionSnapshot?.docs.map(documentSnapshot => {
+        if (documentSnapshot?.id === currentMessage?.id) {
+          documentSnapshot?.ref?.update({read: false});
+        }
+      });
+    });
+  }, []);
 
-  const updateCurrentMessageAsRead = useCallback(() => {}, []);
+  const updateCurrentMessageAsRead = useCallback(() => {
+    const messageRef = firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    return messageRef?.then(collectionSnapshot => {
+      collectionSnapshot?.docs?.map(documentSnapshot => {
+        if (documentSnapshot?.id === currentMessage?.id) {
+          documentSnapshot?.ref?.update({read: true});
+        }
+      });
+    });
+  }, []);
 
   const deleteEntireConversation = useCallback(() => {}, []);
 
@@ -96,8 +126,7 @@ const ChatOptionsBottomSheet = ({
             <Pressable
               android_ripple={{color: COLORS.rippleColor}}
               onPress={() => {
-                updateCurrentMessageAsUnread();
-                console.log(currentMessage);
+                updateCurrentMessageAsUnread().then(() => dismissAll());
               }}
               style={styles.optionContainer}>
               <MaterialIcons
@@ -119,8 +148,7 @@ const ChatOptionsBottomSheet = ({
             <Pressable
               android_ripple={{color: COLORS.rippleColor}}
               onPress={() => {
-                updateCurrentMessageAsRead();
-                console.log(currentMessage);
+                updateCurrentMessageAsRead().then(() => dismissAll());
               }}
               style={styles.optionContainer}>
               <MaterialIcons
@@ -141,9 +169,7 @@ const ChatOptionsBottomSheet = ({
           )}
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
-            onPress={() => {
-              setAlertDialogVisible(true);
-            }}
+            onPress={deleteConversationAlert}
             style={styles.optionContainer}>
             <MaterialIcons
               name="delete"

@@ -8,10 +8,14 @@
 
 import React, {useCallback, useMemo, useRef} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
-import {fontValue, heightPercentageToDP} from '../../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {isNull, uniqBy} from 'lodash';
@@ -19,6 +23,8 @@ import {DecryptAES} from '../../utils/crypto/cryptoTools';
 import {PurpleBackground} from '../../index.d';
 import firestore from '@react-native-firebase/firestore';
 import ChatOptionsBottomSheet from './BottomSheet/ChatOptionsBottomSheet';
+import {ThemeContext} from '../../config/Theme/Context';
+import SpacerHorizontal from '../Spacer/SpacerHorizontal';
 
 const MessagesList = ({ListData}) => {
   const navigation = useNavigation();
@@ -70,6 +76,11 @@ const MessagesList = ({ListData}) => {
     }
   };
 
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  const {isThemeDark} = React.useContext(ThemeContext);
+  const [alertDialogVisible, setAlertDialogVisible] = React.useState(false);
+
   return (
     <FlatList
       style={{flex: 1}}
@@ -86,77 +97,153 @@ const MessagesList = ({ListData}) => {
       keyExtractor={item => item?.id}
       renderItem={({item, index}) => {
         return (
-          <Pressable
-            android_ripple={{color: COLORS.rippleColor}}
-            onPress={() => {
-              navigation?.navigate('chat', {
-                item:
-                  item?.last_uid === auth()?.currentUser?.uid
-                    ? item?.sent_to_uid
-                    : item?.last_uid,
-              });
-            }}
-            onLongPress={() => handlePresentModal()}
-            style={{
-              flexDirection: 'row',
-              padding: '2%',
-            }}>
-            <View
-              style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-              }}>
-              <Avatar.Image
-                style={styles.userHaveStory}
-                size={52.5}
-                source={
-                  item?.to_avatar
-                    ? {
-                        uri: item?.to_avatar,
+          <>
+            <Portal>
+              <Dialog
+                dismissable={true}
+                visible={alertDialogVisible}
+                onDismiss={() => setAlertDialogVisible(false)}>
+                <Dialog.Title
+                  style={{
+                    color: isThemeDark ? COLORS.white : COLORS.black,
+                    opacity: 0.9,
+                  }}>
+                  Delete this entire conversation?
+                </Dialog.Title>
+                <Dialog.Content>
+                  <Paragraph
+                    adjustsFontSizeToFit
+                    style={{
+                      fontSize: fontValue(14),
+                      color: isThemeDark ? COLORS.white : COLORS.black,
+                      opacity: isThemeDark ? 0.8 : 0.6,
+                    }}>
+                    Once you delete your copy of the conversation, it can't be
+                    undone.
+                  </Paragraph>
+                </Dialog.Content>
+                <Dialog.Actions>
+                  <Button
+                    uppercase={false}
+                    style={{margin: '0.5%'}}
+                    mode={'outlined'}
+                    color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
+                    onPress={() => setAlertDialogVisible(false)}>
+                    Cancel
+                  </Button>
+                  <SpacerHorizontal width={widthPercentageToDP(0.5)} />
+                  <Button
+                    uppercase={false}
+                    mode={'outlined'}
+                    color={
+                      isThemeDark ? COLORS.redDarkError : COLORS.redLightError
+                    }
+                    style={{margin: '0.5%'}}
+                    onPress={() => {
+                      try {
+                        const discussionsRef = firestore()
+                          .collection('users')
+                          .doc(auth()?.currentUser?.uid)
+                          .collection('messages')
+                          .doc(
+                            item?.last_uid === auth()?.currentUser?.uid
+                              ? item?.sent_to_uid
+                              : item?.last_uid,
+                          )
+                          .collection('discussions')
+                          .get();
+                        return discussionsRef?.then(collectionSnapshot => {
+                          collectionSnapshot?.docs?.map(documentSnapshot => {
+                            // Implement batch deleting.
+                          });
+                        });
+                      } catch (e) {
+                        if (__DEV__) {
+                          console?.error(e);
+                        }
                       }
-                    : PurpleBackground
-                }
-              />
-            </View>
-            <View
+                      setAlertDialogVisible(false);
+                    }}>
+                    Delete
+                  </Button>
+                </Dialog.Actions>
+              </Dialog>
+            </Portal>
+            <Pressable
+              android_ripple={{color: COLORS.rippleColor}}
+              onPress={() => {
+                navigation?.navigate('chat', {
+                  item:
+                    item?.last_uid === auth()?.currentUser?.uid
+                      ? item?.sent_to_uid
+                      : item?.last_uid,
+                });
+              }}
+              onLongPress={() => {
+                setCurrentIndex(index);
+                handlePresentModal();
+              }}
               style={{
+                flexDirection: 'row',
                 padding: '2%',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
               }}>
-              <Text
-                adjustsFontSizeToFit
-                numberOfLines={1}
-                style={styles.heading('left', item?.read)}>
-                {item?.to_first_name + ' ' + item?.to_last_name}
-              </Text>
-              <Text
-                adjustsFontSizeToFit
-                numberOfLines={1}
-                style={styles.subheading('left', true, item?.read)}>
-                {messageText(item)}
-              </Text>
-            </View>
-            <View
-              style={{
-                flexGrow: 1,
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-              }}>
-              <Text
-                adjustsFontSizeToFit
-                numberOfLines={1}
-                style={styles.subheading('right', false, item?.read)}>
-                {moment(item?.time?.toDate())?.format('MMM ddd HH:MM A')}
-              </Text>
-            </View>
-            <ChatOptionsBottomSheet
-              sheetRef={chatOptionsRef}
-              index={0}
-              snapPoints={sheetSnapPoints}
-              currentMessage={item}
-            />
-          </Pressable>
+              <View
+                style={{
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                }}>
+                <Avatar.Image
+                  style={styles.userHaveStory}
+                  size={52.5}
+                  source={
+                    item?.to_avatar
+                      ? {
+                          uri: item?.to_avatar,
+                        }
+                      : PurpleBackground
+                  }
+                />
+              </View>
+              <View
+                style={{
+                  padding: '2%',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                }}>
+                <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  style={styles.heading('left', item?.read)}>
+                  {item?.to_first_name + ' ' + item?.to_last_name}
+                </Text>
+                <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  style={styles.subheading('left', true, item?.read)}>
+                  {messageText(item)}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexGrow: 1,
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                }}>
+                <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  style={styles.subheading('right', false, item?.read)}>
+                  {moment(item?.time?.toDate())?.format('MMM ddd HH:MM A')}
+                </Text>
+              </View>
+              <ChatOptionsBottomSheet
+                sheetRef={chatOptionsRef}
+                index={0}
+                snapPoints={sheetSnapPoints}
+                currentMessage={ListData[currentIndex]}
+              />
+            </Pressable>
+          </>
         );
       }}
     />
