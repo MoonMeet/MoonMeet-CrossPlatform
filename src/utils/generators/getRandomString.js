@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-export default function getRandomString(length) {
+function getRandomString(length) {
   const randomChars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
@@ -17,3 +17,5 @@ export default function getRandomString(length) {
   }
   return result;
 }
+
+export {getRandomString}
