@@ -51,7 +51,7 @@ import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import axios from 'axios';
 import {waitForAnd} from '../utils/timers/delay';
-import getRandomString from '../utils/generators/getRandomString';
+import {getRandomString} from '../utils/generators/getRandomString';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
 import OneSignal from 'react-native-onesignal';
 
