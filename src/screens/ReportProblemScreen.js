@@ -38,7 +38,7 @@ import Animated, {
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import RemoveIcon from '../assets/images/clear.png';
-import getRandomString from '../utils/generators/getRandomString';
+import {getRandomString} from '../utils/generators/getRandomString';
 
 const ReportProblemScreen = () => {
   const AnimatedFAB = Animated.createAnimatedComponent(FAB);
