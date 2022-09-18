@@ -7,14 +7,14 @@
  */
 
 import React, {useEffect} from 'react';
-import StackNavigator from './src/config/Stack';
+import StackNavigator from './config/Stack';
 import {StatusBar, StyleSheet} from 'react-native';
 import Toast from 'react-native-toast-message';
-import {COLORS} from './src/config/Miscellaneous';
+import {COLORS} from './config/Miscellaneous';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import {ThemeContext} from './src/config/Theme/Context';
-import {ThemeMMKV} from './src/config/MMKV/ThemeMMKV';
-import {MoonMeetDarkTheme} from './src/config/Theme/Theme';
+import {ThemeContext} from './config/Theme/Context';
+import {ThemeMMKV} from './config/MMKV/ThemeMMKV';
+import {MoonMeetDarkTheme} from './config/Theme/Theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';

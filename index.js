@@ -7,7 +7,7 @@
  */
 import {AppRegistry} from 'react-native';
 import OneSignal from 'react-native-onesignal';
-import App from './App';
+import App from './src/App';
 import {name as MoonMeet} from './app.json';
 import {ONESIGNAL_APP_ID} from './src/secrets/sensitive';
 import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
