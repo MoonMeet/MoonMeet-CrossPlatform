@@ -7,13 +7,13 @@
  */
 
 import React from 'react';
-import {StyleSheet, Platform, Pressable} from 'react-native';
-import Animated, {interpolateNode, Extrapolate} from 'react-native-reanimated';
+import {Platform, Pressable, StyleSheet} from 'react-native';
+import Animated, {Extrapolate, interpolateNode} from 'react-native-reanimated';
 import {fontValue} from '../../config/Dimensions';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
+import {useNavigation} from '@react-navigation/native';
 // @ts-ignore
 import AddIconImage from '../../assets/images/add_24.png';
-import {useNavigation} from '@react-navigation/native';
 
 const MoonStickyStoryView = ({
   x,
