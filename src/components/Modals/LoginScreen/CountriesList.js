@@ -88,13 +88,21 @@ const CountriesList = (props: CountriesListInterface) => {
 
   const SearchInData = text => {
     if (text) {
-      const newData = MasterData?.filter(item => {
-        const itemData = item?.name
-          ? item?.name?.toUpperCase()
-          : ''?.toLowerCase();
-        const textData = text?.toUpperCase();
-        return itemData?.indexOf(textData) > -1;
-      });
+      let newData = [];
+      if (text?.startsWith('+')) {
+        newData = MasterData?.filter(item => {
+          const itemData = item?.dial_code;
+          return itemData?.indexOf(text) > -1;
+        });
+      } else {
+        newData = MasterData?.filter(item => {
+          const itemData = item?.name
+            ? item?.name?.toUpperCase()
+            : ''.toLowerCase();
+          const textData = text?.toUpperCase();
+          return itemData?.indexOf(textData) > -1;
+        });
+      }
       setFilteredData(newData);
       setSearchData(text);
     } else {
@@ -116,7 +124,7 @@ const CountriesList = (props: CountriesListInterface) => {
    * @returns {JSX.Element}
    * @private
    */
-  const renderItem = item => {
+  const renderItem = ({item}) => {
     return (
       <Pressable
         android_ripple={{color: COLORS.rippleColor}}
@@ -201,17 +209,18 @@ const CountriesList = (props: CountriesListInterface) => {
           showsVerticalScrollIndicator={false}
           data={unionBy(sortBy(FilteredData, [data => data?.name]), 'code')}
           removeClippedSubviews={true}
-          keyExtractor={item => item?.code}
+          keyExtractor={item => item?.id}
           contentContainerStyle={[
             {flexGrow: 1},
             FilteredData.length > 0 ? null : {justifyContent: 'center'},
           ]}
+          disableVirtualization
           initialNumToRender={
             unionBy(sortBy(FilteredData, [data => data?.name]), 'code').length /
             2
           }
           ListEmptyComponent={listEmptyComponent}
-          renderItem={({item}) => renderItem(item)}
+          renderItem={renderItem}
         />
       </BottomSheetView>
     </BottomSheetModal>
