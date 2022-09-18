@@ -26,23 +26,6 @@ const isWeb: boolean = Platform.OS === 'web';
 const isWindows: boolean = Platform.OS === 'windows';
 const PlatformVersion = Platform.Version;
 
-const rgbaColor = (r, g, b, alpha = 1) => {
-  if (isWeb) {
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }
-  const a = Math.round(alpha * 255);
-  const c =
-    a * (1 << 24) +
-    Math.round(r) * (1 << 16) +
-    Math.round(g) * (1 << 8) +
-    Math.round(b);
-  if (Platform.OS === 'android') {
-    // on Android color is represented as signed 32 bit int
-    return c < (1 << 31) >>> 0 ? c : c - Math.pow(2, 32);
-  }
-  return c;
-};
-
 export {
   isIOS,
   isAndroid,
@@ -57,5 +40,4 @@ export {
   WindowScale,
   WindowFontScale,
   PlatformVersion,
-  rgbaColor,
 };
