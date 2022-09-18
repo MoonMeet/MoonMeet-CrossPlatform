@@ -208,9 +208,14 @@ const MyInputToolbar = ({
                 radius: 30 - 0.1 * 30,
               }}
               style={styles.emoticonButton}
-              onPress={() =>
-                emojiGetter ? emojiSetter(false) : emojiSetter(true)
-              }>
+              onPress={() => {
+                if (emojiGetter) {
+                  emojiSetter(false);
+                } else {
+                  emojiSetter(true);
+                  Keyboard.dismiss();
+                }
+              }}>
               <MaterialCommunityIcons
                 name={emojiGetter ? 'close' : 'emoticon-outline'}
                 size={23}
@@ -229,27 +234,31 @@ const MyInputToolbar = ({
               }}
               style={styles.input}
               value={messageGetter}
-              onChangeText={text => {
+              onChangeText={async text => {
                 messageSetter(text);
                 if (text?.trim()?.length === 0) {
-                  firestore()
+                  const typingRef = await firestore()
                     .collection('chats')
                     .doc(userUID)
                     .collection('discussions')
                     .doc(auth()?.currentUser?.uid)
-                    .update({
-                      typing: null,
-                    });
+                    .get();
+                  if (typingRef?.exists) {
+                    typingRef?.ref?.update({typing: null});
+                  }
                 } else {
                   if (text?.trim()?.length - lastLength > lastLength) {
-                    firestore()
+                    const typingRef = await firestore()
                       .collection('chats')
                       .doc(userUID)
                       .collection('discussions')
                       .doc(auth()?.currentUser?.uid)
-                      .update({
-                        typing: firestore?.Timestamp?.fromDate(new Date()),
+                      .get();
+                    if (typingRef?.exists) {
+                      typingRef?.ref?.update({
+                        typing: firestore?.Timestamp.fromDate(new Date()),
                       });
+                    }
                   }
                 }
                 setLastLength(text?.length);
