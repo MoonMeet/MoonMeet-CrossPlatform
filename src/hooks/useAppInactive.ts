@@ -13,7 +13,7 @@ import {AppState, AppStateStatus, Platform} from 'react-native';
  * Called when the application from foreground to background
  * @public
  */
-export function useAppInactive(fn: () => void): void {
+export function useAppInactive(fn: () => void, dependencies = []): void {
   const onChange = (state: AppStateStatus) => {
     if (
       state ===
@@ -30,5 +30,5 @@ export function useAppInactive(fn: () => void): void {
     const subscribe = AppState.addEventListener('change', onChange);
 
     return () => subscribe.remove();
-  }, []);
+  }, dependencies);
 }

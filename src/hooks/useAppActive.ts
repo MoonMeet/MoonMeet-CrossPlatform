@@ -13,7 +13,7 @@ import {AppState, AppStateStatus} from 'react-native';
  * Called when the application from background to foreground
  * @public
  */
-export function useAppActive(fn: () => void): void {
+export function useAppActive(fn: () => void, dependencies = []): void {
   const onChange = (state: AppStateStatus) => {
     if (state === 'active') {
       fn();
@@ -24,5 +24,5 @@ export function useAppActive(fn: () => void): void {
     const subscribe = AppState.addEventListener('change', onChange);
 
     return () => subscribe.remove();
-  }, []);
+  }, dependencies);
 }
