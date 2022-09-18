@@ -66,7 +66,7 @@ import {useAppInactive} from '../hooks/useAppInactive';
 import {PurpleBackground} from '../index.d';
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
-import getRandomString from '../utils/generators/getRandomString';
+import {getRandomString} from '../utils/generators/getRandomString';
 
 const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
   return (
@@ -153,7 +153,6 @@ const ChatScreen = () => {
     } catch (error) {
       setMe([]);
     }
-    return () => setMe([]);
   }, []);
 
   /**
