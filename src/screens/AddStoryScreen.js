@@ -51,7 +51,7 @@ import {
 } from '../config/Dimensions';
 import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import getRandomString from '../utils/generators/getRandomString';
+import {getRandomString} from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
