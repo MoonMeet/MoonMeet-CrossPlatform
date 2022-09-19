@@ -14,7 +14,7 @@
 - **Moon Meet** is a social media platform including a chatting feature.
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
-- **Moon Meet** is an Open Source Project means that anyone can see, change, get the source code and can contribute to make this project more better.
+- **Moon Meet** is an open source project means that anyone can see, change, get the source code and can contribute to make this project more better.
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
 ### Screenshots
