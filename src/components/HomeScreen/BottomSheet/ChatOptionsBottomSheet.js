@@ -21,6 +21,7 @@ import {fontValue} from '../../../config/Dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import {waitForAnd} from '../../../utils/timers/delay';
 
 const ChatOptionsBottomSheet = ({
   sheetRef,
@@ -62,37 +63,33 @@ const ChatOptionsBottomSheet = ({
 
   const {dismissAll} = useBottomSheetModal();
 
-  const updateCurrentMessageAsUnread = useCallback(() => {
+  const updateCurrentMessageAsUnread = useCallback(async () => {
     const messageRef = firestore()
       .collection('chats')
       .doc(auth()?.currentUser?.uid)
       .collection('discussions')
       .get();
-    return messageRef?.then(collectionSnapshot => {
-      collectionSnapshot?.docs.map(documentSnapshot => {
-        if (documentSnapshot?.id === currentMessage?.id) {
-          documentSnapshot?.ref?.update({read: false});
-        }
-      });
+    const collectionSnapshot = await messageRef;
+    collectionSnapshot?.docs.map(documentSnapshot => {
+      if (documentSnapshot?.id === currentMessage?.id) {
+        documentSnapshot?.ref?.update({read: false});
+      }
     });
   }, []);
 
-  const updateCurrentMessageAsRead = useCallback(() => {
+  const updateCurrentMessageAsRead = useCallback(async () => {
     const messageRef = firestore()
       .collection('chats')
       .doc(auth()?.currentUser?.uid)
       .collection('discussions')
       .get();
-    return messageRef?.then(collectionSnapshot => {
-      collectionSnapshot?.docs?.map(documentSnapshot => {
-        if (documentSnapshot?.id === currentMessage?.id) {
-          documentSnapshot?.ref?.update({read: true});
-        }
-      });
+    const collectionSnapshot = await messageRef;
+    collectionSnapshot?.docs?.map(documentSnapshot => {
+      if (documentSnapshot?.id === currentMessage?.id) {
+        documentSnapshot?.ref?.update({read: true});
+      }
     });
   }, []);
-
-  const deleteEntireConversation = useCallback(() => {}, []);
 
   return (
     <>
@@ -126,7 +123,7 @@ const ChatOptionsBottomSheet = ({
             <Pressable
               android_ripple={{color: COLORS.rippleColor}}
               onPress={() => {
-                updateCurrentMessageAsUnread().then(() => dismissAll());
+                updateCurrentMessageAsUnread().finally(() => dismissAll());
               }}
               style={styles.optionContainer}>
               <MaterialIcons
@@ -148,7 +145,7 @@ const ChatOptionsBottomSheet = ({
             <Pressable
               android_ripple={{color: COLORS.rippleColor}}
               onPress={() => {
-                updateCurrentMessageAsRead().then(() => dismissAll());
+                updateCurrentMessageAsRead().finally(() => dismissAll());
               }}
               style={styles.optionContainer}>
               <MaterialIcons
@@ -169,7 +166,10 @@ const ChatOptionsBottomSheet = ({
           )}
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
-            onPress={deleteConversationAlert}
+            onPress={() => {
+              deleteConversationAlert(true);
+              waitForAnd(0).finally(() => dismissAll());
+            }}
             style={styles.optionContainer}>
             <MaterialIcons
               name="delete"
@@ -216,4 +216,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatOptionsBottomSheet;
+export default React.memo(ChatOptionsBottomSheet);
