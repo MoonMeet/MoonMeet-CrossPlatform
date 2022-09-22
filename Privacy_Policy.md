@@ -1,4 +1,4 @@
-# Privacy Pollicy
+# Privacy Policy
 
 <p>
 Rayen sbai built the Moon Meet app as an Open Source app. This
