@@ -103,8 +103,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             to provide us with certain personally identifiable information. The
             information that I request will be retained on your device and is
             not collected by me in any way. The app does use third-party
-            services that may collect information used to identify you. Link to
-            the privacy policy of third-party service providers used by the app
+            services that may collect information used to identify you.
           </Text>
           <Text style={styles.subText}>- Google Firebase</Text>
           <Text style={styles.subText}>- Google Crashlytics for Firebase</Text>
@@ -136,12 +135,12 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             I may employ third-party companies and individuals due to the
             following reasons:
           </Text>
-          <Text style={styles.subText}>- To facilitate our Service</Text>
+          <Text style={styles.subText}>- To facilitate our service</Text>
           <Text style={styles.subText}>
-            - To provide the Service on our behalf
+            - To provide the service on our behalf
           </Text>
           <Text style={styles.subText}>
-            - To perform Service-related services
+            - To perform service-related services
           </Text>
           <Text style={styles.subText}>
             - To assist us in analyzing how our Service is used
@@ -154,7 +153,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             cannot guarantee its absolute security.
           </Text>
           <Text style={styles.subText}>
-            IThis Service may contain links to other sites. If you click on a
+            This service may contain links to other sites. If you click on a
             third-party link, you will be directed to that site. Note that these
             external sites are not operated by me. Therefore, I strongly advise
             you to review the Privacy Policy of these websites. I have no
@@ -162,19 +161,19 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             policies, or practices of any third-party sites or services.
           </Text>
           <Text style={styles.subText}>
-            These Services do not address anyone under the age of 13. I do not
+            These services do not address anyone under the age of 13. I do not
             knowingly collect personally identifiable information from children
             under 13 years of age. In the case I discover that a child under 13
             has provided me with personal information, I immediately delete this
             from our servers. If you are a parent or guardian and you are aware
             that your child has provided us with personal information, please
-            contact me so that I will be able to do the necessary actions.
+            contact me so that i will be able to do the necessary actions.
           </Text>
           <Text style={styles.subText}>
             I may update our Privacy Policy from time to time. Thus, you are
             advised to review this page periodically for any changes. I will
             notify you of any changes by posting the new Privacy Policy on this
-            page. This policy is effective as of 2022-08-13
+            page. This policy is effective as of 2022-9-10
           </Text>
           <Text style={styles.subText}>
             Contact Us: If you have any questions or suggestions about Moon Meet
