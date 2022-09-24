@@ -13,22 +13,20 @@ import {
   BottomSheetModal,
   BottomSheetView,
   useBottomSheetDynamicSnapPoints,
-  useBottomSheetModal,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 import {FONTS, COLORS} from '../../../config/Miscellaneous';
 import {fontValue} from '../../../config/Dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import {waitForAnd} from '../../../utils/timers/delay';
 
 const ChatOptionsBottomSheet = ({
   sheetRef,
   snapPoints,
   index,
   currentMessage,
-  deleteConversationAlert,
+  unReadFunction,
+  readFunction,
+  deleteFunction,
 }) => {
   const {animatedHandleHeight, handleContentLayout} =
     useBottomSheetDynamicSnapPoints(snapPoints);
@@ -61,119 +59,41 @@ const ChatOptionsBottomSheet = ({
     [],
   );
 
-  const {dismissAll} = useBottomSheetModal();
-
-  const updateCurrentMessageAsUnread = useCallback(async () => {
-    const messageRef = firestore()
-      .collection('chats')
-      .doc(auth()?.currentUser?.uid)
-      .collection('discussions')
-      .get();
-    const collectionSnapshot = await messageRef;
-    collectionSnapshot?.docs.map(documentSnapshot => {
-      if (documentSnapshot?.id === currentMessage?.id) {
-        documentSnapshot?.ref?.update({read: false});
-      }
-    });
-  }, []);
-
-  const updateCurrentMessageAsRead = useCallback(async () => {
-    const messageRef = firestore()
-      .collection('chats')
-      .doc(auth()?.currentUser?.uid)
-      .collection('discussions')
-      .get();
-    const collectionSnapshot = await messageRef;
-    collectionSnapshot?.docs?.map(documentSnapshot => {
-      if (documentSnapshot?.id === currentMessage?.id) {
-        documentSnapshot?.ref?.update({read: true});
-      }
-    });
-  }, []);
-
   return (
-    <>
-      <BottomSheetModal
-        ref={sheetRef}
-        index={index}
-        snapPoints={snapPoints}
-        handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
-        enablePanDownToClose={true}
-        handleHeight={animatedHandleHeight}
-        animationConfigs={animationConfigs}
-        backdropComponent={renderBackdrop}
-        animateOnMount={true}
-        style={sheetStyle}>
-        <BottomSheetView
-          onLayout={handleContentLayout}
+    <BottomSheetModal
+      ref={sheetRef}
+      index={index}
+      snapPoints={snapPoints}
+      handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
+      enablePanDownToClose={true}
+      handleHeight={animatedHandleHeight}
+      animationConfigs={animationConfigs}
+      backdropComponent={renderBackdrop}
+      animateOnMount={true}
+      style={sheetStyle}>
+      <BottomSheetView
+        onLayout={handleContentLayout}
+        style={{
+          backgroundColor: COLORS.primaryLight,
+          flex: 1,
+        }}>
+        <Text
           style={{
-            backgroundColor: COLORS.primaryLight,
-            flex: 1,
+            fontSize: fontValue(22.5),
+            fontFamily: FONTS.regular,
+            color: COLORS.accentLight,
+            textAlign: 'center',
           }}>
-          <Text
-            style={{
-              fontSize: fontValue(22.5),
-              fontFamily: FONTS.regular,
-              color: COLORS.accentLight,
-              textAlign: 'center',
-            }}>
-            Chat Options
-          </Text>
-          {currentMessage?.read ? (
-            <Pressable
-              android_ripple={{color: COLORS.rippleColor}}
-              onPress={() => {
-                updateCurrentMessageAsUnread().finally(() => dismissAll());
-              }}
-              style={styles.optionContainer}>
-              <MaterialIcons
-                name="mark-chat-unread"
-                size={25 - 0.1 * 25}
-                style={styles.arrowStyle}
-              />
-              <Text
-                style={{
-                  fontSize: fontValue(20),
-                  fontFamily: FONTS.regular,
-                  color: COLORS.black,
-                  opacity: 0.9,
-                }}>
-                Mark as unread
-              </Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              android_ripple={{color: COLORS.rippleColor}}
-              onPress={() => {
-                updateCurrentMessageAsRead().finally(() => dismissAll());
-              }}
-              style={styles.optionContainer}>
-              <MaterialIcons
-                name="mark-chat-read"
-                size={25 - 0.1 * 25}
-                style={styles.arrowStyle}
-              />
-              <Text
-                style={{
-                  fontSize: fontValue(20),
-                  fontFamily: FONTS.regular,
-                  color: COLORS.black,
-                  opacity: 0.9,
-                }}>
-                Mark as read
-              </Text>
-            </Pressable>
-          )}
+          Chat Options
+        </Text>
+        {currentMessage?.read ? (
           <Pressable
             android_ripple={{color: COLORS.rippleColor}}
-            onPress={() => {
-              deleteConversationAlert(true);
-              waitForAnd(0).finally(() => dismissAll());
-            }}
+            onPress={unReadFunction}
             style={styles.optionContainer}>
             <MaterialIcons
-              name="delete"
-              size={27.5 - 0.1 * 27.5}
+              name="mark-chat-unread"
+              size={25 - 0.1 * 25}
               style={styles.arrowStyle}
             />
             <Text
@@ -183,12 +103,51 @@ const ChatOptionsBottomSheet = ({
                 color: COLORS.black,
                 opacity: 0.9,
               }}>
-              Delete conversation
+              Mark as unread
             </Text>
           </Pressable>
-        </BottomSheetView>
-      </BottomSheetModal>
-    </>
+        ) : (
+          <Pressable
+            android_ripple={{color: COLORS.rippleColor}}
+            onPress={readFunction}
+            style={styles.optionContainer}>
+            <MaterialIcons
+              name="mark-chat-read"
+              size={25 - 0.1 * 25}
+              style={styles.arrowStyle}
+            />
+            <Text
+              style={{
+                fontSize: fontValue(20),
+                fontFamily: FONTS.regular,
+                color: COLORS.black,
+                opacity: 0.9,
+              }}>
+              Mark as read
+            </Text>
+          </Pressable>
+        )}
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          onPress={deleteFunction}
+          style={styles.optionContainer}>
+          <MaterialIcons
+            name="delete"
+            size={27.5 - 0.1 * 27.5}
+            style={styles.arrowStyle}
+          />
+          <Text
+            style={{
+              fontSize: fontValue(20),
+              fontFamily: FONTS.regular,
+              color: COLORS.black,
+              opacity: 0.9,
+            }}>
+            Delete conversation
+          </Text>
+        </Pressable>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 };
 
