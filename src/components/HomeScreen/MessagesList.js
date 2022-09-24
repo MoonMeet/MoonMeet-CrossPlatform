@@ -86,6 +86,34 @@ const MessagesList = ({ListData}) => {
 
   const {dismissAll} = useBottomSheetModal();
 
+  const updateCurrentMessageAsUnread = useCallback(async currentMessage => {
+    const messageRef = firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const collectionSnapshot = await messageRef;
+    collectionSnapshot?.docs.map(documentSnapshot => {
+      if (documentSnapshot?.id === currentMessage?.id) {
+        documentSnapshot?.ref?.update({read: false});
+      }
+    });
+  }, []);
+
+  const updateCurrentMessageAsRead = useCallback(async currentMessage => {
+    const messageRef = firestore()
+      .collection('chats')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions')
+      .get();
+    const collectionSnapshot = await messageRef;
+    collectionSnapshot?.docs?.map(documentSnapshot => {
+      if (documentSnapshot?.id === currentMessage?.id) {
+        documentSnapshot?.ref?.update({read: true});
+      }
+    });
+  }, []);
+
   const renderItem = ({item, index}) => {
     return (
       <>
@@ -121,7 +149,9 @@ const MessagesList = ({ListData}) => {
                 color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
                 onPress={() => {
                   setAlertDialogVisible(false);
-                  waitForAnd(0).finally(() => dismissAll());
+                  waitForAnd(0).then(() => {
+                    dismissAll();
+                  });
                 }}>
                 Cancel
               </Button>
@@ -132,6 +162,7 @@ const MessagesList = ({ListData}) => {
                 color={isThemeDark ? COLORS.redDarkError : COLORS.redLightError}
                 style={{margin: '0.5%'}}
                 onPress={async () => {
+                  setAlertDialogVisible(false);
                   try {
                     const lastChatsRef = firestore()
                       .collection('chats')
@@ -163,8 +194,7 @@ const MessagesList = ({ListData}) => {
                       1500,
                     );
                   }
-                  setAlertDialogVisible(false);
-                  waitForAnd(0).finally(() => dismissAll());
+                  waitForAnd(0).then(() => dismissAll());
                 }}>
                 Delete
               </Button>
@@ -208,6 +238,7 @@ const MessagesList = ({ListData}) => {
           </View>
           <View
             style={{
+              flexGrow: 1,
               padding: '2%',
               justifyContent: 'center',
               alignItems: 'flex-start',
@@ -243,7 +274,22 @@ const MessagesList = ({ListData}) => {
             index={0}
             snapPoints={sheetSnapPoints}
             currentMessage={ListData[currentIndex]}
-            deleteConversationAlert={setAlertDialogVisible}
+            unReadFunction={() =>
+              updateCurrentMessageAsUnread(ListData[currentIndex]).then(() =>
+                waitForAnd(0).then(() => dismissAll()),
+              )
+            }
+            readFunction={() =>
+              updateCurrentMessageAsRead(ListData[currentIndex]).then(() =>
+                waitForAnd(0).then(() => dismissAll()),
+              )
+            }
+            deleteFunction={() => {
+              setAlertDialogVisible(true);
+              waitForAnd(0).then(() => {
+                dismissAll();
+              });
+            }}
           />
         </Pressable>
       </>
@@ -265,6 +311,7 @@ const MessagesList = ({ListData}) => {
       initialNumToRender={10}
       keyExtractor={item => item?.id}
       renderItem={renderItem}
+      nestedScrollEnabled
     />
   );
 };
