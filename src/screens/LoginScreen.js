@@ -332,7 +332,7 @@ const LoginScreen = () => {
      * @type {RegExp}
      * @private
      */
-    let allowedCharactersRegex = /[^0-9]/g;
+    const allowedCharactersRegex = /[^0-9]/g;
     NumberSetText(text?.replace(allowedCharactersRegex, ''));
   };
 
