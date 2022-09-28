@@ -46,7 +46,7 @@ jobs:
     - name: Increase Gradle JVM max memory.
       run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
     - name: Enable New Arch
-      run: cd android && 's/newArchEnabled=false/newArchEnabled=true/g' && cd ..
+      run: cd android && sed 's/newArchEnabled=false/newArchEnabled=true/g' gradle.properties && cd ..
     - name: Clean the build.
       run: cd android && ./gradlew clean && cd ..
     - name: Build release APK.
