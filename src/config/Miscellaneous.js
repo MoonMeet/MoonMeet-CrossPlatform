@@ -15,9 +15,9 @@ const FONTS = {
 
 const COLORS = {
   primaryLight: '#fffefe',
-  primaryDark: '#181818',
+  primaryDark: '#000000',
   accentLight: '#566193',
-  accentDark: '#00B2FF',
+  accentDark: '#429AFF',
   controlNormal: '#DADADA',
   controlHighlight: '#ADADAD',
   darkGrey: '#999999',

@@ -24,6 +24,7 @@ import DiscoverPeopleScreen from '../screens/DiscoverPeopleScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import HomeChats from '../screens/HomeChatsScreen.js';
 import HomePeople from '../screens/HomePeopleScreen';
+import HomeStories from '../screens/HomeStoriesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import IntroScreen from '../screens/IntroScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -42,7 +43,6 @@ import SetupPasscodeScreen from '../screens/SetupPasscodeScreen';
 import VerifyPasscodeScreen from '../screens/VerifyPasscodeScreen';
 import {fontValue} from './Dimensions';
 import {MoonMeetDarkTheme} from './Theme/Theme';
-import {useTheme} from 'react-native-paper';
 import {ThemeContext} from './Theme/Context';
 import DarkModeSettings from '../screens/DarkModeScreen';
 import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
@@ -64,11 +64,17 @@ function HomeScreen() {
       title: 'People',
       icon: 'account',
     },
+    {
+      key: 'stories',
+      title: 'Stories',
+      icon: 'book-open-blank-variant',
+    },
   ]);
 
   const renderScene = BottomNavigation.SceneMap({
     chats: HomeChats,
     people: HomePeople,
+    stories: HomeStories,
   });
 
   return (
@@ -84,7 +90,7 @@ function HomeScreen() {
   );
 }
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   navStyle: {
     backgroundColor: COLORS.white,
     shadowColor: COLORS.redDarkError,
