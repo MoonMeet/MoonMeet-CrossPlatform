@@ -11,13 +11,13 @@ import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import CreateImage from '../assets/images/create.png';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
@@ -165,17 +165,18 @@ const HomePeopleScreen = () => {
               onPress={() => {
                 navigation?.navigate('discover');
                 updateUserActiveStatus();
+              }}
+              style={{
+                backgroundColor: COLORS.rippleColor,
+                borderRadius: 360,
+                padding: '2%',
+                overflow: 'hidden',
               }}>
-              <Avatar.Icon
-                icon={CreateImage}
-                size={37.5}
+              <MaterialCommunityIcons
+                name="pencil-outline"
+                size={24}
                 color={COLORS.black}
-                style={styles.right_icon}
-                theme={{
-                  colors: {
-                    primary: COLORS.rippleColor,
-                  },
-                }}
+                style={{opacity: 0.6, padding: '2%'}}
               />
             </Pressable>
           </View>
