@@ -13,11 +13,11 @@ import {EncryptionKey} from '../../secrets/sensitive';
  * Add your secret key from your file in /src/sensitive.js
  */
 
-const EncryptAES = word => {
+const EncryptAES = (word: string) => {
   return CryptoJS?.AES?.encrypt(word, EncryptionKey)?.toString();
 };
 
-const DecryptAES = word => {
+const DecryptAES = (word: string) => {
   return CryptoJS?.AES?.decrypt(word, EncryptionKey)?.toString(
     CryptoJS?.enc?.Utf8,
   );

@@ -6,11 +6,10 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-const lowerToUppercase = text => {
-  if (!text || text?.length < 1) {
-    return '';
-  }
-  return (text[0]?.toUpperCase() + text?.substring(1))?.trim();
-};
+function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-export {lowerToUppercase};
+export {getRandomInt};

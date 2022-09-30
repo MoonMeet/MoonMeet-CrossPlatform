@@ -6,12 +6,12 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-const bytesToSize = bytes => {
+const bytesToSize = (bytes: number) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) {
     return '0';
   }
-  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+  const i: number = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
   if (i === 0) {
     return `${bytes} ${sizes[i]})`;
   }
