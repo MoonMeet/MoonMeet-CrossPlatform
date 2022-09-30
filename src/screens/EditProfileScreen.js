@@ -22,7 +22,6 @@ import Spacer from '../components/Spacer/Spacer';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CameraIcon from '../assets/images/photo-camera.png';
-import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
 import ArrowForward from '../assets/images/arrow-forward.png';
 import {
@@ -38,6 +37,8 @@ import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {PurpleBackground} from '../index.d';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import ImagePicker from 'react-native-image-crop-picker';
+import {waitForAnd} from '../utils/timers/delay';
 
 const EditProfileScreen = () => {
   const pickerRef = useRef(null);
@@ -64,7 +65,6 @@ const EditProfileScreen = () => {
 
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
-  const [oldAvatar, setOldAvatar] = React.useState('');
 
   const [UserPhoto, setUserPhoto] = React.useState(null);
 
@@ -88,7 +88,6 @@ const EditProfileScreen = () => {
           setAvatarURL(documentSnapshot?.data()?.avatar);
           setFirstName(documentSnapshot?.data()?.first_name);
           setLastName(documentSnapshot?.data()?.last_name);
-          setOldAvatar(documentSnapshot?.data()?.avatar);
           setOldFirstname(documentSnapshot?.data()?.first_name);
           setOldLastName(documentSnapshot?.data()?.last_name);
           setLoading(false);
@@ -380,7 +379,7 @@ const EditProfileScreen = () => {
         icon={ArrowForward}
         color={COLORS.primaryLight}
         animated={true}
-        visible={loaderVisible}
+        visible={loaderVisible === false}
         theme={{
           colors: {
             accent: COLORS.accentLight,
@@ -436,24 +435,48 @@ const EditProfileScreen = () => {
         index={0}
         snapPoints={sheetSnapPoints}
         onCameraPress={() => {
-          openCamera()
+          ImagePicker.openCamera({
+            height: 1024,
+            width: 1024,
+            cropping: true,
+            mediaType: 'photo',
+          })
             .then(async image => {
               setUserPhoto(image);
-              dismissAll();
             })
-            .catch(e => {
+            .catch(() => {
               setLoaderVisible(false);
+              ErrorToast(
+                'bottom',
+                'Failed to open camera',
+                'please accept camera permission from settings',
+                true,
+                1000,
+              );
             });
+          waitForAnd(0).then(() => dismissAll());
         }}
         onFilePicker={() => {
-          openImagePicker()
+          ImagePicker.openPicker({
+            height: 1024,
+            width: 1024,
+            cropping: true,
+            mediaType: 'photo',
+          })
             .then(async image => {
               setUserPhoto(image);
-              dismissAll();
             })
-            .catch(e => {
+            .catch(() => {
               setLoaderVisible(false);
+              ErrorToast(
+                'bottom',
+                'Failed to open picker',
+                'please accept storage permission from settings',
+                true,
+                1000,
+              );
             });
+          waitForAnd(0).then(() => dismissAll());
         }}
       />
       <LoadingIndicator isVisible={loaderVisible} />
