@@ -89,7 +89,9 @@ const LoginScreen = () => {
       setPushToken(deviceState?.pushToken);
       setUserId(deviceState?.userId);
       setSubscribed(deviceState?.isSubscribed);
-      console.log(pushToken, isSubscribed, userId);
+      if (__DEV__) {
+        console.log(pushToken, isSubscribed, userId);
+      }
     } catch (e) {
       if (__DEV__) {
         console.error('OneSignal: ', e);
@@ -319,7 +321,7 @@ const LoginScreen = () => {
 
   const setCountryCodeData = data => {
     CountrySetText(data);
-    dismissAll();
+    waitForAnd(0).then(() => dismissAll());
   };
 
   /**
