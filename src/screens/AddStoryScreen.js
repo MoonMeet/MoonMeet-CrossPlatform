@@ -49,7 +49,6 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {getRandomString} from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
@@ -59,6 +58,8 @@ import Animated, {
   useAnimatedKeyboard,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import {waitForAnd} from '../utils/timers/delay';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -245,13 +246,15 @@ const AddStoryScreen = () => {
       });
     } else if (userSelection === 'text') {
       navigation?.setOptions({
-        headerTitle: 'Text story',
+        headerTitle: Loading ? '' : 'Text story',
+        headerBackVisible: Loading === false,
         headerRight:
           Loading === false ? props => <TitleText {...props} /> : null,
       });
     } else {
       navigation?.setOptions({
-        headerTitle: 'Image story',
+        headerTitle: Loading ? '' : 'Image story',
+        headerBackVisible: Loading === false,
         headerRight:
           Loading === false ? props => <ImageTitle {...props} /> : null,
       });
@@ -522,12 +525,11 @@ const AddStoryScreen = () => {
               style={{
                 height: '80%',
                 width: '99%',
-                resizeMode: 'cover',
+                resizeMode: 'contain',
               }}
               source={{uri: UserPhoto?.path}}
             />
-          ) : null}
-          {!UserPhoto ? (
+          ) : (
             <Image
               style={{
                 height: 50,
@@ -536,7 +538,7 @@ const AddStoryScreen = () => {
               }}
               source={PickImage}
             />
-          ) : null}
+          )}
         </Pressable>
         {inputEnabledForImage ? (
           <Animated.View
@@ -582,12 +584,17 @@ const AddStoryScreen = () => {
           index={0}
           snapPoints={sheetSnapPoints}
           onCameraPress={() => {
-            openCamera()
-              .then(image => {
+            ImagePicker.openCamera({
+              height: 1024,
+              width: 1024,
+              cropping: true,
+              mediaType: 'photo',
+            })
+              .then(async image => {
                 setUserPhoto(image);
                 setImageVisible(true);
               })
-              .catch(e => {
+              .catch(() => {
                 ErrorToast(
                   'bottom',
                   'Failed to open camera',
@@ -596,24 +603,29 @@ const AddStoryScreen = () => {
                   1000,
                 );
               });
-            dismissAll();
+            waitForAnd(0).then(() => dismissAll());
           }}
           onFilePicker={() => {
-            openImagePicker()
-              .then(image => {
+            ImagePicker.openPicker({
+              height: 1024,
+              width: 1024,
+              cropping: true,
+              mediaType: 'photo',
+            })
+              .then(async image => {
                 setUserPhoto(image);
                 setImageVisible(true);
               })
-              .catch(e => {
+              .catch(() => {
                 ErrorToast(
                   'bottom',
-                  'Failed to open camera',
-                  'please accept camera permission from settings',
+                  'Failed to open picker',
+                  'please accept storage permission from settings',
                   true,
                   1000,
                 );
               });
-            dismissAll();
+            waitForAnd(0).then(() => dismissAll());
           }}
         />
       </BaseView>
