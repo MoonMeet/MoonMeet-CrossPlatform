@@ -84,6 +84,10 @@
 
 -keep public class com.horcrux.svg.** {*;}
 
+# Shopify Skia
+
+-keep public class com.shopify.reactnative.skia.* { *; } 
+
 # Reanimated
 
 -keep class com.swmansion.reanimated.** { *; }
