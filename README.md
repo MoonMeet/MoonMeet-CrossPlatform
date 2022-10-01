@@ -21,9 +21,13 @@
 
 <details><summary>Click to expand</summary>
 <p float="left">
-![Spalsh Screen](./assets/splash.png "Splash Screen")
-<img src="assets/login.png" alt="Login Screen" width=325 height=800>
-<img src="assets/home.png" alt="Home Screen" width=325 height=800>
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png" width="720" height="1080" />
+![Splash Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png)
+
+![Login Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/login.png)
+
+![Home Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/home.png)
+
 <p>
 <p float="right">
 <img src="assets/me.png" alt="Settings Screen" width=325 height=800>
