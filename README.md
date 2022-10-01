@@ -1,10 +1,10 @@
 ## MoonMeet CrossPlatform 🎉️
 
 <p>
-<img src="https://img.shields.io/github/contributors/MoonMeet/MoonMeet-CrossPlatform" />
 <img src="https://img.shields.io/badge/license-GPL-blue.svg" />
 <img src="https://visitor-badge.laobi.icu/badge?page_id=MoonMeet.MoonMeet-CrossPlatform" />
 <img src="https://github.com/MoonMeet/MoonMeet-CrossPlatform/actions/workflows/android-ci-linux.yml/badge.svg" />
+<img src="https://github.com/MoonMeet/MoonMeet-CrossPlatform/actions/workflows/android-ci-linux-narch.yml/badge.svg" />
 <img src="https://www.codefactor.io/repository/github/moonmeet/moonmeet-crossplatform/badge" />
 </p>
 - We give people the closest distances
@@ -18,9 +18,10 @@
 - **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
 
 ### Screenshots
+
 <details><summary>Click to expand</summary>
 <p float="left">
-<img src="assets/splash.png" alt="Splash Screen" width=325  height=800>
+[Spalsh Screen](./assets/splash.png)
 <img src="assets/login.png" alt="Login Screen" width=325 height=800>
 <img src="assets/home.png" alt="Home Screen" width=325 height=800>
 <p>
@@ -53,13 +54,12 @@
   - Your `release.keystore` and `google-services.json`
   - Your `sensitive.js` file, [see more info here](/src/secrets/info.md)
   - You should add keystore  credentials as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
-  
+
   ```
   export KEYALIAS=YOURKEYALIAS
   export KEYPASS=YOURKEYPASS
   export KEYALIASPASS=YOURKEYALIASPASS
   ```
-
 
 ### Commit message
 
