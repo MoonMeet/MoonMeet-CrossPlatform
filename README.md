@@ -21,17 +21,14 @@
 
 <details><summary>Click to expand</summary>
 <p float="left">
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png" width="720" height="1080" />
-![Splash Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png)
-
-![Login Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/login.png)
-
-![Home Screen](https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/home.png)
-
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png" width="300" height="650" />
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/login.png" width="300" height="650" />
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/home.png" width="300" height="650" />
 <p>
-<p float="right">
-<img src="assets/me.png" alt="Settings Screen" width=325 height=800>
-<img src="assets/chat.png" alt="Chat Screen" width=325 height=800>
+<p float="left">
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/me.png" width="300" height="650" />
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/chats.png" width="300" height="650" />
+<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/discover.png" width="300" height="650" />
 <p>
 </details>
 
