@@ -21,7 +21,7 @@
 
 <details><summary>Click to expand</summary>
 <p float="left">
-[Spalsh Screen](./assets/splash.png)
+![Spalsh Screen](./assets/splash.png "Splash Screen")
 <img src="assets/login.png" alt="Login Screen" width=325 height=800>
 <img src="assets/home.png" alt="Home Screen" width=325 height=800>
 <p>
