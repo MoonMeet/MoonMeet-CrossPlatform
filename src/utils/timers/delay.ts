@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-const waitForAnd = millis =>
+const waitForAnd = (millis: number) =>
   new Promise(toResolve => setTimeout(toResolve, millis));
 
 export {waitForAnd};
