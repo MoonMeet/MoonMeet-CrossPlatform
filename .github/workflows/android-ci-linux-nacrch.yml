@@ -1,4 +1,4 @@
-name: New Arch CI on Linux.
+name: New Arch CI on Linux
 
 on:
   workflow_dispatch:

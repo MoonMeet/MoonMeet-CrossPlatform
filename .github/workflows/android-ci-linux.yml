@@ -1,4 +1,4 @@
-name: Android CI on Linux.
+name: Android CI on Linux
 
 on:
   workflow_dispatch:
