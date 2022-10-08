@@ -7,7 +7,15 @@
  */
 
 import React, {useCallback, useEffect} from 'react';
-import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  BackHandler,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
@@ -18,19 +26,22 @@ import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatGrid} from 'react-native-super-grid';
+import {DecryptAES} from '../utils/crypto/cryptoTools';
+import {reverse, sortBy, uniqBy} from 'lodash';
+import {StoryMMKV} from '../config/MMKV/StoryMMKV';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
 
-  const [Loading, setLoading] = React.useState(true);
-
   const [avatarURL, setAvatarURL] = React.useState('');
 
-  const [masterData, setMasterData] = React.useState([]);
+  const [storyLoading, setStoryLoading] = React.useState(true);
 
   const [newActiveTime, setNewActiveTime] = React.useState('');
 
   const [activeStatusState, setActiveStatusState] = React.useState(null);
+
+  const [storiesData, setStoriesData] = React.useState([]);
 
   async function updateUserActiveStatus() {
     await firestore()
@@ -59,11 +70,119 @@ const HomePeopleScreen = () => {
     }, []),
   );
 
+  const renderItem = ({item, index}) => {
+    let currentSid = storiesData[index]?.id;
+    let storySeenAlready = StoryMMKV.contains(currentSid);
+    return (
+      <Pressable
+        style={styles.itemContainer}
+        android_ripple={{color: COLORS.rippleColor}}
+        onPress={() => {
+          StoryMMKV.set(currentSid, JSON.stringify(item));
+          navigation?.navigate('story', {
+            userUID: item?.uid,
+            myUID: auth()?.currentUser?.uid,
+          });
+        }}>
+        <Image
+          style={{
+            backgroundColor: COLORS.white,
+            borderRadius: 5,
+            height: '100%',
+            resizeMode: 'contain',
+          }}
+          source={{
+            uri: item?.image ? item?.image : item?.avatar,
+          }}
+        />
+        <View
+          style={{
+            position: 'absolute',
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 12,
+            },
+            shadowOpacity: 0.58,
+            shadowRadius: 16.0,
+            elevation: 24,
+            zIndex: 1,
+            borderColor: storySeenAlready
+              ? COLORS.darkGrey
+              : COLORS.accentLight,
+            borderWidth: 1.5,
+            borderRadius: 360,
+            padding: '1.5%',
+            transform: [{translateY: 15}, {translateX: 10}],
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Avatar.Image
+            source={{uri: item?.avatar}}
+            size={35}
+            style={{overflow: 'hidden'}}
+          />
+        </View>
+        <Text
+          style={{
+            position: 'absolute',
+            width: '100%',
+            textAlign: 'left',
+            lineHeightight: 14,
+            fontSize: Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
+            fontWeight: '600',
+            color: COLORS.white,
+            fontFamily: FONTS.regular,
+            paddingHorizontal: 5 * 2,
+            transform: [{translateY: 275 / 2 + 275 / 4}],
+            zIndex: 1,
+            textShadowColor: 'rgba(0, 0, 0, 0.75)',
+            textShadowOffset: {width: -1, height: 1},
+            textShadowRadius: 10,
+          }}>{`${item?.first_name}${'\n'}${item?.last_name}`}</Text>
+      </Pressable>
+    );
+  };
+
+  /**
+   *
+   * @function
+   * @name deleteCurrentStory
+   * @param {string} sid
+   * @returns {Promise<void>}
+   */
+  const deleteCurrentStory = useCallback(async sid => {
+    return await firestore().collection('stories')?.doc(sid)?.delete();
+  }, []);
+
+  useEffect(() => {
+    const storySubsribe = firestore()
+      .collection('stories')
+      .onSnapshot(subCollectionSnapshot => {
+        subCollectionSnapshot?.forEach(subDocument => {
+          if (
+            subDocument?.data()?.time &&
+            (subDocument?.data()?.text || subDocument?.data()?.image)
+          ) {
+            if (
+              firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                subDocument?.data()?.time?.toDate() >
+              86400000
+            ) {
+              deleteCurrentStory(subDocument?.id);
+            }
+          }
+        });
+      });
+    return () => {
+      storySubsribe();
+    };
+  }, [deleteCurrentStory]);
+
   useEffect(() => {
     const userSusbcribe = firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
-        let activeSnapshot = [];
         collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.id === auth()?.currentUser?.uid) {
             if (
@@ -81,26 +200,6 @@ const HomePeopleScreen = () => {
               setNewActiveTime(documentSnapshot?.data()?.active_time);
             }
           }
-          if (
-            documentSnapshot?.data()?.active_status === 'normal' &&
-            firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-              documentSnapshot?.data()?.active_time?.toDate() <
-              180000
-          ) {
-            if (
-              documentSnapshot?.data()?.avatar &&
-              documentSnapshot?.data()?.first_name &&
-              documentSnapshot?.data()?.last_name &&
-              documentSnapshot?.data()?.active_status &&
-              documentSnapshot?.data()?.active_time
-            ) {
-              activeSnapshot.push({
-                ...documentSnapshot?.data(),
-              });
-            }
-          }
-          setMasterData(activeSnapshot);
-          setLoading(false);
         });
       });
     return () => {
@@ -108,70 +207,38 @@ const HomePeopleScreen = () => {
     };
   }, []);
 
-  const [items, setItems] = React.useState([
-    {name: 'TURQUOISE', code: '#1abc9c'},
-    {name: 'EMERALD', code: '#2ecc71'},
-    {name: 'PETER RIVER', code: '#3498db'},
-    {name: 'AMETHYST', code: '#9b59b6'},
-    {name: 'WET ASPHALT', code: '#34495e'},
-    {name: 'GREEN SEA', code: '#16a085'},
-    {name: 'NEPHRITIS', code: '#27ae60'},
-    {name: 'BELIZE HOLE', code: '#2980b9'},
-    {name: 'WISTERIA', code: '#8e44ad'},
-    {name: 'MIDNIGHT BLUE', code: '#2c3e50'},
-    {name: 'SUN FLOWER', code: '#f1c40f'},
-    {name: 'CARROT', code: '#e67e22'},
-    {name: 'ALIZARIN', code: '#e74c3c'},
-    {name: 'CLOUDS', code: '#ecf0f1'},
-    {name: 'CONCRETE', code: '#95a5a6'},
-    {name: 'ORANGE', code: '#f39c12'},
-    {name: 'PUMPKIN', code: '#d35400'},
-    {name: 'POMEGRANATE', code: '#c0392b'},
-    {name: 'SILVER', code: '#bdc3c7'},
-    {name: 'ASBESTOS', code: '#7f8c8d'},
-    {name: 'TURQUOISE', code: '#1abc9c'},
-    {name: 'EMERALD', code: '#2ecc71'},
-    {name: 'PETER RIVER', code: '#3498db'},
-    {name: 'AMETHYST', code: '#9b59b6'},
-    {name: 'WET ASPHALT', code: '#34495e'},
-    {name: 'GREEN SEA', code: '#16a085'},
-    {name: 'NEPHRITIS', code: '#27ae60'},
-    {name: 'BELIZE HOLE', code: '#2980b9'},
-    {name: 'WISTERIA', code: '#8e44ad'},
-    {name: 'MIDNIGHT BLUE', code: '#2c3e50'},
-    {name: 'SUN FLOWER', code: '#f1c40f'},
-    {name: 'CARROT', code: '#e67e22'},
-    {name: 'ALIZARIN', code: '#e74c3c'},
-    {name: 'CLOUDS', code: '#ecf0f1'},
-    {name: 'CONCRETE', code: '#95a5a6'},
-    {name: 'ORANGE', code: '#f39c12'},
-    {name: 'PUMPKIN', code: '#d35400'},
-    {name: 'POMEGRANATE', code: '#c0392b'},
-    {name: 'SILVER', code: '#bdc3c7'},
-    {name: 'ASBESTOS', code: '#7f8c8d'},
-    {name: 'TURQUOISE', code: '#1abc9c'},
-    {name: 'EMERALD', code: '#2ecc71'},
-    {name: 'PETER RIVER', code: '#3498db'},
-    {name: 'AMETHYST', code: '#9b59b6'},
-    {name: 'WET ASPHALT', code: '#34495e'},
-    {name: 'GREEN SEA', code: '#16a085'},
-    {name: 'NEPHRITIS', code: '#27ae60'},
-    {name: 'BELIZE HOLE', code: '#2980b9'},
-    {name: 'WISTERIA', code: '#8e44ad'},
-    {name: 'MIDNIGHT BLUE', code: '#2c3e50'},
-    {name: 'SUN FLOWER', code: '#f1c40f'},
-    {name: 'CARROT', code: '#e67e22'},
-    {name: 'ALIZARIN', code: '#e74c3c'},
-    {name: 'CLOUDS', code: '#ecf0f1'},
-    {name: 'CONCRETE', code: '#95a5a6'},
-    {name: 'ORANGE', code: '#f39c12'},
-    {name: 'PUMPKIN', code: '#d35400'},
-    {name: 'POMEGRANATE', code: '#c0392b'},
-    {name: 'SILVER', code: '#bdc3c7'},
-    {name: 'ASBESTOS', code: '#7f8c8d'},
-  ]);
+  useEffect(() => {
+    const storiesSubscribe = firestore()
+      .collection('stories')
+      .onSnapshot(collectionSnapshot => {
+        if (collectionSnapshot?.empty) {
+          setStoriesData([]);
+        } else {
+          let collectionDocs = collectionSnapshot?.docs?.map(element => ({
+            ...element?.data(),
+            image:
+              element.data()?.image === undefined
+                ? ''
+                : DecryptAES(element?.data()?.image),
+            id: element?.id,
+          }));
 
-  if (Loading) {
+          collectionDocs = sortBy(collectionDocs, [
+            docs => docs?.time?.toDate(),
+          ]);
+          collectionDocs = reverse(collectionDocs);
+          setStoriesData(collectionDocs);
+          console.log(collectionDocs);
+        }
+        setStoryLoading(false);
+      });
+
+    return () => {
+      storiesSubscribe();
+    };
+  }, []);
+
+  if (storyLoading) {
     return (
       <MiniBaseView>
         <View
@@ -246,17 +313,10 @@ const HomePeopleScreen = () => {
         </View>
         <FlatGrid
           itemDimension={185}
-          data={items}
+          data={uniqBy(storiesData, 'uid')}
           style={styles.gridView}
-          // staticDimension={300}
-          fixed
           spacing={15}
-          renderItem={({item}) => (
-            <View style={[styles.itemContainer, {backgroundColor: item.code}]}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemCode}>{item.code}</Text>
-            </View>
-          )}
+          renderItem={renderItem}
         />
       </MiniBaseView>
     );
@@ -307,24 +367,14 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   gridView: {
-    marginTop: 10,
+    marginTop: '1%',
     flex: 1,
   },
   itemContainer: {
-    justifyContent: 'flex-end',
-    borderRadius: 5,
-    padding: 10,
+    padding: '2%',
     height: 250,
-  },
-  itemName: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: '600',
-  },
-  itemCode: {
-    fontWeight: '600',
-    fontSize: 12,
-    color: '#fff',
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
   },
 });
 export default HomePeopleScreen;
