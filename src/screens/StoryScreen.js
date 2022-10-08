@@ -55,7 +55,8 @@ const StoryScreen = () => {
   const [current, setCurrent] = React.useState([]);
   // const [viewsData, setViewsData] = React.useState([]);
 
-  const [Loading, setLoading] = React.useState(true);
+  const [StoryLoading, setStoryLoading] = React.useState(true);
+  const [DataLoading, setDataLoading] = React.useState(true);
   // const [storyViewsVisible, setStoryViewsVisible] = React.useState(false);
 
   const storySheetRef = useRef(null);
@@ -98,6 +99,7 @@ const StoryScreen = () => {
         setStoryFirstName(documentSnapshot?.data()?.first_name);
         setStoryLastName(documentSnapshot?.data().last_name);
         setStoryAvatar(documentSnapshot?.data()?.avatar);
+        setDataLoading(false);
       });
   }, [userStoryUID]);
 
@@ -125,11 +127,11 @@ const StoryScreen = () => {
           documentCols => documentCols?.uid === userStoryUID,
         );
         setAllCurrentUserStories(collectionDocs);
-        setLoading(false);
+        setStoryLoading(false);
       });
   }, [userStoryUID]);
 
-  if (Loading) {
+  if (StoryLoading && DataLoading) {
     return (
       <MiniBaseView>
         <View
@@ -168,13 +170,8 @@ const StoryScreen = () => {
           <View style={styles.mid_side}>
             <Avatar.Image
               size={40}
-              source={
-                Loading
-                  ? PurpleBackground
-                  : storyAvatar
-                  ? {uri: storyAvatar}
-                  : PurpleBackground
-              }
+              source={storyAvatar ? {uri: storyAvatar} : PurpleBackground}
+              renderToHardwareTextureAndroid
             />
             <View
               style={{
