@@ -367,7 +367,6 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   gridView: {
-    marginTop: '1%',
     flex: 1,
   },
   itemContainer: {
