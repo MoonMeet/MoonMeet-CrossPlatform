@@ -7,15 +7,7 @@
  */
 
 import React, {useCallback, useEffect} from 'react';
-import {
-  BackHandler,
-  Image,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
@@ -26,24 +18,12 @@ import firestore from '@react-native-firebase/firestore';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
-import {reverse, sortBy, uniqBy} from 'lodash';
+import {reverse, sortBy} from 'lodash';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
-import StickyItemFlatList from '@gorhom/sticky-item';
-import MoonStickyStoryView from '../components/HomeScreen/MoonStickyStoryView';
 import Spacer from '../components/Spacer/Spacer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
-import {DecryptAES} from '../utils/crypto/cryptoTools';
 
 const HomeChatsScreen = () => {
-  // Sticky-Item Config
-  const ITEM_WIDTH = 120;
-  const ITEM_HEIGHT = 200;
-  const STICKY_ITEM_WIDTH = 50;
-  const STICKY_ITEM_HEIGHT = 50;
-  const STICKY_ITEM_BACKGROUNDS = [COLORS.rippleColor, COLORS.accentLight];
-  const SEPARATOR_SIZE = 8;
-  const BORDER_RADIUS = 10;
-
   const navigation = useNavigation();
 
   const [chatsData, setChatsData] = React.useState([]);
@@ -53,12 +33,6 @@ const HomeChatsScreen = () => {
   const [newActiveTime, setNewActiveTime] = React.useState('');
 
   const [activeStatusState, setActiveStatusState] = React.useState(null);
-
-  const [storiesData, setStoriesData] = React.useState([]);
-
-  const [myUID, setMyUID] = React.useState('');
-
-  const [storyLoading, setStoryLoading] = React.useState(true);
 
   const [chatsLoading, setChatsLoading] = React.useState(true);
 
@@ -109,17 +83,6 @@ const HomeChatsScreen = () => {
       });
   }
 
-  /**
-   *
-   * @function
-   * @name deleteCurrentStory
-   * @param {string} sid
-   * @returns {Promise<void>}
-   */
-  const deleteCurrentStory = useCallback(async sid => {
-    return await firestore().collection('stories')?.doc(sid)?.delete();
-  }, []);
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -147,7 +110,6 @@ const HomeChatsScreen = () => {
                 documentSnapshot?.data()?.active_status &&
                 documentSnapshot?.data()?.active_time
               ) {
-                setMyUID(documentSnapshot?.data()?.uid);
                 setAvatarURL(documentSnapshot?.data()?.avatar);
                 checkJwtKey(documentSnapshot?.data()?.jwtKey);
                 if (documentSnapshot?.data()?.active_status === 'normal') {
@@ -197,61 +159,7 @@ const HomeChatsScreen = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const storySubsribe = firestore()
-      .collection('stories')
-      .onSnapshot(subCollectionSnapshot => {
-        subCollectionSnapshot?.forEach(subDocument => {
-          if (
-            subDocument?.data()?.time &&
-            (subDocument?.data()?.text || subDocument?.data()?.image)
-          ) {
-            if (
-              firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                subDocument?.data()?.time?.toDate() >
-              86400000
-            ) {
-              deleteCurrentStory(subDocument?.id);
-            }
-          }
-        });
-      });
-    return () => {
-      storySubsribe();
-    };
-  }, [deleteCurrentStory]);
-
-  useEffect(() => {
-    const storiesSubscribe = firestore()
-      .collection('stories')
-      .onSnapshot(collectionSnapshot => {
-        if (collectionSnapshot?.empty) {
-          setStoriesData([]);
-        } else {
-          let collectionDocs = collectionSnapshot?.docs?.map(element => ({
-            ...element?.data(),
-            image:
-              element.data()?.image === undefined
-                ? ''
-                : DecryptAES(element?.data()?.image),
-            id: element?.id,
-          }));
-
-          collectionDocs = sortBy(collectionDocs, [
-            docs => docs?.time?.toDate(),
-          ]);
-          collectionDocs = reverse(collectionDocs);
-          setStoriesData(collectionDocs);
-        }
-        setStoryLoading(false);
-      });
-
-    return () => {
-      storiesSubscribe();
-    };
-  }, []);
-
-  if (storyLoading && chatsLoading) {
+  if (chatsLoading) {
     return (
       <MiniBaseView>
         <View
@@ -303,74 +211,6 @@ const HomeChatsScreen = () => {
           <View style={styles.mid_side}>
             <Text style={styles.top_text}>Chats</Text>
           </View>
-        </View>
-        <View
-          style={{
-            height: ITEM_HEIGHT,
-            width: '100%',
-          }}>
-          <StickyItemFlatList
-            itemWidth={ITEM_WIDTH}
-            itemHeight={ITEM_HEIGHT}
-            separatorSize={SEPARATOR_SIZE}
-            borderRadius={BORDER_RADIUS}
-            stickyItemWidth={STICKY_ITEM_WIDTH}
-            stickyItemHeight={STICKY_ITEM_HEIGHT}
-            stickyItemBackgroundColors={STICKY_ITEM_BACKGROUNDS}
-            stickyItemContent={props => (
-              <MoonStickyStoryView
-                {...props}
-                userAvatar={auth()?.currentUser?.photoURL}
-                tempAvatar={PurpleBackground}
-              />
-            )}
-            onStickyItemPress={undefined}
-            data={uniqBy(storiesData, 'uid')}
-            renderItem={({item}) => (
-              <Pressable
-                style={{
-                  height: ITEM_HEIGHT,
-                  width: ITEM_WIDTH,
-                  borderRadius: BORDER_RADIUS,
-                  backgroundColor: COLORS.rippleColor,
-                }}
-                onPress={() => {
-                  navigation?.navigate('story', {
-                    userUID: item?.uid,
-                    myUID: myUID,
-                  });
-                }}>
-                <Image
-                  style={{
-                    backgroundColor: COLORS.white,
-                    width: ITEM_WIDTH,
-                    height: ITEM_WIDTH,
-                    borderRadius: BORDER_RADIUS,
-                    resizeMode: 'contain',
-                  }}
-                  source={{
-                    uri: item?.image ? item?.image : item?.avatar,
-                  }}
-                />
-                <Text
-                  style={{
-                    position: 'absolute',
-                    width: '100%',
-                    textAlign: 'center',
-                    lineHeightight: 14,
-                    fontSize:
-                      Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
-                    fontWeight: '500',
-                    color: COLORS.black,
-                    fontFamily: FONTS.regular,
-                    paddingHorizontal: SEPARATOR_SIZE * 2,
-                    transform: [
-                      {translateY: ITEM_HEIGHT / 2 + ITEM_HEIGHT / 4},
-                    ],
-                  }}>{`${item?.first_name}${' '}${item?.last_name}`}</Text>
-              </Pressable>
-            )}
-          />
         </View>
         <Spacer height={heightPercentageToDP(0.5)} />
         <MessagesList ListData={chatsData} />
