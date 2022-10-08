@@ -50,6 +50,7 @@ const UserList = ({ListData}) => {
               <View style={styles.left_side}>
                 <Avatar.Image
                   source={item?.avatar ? {uri: item?.avatar} : PurpleBackground}
+                  style={{overflow: 'hidden'}}
                   size={55}
                 />
               </View>
