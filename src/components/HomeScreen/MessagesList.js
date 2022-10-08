@@ -149,9 +149,7 @@ const MessagesList = ({ListData}) => {
                 color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
                 onPress={() => {
                   setAlertDialogVisible(false);
-                  waitForAnd(0).then(() => {
-                    dismissAll();
-                  });
+                  waitForAnd(0).then(() => dismissAll());
                 }}>
                 Cancel
               </Button>
@@ -194,7 +192,9 @@ const MessagesList = ({ListData}) => {
                       1500,
                     );
                   }
-                  waitForAnd(0).then(() => dismissAll());
+                  waitForAnd(0).then(() => {
+                    dismissAll();
+                  });
                 }}>
                 Delete
               </Button>
@@ -274,11 +274,10 @@ const MessagesList = ({ListData}) => {
             index={0}
             snapPoints={sheetSnapPoints}
             currentMessage={ListData[currentIndex]}
-            unReadFunction={() =>
-              updateCurrentMessageAsUnread(ListData[currentIndex]).then(() =>
-                waitForAnd(0).then(() => dismissAll()),
-              )
-            }
+            unReadFunction={() => {
+              updateCurrentMessageAsUnread(ListData[currentIndex]);
+              waitForAnd(0).then(() => dismissAll());
+            }}
             readFunction={() =>
               updateCurrentMessageAsRead(ListData[currentIndex]).then(() =>
                 waitForAnd(0).then(() => dismissAll()),
@@ -286,9 +285,7 @@ const MessagesList = ({ListData}) => {
             }
             deleteFunction={() => {
               setAlertDialogVisible(true);
-              waitForAnd(0).then(() => {
-                dismissAll();
-              });
+              waitForAnd(0).then(() => dismissAll());
             }}
           />
         </Pressable>
@@ -298,13 +295,11 @@ const MessagesList = ({ListData}) => {
 
   return (
     <FlatList
-      style={{flex: 1}}
       data={uniqBy(ListData, 'id')}
       ListEmptyComponent={listEmptyComponent}
       contentContainerStyle={{
-        paddingStart: '1%',
-        paddingEnd: '2%',
-        paddingBottom: heightPercentageToDP(10),
+        paddingStart: '0.5%',
+        paddingEnd: '0.5%',
       }}
       showsVerticalScrollIndicator={false}
       removeClippedSubviews={true}
@@ -318,8 +313,6 @@ const MessagesList = ({ListData}) => {
 
 const styles = StyleSheet.create({
   userHaveStory: {
-    borderWidth: /*1.5*/ 0,
-    borderColor: COLORS.accentLight,
     overflow: 'hidden',
   },
   heading: (align, isRead) => {
