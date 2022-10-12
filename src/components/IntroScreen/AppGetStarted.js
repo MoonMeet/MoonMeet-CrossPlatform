@@ -7,10 +7,11 @@
  */
 
 import React from 'react';
-import {View, Text, Image} from 'react-native';
-import {Button} from 'react-native-paper';
+import {View, Image} from 'react-native';
+import {Button, Text} from 'react-native-paper';
 import {IntroStyles} from './IntroStyles';
 import GetStarted from '../../assets/images/get_started.png';
+import {COLORS} from '../../config/Miscellaneous';
 
 const AppGetStarted = ({onPressButton}) => {
   return (
@@ -30,7 +31,7 @@ const AppGetStarted = ({onPressButton}) => {
       <Button
         style={IntroStyles.introduction_button}
         uppercase={false}
-        color="#566193"
+        textColor={COLORS.accentLight}
         mode="outlined"
         onPress={onPressButton}>
         Continue
