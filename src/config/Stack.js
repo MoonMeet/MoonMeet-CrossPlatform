@@ -48,6 +48,7 @@ import DarkModeSettings from '../screens/DarkModeScreen';
 import PrivacySecurityScreen from '../screens/PrivacySecurityScreen';
 import ChatSettingsScreen from '../screens/ChatSettingsScreen';
 import {StyleSheet} from 'react-native';
+import {Easing} from 'react-native-reanimated';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,17 +58,20 @@ function HomeScreen() {
     {
       key: 'chats',
       title: 'Chats',
-      icon: 'chat',
+      focusedIcon: 'chat',
+      unfocusedIcon: 'chat-outline',
     },
     {
       key: 'people',
       title: 'People',
-      icon: 'account',
+      focusedIcon: 'account',
+      unfocusedIcon: 'account-outline',
     },
     {
       key: 'stories',
       title: 'Stories',
-      icon: 'book-open-blank-variant',
+      focusedIcon: 'book',
+      unfocusedIcon: 'book-outline',
     },
   ]);
 
@@ -82,6 +86,8 @@ function HomeScreen() {
       navigationState={{index, routes}}
       onIndexChange={setIndex}
       renderScene={renderScene}
+      sceneAnimationType={'shifting'}
+      sceneAnimationEasing={Easing.ease}
       style={styles.navStyle}
       barStyle={{backgroundColor: COLORS.white}}
       activeColor={COLORS.accentLight}
