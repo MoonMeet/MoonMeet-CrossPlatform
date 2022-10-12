@@ -7,9 +7,10 @@
  */
 
 import React from 'react';
-import {View, Image, Text} from 'react-native';
+import {View, Image} from 'react-native';
 import {IntroStyles} from './IntroStyles';
 import StartupIntro from '../../assets/images/startup_intro.png';
+import {Text} from 'react-native-paper';
 
 const AppOverview = () => {
   return (
