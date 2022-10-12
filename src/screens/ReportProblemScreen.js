@@ -265,14 +265,14 @@ const ReportProblemScreen = () => {
           </>
         ) : (
           <Chip
-            icon={PhotoCamera}
+            icon={'image-plus'}
             mode={'outlined'}
             style={{width: widthPercentageToDP(30)}}
             selectedColor={COLORS.black}
             onPress={() => {
               ImagePicker.openPicker({
-                width: 550,
-                height: 650,
+                width: 1024,
+                height: 1024,
                 cropping: false,
                 mediaType: 'photo',
               })
