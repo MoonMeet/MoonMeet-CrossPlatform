@@ -8,14 +8,17 @@
 
 import React, {useCallback, useMemo, useRef} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import {Avatar, Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import {
+  Avatar,
+  Button,
+  Dialog,
+  Divider,
+  Paragraph,
+  Portal,
+} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
-import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../../config/Dimensions';
+import {fontValue, widthPercentageToDP} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {isNull, uniqBy} from 'lodash';
@@ -289,6 +292,7 @@ const MessagesList = ({ListData}) => {
             }}
           />
         </Pressable>
+        <Divider leftInset />
       </>
     );
   };
