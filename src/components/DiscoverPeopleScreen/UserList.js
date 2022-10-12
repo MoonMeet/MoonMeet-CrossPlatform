@@ -9,7 +9,7 @@
 import React from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Divider} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
@@ -24,8 +24,8 @@ const UserList = ({ListData}) => {
     <FlatList
       data={uniqBy(ListData, 'uid')}
       contentContainerStyle={{
-        paddingStart: '1%',
-        paddingEnd: '2%',
+        paddingStart: '0.5%',
+        paddingEnd: '0.5%',
       }}
       showsVerticalScrollIndicator={false}
       disableVirtualization
@@ -66,6 +66,7 @@ const UserList = ({ListData}) => {
               </View>
             </Pressable>
           ) : null}
+          <Divider leftInset />
         </>
       )}
     />
