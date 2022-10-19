@@ -39,7 +39,6 @@ import TermsConditions from '../components/Modals/TermsConditions/TermsCondition
 
 import DeviceInfo from 'react-native-device-info';
 
-import ArrowForward from '../assets/images/arrow-forward.png';
 import DotsImage from '../assets/images/dots.png';
 import WelcomeImage from '../assets/images/welcome.png';
 
@@ -185,6 +184,10 @@ const LoginScreen = () => {
    */
 
   const isSMSSendingAcceptable = () => {
+    if (__DEV__) {
+      console.log('CountryText: ', CountryText?.trim()?.length);
+      console.log('NumberText: ', NumberText?.trim()?.length);
+    }
     return CountryText?.trim()?.length > 1 && NumberText?.trim()?.length > 4;
   };
 
@@ -495,6 +498,11 @@ const LoginScreen = () => {
               <Menu
                 visible={MenuVisible}
                 onDismiss={closeMenu}
+                theme={{
+                  colors: {
+                    onSecondaryContainer: COLORS.accentLight,
+                  },
+                }}
                 anchor={
                   <IconButton
                     icon={DotsImage}
@@ -548,7 +556,7 @@ const LoginScreen = () => {
                     style={{
                       width: '36%',
                     }}
-                    mode="outlined"
+                    mode="flat"
                     keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                     label="Country Code"
                     value={CountryText}
@@ -559,13 +567,9 @@ const LoginScreen = () => {
                     multiline={false}
                     theme={{
                       colors: {
-                        text: COLORS.accentLight,
                         primary: COLORS.accentLight,
-                        backgroundColor: COLORS.rippleColor,
+                        surfaceVariant: COLORS.rippleColor,
                         placeholder: COLORS.darkGrey,
-                        underlineColor: '#566193',
-                        selectionColor: '#DADADA',
-                        outlineColor: '#566193',
                       },
                     }}
                     onChangeText={text => {
@@ -577,7 +581,7 @@ const LoginScreen = () => {
                       width: '62%',
                       paddingRight: '2%',
                     }}
-                    mode="outlined"
+                    mode="flat"
                     keyboardType={isAndroid ? 'numeric' : 'number-pad'}
                     label="Phone Number"
                     value={NumberText}
@@ -586,13 +590,9 @@ const LoginScreen = () => {
                     multiline={false}
                     theme={{
                       colors: {
-                        text: COLORS.accentLight,
                         primary: COLORS.accentLight,
-                        backgroundColor: COLORS.rippleColor,
+                        surfaceVariant: COLORS.rippleColor,
                         placeholder: COLORS.darkGrey,
-                        underlineColor: '#566193',
-                        selectionColor: '#DADADA',
-                        outlineColor: '#566193',
                       },
                     }}
                     onChangeText={_NumberText => {
@@ -668,13 +668,14 @@ const LoginScreen = () => {
                 </Snackbar>
                 <FAB
                   style={styles.fab(mBottomMargin)}
-                  normal
-                  icon={ArrowForward}
+                  mode={'elevated'}
+                  size={'medium'}
+                  icon={'chevron-right'}
                   color={COLORS.primaryLight}
                   animated={true}
                   theme={{
                     colors: {
-                      accent: COLORS.accentLight,
+                      primaryContainer: COLORS.accentLight,
                     },
                   }}
                   onPress={async () => {
@@ -684,14 +685,14 @@ const LoginScreen = () => {
                       if (isSMSSendingAcceptable()) {
                         signInWithPhoneNumber(CountryText + NumberText);
                       } else {
-                        setBottomMargin(heightPercentageToDP(7.5));
+                        setBottomMargin(heightPercentageToDP(8));
                         setErrorSnackbarText(
                           'Please enter a valid Country Code and Phone Number',
                         );
                         onToggleErrorSnackBar();
                       }
                     } else {
-                      setBottomMargin(heightPercentageToDP(7.5));
+                      setBottomMargin(heightPercentageToDP(8));
                       setErrorSnackbarText(
                         'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
                       );
