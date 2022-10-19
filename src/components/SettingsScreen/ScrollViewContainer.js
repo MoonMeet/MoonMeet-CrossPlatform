@@ -7,7 +7,7 @@
  */
 
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Platform, BackHandler} from 'react-native';
+import {Platform, BackHandler, View} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -125,8 +125,10 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           dismissable={true}
           visible={LogoutDialogVisivle}
           onDismiss={() => setLogoutDialogVisible(false)}>
+          <Dialog.Icon size={30} icon={'account-alert'} />
           <Dialog.Title
             style={{
+              textAlign: 'center',
               color: isThemeDark ? COLORS.white : COLORS.black,
               opacity: 0.9,
             }}>
@@ -139,20 +141,12 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
                 fontSize: fontValue(14),
                 color: isThemeDark ? COLORS.white : COLORS.black,
                 opacity: isThemeDark ? 0.8 : 0.6,
+                textAlign: 'center',
               }}>
               Are you sure you want to log out ?
             </Paragraph>
           </Dialog.Content>
-          <Dialog.Actions>
-            <Button
-              uppercase={false}
-              style={{margin: '0.5%'}}
-              mode={'outlined'}
-              color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
-              onPress={() => setLogoutDialogVisible(false)}>
-              Flip a coin
-            </Button>
-            <SpacerHorizontal width={widthPercentageToDP(0.5)} />
+          <Dialog.Actions style={{alignSelf: 'center'}}>
             <Button
               uppercase={false}
               mode={'outlined'}
