@@ -299,13 +299,9 @@ const EditProfileScreen = () => {
           right={<TextInput.Affix text={`${firstName?.trim()?.length}/20`} />}
           theme={{
             colors: {
-              text: COLORS.black,
               primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
+              onSurface: COLORS.black,
+              background: COLORS.dimmed,
             },
           }}
           onChangeText={onFirstnameTextChange}
@@ -330,13 +326,9 @@ const EditProfileScreen = () => {
           right={<TextInput.Affix text={`${lastName?.trim()?.length}/20`} />}
           theme={{
             colors: {
-              text: COLORS.black,
               primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
+              onSurface: COLORS.black,
+              background: COLORS.dimmed,
             },
           }}
           onChangeText={onLastnameTextChange}
@@ -353,7 +345,7 @@ const EditProfileScreen = () => {
           padding={'none'}
           type="info"
           visible={true}>
-          If you want to change your bio, We need to redirect you
+          If you want to change your biography, go
         </HelperText>
         <View
           style={{
@@ -375,16 +367,16 @@ const EditProfileScreen = () => {
       </View>
       <FAB
         style={styles.fab}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
+        mode={'elevated'}
+        size={'medium'}
+        icon={'chevron-right'}
         animated={true}
-        visible={loaderVisible === false}
         theme={{
           colors: {
-            accent: COLORS.accentLight,
+            primaryContainer: COLORS.dimmed,
           },
         }}
+        visible={loaderVisible === false}
         onPress={() => {
           if (isConnected) {
             if (!firstnameHasLessLength() && !lastnameHasLessLength()) {
@@ -536,7 +528,6 @@ const styles = StyleSheet.create({
   },
   instruction: {
     flexDirection: 'row',
-    padding: '0.25%',
     justifyContent: 'center',
   },
   fab: {
