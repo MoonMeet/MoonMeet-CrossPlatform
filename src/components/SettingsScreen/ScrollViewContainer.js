@@ -7,7 +7,7 @@
  */
 
 import React, {useRef, useMemo, useCallback} from 'react';
-import {Platform, BackHandler, View} from 'react-native';
+import {Platform, BackHandler} from 'react-native';
 
 import DataItemTitle from './DataItemTitle';
 import DataItem from './DataItem';
@@ -44,12 +44,11 @@ import {
   InfoToast,
   SuccessToast,
 } from '../ToastInitializer/ToastInitializer';
-import {Button, Dialog, Paragraph, Portal, useTheme} from 'react-native-paper';
+import {Button, Dialog, Divider, Paragraph, Portal} from 'react-native-paper';
 import {ThemeContext} from '../../config/Theme/Context';
 import {ThemeMMKV} from '../../config/MMKV/ThemeMMKV';
-import {fontValue, widthPercentageToDP} from '../../config/Dimensions';
+import {fontValue} from '../../config/Dimensions';
 import notifee from '@notifee/react-native';
-import SpacerHorizontal from '../Spacer/SpacerHorizontal';
 
 interface ScrollViewContainerInterface {
   firstName?: string | undefined;
@@ -97,8 +96,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
 
   const navigation = useNavigation();
 
-  const theme = useTheme();
-  const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
+  const {isThemeDark} = React.useContext(ThemeContext);
 
   useFocusEffect(
     useCallback(() => {
@@ -220,6 +218,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           navigation.navigate('editProfile');
         }}
       />
+      <Divider />
       <DataItem
         leftIcon={PassCodeIcon}
         leftIconColor={COLORS.green}
@@ -238,6 +237,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           }
         }}
       />
+      <Divider />
       <DataItem
         leftIcon={PrivacyIcon}
         leftIconColor={COLORS.orange}
@@ -246,12 +246,14 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           navigation?.navigate('privacySecurity');
         }}
       />
+      <Divider />
       <DataItem
         leftIcon={LogoutIcon}
         leftIconColor={COLORS.redLightError}
         titleTextContainer={'Log out'}
         onPressTrigger={() => setLogoutDialogVisible(true)}
       />
+      <Divider />
       <DataItemTitle titleItem={'Profile'} />
       <DataItemCustom
         leftIcon={ActiveStatusIcon}
@@ -269,6 +271,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
         }}
         onLongPressTrigger={null}
       />
+      <Divider />
       <DataItemCustom
         leftIcon={UsernameIcon}
         leftIconColor={COLORS.redDarkError}
@@ -302,6 +305,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           }
         }}
       />
+      <Divider />
       <DataItemTitle titleItem={'Settings'} />
       <DataItem
         leftIcon={NotificationsIcon}
@@ -311,6 +315,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           await notifee.openNotificationSettings();
         }}
       />
+      <Divider />
       <DataItem
         leftIcon={MessageIcon}
         leftIconColor={COLORS.blue_second}
@@ -329,7 +334,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           }
         }}
       />
+      <Divider />
       <DevicesScreen />
+      <Divider />
       <DataItemTitle titleItem={'Help'} />
       <DataItem
         leftIcon={PriPoIcon}
@@ -339,12 +346,14 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           handlePresentPrivacyModal();
         }}
       />
+      <Divider />
       <DataItem
         leftIcon={FAQIcon}
         leftIconColor={COLORS.pink}
         titleTextContainer={'Frequently asked questions'}
         onPressTrigger={() => handlePresentFaqModal()}
       />
+      <Divider />
       <DataItem
         leftIcon={ReportIcon}
         leftIconColor={COLORS.accentLight}
@@ -353,6 +362,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
           navigation?.navigate('bugreport');
         }}
       />
+      <Divider />
       <PrivacyPolicy
         sheetRef={privacyRef}
         index={0}
