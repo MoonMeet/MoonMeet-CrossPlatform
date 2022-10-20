@@ -16,46 +16,48 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/Dimensions';
+import {Divider} from 'react-native-paper';
 
 const DevicesList = ({ListData}) => {
+  const renderItem = ({item}) => {
+    return (
+      <>
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          style={styles.container}>
+          <View style={styles.left_side}>
+            <Text style={styles.heading}>
+              {'Moon Meet' + ' ' + item?.system_name + ' ' + item?.app_version}
+            </Text>
+            <Text style={styles.subheading(false)}>
+              {item?.manufacturer + ' ' + item?.model}
+            </Text>
+          </View>
+          <View style={styles.right_side}>
+            <Text style={styles.subheading(true)}>
+              {moment(item?.time?.toDate())?.calendar()}
+            </Text>
+          </View>
+        </Pressable>
+        <Divider />
+      </>
+    );
+  };
+
   return (
-    <View style={{flex: 1}}>
-      <FlatList
-        data={ListData}
-        contentContainerStyle={{
-          paddingStart: widthPercentageToDP(1.75),
-          paddingEnd: widthPercentageToDP(1.75),
-        }}
-        showsVerticalScrollIndicator={false}
-        disableVirtualization
-        removeClippedSubviews={true}
-        initialNumToRender={10}
-        keyExtractor={item => item.time}
-        renderItem={({item}) => (
-          <Pressable
-            android_ripple={{color: COLORS.rippleColor}}
-            style={styles.container}>
-            <View style={styles.left_side}>
-              <Text style={styles.heading}>
-                {'Moon Meet' +
-                  ' ' +
-                  item?.system_name +
-                  ' ' +
-                  item?.app_version}
-              </Text>
-              <Text style={styles.subheading(false)}>
-                {item?.manufacturer + ' ' + item?.model}
-              </Text>
-            </View>
-            <View style={styles.right_side}>
-              <Text style={styles.subheading(true)}>
-                {moment(item?.time?.toDate())?.calendar()}
-              </Text>
-            </View>
-          </Pressable>
-        )}
-      />
-    </View>
+    <FlatList
+      data={ListData}
+      contentContainerStyle={{
+        paddingStart: widthPercentageToDP(1.75),
+        paddingEnd: widthPercentageToDP(1.75),
+      }}
+      showsVerticalScrollIndicator={false}
+      disableVirtualization
+      removeClippedSubviews={true}
+      initialNumToRender={10}
+      keyExtractor={item => item.time}
+      renderItem={renderItem}
+    />
   );
 };
 
