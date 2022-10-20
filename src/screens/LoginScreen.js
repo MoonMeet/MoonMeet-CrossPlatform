@@ -128,13 +128,24 @@ const LoginScreen = () => {
       if (listenerState?.isConnected) {
         getCountryCodeFromApi();
       } else {
-        setErrorSnackbarText(
-          'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
+        if (__DEV__) {
+          console.log('not connected');
+        }
+        CustomToast(
+          'error',
+          'bottom',
+          'No internet',
+          'Please enable your Mobile Data or WiFi Network.',
+          true,
+          0,
+          heightPercentageToDP(10),
+          1500,
         );
-        setErrorSnackBarVisible(true);
+        CountrySetText('+1');
       }
     });
-    return netEventListener;
+    return () => netEventListener;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigation = useNavigation();
@@ -635,7 +646,6 @@ const LoginScreen = () => {
                   mode={'elevated'}
                   size={'medium'}
                   icon={'chevron-right'}
-                  color={COLORS.primaryLight}
                   animated={true}
                   theme={{
                     colors: {
