@@ -22,7 +22,7 @@ import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {fontValue} from '../config/Dimensions';
+import {fontValue, screenWidth} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatGrid} from 'react-native-super-grid';
@@ -89,6 +89,7 @@ const HomePeopleScreen = () => {
             backgroundColor: COLORS.white,
             borderRadius: 5,
             height: '100%',
+            width: '100%',
             resizeMode: 'contain',
           }}
           source={{
@@ -126,7 +127,6 @@ const HomePeopleScreen = () => {
         <Text
           style={{
             position: 'absolute',
-            width: '100%',
             textAlign: 'left',
             lineHeightight: 14,
             fontSize: Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
@@ -312,7 +312,7 @@ const HomePeopleScreen = () => {
           </View>
         </View>
         <FlatGrid
-          itemDimension={185}
+          itemDimension={screenWidth / 3}
           data={uniqBy(storiesData, 'uid')}
           style={styles.gridView}
           spacing={15}
@@ -370,7 +370,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemContainer: {
-    padding: '2%',
     height: 250,
     backgroundColor: COLORS.white,
     borderRadius: 10,
