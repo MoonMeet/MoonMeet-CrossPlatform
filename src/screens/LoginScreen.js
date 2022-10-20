@@ -13,7 +13,6 @@ import {
   FAB,
   IconButton,
   Menu,
-  Snackbar,
   Text,
   TextInput,
 } from 'react-native-paper';
@@ -45,7 +44,10 @@ import WelcomeImage from '../assets/images/welcome.png';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {getRandomInt} from '../utils/generators/getRandomNumber';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
-import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
+import {
+  CustomToast,
+  ErrorToast,
+} from '../components/ToastInitializer/ToastInitializer';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import axios from 'axios';
@@ -188,7 +190,7 @@ const LoginScreen = () => {
       console.log('CountryText: ', CountryText?.trim()?.length);
       console.log('NumberText: ', NumberText?.trim()?.length);
     }
-    return CountryText?.trim()?.length > 1 && NumberText?.trim()?.length > 4;
+    return CountryText?.trim()?.length > 0 && NumberText?.trim()?.length > 4;
   };
 
   const phoneRef = useRef();
@@ -235,25 +237,6 @@ const LoginScreen = () => {
   }
 
   /**
-   * SnackBar Stuff
-   */
-
-  const [mBottomMargin, setBottomMargin] = React.useState(0);
-
-  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState('');
-
-  const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
-
-  const onToggleErrorSnackBar = useCallback(() => {
-    setErrorSnackBarVisible(!ErrorSnackBarVisible);
-  }, [ErrorSnackBarVisible]);
-
-  const onDismissErrorSnackBar = () => {
-    setBottomMargin(0);
-    setErrorSnackBarVisible(!ErrorSnackBarVisible);
-  };
-
-  /**
    * get dial code from internet API
    * @return {NaN, String} data to {CountryText}
    */
@@ -268,11 +251,13 @@ const LoginScreen = () => {
           CountrySetText(element?.data);
         }
       })
-      .catch(error => {
+      .catch(e => {
         if (__DEV__) {
-          console.error(error);
+          console.error(e);
         }
-        CountrySetText(+1);
+        if (CountryText?.trim()?.length < 0) {
+          CountrySetText('+1');
+        }
       });
   };
 
@@ -396,7 +381,7 @@ const LoginScreen = () => {
               textAlign: 'center',
               alignSelf: 'center',
             }}
-            color={COLORS.accentLight}
+            textColor={COLORS.accentLight}
             uppercase={false}
             hitSlop={20}
             onPress={() => {
@@ -602,7 +587,7 @@ const LoginScreen = () => {
                 </View>
                 <View
                   style={{
-                    paddingLeft: '4%',
+                    paddingLeft: '2%',
                     paddingRight: '2%',
                     position: 'relative',
                   }}>
@@ -620,7 +605,7 @@ const LoginScreen = () => {
                   style={{
                     flexDirection: 'row',
                     position: 'relative',
-                    paddingLeft: '4%',
+                    paddingLeft: '2%',
                     paddingRight: '2%',
                   }}>
                   <Text
@@ -645,29 +630,8 @@ const LoginScreen = () => {
                     {'Terms & Conditions'}
                   </Text>
                 </View>
-                <Snackbar
-                  visible={ErrorSnackBarVisible}
-                  onDismiss={onDismissErrorSnackBar}
-                  duration={3000}
-                  action={{
-                    label: 'OK',
-                    onPress: () => {
-                      onDismissErrorSnackBar();
-                    },
-                  }}
-                  theme={{
-                    colors: {
-                      onSurface: COLORS.redLightError,
-                      accent: COLORS.white,
-                    },
-                  }}
-                  style={{
-                    margin: '4%',
-                  }}>
-                  {ErrorSnackbarText}
-                </Snackbar>
                 <FAB
-                  style={styles.fab(mBottomMargin)}
+                  style={styles.fab}
                   mode={'elevated'}
                   size={'medium'}
                   icon={'chevron-right'}
@@ -685,18 +649,28 @@ const LoginScreen = () => {
                       if (isSMSSendingAcceptable()) {
                         signInWithPhoneNumber(CountryText + NumberText);
                       } else {
-                        setBottomMargin(heightPercentageToDP(8));
-                        setErrorSnackbarText(
-                          'Please enter a valid Country Code and Phone Number',
+                        CustomToast(
+                          'error',
+                          'bottom',
+                          'Wrong credentials',
+                          'Please enter a valid Country Code and Phone Number.',
+                          true,
+                          0,
+                          heightPercentageToDP(10),
+                          1500,
                         );
-                        onToggleErrorSnackBar();
                       }
                     } else {
-                      setBottomMargin(heightPercentageToDP(8));
-                      setErrorSnackbarText(
-                        'Please enable your Mobile Data or WiFi Network to can you access Moon Meet and Login',
+                      CustomToast(
+                        'error',
+                        'bottom',
+                        'No internet',
+                        'Please enable your Mobile Data or WiFi Network.',
+                        true,
+                        0,
+                        heightPercentageToDP(10),
+                        1500,
                       );
-                      onToggleErrorSnackBar();
                     }
                   }}
                 />
@@ -842,13 +816,11 @@ const styles = StyleSheet.create({
     paddingRight: '2%',
     alignSelf: 'center',
   },
-  fab: bottomMargin => {
-    return {
-      position: 'absolute',
-      margin: 16 - 0.1 * 16,
-      right: 0,
-      bottom: bottomMargin,
-    };
+  fab: {
+    position: 'absolute',
+    margin: 16 - 0.1 * 16,
+    right: 0,
+    bottom: 0,
   },
 });
 export default LoginScreen;
