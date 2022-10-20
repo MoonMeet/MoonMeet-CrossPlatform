@@ -29,7 +29,7 @@ const ActivePeopleList = ({ListData}) => {
     );
   };
 
-  const renderItem = item => {
+  const renderItem = ({item}) => {
     return (
       <Pressable
         android_ripple={{color: COLORS.rippleColor}}
@@ -70,7 +70,7 @@ const ActivePeopleList = ({ListData}) => {
       data={uniqBy(ListData, 'uid')}
       contentContainerStyle={{
         paddingStart: '1%',
-        paddingEnd: '2%',
+        paddingEnd: '1%',
       }}
       showsVerticalScrollIndicator={false}
       disableVirtualization
@@ -78,7 +78,7 @@ const ActivePeopleList = ({ListData}) => {
       initialNumToRender={25}
       ListEmptyComponent={listEmptyComponent}
       keyExtractor={item => item?.avatar}
-      renderItem={({item}) => renderItem(item)}
+      renderItem={renderItem}
     />
   );
 };
