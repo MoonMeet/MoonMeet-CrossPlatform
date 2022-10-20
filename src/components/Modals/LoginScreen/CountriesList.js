@@ -9,10 +9,10 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {Pressable, Text, View, StyleSheet} from 'react-native';
 import CountriesJson from '../../../assets/data/json/country-codes.json';
-import {Searchbar} from 'react-native-paper';
+import {Divider, Searchbar} from 'react-native-paper';
 import {COLORS, FONTS} from '../../../config/Miscellaneous';
 import ClearImage from '../../../assets/images/clear.png';
-import {unionBy, sortBy} from 'lodash';
+import {unionBy, sortBy, filter} from 'lodash';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -87,22 +87,14 @@ const CountriesList = (props: CountriesListInterface) => {
    */
 
   const SearchInData = text => {
-    if (text) {
-      let newData = [];
-      if (text?.startsWith('+')) {
-        newData = MasterData?.filter(item => {
-          const itemData = item?.dial_code;
-          return itemData?.indexOf(text) > -1;
-        });
-      } else {
-        newData = MasterData?.filter(item => {
-          const itemData = item?.name
-            ? item?.name?.toUpperCase()
-            : ''.toLowerCase();
-          const textData = text?.toUpperCase();
-          return itemData?.indexOf(textData) > -1;
-        });
-      }
+    if (text?.trim().length > 0) {
+      const newData = filter(MasterData, item => {
+        const itemData = item?.name
+          ? item?.name?.toUpperCase()
+          : ''.toLowerCase();
+        const textData = text?.toUpperCase();
+        return itemData?.indexOf(textData) > -1;
+      });
       setFilteredData(newData);
       setSearchData(text);
     } else {
@@ -126,15 +118,18 @@ const CountriesList = (props: CountriesListInterface) => {
    */
   const renderItem = ({item}) => {
     return (
-      <Pressable
-        android_ripple={{color: COLORS.rippleColor}}
-        style={styles.container}
-        onPress={() => {
-          props?.sharedData(item?.dial_code);
-        }}>
-        <Text style={styles.country_text}>{item?.name}</Text>
-        <Text style={styles.dial_text}>{item?.dial_code}</Text>
-      </Pressable>
+      <>
+        <Pressable
+          android_ripple={{color: COLORS.rippleColor}}
+          style={styles.container}
+          onPress={() => {
+            props?.sharedData(item?.dial_code);
+          }}>
+          <Text style={styles.country_text}>{item?.name}</Text>
+          <Text style={styles.dial_text}>{item?.dial_code}</Text>
+        </Pressable>
+        <Divider />
+      </>
     );
   };
   const listEmptyComponent = () => {
@@ -197,13 +192,10 @@ const CountriesList = (props: CountriesListInterface) => {
           style={{margin: '0.5%'}}
           iconColor={COLORS.darkGrey}
           inputStyle={{
-            color: COLORS.accentLight,
+            color: COLORS.black,
             fontFamily: FONTS.regular,
           }}
           clearIcon={ClearImage}
-          theme={{
-            roundness: 5,
-          }}
         />
         <FlatList
           showsVerticalScrollIndicator={false}
