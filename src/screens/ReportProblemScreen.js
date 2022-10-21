@@ -13,7 +13,6 @@ import {FAB, HelperText, TextInput, Chip, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
-import ArrowForward from '../assets/images/arrow-forward.png';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
@@ -27,43 +26,15 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import PhotoCamera from '../assets/images/pick-photo.png';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withTiming,
-  useAnimatedRef,
-} from 'react-native-reanimated';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import RemoveIcon from '../assets/images/clear.png';
 import {getRandomString} from '../utils/generators/getRandomString';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {ScreenWidth} from '../utils/device/DeviceInfo';
 
 const ReportProblemScreen = () => {
-  const AnimatedFAB = Animated.createAnimatedComponent(FAB);
-  const AnimatedFABRef = useAnimatedRef();
-
   const navigation = useNavigation();
-
-  const translateY = useSharedValue(0);
-
-  const animateFab = () => {
-    translateY.value = withDelay(
-      30,
-      withTiming(1500, {duration: 400}, isFinished => {
-        if (isFinished) {
-          translateY.value = withDelay(1500, withTiming(0, {duration: 400}));
-        }
-      }),
-    );
-  };
-
-  const fabAnimation = useAnimatedStyle(() => {
-    return {
-      transform: [{translateY: translateY.value}],
-    };
-  }, []);
 
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
@@ -206,13 +177,9 @@ const ReportProblemScreen = () => {
           }
           theme={{
             colors: {
-              text: COLORS.black,
               primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
+              onSurface: COLORS.black,
+              background: COLORS.dimmed,
             },
           }}
           onChangeText={onReportTextChange}
@@ -267,8 +234,15 @@ const ReportProblemScreen = () => {
           <Chip
             icon={'image-plus'}
             mode={'outlined'}
-            style={{width: widthPercentageToDP(30)}}
+            style={{height: ScreenWidth / 10}}
             selectedColor={COLORS.black}
+            theme={{
+              colors: {
+                primary: COLORS.black,
+                surface: COLORS.white,
+              },
+            }}
+            textStyle={{color: COLORS.black}}
             onPress={() => {
               ImagePicker.openPicker({
                 width: 1024,
@@ -289,16 +263,22 @@ const ReportProblemScreen = () => {
           </Chip>
         )}
       </View>
-      <AnimatedFAB
-        ref={ref => (AnimatedFABRef.current = ref)}
-        style={[styles.fab, fabAnimation]}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
+      <FAB
+        style={styles.fab}
+        mode={'elevated'}
+        size={'medium'}
+        icon={({size, allowFontScaling}) => (
+          <MaterialIcons
+            name="chevron-right"
+            color={COLORS.white}
+            size={size}
+            allowFontScaling={allowFontScaling}
+          />
+        )}
         animated={true}
         theme={{
           colors: {
-            accent: COLORS.accentLight,
+            primaryContainer: COLORS.accentLight,
           },
         }}
         onPress={() => {
@@ -306,7 +286,6 @@ const ReportProblemScreen = () => {
             if (!hasMoreLength() && !hasLessLength()) {
               pushReport(UserPhoto?.path ? 'image' : 'text');
             } else {
-              animateFab();
               ErrorToast(
                 'bottom',
                 'Invalid report message',
@@ -316,7 +295,6 @@ const ReportProblemScreen = () => {
               );
             }
           } else {
-            animateFab();
             ErrorToast(
               'bottom',
               'Network unavailable',
