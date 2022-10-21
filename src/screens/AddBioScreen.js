@@ -18,7 +18,6 @@ import {
 import {COLORS} from '../config/Miscellaneous';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
-import ArrowForward from '../assets/images/arrow-forward.png';
 import {
   ErrorToast,
   SuccessToast,
@@ -29,6 +28,7 @@ import NetInfo from '@react-native-community/netinfo';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AddBioScreen = () => {
   const navigation = useNavigation();
@@ -142,13 +142,9 @@ const AddBioScreen = () => {
           placeholder={'Type your new bio here.'}
           theme={{
             colors: {
-              text: COLORS.black,
               primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
+              onSurface: COLORS.black,
+              background: COLORS.dimmed,
             },
           }}
           onChangeText={onBioTextChange}
@@ -163,13 +159,20 @@ const AddBioScreen = () => {
       </HelperText>
       <FAB
         style={styles.fab}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
+        mode={'elevated'}
+        size={'medium'}
+        icon={({size, allowFontScaling}) => (
+          <MaterialIcons
+            name="chevron-right"
+            color={COLORS.white}
+            size={size}
+            allowFontScaling={allowFontScaling}
+          />
+        )}
         animated={true}
         theme={{
           colors: {
-            accent: COLORS.accentLight,
+            primaryContainer: COLORS.accentLight,
           },
         }}
         onPress={() => {
