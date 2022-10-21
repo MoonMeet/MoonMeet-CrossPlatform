@@ -95,9 +95,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             our Terms and Conditions, which are accessible at Moon Meet unless
             otherwise defined in this Privacy Policy.
           </Text>
-          <Text style={styles.lastUpdate}>
-            last updated: September 10, 2022
-          </Text>
+          <Text style={styles.lastUpdate}>last updated: October 21, 2022</Text>
           <Text style={styles.subText}>
             For a better experience, while using our Service, I may require you
             to provide us with certain personally identifiable information. The
@@ -179,8 +177,7 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
             Contact Us: If you have any questions or suggestions about Moon Meet
             Privacy Policy, do not hesitate to contact me on:
           </Text>
-          <Text style={styles.subText}>Email: rayensbai2@gmail.com</Text>
-          <Text style={styles.subText}>Phone: +216 55063898</Text>
+          <Text style={styles.subText}>email: contact.moonmeet@gmail.com</Text>
         </ScrollView>
       </BottomSheetView>
     </BottomSheetModal>
