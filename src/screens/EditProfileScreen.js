@@ -23,7 +23,6 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import CameraIcon from '../assets/images/photo-camera.png';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
-import ArrowForward from '../assets/images/arrow-forward.png';
 import {
   ErrorToast,
   SuccessToast,
@@ -32,13 +31,14 @@ import NetInfo from '@react-native-community/netinfo';
 import storage from '@react-native-firebase/storage';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
-import {heightPercentageToDP} from '../config/Dimensions';
+import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {PurpleBackground} from '../index.d';
 import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import ImagePicker from 'react-native-image-crop-picker';
 import {waitForAnd} from '../utils/timers/delay';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const EditProfileScreen = () => {
   const pickerRef = useRef(null);
@@ -369,11 +369,18 @@ const EditProfileScreen = () => {
         style={styles.fab}
         mode={'elevated'}
         size={'medium'}
-        icon={'chevron-right'}
+        icon={({size, allowFontScaling}) => (
+          <MaterialIcons
+            name="chevron-right"
+            color={COLORS.white}
+            size={size}
+            allowFontScaling={allowFontScaling}
+          />
+        )}
         animated={true}
         theme={{
           colors: {
-            primaryContainer: COLORS.dimmed,
+            primaryContainer: COLORS.accentLight,
           },
         }}
         visible={loaderVisible === false}
@@ -477,30 +484,12 @@ const EditProfileScreen = () => {
 };
 const styles = StyleSheet.create({
   under_header: {
-    padding: '2%',
+    padding: '1%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  left_side: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  mid_side: {
-    flex: 2,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontSize: 18,
-    marginLeft: '2.5%',
-    marginRight: '2.5%',
-  },
-  toolbar: {
-    padding: '2%',
-    flexDirection: 'row',
-  },
   toolbar_text: {
-    fontSize: 22,
+    fontSize: fontValue(22),
     paddingLeft: '2%',
     paddingRight: '3%',
     textAlign: 'center',
@@ -509,7 +498,7 @@ const styles = StyleSheet.create({
   },
   under_header_text: {
     position: 'relative',
-    fontSize: 24,
+    fontSize: fontValue(24),
     paddingLeft: '3%',
     paddingRight: '3%',
     paddingTop: '1%',
@@ -518,12 +507,12 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   avatarHolder: {
-    padding: '2%',
+    padding: '1%',
     alignItems: 'center',
     justifyContent: 'center',
   },
   inputHolder: {
-    padding: '2%',
+    padding: '1.5%',
     justifyContent: 'center',
   },
   instruction: {
