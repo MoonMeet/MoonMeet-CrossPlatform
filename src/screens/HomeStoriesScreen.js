@@ -238,6 +238,19 @@ const HomePeopleScreen = () => {
     };
   }, []);
 
+  const listEmptyComponent = () => {
+    return (
+      <View style={styles.emptyView}>
+        <Text adjustsFontSizeToFit style={styles.heading}>
+          No stories available, yet.
+        </Text>
+        <Text adjustsFontSizeToFit style={styles.subheading}>
+          there's no one have shared a story at the moment.
+        </Text>
+      </View>
+    );
+  };
+
   if (storyLoading) {
     return (
       <MiniBaseView>
@@ -317,6 +330,7 @@ const HomePeopleScreen = () => {
           style={styles.gridView}
           spacing={15}
           renderItem={renderItem}
+          ListEmptyComponent={listEmptyComponent}
         />
       </MiniBaseView>
     );
@@ -373,6 +387,26 @@ const styles = StyleSheet.create({
     height: 250,
     backgroundColor: COLORS.white,
     borderRadius: 10,
+  },
+  heading: {
+    fontSize: fontValue(16),
+    textAlign: 'left',
+    color: COLORS.black,
+    fontFamily: FONTS.regular,
+  },
+  subheading: {
+    fontSize: fontValue(14),
+    paddingTop: '1%',
+    textAlign: 'left',
+    color: COLORS.black,
+    opacity: 0.4,
+    fontFamily: FONTS.regular,
+  },
+  emptyView: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+    alignContent: 'center',
   },
 });
 export default HomePeopleScreen;
