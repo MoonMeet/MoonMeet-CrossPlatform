@@ -18,7 +18,6 @@ import {
   HelperText,
   TextInput,
 } from 'react-native-paper';
-import ArrowForward from '../assets/images/arrow-forward.png';
 import BaseView from '../components/BaseView/BaseView';
 import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
@@ -29,6 +28,7 @@ import {
 } from '../components/ToastInitializer/ToastInitializer';
 import {heightPercentageToDP} from '../config/Dimensions';
 import {COLORS} from '../config/Miscellaneous';
+import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const ChangeUsernameScreen = () => {
   const navigation = useNavigation();
@@ -158,13 +158,9 @@ const ChangeUsernameScreen = () => {
           placeholder={'Type your new username here.'}
           theme={{
             colors: {
-              text: COLORS.black,
               primary: COLORS.accentLight,
-              backgroundColor: COLORS.rippleColor,
-              placeholder: COLORS.darkGrey,
-              underlineColor: '#566193',
-              selectionColor: '#DADADA',
-              outlineColor: '#566193',
+              onSurface: COLORS.black,
+              background: COLORS.dimmed,
             },
           }}
           onChangeText={onUsernameTextChange}
@@ -188,13 +184,20 @@ const ChangeUsernameScreen = () => {
       )}
       <FAB
         style={styles.fab}
-        normal
-        icon={ArrowForward}
-        color={COLORS.primaryLight}
+        mode={'elevated'}
+        size={'medium'}
+        icon={({size, allowFontScaling}) => (
+          <MaterialIcons
+            name="chevron-right"
+            color={COLORS.white}
+            size={size}
+            allowFontScaling={allowFontScaling}
+          />
+        )}
         animated={true}
         theme={{
           colors: {
-            accent: COLORS.accentLight,
+            primaryContainer: COLORS.accentLight,
           },
         }}
         onPress={() => {
