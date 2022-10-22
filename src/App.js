@@ -59,10 +59,6 @@ const App = () => {
           OneSignal.addTrigger('unsubscribed', 'true');
           OneSignal.promptForPushNotificationsWithUserResponse(true);
         }
-        if (__DEV__) {
-          console.warn('OneSignal: isSubscribed ', deviceState?.isSubscribed);
-          console.warn('OneSignal: userId ', deviceState?.userId);
-        }
       }
     });
   }, []);
