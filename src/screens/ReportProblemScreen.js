@@ -238,11 +238,11 @@ const ReportProblemScreen = () => {
             selectedColor={COLORS.black}
             theme={{
               colors: {
-                primary: COLORS.black,
+                primary: COLORS.darkGrey,
                 surface: COLORS.white,
               },
             }}
-            textStyle={{color: COLORS.black}}
+            textStyle={{color: COLORS.darkGrey}}
             onPress={() => {
               ImagePicker.openPicker({
                 width: 1024,
