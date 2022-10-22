@@ -241,10 +241,12 @@ const HomePeopleScreen = () => {
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text adjustsFontSizeToFit style={styles.heading}>
+        <Text adjustsFontSizeToFit style={styles.heading('center', false)}>
           No stories available, yet.
         </Text>
-        <Text adjustsFontSizeToFit style={styles.subheading}>
+        <Text
+          adjustsFontSizeToFit
+          style={styles.subheading('center', false, true)}>
           there's no one have shared a story at the moment.
         </Text>
       </View>
@@ -388,19 +390,24 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 10,
   },
-  heading: {
-    fontSize: fontValue(16),
-    textAlign: 'left',
-    color: COLORS.black,
-    fontFamily: FONTS.regular,
+  heading: (align, isRead) => {
+    return {
+      fontSize: 16,
+      textAlign: align,
+      color: COLORS.black,
+      opacity: isRead ? 0.6 : 1,
+      fontFamily: FONTS.regular,
+    };
   },
-  subheading: {
-    fontSize: fontValue(14),
-    paddingTop: '1%',
-    textAlign: 'left',
-    color: COLORS.black,
-    opacity: 0.4,
-    fontFamily: FONTS.regular,
+  subheading: (align, isMessage, isRead) => {
+    return {
+      fontSize: isMessage ? fontValue(14) : fontValue(11.5),
+      paddingTop: '1%',
+      textAlign: align,
+      color: COLORS.black,
+      opacity: isRead ? 0.6 : 1,
+      fontFamily: FONTS.regular,
+    };
   },
   emptyView: {
     flex: 1,
