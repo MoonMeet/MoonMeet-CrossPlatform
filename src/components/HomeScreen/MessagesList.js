@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     };
   },
   emptyView: {
-    marginTop: 8 - 0.1 * 8,
+    marginTop: 12 - 0.1 * 12,
     flex: 1,
     backgroundColor: COLORS.white,
     alignSelf: 'center',
