@@ -494,13 +494,9 @@ const AddStoryScreen = () => {
             value={StoryTextInput}
             theme={{
               colors: {
-                text: COLORS.black,
                 primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
+                onSurface: COLORS.black,
+                background: COLORS.dimmed,
               },
             }}
             onChangeText={onStoryTextInputChange}
@@ -561,13 +557,9 @@ const AddStoryScreen = () => {
               value={SecondStoryTextInput}
               theme={{
                 colors: {
-                  text: COLORS.black,
                   primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
+                  onSurface: COLORS.black,
+                  background: COLORS.dimmed,
                 },
               }}
               onChangeText={onSecondStoryTextInputChange}
