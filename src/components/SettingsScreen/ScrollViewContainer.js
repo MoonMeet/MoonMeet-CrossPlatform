@@ -148,7 +148,9 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
             <Button
               uppercase={false}
               mode={'outlined'}
-              color={isThemeDark ? COLORS.redDarkError : COLORS.redLightError}
+              textColor={
+                isThemeDark ? COLORS.redDarkError : COLORS.redLightError
+              }
               style={{margin: '0.5%'}}
               onPress={() => {
                 try {
