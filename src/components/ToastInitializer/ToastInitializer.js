@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import Toast, {ToastPosition} from 'react-native-toast-message';
+import Toast, {ToastPosition, ToastType} from 'react-native-toast-message';
 import {heightPercentageToDP} from '../../config/Dimensions';
 
 const SuccessToast = (
@@ -23,7 +23,7 @@ const SuccessToast = (
     text2: text2,
     autoHide: autoHide,
     topOffset: 30,
-    bottomOffset: 40,
+    bottomOffset: heightPercentageToDP(10),
     visibilityTime: time,
     activeOpacity: 1,
   });
@@ -43,7 +43,7 @@ function InfoToast(
     text2: text2,
     autoHide: autoHide,
     topOffset: heightPercentageToDP(7),
-    bottomOffset: 40,
+    bottomOffset: heightPercentageToDP(10),
     visibilityTime: time,
     activeOpacity: 1,
   });
@@ -63,14 +63,14 @@ function ErrorToast(
     text2: text2,
     autoHide: autoHide,
     topOffset: heightPercentageToDP(7),
-    bottomOffset: 40,
+    bottomOffset: heightPercentageToDP(10),
     visibilityTime: time,
     activeOpacity: 1,
   });
 }
 
 function CustomToast(
-  type: string,
+  type: ToastType,
   position: ToastPosition,
   text1: string,
   text2: string,
