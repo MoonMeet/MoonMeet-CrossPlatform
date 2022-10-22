@@ -92,6 +92,11 @@ function HomeScreen() {
       barStyle={{backgroundColor: COLORS.white}}
       activeColor={COLORS.accentLight}
       inactiveColor={COLORS.lightGrey}
+      theme={{
+        colors: {
+          secondaryContainer: COLORS.rippleColor,
+        },
+      }}
     />
   );
 }
