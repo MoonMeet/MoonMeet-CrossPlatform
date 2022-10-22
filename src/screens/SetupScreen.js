@@ -37,7 +37,6 @@ import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 import placeHolderPhoto from '../assets/images/pick-photo.png';
-import ArrowForward from '../assets/images/arrow-forward.png';
 import {
   ErrorToast,
   InfoToast,
@@ -48,6 +47,7 @@ import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
 import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import {useFocusEffect} from '@react-navigation/native';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const SetupScreen = ({route}) => {
   const pickerRef = useRef(null);
@@ -220,13 +220,9 @@ const SetupScreen = ({route}) => {
               multiline={false}
               theme={{
                 colors: {
-                  text: COLORS.accentLight,
                   primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
+                  onSurface: COLORS.black,
+                  background: COLORS.dimmed,
                 },
               }}
               onChangeText={_firstName => {
@@ -243,13 +239,9 @@ const SetupScreen = ({route}) => {
               multiline={false}
               theme={{
                 colors: {
-                  text: COLORS.accentLight,
                   primary: COLORS.accentLight,
-                  backgroundColor: COLORS.rippleColor,
-                  placeholder: COLORS.darkGrey,
-                  underlineColor: '#566193',
-                  selectionColor: '#DADADA',
-                  outlineColor: '#566193',
+                  onSurface: COLORS.black,
+                  background: COLORS.dimmed,
                 },
               }}
               onChangeText={_lastName => {
@@ -260,13 +252,20 @@ const SetupScreen = ({route}) => {
         </View>
         <FAB
           style={styles.fab}
-          normal
-          icon={ArrowForward}
-          color={COLORS.primaryLight}
+          mode={'elevated'}
+          size={'medium'}
+          icon={({size, allowFontScaling}) => (
+            <MaterialIcons
+              name="chevron-right"
+              color={COLORS.white}
+              size={size}
+              allowFontScaling={allowFontScaling}
+            />
+          )}
           animated={true}
           theme={{
             colors: {
-              accent: COLORS.accentLight,
+              primaryContainer: COLORS.accentLight,
             },
           }}
           onPress={async () => {
