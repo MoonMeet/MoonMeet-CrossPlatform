@@ -68,7 +68,14 @@ import {bytesToSize} from '../utils/converters/bytesToSize';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import {getRandomString} from '../utils/generators/getRandomString';
 
-const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
+const ChatTitle = ({
+  firstName,
+  lastName,
+  avatar,
+  myStatus,
+  userStatus,
+  userTime,
+}) => {
   return (
     <Pressable
       style={{
@@ -109,13 +116,16 @@ const ChatTitle = ({firstName, lastName, avatar, activeTime, activeStatus}) => {
             color: COLORS.black,
             opacity: 0.4,
           }}>
-          {activeStatus === 'normal'
-            ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                activeTime >
+          {myStatus === 'recently'
+            ? 'last seen recently'
+            : myStatus === 'normal' && userStatus === 'recently'
+            ? 'last seen recently'
+            : myStatus === 'normal' && userStatus === 'normal'
+            ? firestore?.Timestamp?.fromDate(new Date())?.toDate() - userTime >
               86400000
-              ? `last seen on ${moment(activeTime)?.format('YYYY MMMM DD')}`
-              : `last seen on ${moment(activeTime)?.format('HH:MM A')}`
-            : 'Last seen recently'}
+              ? `last seen on ${moment(userTime)?.format('YYYY MMMM DD')}`
+              : `last seen on ${moment(userTime)?.format('HH:MM A')}`
+            : 'long time ago'}
         </Text>
       </View>
     </Pressable>
@@ -962,8 +972,9 @@ const ChatScreen = () => {
           firstName={userFirstName}
           lastName={userLastName}
           avatar={userAvatar}
-          activeStatus={userActiveStatus}
-          activeTime={userActiveTime}
+          myStatus={Me?.active_status}
+          userStatus={userActiveStatus}
+          userTime={userActiveTime}
         />
       ),
     });
@@ -973,6 +984,7 @@ const ChatScreen = () => {
       });
     };
   }, [
+    Me?.active_status,
     navigation,
     userActiveStatus,
     userActiveTime,
