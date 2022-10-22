@@ -55,6 +55,7 @@ import {waitForAnd} from '../utils/timers/delay';
 import {getRandomString} from '../utils/generators/getRandomString';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
 import OneSignal from 'react-native-onesignal';
+import MaterialIcons from 'react-native-vector-icons';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -645,7 +646,14 @@ const LoginScreen = () => {
                   style={styles.fab}
                   mode={'elevated'}
                   size={'medium'}
-                  icon={'chevron-right'}
+                  icon={({size, allowFontScaling}) => (
+                    <MaterialIcons
+                      name="chevron-right"
+                      color={COLORS.white}
+                      size={size}
+                      allowFontScaling={allowFontScaling}
+                    />
+                  )}
                   animated={true}
                   theme={{
                     colors: {
