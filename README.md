@@ -21,7 +21,7 @@
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
 - **Moon Meet** is an open source project means that anyone can see, change, get the source code and can contribute to make this project more better.
-- **Moon Meet** nothing with its contributors, so let's contribute together to make it alive !
+- **Moon Meet** is nothing without its contributors, so let's contribute together to make it alive!
 
 ### Screenshots
 
@@ -42,9 +42,10 @@
 
 #### Requirments:
 
-- A Working react native envirment environment.
-- Physical device (real device) because emulators have problem with SHA-256.
-- NDK Version `21.4.7075529`, NOTE: for Mac M1 users, you'll just need NDK version `24.0.8215888`.
+- A working react native environment.
+- A physical device (real device) because emulators have problem with SHA-256.
+- NDK Version `21.4.7075529`. *NOTE: For Mac M1 users, you'll need NDK version `24.0.8215888`.*
+
 - SDK Version `33, 32, 31 and 30`.
 - ICU for linux (optional):
 
