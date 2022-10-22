@@ -29,6 +29,7 @@ import {FlatGrid} from 'react-native-super-grid';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
 import {reverse, sortBy, uniqBy} from 'lodash';
 import {StoryMMKV} from '../config/MMKV/StoryMMKV';
+import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
@@ -37,9 +38,9 @@ const HomePeopleScreen = () => {
 
   const [storyLoading, setStoryLoading] = React.useState(true);
 
-  const [newActiveTime, setNewActiveTime] = React.useState('');
+  const [newActiveTime, setNewActiveTime] = React.useState();
 
-  const [activeStatusState, setActiveStatusState] = React.useState(null);
+  const [activeStatusState, setActiveStatusState] = React.useState();
 
   const [storiesData, setStoriesData] = React.useState([]);
 
@@ -215,7 +216,6 @@ const HomePeopleScreen = () => {
           ]);
           collectionDocs = reverse(collectionDocs);
           setStoriesData(collectionDocs);
-          console.log(collectionDocs);
         }
         setStoryLoading(false);
       });
@@ -227,25 +227,36 @@ const HomePeopleScreen = () => {
 
   useEffect(() => {
     const ActiveStatusInterval = setInterval(() => {
-      updateUserActiveStatus();
+      // updateUserActiveStatus();
     }, 30000);
     return () => {
       clearInterval(ActiveStatusInterval);
     };
   }, []);
 
-  async function updateUserActiveStatus() {
+  const [Me, setMe] = React.useState([]);
+
+  useEffect(() => {
+    try {
+      setMe(JSON.parse(UserDataMMKV.getString('Me')));
+    } catch (error) {
+      setMe([]);
+    }
+    return () => {};
+  }, []);
+
+  const updateUserActiveStatus = useCallback(async () => {
     await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
-        active_status: activeStatusState === true ? 'normal' : 'recently',
+        active_status: Me?.active_status === 'normal' ? 'normal' : 'recently',
         active_time:
-          newActiveTime === 'Last seen recently'
+          Me?.active_time === 'Last seen recently'
             ? 'Last seen recently'
             : firestore.Timestamp.fromDate(new Date()),
       });
-  }
+  }, [Me?.active_status, Me?.active_time]);
 
   const listEmptyComponent = () => {
     return (

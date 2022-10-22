@@ -72,25 +72,36 @@ const HomeChatsScreen = () => {
 
   useEffect(() => {
     const ActiveStatusInterval = setInterval(() => {
-      updateUserActiveStatus();
+      // updateUserActiveStatus();
     }, 30000);
     return () => {
       clearInterval(ActiveStatusInterval);
     };
   }, []);
 
-  async function updateUserActiveStatus() {
+  const [Me, setMe] = React.useState([]);
+
+  useEffect(() => {
+    try {
+      setMe(JSON.parse(UserDataMMKV.getString('Me')));
+    } catch (error) {
+      setMe([]);
+    }
+    return () => {};
+  }, []);
+
+  const updateUserActiveStatus = useCallback(async () => {
     await firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .update({
-        active_status: activeStatusState === true ? 'normal' : 'recently',
+        active_status: Me?.active_status === 'normal' ? 'normal' : 'recently',
         active_time:
-          newActiveTime === 'Last seen recently'
+          Me?.active_time === 'Last seen recently'
             ? 'Last seen recently'
             : firestore.Timestamp.fromDate(new Date()),
       });
-  }
+  }, [Me?.active_status, Me?.active_time]);
 
   useFocusEffect(
     useCallback(() => {
