@@ -70,6 +70,15 @@ const HomeChatsScreen = () => {
     [navigation],
   );
 
+  useEffect(() => {
+    const ActiveStatusInterval = setInterval(() => {
+      updateUserActiveStatus();
+    }, 30000);
+    return () => {
+      clearInterval(ActiveStatusInterval);
+    };
+  }, []);
+
   async function updateUserActiveStatus() {
     await firestore()
       .collection('users')

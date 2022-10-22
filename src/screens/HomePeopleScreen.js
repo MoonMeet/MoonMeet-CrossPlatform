@@ -32,19 +32,6 @@ const HomePeopleScreen = () => {
 
   const [activeStatusState, setActiveStatusState] = React.useState(null);
 
-  async function updateUserActiveStatus() {
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        active_status: activeStatusState === true ? 'normal' : 'recently',
-        active_time:
-          newActiveTime === 'Last seen recently'
-            ? 'Last seen recently'
-            : firestore?.Timestamp?.fromDate(new Date()),
-      });
-  }
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -107,6 +94,28 @@ const HomePeopleScreen = () => {
       userSusbcribe();
     };
   }, []);
+
+  useEffect(() => {
+    const ActiveStatusInterval = setInterval(() => {
+      updateUserActiveStatus();
+    }, 30000);
+    return () => {
+      clearInterval(ActiveStatusInterval);
+    };
+  }, []);
+
+  async function updateUserActiveStatus() {
+    await firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .update({
+        active_status: activeStatusState === true ? 'normal' : 'recently',
+        active_time:
+          newActiveTime === 'Last seen recently'
+            ? 'Last seen recently'
+            : firestore.Timestamp.fromDate(new Date()),
+      });
+  }
 
   if (Loading) {
     return (
