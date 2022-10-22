@@ -55,7 +55,7 @@ import {waitForAnd} from '../utils/timers/delay';
 import {getRandomString} from '../utils/generators/getRandomString';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
 import OneSignal from 'react-native-onesignal';
-import MaterialIcons from 'react-native-vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const LoginScreen = () => {
   useFocusEffect(
