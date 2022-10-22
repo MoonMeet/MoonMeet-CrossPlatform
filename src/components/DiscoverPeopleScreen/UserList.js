@@ -9,7 +9,7 @@
 import React, {useEffect} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {Avatar, Divider} from 'react-native-paper';
+import {Avatar} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
@@ -32,6 +32,60 @@ const UserList = ({ListData}) => {
     }
   }, []);
 
+  const renderItem = ({item, index}) => {
+    if (item?.uid !== auth()?.currentUser?.uid) {
+      console.log(item?.active_status + item?.active_time);
+      return (
+        <>
+          <Pressable
+            android_ripple={{color: COLORS.rippleColor}}
+            style={styles.container}
+            onPress={() => {
+              navigation?.navigate('chat', {item: item?.uid});
+            }}
+            onLongPress={() => {
+              navigation?.navigate('userProfile', {
+                uid: item?.uid,
+                cameFrom: 'others',
+              });
+            }}>
+            <View style={styles.left_side}>
+              <Avatar.Image
+                source={item?.avatar ? {uri: item?.avatar} : PurpleBackground}
+                style={{overflow: 'hidden'}}
+                size={55}
+              />
+            </View>
+            <View style={styles.mid_side}>
+              <Text style={styles.heading}>
+                {item?.first_name + ' ' + item?.last_name}
+              </Text>
+              <Text style={styles.subheading}>
+                {Me?.active_status === 'recently'
+                  ? 'last seen recently'
+                  : Me?.active_status === 'normal' &&
+                    item?.active_status === 'recently'
+                  ? 'last seen recently'
+                  : Me?.active_status === 'normal' &&
+                    item?.active_status === 'normal'
+                  ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                      item?.active_time?.toDate() >
+                    86400000
+                    ? `last seen on ${moment(
+                        item?.active_time?.toDate(),
+                      )?.format('YYYY MMMM DD')}`
+                    : `last seen on ${moment(
+                        item?.active_time?.toDate(),
+                      )?.format('HH:MM A')}`
+                  : 'long time ago'}
+              </Text>
+            </View>
+          </Pressable>
+        </>
+      );
+    }
+  };
+
   return (
     <FlatList
       data={uniqBy(ListData, 'uid')}
@@ -44,57 +98,7 @@ const UserList = ({ListData}) => {
       removeClippedSubviews={true}
       initialNumToRender={25}
       keyExtractor={item => item?.uid}
-      renderItem={({item}) => (
-        <>
-          {auth()?.currentUser?.uid !== item?.uid ? (
-            <Pressable
-              android_ripple={{color: COLORS.rippleColor}}
-              style={styles.container}
-              onPress={() => {
-                navigation?.navigate('chat', {item: item?.uid});
-              }}
-              onLongPress={() => {
-                navigation?.navigate('userProfile', {
-                  uid: item?.uid,
-                  cameFrom: 'others',
-                });
-              }}>
-              <View style={styles.left_side}>
-                <Avatar.Image
-                  source={item?.avatar ? {uri: item?.avatar} : PurpleBackground}
-                  style={{overflow: 'hidden'}}
-                  size={55}
-                />
-              </View>
-              <View style={styles.mid_side}>
-                <Text style={styles.heading}>
-                  {item?.first_name + ' ' + item?.last_name}
-                </Text>
-                <Text style={styles.subheading}>
-                  {Me?.active_status === 'recently'
-                    ? 'last seen recently'
-                    : Me?.active_status === 'normal' &&
-                      item?.active_status === 'recently'
-                    ? 'last seen recently'
-                    : Me?.active_status === 'normal' &&
-                      item?.active_status === 'normal'
-                    ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                        Me?.active_time >
-                      86400000
-                      ? `last seen on ${moment(item?.active_time)?.format(
-                          'YYYY MMMM DD',
-                        )}`
-                      : `last seen on ${moment(item?.active_time)?.format(
-                          'HH:MM A',
-                        )}`
-                    : 'long time ago'}
-                </Text>
-              </View>
-            </Pressable>
-          ) : null}
-          <Divider leftInset />
-        </>
-      )}
+      renderItem={renderItem}
     />
   );
 };
