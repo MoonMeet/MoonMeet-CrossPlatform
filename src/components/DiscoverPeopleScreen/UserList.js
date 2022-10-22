@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar, Divider} from 'react-native-paper';
@@ -16,9 +16,21 @@ import moment from 'moment';
 import {PurpleBackground} from '../../index.d';
 import {uniqBy} from 'lodash';
 import {fontValue} from '../../config/Dimensions';
+import {UserDataMMKV} from '../../config/MMKV/UserDataMMKV';
+import firestore from '@react-native-firebase/firestore';
 
 const UserList = ({ListData}) => {
   const navigation = useNavigation();
+
+  const [Me, setMe] = React.useState([]);
+
+  useEffect(() => {
+    try {
+      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
+    } catch (error) {
+      setMe([]);
+    }
+  }, []);
 
   return (
     <FlatList
@@ -59,9 +71,23 @@ const UserList = ({ListData}) => {
                   {item?.first_name + ' ' + item?.last_name}
                 </Text>
                 <Text style={styles.subheading}>
-                  {item?.active_status === 'recently'
-                    ? 'Last seen recently'
-                    : moment(item?.active_time?.toDate())?.calendar()}
+                  {Me?.active_status === 'recently'
+                    ? 'last seen recently'
+                    : Me?.active_status === 'normal' &&
+                      item?.active_status === 'recently'
+                    ? 'last seen recently'
+                    : Me?.active_status === 'normal' &&
+                      item?.active_status === 'normal'
+                    ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                        Me?.active_time >
+                      86400000
+                      ? `last seen on ${moment(item?.active_time)?.format(
+                          'YYYY MMMM DD',
+                        )}`
+                      : `last seen on ${moment(item?.active_time)?.format(
+                          'HH:MM A',
+                        )}`
+                    : 'long time ago'}
                 </Text>
               </View>
             </Pressable>
