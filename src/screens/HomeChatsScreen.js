@@ -30,10 +30,6 @@ const HomeChatsScreen = () => {
 
   const [avatarURL, setAvatarURL] = React.useState('');
 
-  const [newActiveTime, setNewActiveTime] = React.useState('');
-
-  const [activeStatusState, setActiveStatusState] = React.useState(null);
-
   const [chatsLoading, setChatsLoading] = React.useState(true);
 
   const checkJwtKey = useCallback(
@@ -70,39 +66,6 @@ const HomeChatsScreen = () => {
     [navigation],
   );
 
-  useEffect(() => {
-    const ActiveStatusInterval = setInterval(() => {
-      // updateUserActiveStatus();
-    }, 30000);
-    return () => {
-      clearInterval(ActiveStatusInterval);
-    };
-  }, []);
-
-  const [Me, setMe] = React.useState([]);
-
-  useEffect(() => {
-    try {
-      setMe(JSON.parse(UserDataMMKV.getString('Me')));
-    } catch (error) {
-      setMe([]);
-    }
-    return () => {};
-  }, []);
-
-  const updateUserActiveStatus = useCallback(async () => {
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        active_status: Me?.active_status === 'normal' ? 'normal' : 'recently',
-        active_time:
-          Me?.active_time === 'Last seen recently'
-            ? 'Last seen recently'
-            : firestore.Timestamp.fromDate(new Date()),
-      });
-  }, [Me?.active_status, Me?.active_time]);
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -132,12 +95,6 @@ const HomeChatsScreen = () => {
               ) {
                 setAvatarURL(documentSnapshot?.data()?.avatar);
                 checkJwtKey(documentSnapshot?.data()?.jwtKey);
-                if (documentSnapshot?.data()?.active_status === 'normal') {
-                  setActiveStatusState(true);
-                } else {
-                  setActiveStatusState(false);
-                }
-                setNewActiveTime(documentSnapshot?.data()?.active_time);
                 UserDataMMKV.set(
                   'Me',
                   JSON?.stringify(documentSnapshot?.data()),
@@ -145,6 +102,22 @@ const HomeChatsScreen = () => {
               }
             }
           }
+        });
+      });
+    const activeStatusSubscribe = firestore()
+      .collection('users')
+      ?.doc(auth()?.currentUser?.uid)
+      .get()
+      ?.then(documentSnapshot => {
+        documentSnapshot?.ref?.update({
+          active_status:
+            documentSnapshot?.data()?.active_status === 'normal'
+              ? 'normal'
+              : 'recently',
+          active_time:
+            documentSnapshot?.data()?.active_time === 'Last seen recently'
+              ? 'Last seen recently'
+              : firestore?.Timestamp?.fromDate(new Date()),
         });
       });
     return () => {
@@ -205,7 +178,6 @@ const HomeChatsScreen = () => {
               hitSlop={15}
               onPress={() => {
                 navigation.navigate('settings');
-                updateUserActiveStatus();
               }}>
               <Avatar.Image
                 size={35.5}

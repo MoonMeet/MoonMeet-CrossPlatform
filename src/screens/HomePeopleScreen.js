@@ -18,6 +18,7 @@ import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {isDate} from 'moment';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const HomePeopleScreen = () => {
@@ -28,10 +29,6 @@ const HomePeopleScreen = () => {
   const [avatarURL, setAvatarURL] = React.useState('');
 
   const [masterData, setMasterData] = React.useState([]);
-
-  const [newActiveTime, setNewActiveTime] = React.useState('');
-
-  const [activeStatusState, setActiveStatusState] = React.useState(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -61,12 +58,7 @@ const HomePeopleScreen = () => {
               documentSnapshot?.data()?.active_time
             ) {
               setAvatarURL(documentSnapshot?.data()?.avatar);
-              if (documentSnapshot?.data()?.active_status === 'normal') {
-                setActiveStatusState(true);
-              } else {
-                setActiveStatusState(false);
-              }
-              setNewActiveTime(documentSnapshot?.data()?.active_time);
+              UserDataMMKV.set('Me', JSON?.stringify(documentSnapshot?.data()));
             }
           }
           if (
@@ -91,43 +83,26 @@ const HomePeopleScreen = () => {
           setLoading(false);
         });
       });
+    const activeStatusSubscribe = firestore()
+      .collection('users')
+      ?.doc(auth()?.currentUser?.uid)
+      .get()
+      ?.then(documentSnapshot => {
+        documentSnapshot?.ref?.update({
+          active_status:
+            documentSnapshot?.data()?.active_status === 'normal'
+              ? 'normal'
+              : 'recently',
+          active_time:
+            documentSnapshot?.data()?.active_time === 'Last seen recently'
+              ? 'Last seen recently'
+              : firestore?.Timestamp?.fromDate(new Date()),
+        });
+      });
     return () => {
       userSusbcribe();
     };
   }, []);
-
-  useEffect(() => {
-    const ActiveStatusInterval = setInterval(() => {
-      // updateUserActiveStatus();
-    }, 30000);
-    return () => {
-      clearInterval(ActiveStatusInterval);
-    };
-  }, []);
-
-  const [Me, setMe] = React.useState([]);
-
-  useEffect(() => {
-    try {
-      setMe(JSON.parse(UserDataMMKV.getString('Me')));
-    } catch (error) {
-      setMe([]);
-    }
-    return () => {};
-  }, []);
-
-  const updateUserActiveStatus = useCallback(async () => {
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        active_status: Me?.active_status === 'normal' ? 'normal' : 'recently',
-        active_time:
-          Me?.active_time === 'Last seen recently'
-            ? 'Last seen recently'
-            : firestore.Timestamp.fromDate(new Date()),
-      });
-  }, [Me?.active_status, Me?.active_time]);
 
   if (Loading) {
     return (
@@ -154,7 +129,6 @@ const HomePeopleScreen = () => {
             <Pressable
               hitSlop={15}
               onPress={() => {
-                updateUserActiveStatus();
                 navigation.navigate('settings');
               }}>
               <Avatar.Image
@@ -185,7 +159,6 @@ const HomePeopleScreen = () => {
             <Pressable
               onPress={() => {
                 navigation?.navigate('discover');
-                updateUserActiveStatus();
               }}
               style={{
                 backgroundColor: COLORS.rippleColor,
