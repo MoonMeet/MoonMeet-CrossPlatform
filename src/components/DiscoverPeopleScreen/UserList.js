@@ -9,7 +9,7 @@
 import React, {useEffect} from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Divider} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import moment from 'moment';
@@ -81,6 +81,7 @@ const UserList = ({ListData}) => {
               </Text>
             </View>
           </Pressable>
+          <Divider leftInset />
         </>
       );
     }
