@@ -28,17 +28,6 @@ const ChatOptionsBottomSheet = ({
   readFunction,
   deleteFunction,
 }) => {
-  const {animatedHandleHeight, handleContentLayout} =
-    useBottomSheetDynamicSnapPoints(snapPoints);
-
-  const animationConfigs = useBottomSheetSpringConfigs({
-    damping: 80,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
-    stiffness: 500,
-  });
-
   const sheetStyle = useMemo(
     () => ({
       ...styles.sheetContainer,
@@ -66,13 +55,10 @@ const ChatOptionsBottomSheet = ({
       snapPoints={snapPoints}
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
-      handleHeight={animatedHandleHeight}
-      animationConfigs={animationConfigs}
       backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
-        onLayout={handleContentLayout}
         style={{
           backgroundColor: COLORS.primaryLight,
           flex: 1,

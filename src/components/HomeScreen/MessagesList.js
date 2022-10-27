@@ -18,7 +18,7 @@ import {
 } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import {FONTS, COLORS} from '../../config/Miscellaneous';
-import {fontValue, widthPercentageToDP} from '../../config/Dimensions';
+import {fontValue} from '../../config/Dimensions';
 import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {isNull, uniqBy} from 'lodash';
@@ -27,7 +27,6 @@ import {PurpleBackground} from '../../index.d';
 import firestore from '@react-native-firebase/firestore';
 import ChatOptionsBottomSheet from './BottomSheet/ChatOptionsBottomSheet';
 import {ThemeContext} from '../../config/Theme/Context';
-import SpacerHorizontal from '../Spacer/SpacerHorizontal';
 import {ErrorToast} from '../ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {waitForAnd} from '../../utils/timers/delay';
@@ -37,6 +36,11 @@ const MessagesList = ({ListData}) => {
 
   const chatOptionsRef = useRef(null);
   const sheetSnapPoints = useMemo(() => ['20%'], []);
+  const [alertDialogVisible, setAlertDialogVisible] = React.useState();
+
+  const memorisedDialogState = useCallback(value => {
+    setAlertDialogVisible(value);
+  }, []);
 
   const handlePresentModal = useCallback(() => {
     chatOptionsRef?.current?.present();
@@ -85,7 +89,6 @@ const MessagesList = ({ListData}) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const {isThemeDark} = React.useContext(ThemeContext);
-  const [alertDialogVisible, setAlertDialogVisible] = React.useState(false);
 
   const {dismissAll} = useBottomSheetModal();
 
@@ -120,90 +123,6 @@ const MessagesList = ({ListData}) => {
   const renderItem = ({item, index}) => {
     return (
       <>
-        <Portal>
-          <Dialog
-            dismissable={true}
-            visible={alertDialogVisible}
-            onDismiss={() => setAlertDialogVisible(false)}>
-            <Dialog.Title
-              style={{
-                color: isThemeDark ? COLORS.white : COLORS.black,
-                opacity: 0.9,
-              }}>
-              Delete this entire conversation?
-            </Dialog.Title>
-            <Dialog.Content>
-              <Paragraph
-                adjustsFontSizeToFit
-                style={{
-                  fontSize: fontValue(14),
-                  color: isThemeDark ? COLORS.white : COLORS.black,
-                  opacity: isThemeDark ? 0.8 : 0.6,
-                }}>
-                Once you delete your copy of the conversation, it can't be
-                undone.
-              </Paragraph>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                uppercase={false}
-                style={{margin: '0.5%'}}
-                mode={'outlined'}
-                color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
-                onPress={() => {
-                  setAlertDialogVisible(false);
-                  waitForAnd(0).then(() => dismissAll());
-                }}>
-                Cancel
-              </Button>
-              <SpacerHorizontal width={widthPercentageToDP(0.5)} />
-              <Button
-                uppercase={false}
-                mode={'outlined'}
-                color={isThemeDark ? COLORS.redDarkError : COLORS.redLightError}
-                style={{margin: '0.5%'}}
-                onPress={async () => {
-                  setAlertDialogVisible(false);
-                  try {
-                    const lastChatsRef = firestore()
-                      .collection('chats')
-                      .doc(auth()?.currentUser.uid)
-                      .collection('discussions')
-                      .doc(ListData[currentIndex]?.id);
-                    await lastChatsRef?.delete();
-                    const discussionsRef = await firestore()
-                      .collection('users')
-                      .doc(auth()?.currentUser?.uid)
-                      .collection('messages')
-                      .doc(ListData[currentIndex]?.id)
-                      .collection('discussions')
-                      .get();
-                    const batchDelete = firestore().batch();
-                    discussionsRef?.forEach(documentSnapshot => {
-                      batchDelete?.delete(documentSnapshot?.ref);
-                    });
-                    return batchDelete?.commit();
-                  } catch (e) {
-                    if (__DEV__) {
-                      console?.error(e);
-                    }
-                    ErrorToast(
-                      'bottom',
-                      'Failed to delete entire conversation',
-                      `${e}`,
-                      true,
-                      1500,
-                    );
-                  }
-                  waitForAnd(0).then(() => {
-                    dismissAll();
-                  });
-                }}>
-                Delete
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
         <Pressable
           android_ripple={{color: COLORS.rippleColor}}
           onPress={() => {
@@ -272,25 +191,6 @@ const MessagesList = ({ListData}) => {
               {moment(item?.time?.toDate())?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
-          <ChatOptionsBottomSheet
-            sheetRef={chatOptionsRef}
-            index={0}
-            snapPoints={sheetSnapPoints}
-            currentMessage={ListData[currentIndex]}
-            unReadFunction={() => {
-              updateCurrentMessageAsUnread(ListData[currentIndex]);
-              waitForAnd(0).then(() => dismissAll());
-            }}
-            readFunction={() =>
-              updateCurrentMessageAsRead(ListData[currentIndex]).then(() =>
-                waitForAnd(0).then(() => dismissAll()),
-              )
-            }
-            deleteFunction={() => {
-              setAlertDialogVisible(true);
-              waitForAnd(0).then(() => dismissAll());
-            }}
-          />
         </Pressable>
         <Divider leftInset />
       </>
@@ -298,20 +198,115 @@ const MessagesList = ({ListData}) => {
   };
 
   return (
-    <FlatList
-      data={uniqBy(ListData, 'id')}
-      ListEmptyComponent={listEmptyComponent}
-      contentContainerStyle={{
-        paddingStart: '0.5%',
-        paddingEnd: '0.5%',
-      }}
-      showsVerticalScrollIndicator={false}
-      removeClippedSubviews={true}
-      initialNumToRender={10}
-      keyExtractor={item => item?.id}
-      renderItem={renderItem}
-      nestedScrollEnabled
-    />
+    <>
+      <FlatList
+        data={uniqBy(ListData, 'id')}
+        ListEmptyComponent={listEmptyComponent}
+        contentContainerStyle={{
+          paddingStart: '0.5%',
+          paddingEnd: '0.5%',
+        }}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        initialNumToRender={10}
+        keyExtractor={item => item?.id}
+        renderItem={renderItem}
+        nestedScrollEnabled
+      />
+      <>
+        <Portal>
+          <Dialog
+            dismissable={true}
+            visible={alertDialogVisible}
+            onDismiss={() => memorisedDialogState(false)}>
+            <Dialog.Title
+              style={{
+                color: isThemeDark ? COLORS.white : COLORS.black,
+                opacity: 0.9,
+              }}>
+              Delete this entire conversation?
+            </Dialog.Title>
+            <Dialog.Content>
+              <Paragraph
+                style={{
+                  fontSize: fontValue(14),
+                  color: isThemeDark ? COLORS.white : COLORS.black,
+                  opacity: isThemeDark ? 0.8 : 0.6,
+                }}>
+                Once you delete your copy of the conversation, it can't be
+                undone.
+              </Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button
+                uppercase={false}
+                mode={'outlined'}
+                color={isThemeDark ? COLORS.redDarkError : COLORS.redLightError}
+                style={{margin: '0.5%'}}
+                onPress={async () => {
+                  memorisedDialogState(false);
+                  try {
+                    const lastChatsRef = firestore()
+                      .collection('chats')
+                      .doc(auth()?.currentUser.uid)
+                      .collection('discussions')
+                      .doc(ListData[currentIndex]?.id);
+                    await lastChatsRef?.delete();
+                    const discussionsRef = await firestore()
+                      .collection('users')
+                      .doc(auth()?.currentUser?.uid)
+                      .collection('messages')
+                      .doc(ListData[currentIndex]?.id)
+                      .collection('discussions')
+                      .get();
+                    const batchDelete = firestore().batch();
+                    discussionsRef?.forEach(documentSnapshot => {
+                      batchDelete?.delete(documentSnapshot?.ref);
+                    });
+                    return batchDelete?.commit();
+                  } catch (e) {
+                    if (__DEV__) {
+                      console?.error(e);
+                    }
+                    ErrorToast(
+                      'bottom',
+                      'Failed to delete entire conversation',
+                      `${e}`,
+                      true,
+                      1500,
+                    );
+                  }
+                }}>
+                Delete
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </>
+      <>
+        <ChatOptionsBottomSheet
+          sheetRef={chatOptionsRef}
+          index={0}
+          snapPoints={sheetSnapPoints}
+          currentMessage={ListData[currentIndex]}
+          unReadFunction={() => {
+            updateCurrentMessageAsUnread(ListData[currentIndex]);
+            waitForAnd(0).then(() => dismissAll());
+          }}
+          readFunction={() =>
+            updateCurrentMessageAsRead(ListData[currentIndex]).then(() =>
+              waitForAnd(0).then(() => dismissAll()),
+            )
+          }
+          deleteFunction={() => {
+            waitForAnd(0).then(() => {
+              memorisedDialogState(true);
+              dismissAll();
+            });
+          }}
+        />
+      </>
+    </>
   );
 };
 
