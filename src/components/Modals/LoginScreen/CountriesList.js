@@ -190,7 +190,6 @@ const CountriesList = (props: CountriesListInterface) => {
           placeholder={'Search'}
           selectionColor={COLORS.controlNormal}
           style={{margin: '0.5%'}}
-          iconColor={COLORS.darkGrey}
           inputStyle={{
             color: COLORS.black,
             fontFamily: FONTS.regular,
