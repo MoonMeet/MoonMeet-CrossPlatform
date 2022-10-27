@@ -11,10 +11,10 @@ import StackNavigator from './config/Stack';
 import {StatusBar, StyleSheet} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {COLORS} from './config/Miscellaneous';
-import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider} from 'react-native-paper';
 import {ThemeContext} from './config/Theme/Context';
 import {ThemeMMKV} from './config/MMKV/ThemeMMKV';
-import {MoonMeetDarkTheme} from './config/Theme/Theme';
+import {MoonMeetDarkTheme, MoonMeetLightTheme} from './config/Theme/Theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
@@ -80,7 +80,7 @@ const App = () => {
     }
   }, [isThemeDark, toggleTheme]);
 
-  let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
+  let theme = isThemeDark ? MoonMeetDarkTheme : MoonMeetLightTheme;
 
   const toggleTheme = React.useCallback(() => {
     return setIsThemeDark(!isThemeDark);
