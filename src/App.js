@@ -109,7 +109,6 @@ const App = () => {
         animated={true}
         barStyle={isThemeDark ? 'light-content' : 'dark-content'}
       />
-
       <ThemeContext.Provider value={themePrefernces}>
         <PaperProvider theme={theme}>
           <GestureHandlerRootView style={styles.GHRV}>
