@@ -90,8 +90,8 @@ const UpdateBottomSheet = ({
         <Button
           style={[styles.buttonStyle, {margin: '1.5%'}]}
           uppercase={false}
-          color={COLORS.accentLight}
-          mode="contained"
+          textColor={COLORS.accentLight}
+          mode="outlined"
           onPress={onDownloadNowPress}>
           Download now
         </Button>
@@ -99,7 +99,7 @@ const UpdateBottomSheet = ({
           <Button
             style={[styles.buttonStyle, {margin: '1.5%'}]}
             uppercase={false}
-            color={COLORS.accentLight}
+            textColor={COLORS.accentLight}
             mode="outlined"
             onPress={onDoItLaterPress}>
             Do it later
