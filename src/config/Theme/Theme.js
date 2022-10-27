@@ -6,7 +6,6 @@ import {
   MD3DarkTheme as PaperMD3DarkTheme,
   MD3LightTheme as PaperMD3LightTheme,
 } from 'react-native-paper';
-import {COLORS} from '../Miscellaneous';
 
 const MoonMeetDarkTheme = {
   ...PaperMD3DarkTheme,
