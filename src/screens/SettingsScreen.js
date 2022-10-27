@@ -84,6 +84,22 @@ const SettingsScreen = () => {
         }
         setLoading(false);
       });
+    const activeStatusSubscribe = firestore()
+      .collection('users')
+      ?.doc(auth()?.currentUser?.uid)
+      .get()
+      ?.then(documentSnapshot => {
+        documentSnapshot?.ref?.update({
+          active_status:
+            documentSnapshot?.data()?.active_status === 'normal'
+              ? 'normal'
+              : 'recently',
+          active_time:
+            documentSnapshot?.data()?.active_time === 'Last seen recently'
+              ? 'Last seen recently'
+              : firestore?.Timestamp?.fromDate(new Date()),
+        });
+      });
     return () => {
       usersSubsriber();
     };
