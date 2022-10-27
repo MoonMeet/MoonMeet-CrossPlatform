@@ -1,38 +1,28 @@
 import {
   DarkTheme as NavigationDarkTheme,
-  DefaultTheme,
   DefaultTheme as NavigationDefaultTheme,
 } from '@react-navigation/native';
 import {
-  DarkTheme as PaperDarkTheme,
-  DefaultTheme as PaperDefaultTheme,
+  MD3DarkTheme as PaperMD3DarkTheme,
+  MD3LightTheme as PaperMD3LightTheme,
 } from 'react-native-paper';
 import {COLORS} from '../Miscellaneous';
 
 const MoonMeetDarkTheme = {
-  ...PaperDarkTheme,
+  ...PaperMD3DarkTheme,
   ...NavigationDarkTheme,
   colors: {
-    background: COLORS.primaryDark,
-    primary: COLORS.primaryDark,
-    accent: COLORS.accentDark,
-    text: COLORS.white,
-    ...PaperDarkTheme.colors,
+    ...PaperMD3DarkTheme.colors,
     ...NavigationDarkTheme.colors,
   },
   version: 3,
 };
 
 const MoonMeetLightTheme = {
-  ...PaperDefaultTheme,
+  ...PaperMD3LightTheme,
   ...NavigationDefaultTheme,
   colors: {
-    background: COLORS.primaryLight,
-    primary: COLORS.redLightError,
-    accent: COLORS.redLightError,
-    surface: COLORS.accentDark,
-    onSurface: COLORS.accentDark,
-    ...PaperDefaultTheme.colors,
+    ...PaperMD3LightTheme.colors,
     ...NavigationDarkTheme.colors,
   },
   version: 3,
