@@ -56,15 +56,15 @@ const ActivePeopleList = ({ListData}) => {
             />
           </View>
           <View style={styles.mid_side}>
-            <Text style={styles.heading}>
+            <Text style={styles.heading('left', true)}>
               {item?.first_name + ' ' + item?.last_name}
             </Text>
-            <Text style={styles.subheading}>
+            <Text style={styles.subheading('left', true, true)}>
               {moment(item?.active_time?.toDate())?.calendar()}
             </Text>
           </View>
         </Pressable>
-        <Divider />
+        <Divider leftInset />
       </>
     );
   };
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   heading: (align, isRead) => {
     return {
-      fontSize: 16,
+      fontSize: fontValue(16),
       textAlign: align,
       color: COLORS.black,
       opacity: isRead ? 0.6 : 1,
