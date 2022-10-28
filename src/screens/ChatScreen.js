@@ -124,6 +124,10 @@ const ChatTitle = ({
             ? firestore?.Timestamp?.fromDate(new Date())?.toDate() - userTime >
               86400000
               ? `last seen on ${moment(userTime)?.format('YYYY MMMM DD')}`
+              : firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+                  userTime <
+                180000
+              ? 'Active now'
               : `last seen on ${moment(userTime)?.format('HH:MM A')}`
             : 'long time ago'}
         </Text>

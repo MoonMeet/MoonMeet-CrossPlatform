@@ -18,7 +18,6 @@ import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {isDate} from 'moment';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 
 const HomePeopleScreen = () => {
