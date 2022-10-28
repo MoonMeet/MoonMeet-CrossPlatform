@@ -34,7 +34,6 @@ const UserList = ({ListData}) => {
 
   const renderItem = ({item}) => {
     if (item?.uid !== auth()?.currentUser?.uid) {
-      console.log(item?.active_status + item?.active_time);
       return (
         <>
           <Pressable
