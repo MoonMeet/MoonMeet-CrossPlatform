@@ -66,14 +66,14 @@ const ActiveStatusScreen = () => {
         <Switch
           value={switchState}
           color={COLORS.accentLight}
-          onValueChange={() => {
+          onValueChange={value => {
             if (isConnected) {
-              setSwitchState(!switchState);
+              setSwitchState(value);
               firestore()
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
                 .update({
-                  active_status: switchState === true ? 'recently' : 'normal',
+                  active_status: value === false ? 'recently' : 'normal',
                   active_time:
                     newActiveTime === 'Last seen recently'
                       ? firestore?.Timestamp?.fromDate(new Date())
@@ -120,10 +120,9 @@ const ActiveStatusScreen = () => {
       </View>
       <View style={styles.switchRow}>
         <HelperText type={'info'} visible={true}>
-          Everyone can see you when you're active, recently active and currently
-          in the same chat as them. To change this, turn off the setting on
-          Active Status Settings, you'll also see when anyone are active or
-          recently active.
+          {switchState
+            ? "Everyone can see you when you're active, recently active on this profile. To change this setting, turn it off on and your active status will no longer be shown, you'll can't also see when anyone are active or recently active."
+            : "You won't see anybody on Moon Meet active, recently active on this profile. To make sure they can see things about you, turn on this setting, and your active status will be shown. "}
         </HelperText>
       </View>
     </MiniBaseView>
