@@ -29,6 +29,8 @@ const HomePeopleScreen = () => {
 
   const [masterData, setMasterData] = React.useState([]);
 
+  const [Me, setMe] = React.useState(JSON.parse(UserDataMMKV?.getString('Me')));
+
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -61,7 +63,7 @@ const HomePeopleScreen = () => {
             }
           }
           if (
-            documentSnapshot?.data()?.active_status === 'normal' &&
+            Me?.active_status === 'normal' &&
             firestore?.Timestamp?.fromDate(new Date())?.toDate() -
               documentSnapshot?.data()?.active_time?.toDate() <
               180000
@@ -101,7 +103,7 @@ const HomePeopleScreen = () => {
     return () => {
       userSusbcribe();
     };
-  }, []);
+  }, [Me?.active_status]);
 
   if (Loading) {
     return (
