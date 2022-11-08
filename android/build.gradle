@@ -3,6 +3,7 @@
 
 buildscript {
     ext {
+        kotlinVersion = '1.5.20'
         buildToolsVersion = "33.0.0"
         minSdkVersion = 24
         compileSdkVersion = 33
