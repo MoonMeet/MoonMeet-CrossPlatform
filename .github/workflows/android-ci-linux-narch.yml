@@ -48,19 +48,19 @@ jobs:
     - name: Enable New Arch
       run: cd android && sed 's/newArchEnabled=false/newArchEnabled=true/g' gradle.properties && cd ..
     - name: Clean the build.
-      run: cd android && ./gradlew -PnewArchEnabled=true clean && cd ..
+      run: cd android && ./gradlew -PnewArchEnabled=true clean --stacktrace && cd ..
     - name: Build release APK.
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
         KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
-      run: cd android && ./gradlew -PnewArchEnabled=true assembleRelease && cd .. 
+      run: cd android && ./gradlew -PnewArchEnabled=true assembleRelease --stacktrace && cd .. 
     - name: Build release BUNDLE.
       env:
         KEYPASS: ${{ secrets.KEYSTORE_PASSWORD }}
         KEYALIAS: ${{ secrets.KEYSTORE_ALIAS }}
         KEYALIASPASS: ${{ secrets.KEY_ALIAS_PASSWORD }}
-      run: cd android && ./gradlew -PnewArchEnabled=true bundleRelease && cd ..
+      run: cd android && ./gradlew -PnewArchEnabled=true bundleRelease --stacktrace && cd ..
     - name: Upload build outputs.
       uses: actions/upload-artifact@v3
       if: ${{ github.event_name == 'workflow_dispatch' }}
