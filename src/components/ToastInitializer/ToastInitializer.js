@@ -9,6 +9,15 @@
 import Toast, {ToastPosition, ToastType} from 'react-native-toast-message';
 import {heightPercentageToDP} from '../../config/Dimensions';
 
+/**
+ * Trigger a Success Toast.
+ * @param position
+ * @param text1
+ * @param text2
+ * @param autoHide
+ * @param time
+ * @constructor
+ */
 const SuccessToast = (
   position: ToastPosition,
   text1: string,
@@ -29,6 +38,15 @@ const SuccessToast = (
   });
 };
 
+/**
+ * Triggers a Info Toast.
+ * @param position
+ * @param text1
+ * @param text2
+ * @param autoHide
+ * @param time
+ * @constructor
+ */
 function InfoToast(
   position: ToastPosition,
   text1: string,
@@ -49,6 +67,15 @@ function InfoToast(
   });
 }
 
+/**
+ * Trigger an Error Toast
+ * @param position
+ * @param text1
+ * @param text2
+ * @param autoHide
+ * @param time
+ * @constructor
+ */
 function ErrorToast(
   position: ToastPosition,
   text1: string,
@@ -69,6 +96,18 @@ function ErrorToast(
   });
 }
 
+/**
+ * Triggers a Custom Toast
+ * @param type
+ * @param position
+ * @param text1
+ * @param text2
+ * @param autoHide
+ * @param topOffset
+ * @param bottomOffset
+ * @param time
+ * @constructor
+ */
 function CustomToast(
   type: ToastType,
   position: ToastPosition,
