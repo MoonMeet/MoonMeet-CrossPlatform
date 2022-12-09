@@ -102,10 +102,13 @@ const LoginScreen = () => {
   }, [isSubscribed, pushToken, userId]);
 
   async function updateOneSignalValues() {
-    firestore()?.collection('users')?.doc(auth()?.currentUser?.uid)?.update({
-      pushToken: pushToken,
-      OneSignalID: userId,
-    });
+    await firestore()
+      ?.collection('users')
+      ?.doc(auth()?.currentUser?.uid)
+      ?.update({
+        pushToken: pushToken,
+        OneSignalID: userId,
+      });
   }
 
   useEffect(() => {
@@ -302,7 +305,7 @@ const LoginScreen = () => {
           } else {
             ErrorToast(
               'bottom',
-              'Unexpected error occured',
+              'Unexpected error occurred',
               `${error}`,
               true,
               2000,

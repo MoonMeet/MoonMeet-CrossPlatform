@@ -106,7 +106,7 @@ const EditProfileScreen = () => {
   async function pushUserData() {
     let _avatarRef = `avatars/${
       auth()?.currentUser?.uid
-    }.${UserPhoto.path?.substr(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+    }.${UserPhoto.path?.substring(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
 
     const storageRef = storage().ref(_avatarRef);
 
@@ -136,6 +136,10 @@ const EditProfileScreen = () => {
     });
   }
 
+  /**
+   * Push image url to currentUser.
+   * @param pureImageUrl
+   */
   function pushImage(pureImageUrl) {
     firestore()
       .collection('users')

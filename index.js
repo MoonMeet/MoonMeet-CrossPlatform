@@ -16,13 +16,19 @@ import notifee, {AndroidImportance, AndroidStyle} from '@notifee/react-native';
  * Notifee message channel
  */
 
-notifee.createChannel({
-  id: 'messages',
-  name: 'Messages',
-  lights: true,
-  vibration: true,
-  importance: AndroidImportance.HIGH,
-});
+notifee
+  .createChannel({
+    id: 'messages',
+    name: 'Messages',
+    lights: true,
+    vibration: true,
+    importance: AndroidImportance.HIGH,
+  })
+  .then(() => {
+    if (__DEV__) {
+      console.log('messages channel created.');
+    }
+  });
 
 /**
  *Initialize OneSignal
