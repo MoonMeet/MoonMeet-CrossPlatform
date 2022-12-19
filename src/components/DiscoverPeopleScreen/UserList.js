@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar, Divider} from 'react-native-paper';
@@ -22,15 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 const UserList = ({ListData}) => {
   const navigation = useNavigation();
 
-  const [Me, setMe] = React.useState([]);
-
-  useEffect(() => {
-    try {
-      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
-    } catch (error) {
-      setMe([]);
-    }
-  }, []);
+  const [Me] = React.useState(UserDataMMKV?.getString('Me'));
 
   const renderItem = ({item}) => {
     if (item?.uid !== auth()?.currentUser?.uid) {
