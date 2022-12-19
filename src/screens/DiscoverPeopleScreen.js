@@ -41,7 +41,7 @@ const DiscoverPeopleScreen = () => {
         setMasterData(usersSnapshot);
         setLoading(false);
       });
-    const activeStatusSubscribe = firestore()
+    firestore()
       .collection('users')
       ?.doc(auth()?.currentUser?.uid)
       .get()
