@@ -64,6 +64,8 @@ const HomePeopleScreen = () => {
           }
           if (
             Me?.active_status === 'normal' &&
+            (documentSnapshot?.data()?.active_time === 'Last seen recently') ===
+              false &&
             firestore?.Timestamp?.fromDate(new Date())?.toDate() -
               documentSnapshot?.data()?.active_time?.toDate() <
               180000
@@ -80,9 +82,9 @@ const HomePeopleScreen = () => {
               });
             }
           }
-          setMasterData(activeSnapshot);
           setLoading(false);
         });
+        setMasterData(activeSnapshot);
       });
     const activeStatusSubscribe = firestore()
       .collection('users')
