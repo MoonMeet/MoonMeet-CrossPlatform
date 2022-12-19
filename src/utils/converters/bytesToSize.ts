@@ -6,6 +6,11 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
+/**
+ * a function to convert bytes to size.
+ * @param bytes
+ * @returns number
+ */
 const bytesToSize = (bytes: number) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes === 0) {
