@@ -29,7 +29,7 @@ const HomePeopleScreen = () => {
 
   const [masterData, setMasterData] = React.useState([]);
 
-  const [Me, setMe] = React.useState(JSON.parse(UserDataMMKV?.getString('Me')));
+  const [Me] = React.useState(JSON.parse(UserDataMMKV?.getString('Me')));
 
   useFocusEffect(
     useCallback(() => {
