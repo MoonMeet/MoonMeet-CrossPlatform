@@ -22,7 +22,7 @@ import firestore from '@react-native-firebase/firestore';
 const UserList = ({ListData}) => {
   const navigation = useNavigation();
 
-  const [Me] = React.useState(UserDataMMKV?.getString('Me'));
+  const [Me] = React.useState(JSON.parse(UserDataMMKV?.getString('Me')));
 
   const renderItem = ({item}) => {
     if (item?.uid !== auth()?.currentUser?.uid) {
