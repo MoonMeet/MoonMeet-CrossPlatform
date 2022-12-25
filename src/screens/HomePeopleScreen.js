@@ -19,6 +19,7 @@ import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {remove} from 'lodash';
 
 const HomePeopleScreen = () => {
   const navigation = useNavigation();
@@ -81,6 +82,8 @@ const HomePeopleScreen = () => {
                 ...documentSnapshot?.data(),
               });
             }
+          } else {
+            remove(activeSnapshot, documentSnapshot.data());
           }
           setLoading(false);
         });
