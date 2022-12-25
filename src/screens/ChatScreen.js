@@ -323,30 +323,59 @@ const ChatScreen = () => {
    * Delete message from database using param `id`
    * @param {string} id
    */
-  async function deleteMessage(id) {
+  async function deleteMessage(messageData, forEveryone) {
     const meMessageRef = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
       .collection('messages')
       .doc(destinedUser)
       .collection('discussions');
-    return await meMessageRef?.get()?.then(collectionSnapshot => {
-      collectionSnapshot?.docs?.map(documentSnapshot => {
-        if (documentSnapshot?.id === id) {
-          documentSnapshot?.ref?.delete();
-          filter(mChatData, element => {
-            element?.id === id;
-          });
-        }
+    const userMessageRef = firestore()
+      .collection('users')
+      .doc(destinedUser)
+      .collection('messages')
+      .doc(auth()?.currentUser?.uid)
+      .collection('discussions');
+    if (forEveryone) {
+      await meMessageRef?.get()?.then(collectionSnapshot => {
+        collectionSnapshot?.docs?.map(documentSnapshot => {
+          if (documentSnapshot?.id === messageData?.id) {
+            documentSnapshot?.ref?.delete();
+            filter(mChatData, element => {
+              element?.id === messageData?.id;
+            });
+          }
+        });
       });
-    });
+      await userMessageRef?.get()?.then(collectionSnapshot => {
+        collectionSnapshot?.docs.map(documentSnapshot => {
+          if (documentSnapshot?.data()?._id === messageData?._id) {
+            documentSnapshot?.ref?.delete();
+            filter(mChatData, element => {
+              element?.id === messageData?.id;
+            });
+          }
+        });
+      });
+    } else {
+      return await meMessageRef?.get()?.then(collectionSnapshot => {
+        collectionSnapshot?.docs?.map(documentSnapshot => {
+          if (documentSnapshot?.id === messageData?.id) {
+            documentSnapshot?.ref?.delete();
+            filter(mChatData, element => {
+              element?.id === messageData?.id;
+            });
+          }
+        });
+      });
+    }
   }
 
   function onLongPress(context, message) {
     const options =
       message?.user?._id === auth()?.currentUser?.uid
-        ? ['Copy Message', 'Delete For Me', 'Cancel']
-        : ['Copy Message', 'Cancel'];
+        ? ['Copy Message', 'Delete For Everyone', 'Delete For Me', 'Cancel']
+        : ['Copy Message', 'Delete For Me', 'Cancel'];
     const cancelButtonIndex = options?.length - 1;
     context?.actionSheet()?.showActionSheetWithOptions(
       {
@@ -354,7 +383,7 @@ const ChatScreen = () => {
         cancelButtonIndex,
       },
       buttonIndex => {
-        if (options?.length === 3) {
+        if (options?.length === 4) {
           switch (buttonIndex) {
             case 0:
               try {
@@ -371,7 +400,20 @@ const ChatScreen = () => {
               break;
             case 1:
               try {
-                deleteMessage(message?.id);
+                deleteMessage(message, true);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+            case 2:
+              try {
+                deleteMessage(message, false);
               } catch (e) {
                 ErrorToast(
                   'bottom',
@@ -388,6 +430,19 @@ const ChatScreen = () => {
             case 0:
               try {
                 Clipboard?.setString(message?.text);
+              } catch (e) {
+                ErrorToast(
+                  'bottom',
+                  'Unexcpected Error Occured',
+                  `${e}`,
+                  true,
+                  1500,
+                );
+              }
+              break;
+            case 1:
+              try {
+                deleteMessage(message, false);
               } catch (e) {
                 ErrorToast(
                   'bottom',
