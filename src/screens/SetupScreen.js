@@ -114,8 +114,8 @@ const SetupScreen = ({route}) => {
    * Used for getting Device Information, useful for DeviceScreen.js
    */
 
-  const [systemName, setSystemName] = React.useState(getSystemName());
-  const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
+  const [systemName] = React.useState(getSystemName());
+  const [systemVersion] = React.useState(getSystemVersion());
   const [Manufacturer, setManufacturer] = React.useState(
     getManufacturer().then(manufacturer => {
       setManufacturer(manufacturer);
@@ -126,8 +126,8 @@ const SetupScreen = ({route}) => {
       setProduct(product);
     }),
   );
-  const [Model, setModel] = React.useState(getModel());
-  const [appVersion, setAppVersion] = React.useState(getVersion());
+  const [Model] = React.useState(getModel());
+  const [appVersion] = React.useState(getVersion());
 
   return (
     <>
