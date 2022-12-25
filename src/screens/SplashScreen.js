@@ -44,7 +44,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
 import {getVersion} from 'react-native-device-info';
-import {isEmpty, isNull} from 'lodash';
+import {inRange, isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
 import {
   ErrorToast,
@@ -336,6 +336,19 @@ const SplashScreen = () => {
     },
   });
 
+  function newYearDescription() {
+    const dateObject = new Date();
+    const currentDay = dateObject.getDate();
+    const currentYear = dateObject.getFullYear();
+    let sloganText = 'We give people the closest distances';
+    if (inRange(currentDay, 24, 32) && currentYear === 2022) {
+      sloganText = 'Hoping you shimmy shake your way into 2023';
+    } else if (inRange(currentDay, 1, 4) && currentYear === 2023) {
+      sloganText = 'Wishing you the best in 2023';
+    }
+    return sloganText;
+  }
+
   return (
     <SafeAreaView
       style={[
@@ -358,9 +371,7 @@ const SplashScreen = () => {
           ]}>
           Moon Meet
         </Text>
-        <Text style={styles.slogan_text}>
-          We give people the closest distances
-        </Text>
+        <Text style={styles.slogan_text}>{newYearDescription()}</Text>
       </Animated.View>
       <UpdateBottomSheet
         sheetRef={updateSheetRef}
