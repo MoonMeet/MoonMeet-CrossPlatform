@@ -149,7 +149,6 @@ const LoginScreen = () => {
       }
     });
     return () => netEventListener;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigation = useNavigation();
@@ -258,19 +257,13 @@ const LoginScreen = () => {
   const getCountryCodeFromApi = () => {
     const ApiURL = 'https://ipapi.co/country_calling_code';
     axios
-      .get(ApiURL, {method: 'get'})
+      .get(ApiURL)
       .then(element => {
-        if (element?.data?.includes('error')) {
-          CountrySetText('+1');
-        } else {
-          CountrySetText(element?.data);
-        }
+        CountrySetText(element?.data);
       })
       .catch(e => {
         if (__DEV__) {
           console.error(e);
-        }
-        if (CountryText?.trim()?.length < 0) {
           CountrySetText('+1');
         }
       });
@@ -554,7 +547,7 @@ const LoginScreen = () => {
                   }}>
                   <TextInput
                     style={{
-                      width: '36%',
+                      width: '37.5%',
                     }}
                     mode="flat"
                     keyboardType={isAndroid ? 'numeric' : 'number-pad'}
