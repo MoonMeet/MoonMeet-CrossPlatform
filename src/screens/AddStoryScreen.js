@@ -26,6 +26,7 @@ import {
   Text,
   View,
   Keyboard,
+  TouchableHighlight,
 } from 'react-native';
 import {
   ActivityIndicator,
@@ -34,7 +35,6 @@ import {
   TextInput,
 } from 'react-native-paper';
 import DoneImage from '../assets/images/done.png';
-import CameraImage from '../assets/images/photo-camera.png';
 import PickImage from '../assets/images/pick-photo.png';
 import BaseView from '../components/BaseView/BaseView';
 import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
@@ -60,6 +60,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import {waitForAnd} from '../utils/timers/delay';
 import ImagePicker from 'react-native-image-crop-picker';
+import LinearGradient from 'react-native-linear-gradient';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AddStoryScreen = () => {
   const navigation = useNavigation();
@@ -434,41 +436,41 @@ const AddStoryScreen = () => {
         <Spacer height={'2%'} />
         <View style={styles.userChoice}>
           <Pressable
-            android_ripple={{
-              color: COLORS.rippleColor,
-              borderless: false,
-            }}
-            style={styles.storyChoiceView}
             onPress={() => {
               setHideMainScreen(true);
               setUserSelection('image');
             }}>
-            <Avatar.Icon
-              icon={CameraImage}
-              size={37.5}
-              color={COLORS.accentLight}
-              style={{
-                overflow: 'hidden',
-                marginRight: '1.5%',
-              }}
-              theme={{
-                colors: {
-                  primary: COLORS.transparent,
-                },
-              }}
-            />
-            <Text style={styles.userChoiceSubheadingText}>Image</Text>
+            <LinearGradient
+              colors={['#98FB98', COLORS.blue]}
+              style={[styles.storyChoiceView, {flexGrow: 1}]}>
+              <MaterialCommunityIcons
+                name="camera-outline"
+                color={COLORS.primaryLight}
+                size={24}
+                style={{overflow: 'hidden', marginRight: '1.5%'}}
+              />
+              <Spacer height={'1%'} />
+              <Text style={styles.userChoiceSubheadingText}>Image</Text>
+            </LinearGradient>
           </Pressable>
           <Spacer height={'5%'} />
           <Pressable
-            android_ripple={{color: COLORS.rippleColor, borderless: false}}
-            style={styles.storyChoiceView}
             onPress={() => {
               setHideMainScreen(true);
               setUserSelection('text');
             }}>
-            <Text style={styles.userChoiceHeadingText}>Aa</Text>
-            <Text style={styles.userChoiceSubheadingText}>Text</Text>
+            <LinearGradient
+              colors={[COLORS.purple, COLORS.pink]}
+              style={[styles.storyChoiceView, {flexGrow: 1}]}>
+              <MaterialCommunityIcons
+                name="text"
+                color={COLORS.primaryLight}
+                size={24}
+                style={{overflow: 'hidden', marginRight: '1.5%'}}
+              />
+              <Spacer height={'1%'} />
+              <Text style={styles.userChoiceSubheadingText}>Text</Text>
+            </LinearGradient>
           </Pressable>
         </View>
       </MiniBaseView>
@@ -680,8 +682,8 @@ const styles = StyleSheet.create({
     paddingLeft: '2%',
     paddingRight: '3%',
     textAlign: 'center',
-    color: COLORS.black,
-    opacity: 0.4,
+    color: COLORS.white,
+    opacity: 0.75,
     fontFamily: FONTS.regular,
   },
   textInputFlexedView: {
