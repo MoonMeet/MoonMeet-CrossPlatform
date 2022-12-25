@@ -7,7 +7,7 @@
  */
 
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {COLORS, FONTS} from '../../config/Miscellaneous';
 import {Avatar, Divider} from 'react-native-paper';
 import moment from 'moment';
@@ -15,22 +15,34 @@ import {uniqBy} from 'lodash';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import {fontValue} from '../../config/Dimensions';
+import {UserDataMMKV} from '../../config/MMKV/UserDataMMKV';
 
 const ActivePeopleList = ({ListData}) => {
   const navigation = useNavigation();
 
-  const listEmptyComponent = () => {
+  const [Me] = useState(JSON.parse(UserDataMMKV.getString('Me')));
+
+  const listEmptyComponent = lastSeenHidden => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading('center', false)}>No one active, yet.</Text>
+        <Text style={styles.heading('center', false)}>
+          {lastSeenHidden
+            ? "You can't see who's active."
+            : 'No one active, yet.'}
+        </Text>
         <Text style={styles.subheading('center', false, true)}>
-          there's no one active at the moment.
+          {lastSeenHidden
+            ? "turn on your active status to see who's active"
+            : "there's no one active at the moment."}
         </Text>
       </View>
     );
   };
 
   const renderItem = ({item}) => {
+    if (Me?.active_time === 'Last seen recently') {
+      return listEmptyComponent(true);
+    }
     return (
       <>
         <Pressable
@@ -77,7 +89,6 @@ const ActivePeopleList = ({ListData}) => {
         paddingEnd: '1%',
       }}
       showsVerticalScrollIndicator={false}
-      disableVirtualization
       removeClippedSubviews={true}
       initialNumToRender={25}
       ListEmptyComponent={listEmptyComponent}
