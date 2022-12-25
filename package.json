@@ -15,7 +15,8 @@
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
     "assembleDebug": "cd android && ./gradlew assembleDebug",
-    "assembleRelease": "cd android && ./gradlew assembleRelease"
+    "assembleRelease": "cd android && ./gradlew assembleRelease",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^4.4.5",
@@ -63,6 +64,9 @@
     "react-native-toast-message": "^2.1.5",
     "react-native-vector-icons": "^9.2.0",
     "react-native-webrtc": "^106.0.1",
+    "react-native-linear-gradient": "^2.6.2",
+    "patch-package": "^6.5.0",
+    "postinstall-postinstall": "^2.1.0",
     "rn-emoji-keyboard": "^1.1.0",
     "styled-components": "^5.3.6",
     "styled-system": "^5.1.5",
