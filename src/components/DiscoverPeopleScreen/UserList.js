@@ -86,7 +86,6 @@ const UserList = ({ListData}) => {
         paddingEnd: '0.5%',
       }}
       showsVerticalScrollIndicator={false}
-      disableVirtualization
       removeClippedSubviews={true}
       initialNumToRender={25}
       keyExtractor={item => item?.uid}
