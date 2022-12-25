@@ -242,7 +242,7 @@ const HomePeopleScreen = () => {
         <Text
           adjustsFontSizeToFit
           style={styles.subheading('center', false, true)}>
-          there's no one have shared a story at the moment.
+          there's no stories at the moment.
         </Text>
       </View>
     );
