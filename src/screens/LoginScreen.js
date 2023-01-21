@@ -8,14 +8,7 @@
 
 import React, {useCallback, useEffect, useRef, useMemo} from 'react';
 import {BackHandler, Image, Keyboard, StyleSheet, View} from 'react-native';
-import {
-  Button,
-  FAB,
-  IconButton,
-  Menu,
-  Text,
-  TextInput,
-} from 'react-native-paper';
+import {Button, FAB, Menu, Text, TextInput} from 'react-native-paper';
 import NetInfo from '@react-native-community/netinfo';
 
 import {
@@ -38,7 +31,6 @@ import TermsConditions from '../components/Modals/TermsConditions/TermsCondition
 
 import DeviceInfo from 'react-native-device-info';
 
-import DotsImage from '../assets/images/dots.png';
 import WelcomeImage from '../assets/images/welcome.png';
 
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
@@ -56,6 +48,8 @@ import {getRandomString} from '../utils/generators/getRandomString';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
 import OneSignal from 'react-native-onesignal';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Pressable} from 'react-native';
 
 const LoginScreen = () => {
   useFocusEffect(
@@ -491,20 +485,22 @@ const LoginScreen = () => {
               <Menu
                 visible={MenuVisible}
                 onDismiss={closeMenu}
-                theme={{
-                  colors: {
-                    onSecondaryContainer: COLORS.accentLight,
-                  },
-                }}
+                contentStyle={{backgroundColor: COLORS.controlNormal}}
                 anchor={
-                  <IconButton
-                    icon={DotsImage}
-                    color={'#999999'}
-                    size={24}
-                    onPress={() => {
-                      openMenu();
+                  <Pressable
+                    style={{padding: '0.75%'}}
+                    android_ripple={{
+                      color: COLORS.controlHighlight,
+                      radius: 20,
+                      borderless: true,
                     }}
-                  />
+                    onPress={() => openMenu()}>
+                    <MaterialCommunityIcons
+                      name="dots-vertical"
+                      size={28}
+                      color={COLORS.grey}
+                    />
+                  </Pressable>
                 }>
                 <Menu.Item
                   onPress={() => {
