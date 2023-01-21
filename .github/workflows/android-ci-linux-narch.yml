@@ -39,6 +39,12 @@ jobs:
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
       run: echo $GOOGLE_SERVICES_JSON > android/app/google-services.json
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.13.1
+      with: 
+        cmake-version: '3.25.2'
+    - name: Try CMake version command.
+      run: cmake --version
     - name: Decode Sensitive JS File.
       env:
         SENSITIVE_JS: ${{ secrets.SENSITIVE_JS }}
