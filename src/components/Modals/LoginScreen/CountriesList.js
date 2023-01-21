@@ -22,6 +22,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import {FlatList} from 'react-native-gesture-handler';
 import {fontValue, heightPercentageToDP} from '../../../config/Dimensions';
+import {ScreenHeight} from '../../../utils/device/DeviceInfo';
 
 interface CountriesListInterface {
   sheetRef?: Ref | undefined;
@@ -116,7 +117,7 @@ const CountriesList = (props: CountriesListInterface) => {
    * @returns {JSX.Element}
    * @private
    */
-  const renderItem = ({item}) => {
+  const renderItem = useCallback(({item}) => {
     return (
       <>
         <Pressable
@@ -131,7 +132,7 @@ const CountriesList = (props: CountriesListInterface) => {
         <Divider />
       </>
     );
-  };
+  }, []);
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
@@ -189,27 +190,26 @@ const CountriesList = (props: CountriesListInterface) => {
           value={SearchData}
           placeholder={'Search'}
           selectionColor={COLORS.controlNormal}
-          style={{margin: '0.5%'}}
+          style={{margin: '0.5%', backgroundColor: COLORS.controlNormal}}
           inputStyle={{
             color: COLORS.black,
             fontFamily: FONTS.regular,
           }}
+          maxLength={20}
           clearIcon={ClearImage}
         />
         <FlatList
           showsVerticalScrollIndicator={false}
           data={unionBy(sortBy(FilteredData, [data => data?.name]), 'code')}
-          removeClippedSubviews={true}
+          maxToRenderPerBatch={50}
+          updateCellsBatchingPeriod={100}
+          initialNumToRender={75}
           keyExtractor={item => item?.id}
+          windowSize={ScreenHeight}
           contentContainerStyle={[
             {flexGrow: 1},
             FilteredData.length > 0 ? null : {justifyContent: 'center'},
           ]}
-          disableVirtualization
-          initialNumToRender={
-            unionBy(sortBy(FilteredData, [data => data?.name]), 'code').length /
-            2
-          }
           ListEmptyComponent={listEmptyComponent}
           renderItem={renderItem}
         />
