@@ -224,7 +224,7 @@ const ScrollViewContainer = (props: ScrollViewContainerInterface) => {
       <DataItem
         leftIcon={PassCodeIcon}
         leftIconColor={COLORS.green}
-        titleTextContainer={'Setup passcode'}
+        titleTextContainer={'Two-step verification'}
         onPressTrigger={() => {
           if (__DEV__) {
             navigation.navigate('passcodeSetup');
