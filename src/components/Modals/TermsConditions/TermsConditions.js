@@ -181,8 +181,8 @@ const TermsConditions = ({sheetRef, snapPoints, index}) => {
             Contact Us: If you have any questions or suggestions about Moon Meet
             Terms & Conditions, do not hesitate to contact me on:
           </Text>
-          <Text style={styles.subText}>Email: rayensbai2@gmail.com</Text>
-          <Text style={styles.subText}>Phone: +216 55063898</Text>
+          <Text style={styles.subText}>email: contact.moonmeet@gmail.com</Text>
+          <Text style={styles.subText}>phone: +216 55063898</Text>
         </ScrollView>
       </BottomSheetView>
     </BottomSheetModal>
