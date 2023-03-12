@@ -1145,24 +1145,19 @@ const ChatScreen = () => {
           }}
           renderBubble={props => {
             return (
-              <Animated.View
-                layout={Layout.springify()}
-                entering={FadeInDown}
-                exiting={FadeOutDown}>
-                <Bubble
-                  {...props}
-                  wrapperStyle={{
-                    right: {
-                      ...props?.wrapperStyle?.right,
-                      backgroundColor: COLORS.accentLight,
-                    },
-                    left: {
-                      ...props?.wrapperStyle?.left,
-                      backgroundColor: COLORS.chats.leftBubble,
-                    },
-                  }}
-                />
-              </Animated.View>
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  right: {
+                    ...props?.wrapperStyle?.right,
+                    backgroundColor: COLORS.accentLight,
+                  },
+                  left: {
+                    ...props?.wrapperStyle?.left,
+                    backgroundColor: COLORS.chats.leftBubble,
+                  },
+                }}
+              />
             );
           }}
           minInputToolbarHeight={0}

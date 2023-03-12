@@ -48,7 +48,7 @@ const CountriesList = (props: CountriesListInterface) => {
 
   const sheetStyle = useMemo(
     () => ({
-      ...styles.sheetContainer(props?.index),
+      ...styles.sheetContainer,
       shadowColor: COLORS.black,
       padding: '3%',
     }),
@@ -165,8 +165,6 @@ const CountriesList = (props: CountriesListInterface) => {
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
       handleHeight={animatedHandleHeight}
-      animationConfigs={animationConfigs}
-      animateOnMount={true}
       backdropComponent={renderBackdrop}
       onLayout={handleContentLayout}
       style={sheetStyle}>
@@ -249,19 +247,17 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     opacity: 0.4,
   },
-  sheetContainer: index => {
-    return {
-      backgroundColor: COLORS.white,
-      borderTopStartRadius: index === 1 ? 0 : 25,
-      borderTopEndRadius: index === 1 ? 0 : 25,
-      shadowOffset: {
-        width: 0,
-        height: 12,
-      },
-      shadowOpacity: 0.75,
-      shadowRadius: 16.0,
-      elevation: 25,
-    };
+  sheetContainer: {
+    backgroundColor: COLORS.white,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 16.0,
+    elevation: 25,
   },
   heading: {
     fontSize: fontValue(20),
