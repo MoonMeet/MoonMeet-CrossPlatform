@@ -19,7 +19,6 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
-import perf from '@react-native-firebase/perf';
 import OneSignal from 'react-native-onesignal';
 import {enableLayoutAnimations} from 'react-native-reanimated';
 
@@ -34,7 +33,6 @@ import {enableLayoutAnimations} from 'react-native-reanimated';
 async function enableFirebaseTools() {
   await crashlytics()?.setCrashlyticsCollectionEnabled(__DEV__ === false);
   await analytics()?.setAnalyticsCollectionEnabled(__DEV__ === false);
-  await perf()?.setPerformanceCollectionEnabled(__DEV__ === false);
 }
 
 /**
