@@ -233,6 +233,7 @@ const LoginScreen = () => {
           1500,
         );
       } else {
+        console.warn(error?.message);
         ErrorToast(
           'bottom',
           'Unexpected error occured',

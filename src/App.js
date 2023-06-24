@@ -21,6 +21,8 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import OneSignal from 'react-native-onesignal';
 import {enableLayoutAnimations} from 'react-native-reanimated';
+import appCheck from '@react-native-firebase/app-check';
+import {FIREBASE_APPCHECK_DEBUG_TOKEN} from './secrets/sensitive';
 
 /**
  * It enables the firebase tools.
@@ -42,6 +44,30 @@ enableLayoutAnimations(false);
 
 const App = () => {
   const [isThemeDark, setIsThemeDark] = React.useState(false);
+
+  /**
+   * Play integrity initialisation
+   */
+  let rnfbProvider = appCheck().newReactNativeFirebaseAppCheckProvider();
+  rnfbProvider.configure({
+    android: {
+      provider: __DEV__ ? 'debug' : 'playIntegrity',
+      debugToken: FIREBASE_APPCHECK_DEBUG_TOKEN,
+    },
+    apple: {
+      provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
+      debugToken: 'NO-TOKEN',
+    },
+    web: {
+      provider: 'reCaptchaV3',
+      siteKey: 'unknown',
+    },
+  });
+
+  appCheck().initializeAppCheck({
+    provider: rnfbProvider,
+    isTokenAutoRefreshEnabled: true,
+  });
 
   useEffect(() => {
     enableFirebaseTools();

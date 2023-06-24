@@ -9,15 +9,16 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useRef} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Snackbar, Text, TextInput, HelperText, FAB} from 'react-native-paper';
+import {Text, TextInput, HelperText, FAB} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import OTPTextView from '../components/OtpView/OTPTextInput';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
-import ArrowForward from '../assets/images/arrow-forward.png';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Spacer from '../components/Spacer/Spacer';
 
 const SetupPasscodeScreen = () => {
   const navigation = useNavigation();
@@ -82,26 +83,34 @@ const SetupPasscodeScreen = () => {
             multiline={false}
             value={mRecoveryPassword}
             maxLength={20}
+            right={
+              <TextInput.Affix
+                text={`${mRecoveryPasswordHint?.trim()?.length}/20`}
+              />
+            }
             theme={{
               colors: {
-                text: COLORS.black,
                 primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
+                onSurface: COLORS.black,
+                background: COLORS.dimmed,
               },
             }}
             onChangeText={text => {
               setRecoveryPassword(text);
             }}
+            accessibilityLabelledBy={undefined}
+            accessibilityLanguage={undefined}
           />
           {passwordHasLessLength() ? (
-            <HelperText type="error" visible={passwordHasLessLength()}>
+            <HelperText
+              type="error"
+              visible={passwordHasLessLength()}
+              accessibilityLabelledBy={undefined}
+              accessibilityLanguage={undefined}>
               Recovery Password must be longer than 2 characters.
             </HelperText>
           ) : null}
+          <Spacer height={heightPercentageToDP(0.75)} />
           <TextInput
             style={{
               width: '100%',
@@ -113,36 +122,51 @@ const SetupPasscodeScreen = () => {
             multiline={false}
             value={mRecoveryPasswordHint}
             maxLength={20}
+            right={
+              <TextInput.Affix
+                text={`${mRecoveryPasswordHint?.trim()?.length}/20`}
+              />
+            }
             theme={{
               colors: {
-                text: COLORS.black,
                 primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
+                onSurface: COLORS.black,
+                background: COLORS.dimmed,
               },
             }}
             onChangeText={text => {
               setRecoveryPasswordHint(text);
             }}
+            accessibilityLabelledBy={undefined}
+            accessibilityLanguage={undefined}
           />
           {passwordHintHasLessLength() ? (
-            <HelperText type="error" visible={passwordHintHasLessLength()}>
+            <HelperText
+              type="error"
+              visible={passwordHintHasLessLength()}
+              accessibilityLabelledBy={undefined}
+              accessibilityLanguage={undefined}>
               Password Hint must be longer than 2 characters.
             </HelperText>
           ) : null}
         </View>
         <FAB
-          style={styles.fab(mBottomMargin)}
-          normal
-          icon={ArrowForward}
+          style={styles.fab}
           color={COLORS.primaryLight}
+          mode={'elevated'}
+          size={'medium'}
+          icon={({size, allowFontScaling}) => (
+            <MaterialIcons
+              name="chevron-right"
+              color={COLORS.white}
+              size={size}
+              allowFontScaling={allowFontScaling}
+            />
+          )}
           animated={true}
           theme={{
             colors: {
-              accent: COLORS.accentLight,
+              primaryContainer: COLORS.accentLight,
             },
           }}
           onPress={() => {
@@ -168,33 +192,12 @@ const SetupPasscodeScreen = () => {
                   }
                 });
             } else {
-              setBottomMargin(heightPercentageToDP(7));
-              setErrorSnackbarText('Please fill the requirments above.');
-              setErrorSnackBarVisible(!ErrorSnackBarVisible);
+              setBottomMargin();
             }
           }}
+          accessibilityLabelledBy={undefined}
+          accessibilityLanguage={undefined}
         />
-        <Snackbar
-          visible={ErrorSnackBarVisible}
-          onDismiss={onDismissErrorSnackBar}
-          duration={3000}
-          action={{
-            label: 'OK',
-            onPress: () => {
-              onDismissErrorSnackBar();
-            },
-          }}
-          theme={{
-            colors: {
-              onSurface: COLORS.redLightError,
-              accent: COLORS.white,
-            },
-          }}
-          style={{
-            margin: '4%',
-          }}>
-          {ErrorSnackbarText}
-        </Snackbar>
       </BaseView>
     );
   } else {
@@ -273,27 +276,6 @@ const SetupPasscodeScreen = () => {
             </View>
           </View>
         ) : null}
-        <Snackbar
-          visible={ErrorSnackBarVisible}
-          onDismiss={onDismissErrorSnackBar}
-          duration={3000}
-          action={{
-            label: 'OK',
-            onPress: () => {
-              onDismissErrorSnackBar();
-            },
-          }}
-          theme={{
-            colors: {
-              onSurface: COLORS.redLightError,
-              accent: COLORS.white,
-            },
-          }}
-          style={{
-            margin: '4%',
-          }}>
-          {ErrorSnackbarText}
-        </Snackbar>
       </BaseView>
     );
   }
@@ -321,13 +303,11 @@ const styles = StyleSheet.create({
     borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
   },
-  fab: bottomMargin => {
-    return {
-      position: 'absolute',
-      margin: 16 - 0.1 * 16,
-      right: 0,
-      bottom: bottomMargin,
-    };
+  fab: {
+    position: 'absolute',
+    margin: 16 - 0.1 * 16,
+    right: 0,
+    bottom: 0,
   },
 });
 
