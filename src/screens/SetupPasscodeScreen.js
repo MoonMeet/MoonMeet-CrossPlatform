@@ -45,19 +45,8 @@ const SetupPasscodeScreen = () => {
   const [mConfirmingCodeForSetup, setConfirmingCodeForSetup] =
     React.useState(false);
 
-  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
-
-  const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
-
   const [mSettingRecoveryPassword, setSettingRecoveryPassword] =
     React.useState(false);
-
-  const [mBottomMargin, setBottomMargin] = React.useState(0);
-
-  const onDismissErrorSnackBar = () => {
-    setBottomMargin(0);
-    setErrorSnackBarVisible(!ErrorSnackBarVisible);
-  };
 
   if (mSettingRecoveryPassword) {
     return (
@@ -192,7 +181,6 @@ const SetupPasscodeScreen = () => {
                   }
                 });
             } else {
-              setBottomMargin();
             }
           }}
           accessibilityLabelledBy={undefined}
@@ -226,10 +214,8 @@ const SetupPasscodeScreen = () => {
             handleTextChange={text => {
               if (text.length > 3) {
                 if (mConfirmingCodeForSetup) {
-                  if (text != mPinCode) {
+                  if (text !== mPinCode) {
                     mPINRef.current.clear();
-                    setErrorSnackbarText('Wrong PIN, Try again');
-                    setErrorSnackBarVisible(true);
                   } else {
                     setSettingRecoveryPassword(true);
                   }
