@@ -14,7 +14,7 @@ import {COLORS} from './config/Miscellaneous';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {ThemeContext} from './config/Theme/Context';
 import {ThemeMMKV} from './config/MMKV/ThemeMMKV';
-import {MoonMeetDarkTheme, MoonMeetLightTheme} from './config/Theme/Theme';
+import {MoonMeetDarkTheme} from './config/Theme/Theme';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
@@ -80,7 +80,6 @@ const App = () => {
         if (isSubscribed) {
           OneSignal.addTrigger('unsubscribed', 'false');
         } else {
-          OneSignal.addTrigger('unsubscribed', 'true');
           OneSignal.promptForPushNotificationsWithUserResponse(true);
         }
       }
