@@ -25,18 +25,7 @@
 
 ### Screenshots
 
-<details><summary>Click to expand</summary>
-<p float="left">
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/splash.png" width="225" height="575" />
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/login.png" width="225" height="575" />
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/home.png" width="225" height="575" />
-</p>
-<p float="left">
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/me.png" width="225" height="575" />
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/chats.png" width="225" height="575" />
-<img src="https://raw.github.com/MoonMeet/MoonMeet-CrossPlatform/main/assets/discover.png" width="225" height="575" />
-</p>
-</details>
+see Google Play for screenshots.
 
 ### Contributing
 
