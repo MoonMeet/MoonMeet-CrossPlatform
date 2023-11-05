@@ -25,7 +25,7 @@
 
 ### Screenshots
 
-see Google Play for screenshots.
+- see Google Play for screenshots.
 
 ### Contributing
 
