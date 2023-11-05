@@ -25,7 +25,7 @@
 
 ### Screenshots
 
-- see Google Play for screenshots.
+- See [Google Play](https://play.google.com/store/apps/details?id=org.moon.moonmeet) for screenshots.
 
 ### Contributing
 
