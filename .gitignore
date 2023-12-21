@@ -73,3 +73,4 @@ src/secrets/sensitive.js
 
 # testing
 /coverage
+/android/app/src/google-services.json
