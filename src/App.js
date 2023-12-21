@@ -32,9 +32,10 @@ import {FIREBASE_APPCHECK_DEBUG_TOKEN} from './secrets/sensitive';
  * @kind function
  * @returns {Promise<void>}
  */
+
 async function enableFirebaseTools() {
-  await crashlytics()?.setCrashlyticsCollectionEnabled(__DEV__ === false);
-  await analytics()?.setAnalyticsCollectionEnabled(__DEV__ === false);
+    await crashlytics()?.setCrashlyticsCollectionEnabled(__DEV__ === false);
+    await analytics()?.setAnalyticsCollectionEnabled(__DEV__ === false);
 }
 
 /**
@@ -43,107 +44,109 @@ async function enableFirebaseTools() {
 enableLayoutAnimations(false);
 
 const App = () => {
-  const [isThemeDark, setIsThemeDark] = React.useState(false);
+    const [isThemeDark, setIsThemeDark] = React.useState(false);
 
-  /**
-   * Play integrity initialisation
-   */
-  let rnfbProvider = appCheck().newReactNativeFirebaseAppCheckProvider();
-  rnfbProvider.configure({
-    android: {
-      provider: __DEV__ ? 'debug' : 'playIntegrity',
-      debugToken: FIREBASE_APPCHECK_DEBUG_TOKEN,
-    },
-    apple: {
-      provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
-      debugToken: 'NO-TOKEN',
-    },
-    web: {
-      provider: 'reCaptchaV3',
-      siteKey: 'unknown',
-    },
-  });
-
-  appCheck().initializeAppCheck({
-    provider: rnfbProvider,
-    isTokenAutoRefreshEnabled: true,
-  });
-
-  useEffect(() => {
-    enableFirebaseTools();
-  }, []);
-
-  useEffect(() => {
-    OneSignal.getDeviceState().then(deviceState => {
-      if (deviceState !== null) {
-        let {isSubscribed} = deviceState;
-        if (isSubscribed) {
-          OneSignal.addTrigger('unsubscribed', 'false');
-        } else {
-          OneSignal.promptForPushNotificationsWithUserResponse(true);
-        }
-      }
+    /**
+     * Play integrity initialisation
+     */
+    let rnfbProvider = appCheck().newReactNativeFirebaseAppCheckProvider();
+    rnfbProvider.configure({
+        android: {
+            provider: __DEV__ ? 'debug' : 'playIntegrity',
+            debugToken: FIREBASE_APPCHECK_DEBUG_TOKEN,
+        },
+        apple: {
+            provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
+            debugToken: 'NO-TOKEN',
+        },
+        web: {
+            provider: 'reCaptchaV3',
+            siteKey: 'unknown',
+        },
     });
-  }, []);
 
-  useEffect(() => {
-    if (ThemeMMKV.contains('isThemeDark')) {
-      if (ThemeMMKV.getBoolean('isThemeDark')) {
-        if (!isThemeDark) {
-          toggleTheme();
+    appCheck().initializeAppCheck({
+        provider: rnfbProvider,
+        isTokenAutoRefreshEnabled: true,
+    }).then(r => {
+    });
+
+
+    useEffect(() => {
+        enableFirebaseTools();
+    }, []);
+
+    useEffect(() => {
+        OneSignal.getDeviceState().then(deviceState => {
+            if (deviceState !== null) {
+                let {isSubscribed} = deviceState;
+                if (isSubscribed) {
+                    OneSignal.addTrigger('unsubscribed', 'false');
+                } else {
+                    OneSignal.promptForPushNotificationsWithUserResponse(true);
+                }
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (ThemeMMKV.contains('isThemeDark')) {
+            if (ThemeMMKV.getBoolean('isThemeDark')) {
+                if (!isThemeDark) {
+                    toggleTheme();
+                }
+            } else {
+                ThemeMMKV.set('isThemeDark', false);
+            }
+        } else {
+            if (isThemeDark) {
+                toggleTheme();
+                ThemeMMKV.set('isThemeDark', false);
+            }
         }
-      } else {
-        ThemeMMKV.set('isThemeDark', false);
-      }
-    } else {
-      if (isThemeDark) {
-        toggleTheme();
-        ThemeMMKV.set('isThemeDark', false);
-      }
-    }
-  }, [isThemeDark, toggleTheme]);
+    }, [isThemeDark, toggleTheme]);
 
-  let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
+    let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
 
-  const toggleTheme = React.useCallback(() => {
-    return setIsThemeDark(!isThemeDark);
-  }, [isThemeDark]);
+    const toggleTheme = React.useCallback(() => {
+        return setIsThemeDark(!isThemeDark);
+    }, [isThemeDark]);
 
-  const themePrefernces = React.useMemo(
-    () => ({
-      toggleTheme,
-      isThemeDark,
-    }),
-    [toggleTheme, isThemeDark],
-  );
+    const themePreferences = React.useMemo(
+        () => ({
+            toggleTheme,
+            isThemeDark,
+        }),
+        [toggleTheme, isThemeDark],
+    );
 
-  const styles = StyleSheet.create({
-    GHRV: {
-      flex: 1,
-      flexGrow: 1,
-      backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
-    },
-  });
+    const styles = StyleSheet.create({
+        GHRV: {
+            flex: 1,
+            flexGrow: 1,
+            backgroundColor: isThemeDark ? COLORS.primaryDark : COLORS.primaryLight,
+        },
+    });
 
-  return (
-    <>
-      <StatusBar
-        backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
-        animated={true}
-        barStyle={isThemeDark ? 'light-content' : 'dark-content'}
-      />
-      <ThemeContext.Provider value={themePrefernces}>
-        <PaperProvider theme={theme}>
-          <GestureHandlerRootView style={styles.GHRV}>
-            <BottomSheetModalProvider>
-              <StackNavigator />
-              <Toast />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
-        </PaperProvider>
-      </ThemeContext.Provider>
-    </>
-  );
+    return (
+        <>
+            <StatusBar
+                backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
+                animated={true}
+                barStyle={isThemeDark ? 'light-content' : 'dark-content'}
+            />
+            <ThemeContext.Provider value={themePreferences}>
+                <PaperProvider theme={theme}>
+                    <GestureHandlerRootView style={styles.GHRV}>
+                        <BottomSheetModalProvider>
+                            <StackNavigator/>
+                            <Toast/>
+                        </BottomSheetModalProvider>
+                    </GestureHandlerRootView>
+                </PaperProvider>
+            </ThemeContext.Provider>
+        </>
+    );
 };
 
 export default App;
