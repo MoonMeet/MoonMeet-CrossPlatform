@@ -7,7 +7,9 @@
 
 ### How to Permanently Delete your account:
 
-- **NB:** **Only** Supported in versions **above** *1.5.1*.
+- **NB:** **Only** Supported in versions **above** *1.5.1*!
+- **NB:** Your account will be deleted permanently along your profile picture, your in-app data such as your published
+  stories, phone number, copy of conversations and more!
 
 #### Steps:
 
