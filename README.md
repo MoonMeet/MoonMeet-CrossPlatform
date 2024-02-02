@@ -20,7 +20,8 @@
 - **Moon Meet** is a social media platform including a chatting feature.
 - **Moon Meet** is a platform formed with Mobile Android App.
 - **Moon Meet** is licensed under the GNU GPL License 3.0.
-- **Moon Meet** is an open source project means that anyone can see, change, get the source code and can contribute to make this project more better.
+- **Moon Meet** is an open source project means that anyone can see, change, get the source code and can contribute to
+  make this project more better.
 - **Moon Meet** is nothing without its contributors, so let's contribute together to make it alive!
 
 ### Screenshots
@@ -48,9 +49,9 @@
   ```
 - You need to add the following`:
 
-  - Your `release.keystore` and `google-services.json`
-  - Your `sensitive.js` file, [see more info here](/src/secrets/info.md)
-  - You should add keystore  credentials as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
+    - Your `release.keystore` and `google-services.json`
+    - Your `sensitive.ts` file, [see more info here](/src/secrets/info.md)
+    - You should add keystore credentials as environment variables: `KEYPASS`, `KEYALIAS` and `KEYALIASPASS`
 
   ```
   export KEYALIAS=YOURKEYALIAS
@@ -60,7 +61,8 @@
 
 ### Commit message
 
-When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that *commit*.
+When you've made changes to one or more files, you have to *commit* that file. You also need a *message* for that
+*commit*.
 
 You should read these guidelines:
 https://www.freecodecamp.org/news/writing-good-commit-messages-a-practical-guide/
@@ -69,13 +71,13 @@ And that summarized:
 
 - Short and detailed
 - Prefix one of these commit types:
-  - `feat:` A feature, possibly improving something already existing
-  - `fix:` A fix, for example of a bug
-  - `style:` Feature and updates related to styling
-  - `refactor:` Refactoring a specific section of the codebase
-  - `test:` Everything related to testing
-  - `docs:` Everything related to documentation
-  - `chore:` Code maintenance (you can also use emojis to represent commit types)
+    - `feat:` A feature, possibly improving something already existing
+    - `fix:` A fix, for example of a bug
+    - `style:` Feature and updates related to styling
+    - `refactor:` Refactoring a specific section of the codebase
+    - `test:` Everything related to testing
+    - `docs:` Everything related to documentation
+    - `chore:` Code maintenance (you can also use emojis to represent commit types)
 
 **Examples:**
 
@@ -91,7 +93,9 @@ And that summarized:
 - [Pranav Purwar](https://github.com/PranavPurwar): for Android CI Workflow.
 - [Ahmed Sbai](https://github.com/sbaiahmed1): for Supporting me since the beginning of Moon Meet.
 
-Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas, fewer bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully accepted.
+Thanks, they help to keep **Moon Meet** alive. It's better to have multiple people work on a project, for more ideas,
+fewer bugs. (sadly sometimes more), and generally quicker development. Each (helpful) contribution that gets thankfully
+accepted.
 
 ### Social
 
