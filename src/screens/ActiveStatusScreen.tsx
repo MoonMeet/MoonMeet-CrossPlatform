@@ -82,7 +82,7 @@ const ActiveStatusScreen = () => {
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
                 .update({
-                  active_status: value === false ? 'recently' : 'normal',
+                  active_status: !value ? 'recently' : 'normal',
                   active_time:
                     newActiveTime === 'Last seen recently'
                       ? firestore?.Timestamp?.fromDate(new Date())

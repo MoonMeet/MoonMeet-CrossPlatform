@@ -95,7 +95,7 @@ const ChangeUsernameScreen = () => {
               setOldUsernameText(UsernameText?.trim());
               setLoaderVisible(false);
             })
-            .catch(error => {
+            .catch(() => {
               ErrorToast(
                 'bottom',
                 'Updating Failed',
