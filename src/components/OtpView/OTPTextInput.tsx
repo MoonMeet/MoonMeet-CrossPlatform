@@ -105,6 +105,7 @@ const OTPTextView = forwardRef<OTPTextViewHandle, OTPTextViewProps>(
      */
     const clear = () => {
       setOtpText(new Array(inputCount).fill(''));
+      setFocusedInput(0);
     };
 
     // Expose the clear method to parent components

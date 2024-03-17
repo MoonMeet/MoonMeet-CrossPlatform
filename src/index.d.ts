@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2024.
  */
 
 import PurpleBackground from '/assets/images/purple_background.png';
@@ -17,8 +17,9 @@ import RocketImage from '/assets/images/rocket_boy.png';
 import AuthenticationImage from '/assets/images/authentication.png';
 import RecoveryImage from '/assets/images/recovery.png';
 import ArrowForward from '/assets/images/arrow-forward.png';
-import DoneImage from '../assets/images/done.png';
-import PickImage from '../assets/images/pick-photo.png';
+import DoneImage from '/assets/images/done.png';
+import PickImage from '/assets/images/pick-photo.png';
+import placeHolderPhoto from '/assets/images/pick-photo.png';
 
 import LoadingAnimation from '/assets/lotties/loader_128.json';
 
@@ -37,8 +38,6 @@ import UsernameIcon from '/assets/images/email.png';
 import ActiveStatusIcon from '/assets/images/hdr.png';
 import FAQIcon from '/assets/images/quiz.png';
 import ReportIcon from '/assets/images/bug.png';
-
-import placeHolderPhoto from '/assets/images/pick-photo.png';
 
 import ChattingIntro from '/assets/images/chatting_intro.png';
 import GetStarted from '/assets/images/get_started.png';
