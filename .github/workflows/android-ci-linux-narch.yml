@@ -42,7 +42,7 @@ jobs:
       - name: Decode Sensitive JS File.
         env:
           SENSITIVE_JS: ${{ secrets.SENSITIVE_JS }}
-        run: echo $SENSITIVE_JS > src/secrets/sensitive.js
+        run: echo $SENSITIVE_JS > src/secrets/sensitive.ts
       - name: Increase Gradle JVM max memory.
         run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
       - name: Enable New Arch
