@@ -20,7 +20,7 @@
     "code": "DZ"
   },
   {
-    "name": "AmericanSamoa",
+    "name": "American Samoa",
     "dial_code": "+1684",
     "code": "AS"
   },
@@ -45,7 +45,7 @@
     "code": "AQ"
   },
   {
-    "name": "Antigua and Barbuda",
+    "name": "Antigua & Barbuda",
     "dial_code": "+1268",
     "code": "AG"
   },
@@ -135,7 +135,7 @@
     "code": "BO"
   },
   {
-    "name": "Bosnia and Herzegovina",
+    "name": "Bosnia & Herzegovina",
     "dial_code": "+387",
     "code": "BA"
   },
@@ -340,7 +340,7 @@
     "code": "ET"
   },
   {
-    "name": "Falkland Islands (Malvinas)",
+    "name": "Falkland Islands",
     "dial_code": "+500",
     "code": "FK"
   },
@@ -460,7 +460,7 @@
     "code": "HT"
   },
   {
-    "name": "Holy See (Vatican City State)",
+    "name": "Vatican City",
     "dial_code": "+379",
     "code": "VA"
   },
@@ -513,11 +513,6 @@
     "name": "Isle of Man",
     "dial_code": "+44",
     "code": "IM"
-  },
-  {
-    "name": "Israel",
-    "dial_code": "+972",
-    "code": "IL"
   },
   {
     "name": "Italy",
@@ -825,7 +820,7 @@
     "code": "PW"
   },
   {
-    "name": "Palestinian Territory, Occupied",
+    "name": "Palestinian (Free Palestine)",
     "dial_code": "+970",
     "code": "PS"
   },
@@ -905,12 +900,12 @@
     "code": "BL"
   },
   {
-    "name": "Saint Helena, Ascension, Cunha",
+    "name": "Saint Helena",
     "dial_code": "+290",
     "code": "SH"
   },
   {
-    "name": "Saint Kitts and Nevis",
+    "name": "Saint Kitts",
     "dial_code": "+1869",
     "code": "KN"
   },
@@ -925,12 +920,12 @@
     "code": "MF"
   },
   {
-    "name": "Saint Pierre and Miquelon",
+    "name": "Saint Pierre",
     "dial_code": "+508",
     "code": "PM"
   },
   {
-    "name": "Saint Vincent and the Grenadines",
+    "name": "Saint Vincent",
     "dial_code": "+1784",
     "code": "VC"
   },
@@ -945,7 +940,7 @@
     "code": "SM"
   },
   {
-    "name": "Sao Tome and Principe",
+    "name": "Sao Tome",
     "dial_code": "+239",
     "code": "ST"
   },
@@ -1010,7 +1005,7 @@
     "code": "SS"
   },
   {
-    "name": "South Georgia, South Sandwich Islands",
+    "name": "South Georgia",
     "dial_code": "+500",
     "code": "GS"
   },
@@ -1035,7 +1030,7 @@
     "code": "SR"
   },
   {
-    "name": "Svalbard and Jan Mayen",
+    "name": "Svalbard & Jan Mayen",
     "dial_code": "+47",
     "code": "SJ"
   },
@@ -1100,7 +1095,7 @@
     "code": "TO"
   },
   {
-    "name": "Trinidad and Tobago",
+    "name": "Trinidad & Tobago",
     "dial_code": "+1868",
     "code": "TT"
   },
@@ -1120,7 +1115,7 @@
     "code": "TM"
   },
   {
-    "name": "Turks and Caicos Islands",
+    "name": "Turks & Caicos Islands",
     "dial_code": "+1649",
     "code": "TC"
   },
@@ -1190,7 +1185,7 @@
     "code": "VI"
   },
   {
-    "name": "Wallis and Futuna",
+    "name": "Wallis & Futuna",
     "dial_code": "+681",
     "code": "WF"
   },
