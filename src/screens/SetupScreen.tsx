@@ -6,25 +6,34 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useRef, useMemo, useCallback} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
+  BackHandler,
   Image,
+  Keyboard,
   Pressable,
   StyleSheet,
   Text,
   View,
-  Keyboard,
-  BackHandler,
 } from 'react-native';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+import {COLORS, FONTS} from 'config/Miscellaneous';
 import {Avatar, FAB, TextInput} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
-import {openCamera, openImagePicker} from '../config/Image-Picker-Config';
-import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
+import {
+  openCamera,
+  openImagePicker,
+  PhotoType,
+} from 'config/Image-Picker-Config';
+import ImagePickerActionSheet from '@components/ImagePickerActionSheet/ImagePickerActionSheet.tsx';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {CommonActions, useNavigation} from '@react-navigation/native';
+import {
+  CommonActions,
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import {
   getManufacturer,
   getModel,
@@ -36,7 +45,6 @@ import {
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
-import placeHolderPhoto from '../assets/images/pick-photo.png';
 import {
   ErrorToast,
   InfoToast,
@@ -44,13 +52,19 @@ import {
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
-import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
-import {useFocusEffect} from '@react-navigation/native';
-import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
+import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {placeHolderPhoto} from 'index.d';
 
-const SetupScreen = ({route}) => {
-  const pickerRef = useRef(null);
+interface SetupScreenProps {
+  route: RouteProp<RootStackParamList, 'setup'>;
+}
+
+const SetupScreen = (props: SetupScreenProps) => {
+  const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['25%'], []);
 
   const handlePresentModal = useCallback(() => {
@@ -74,7 +88,7 @@ const SetupScreen = ({route}) => {
     }, []),
   );
 
-  const [UserPhoto, setUserPhoto] = React.useState(null);
+  const [UserPhoto, setUserPhoto] = useState<PhotoType | null>(null);
 
   /**
    * getting params from stack navigator
@@ -82,52 +96,62 @@ const SetupScreen = ({route}) => {
    * user#uid, user#phone etc...
    */
 
-  const user = route?.params?.user;
+  const user = props?.route?.params?.user;
 
   /**
    * TextInput stuffs (setter & getter)
    */
 
-  const [firstName, setFirstName] = React.useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
-  const [lastName, setLastName] = React.useState('');
+  const memoizedFirstName = useMemo(() => firstName?.trim(), [firstName]);
+  const memoizedLastName = useMemo(() => lastName?.trim(), [lastName]);
 
   /**
    * Open a modal as BottomSheet
    */
 
-  const [LoaderVisible, setLoaderVisible] = React.useState(false);
+  const [LoaderVisible, setLoaderVisible] = useState<boolean>(false);
 
   /**
    * Using react navigation.
    */
 
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   /**
    * JwtKey used for terminate all active sessions in your Moon Meet account.
    * @type {*|string}
    */
 
-  let jwt_key = uuidv4();
+  let jwt_key: string =
+    StorageInstance.getString('currentUserJwtKey') || uuidv4();
   /**
    * Used for getting Device Information, useful for DeviceScreen.js
    */
 
-  const [systemName] = React.useState(getSystemName());
-  const [systemVersion] = React.useState(getSystemVersion());
-  const [Manufacturer, setManufacturer] = React.useState(
+  const [systemName] = useState(getSystemName());
+  const [systemVersion] = useState(getSystemVersion());
+  const [Manufacturer, setManufacturer] = useState<string>('');
+  const [Product, setProduct] = useState<string>('');
+  const [Model] = useState(getModel());
+  const [appVersion] = useState(getVersion());
+
+  useEffect(() => {
     getManufacturer().then(manufacturer => {
       setManufacturer(manufacturer);
-    }),
-  );
-  const [Product, setProduct] = React.useState(
+    });
+  }, []);
+
+  useEffect(() => {
     getProduct().then(product => {
       setProduct(product);
-    }),
-  );
-  const [Model] = React.useState(getModel());
-  const [appVersion] = React.useState(getVersion());
+    });
+  }, []);
+
+  StorageInstance?.set('currentUserJwtKey', jwt_key);
 
   return (
     <>
@@ -166,7 +190,6 @@ const SetupScreen = ({route}) => {
                   width: 55 - 0.1 * 55,
                   backgroundColor: COLORS.rippleColor,
                 }}
-                color={COLORS.rippleColor}
                 size={55}
                 source={{uri: UserPhoto?.path}}
                 theme={{
@@ -269,20 +292,20 @@ const SetupScreen = ({route}) => {
             },
           }}
           onPress={async () => {
+            const _firstName = lowerToUppercase(memoizedFirstName);
+            const _lastName = lowerToUppercase(memoizedLastName);
+            jwt_key =
+              StorageInstance?.getString('currentUserJwtKey') || uuidv4();
             if (UserPhoto) {
-              if (
-                firstName?.trim()?.length > 1 &&
-                lastName?.trim()?.length > 1
-              ) {
+              if (_firstName?.length > 1 && _lastName?.length > 1) {
                 setLoaderVisible(true);
                 /**
                  * Reference to users image path
-                 * @type {FirebaseStorageTypes.Reference}
                  */
                 try {
                   let _userAvatarRef = `avatars/${
                     auth()?.currentUser?.uid
-                  }.${UserPhoto?.path?.substr(
+                  }.${UserPhoto?.path?.substring(
                     UserPhoto?.path?.lastIndexOf('.') + 1,
                     3,
                   )}`;
@@ -291,7 +314,6 @@ const SetupScreen = ({route}) => {
 
                   /**
                    * Uploading image to Firebase Storage
-                   * @type {FirebaseStorageTypes.Task}
                    */
 
                   const uploadImageTask = storageRef?.putFile(UserPhoto?.path);
@@ -300,13 +322,15 @@ const SetupScreen = ({route}) => {
                    * Add observer to image uploading.
                    */
 
-                  uploadImageTask.on('state_changed', taskSnapshot => {
-                    if (__DEV__) {
-                      console.log(
-                        `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-                      );
-                    }
-                  });
+                  if (__DEV__) {
+                    uploadImageTask.on('state_changed', taskSnapshot => {
+                      let percentage =
+                        (taskSnapshot.bytesTransferred /
+                          taskSnapshot.totalBytes) *
+                        100;
+                      console.log(`Upload is ${percentage}% done`);
+                    });
+                  }
 
                   /**
                    * an async function to get {avatarUrl} and upload all user data.
@@ -347,22 +371,22 @@ const SetupScreen = ({route}) => {
                      * we must push data to firebase.
                      */
 
-                    JwtKeyMMKV?.set('currentUserJwtKey', jwt_key);
+                    StorageInstance?.set('currentUserJwtKey', jwt_key);
                     firestore()
                       .collection('users')
                       .doc(auth()?.currentUser?.uid)
                       .set({
                         ...user,
-                        first_name: lowerToUppercase(firstName?.trim()),
-                        last_name: lowerToUppercase(lastName?.trim()),
+                        first_name: _firstName,
+                        last_name: _lastName,
                         avatar: avatarUrl,
                         active_status: 'normal',
                         info: {
                           created_At: firestore?.Timestamp?.fromDate(
                             new Date(),
                           ),
-                          premuim: false,
-                          premuimUntil: 'none',
+                          premium: false,
+                          premiumUntil: 'none',
                           banned: false,
                           bannedUntil: '',
                         },
@@ -380,9 +404,7 @@ const SetupScreen = ({route}) => {
                          */
 
                         await auth()?.currentUser?.updateProfile({
-                          displayName: `${lowerToUppercase(
-                            firstName?.trim(),
-                          )} ${lowerToUppercase(lastName?.trim())}`,
+                          displayName: `${_firstName} ${_lastName}`,
                           photoURL: avatarUrl,
                         });
                         navigation?.dispatch(
@@ -399,7 +421,7 @@ const SetupScreen = ({route}) => {
                   setLoaderVisible(false);
                   ErrorToast(
                     'bottom',
-                    'Unexpected error occured',
+                    'Unexpected error occurred',
                     `${e}`,
                     true,
                     2000,
@@ -426,12 +448,7 @@ const SetupScreen = ({route}) => {
           }}
         />
       </BaseView>
-      <LoadingIndicator
-        isVisible={LoaderVisible}
-        hideModal={() => {
-          setLoaderVisible(false);
-        }}
-      />
+      <LoadingIndicator isVisible={LoaderVisible} />
       <ImagePickerActionSheet
         sheetRef={pickerRef}
         index={0}
@@ -439,7 +456,7 @@ const SetupScreen = ({route}) => {
         onCameraPress={async () => {
           await openCamera()
             .then(image => {
-              setUserPhoto(image);
+              setUserPhoto(image as PhotoType);
             })
             .catch(e => {
               console.error(e);
@@ -449,7 +466,7 @@ const SetupScreen = ({route}) => {
         onFilePicker={async () => {
           await openImagePicker()
             .then(image => {
-              setUserPhoto(image);
+              setUserPhoto(image as PhotoType);
             })
             .catch(e => {
               if (__DEV__) {

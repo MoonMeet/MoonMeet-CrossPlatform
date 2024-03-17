@@ -13,23 +13,27 @@ import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {BackHandler, Pressable, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Text} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import PrivacyBottomSheet from '../components/PrivacySecurityScreen/PrivacyBottomSheet';
-import ViewItem from '../components/PrivacySecurityScreen/ViewItem';
-import ViewItemTitle from '../components/PrivacySecurityScreen/ViewItemTitle';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView';
+import PrivacyBottomSheet from '@components/PrivacySecurityScreen/PrivacyBottomSheet';
+import ViewItem from '@components/PrivacySecurityScreen/ViewItem';
+import ViewItemTitle from '@components/PrivacySecurityScreen/ViewItemTitle';
 import Spacer from '../components/Spacer/Spacer';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {InfoToast} from 'components/ToastInitializer/ToastInitializer';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
-} from '../config/Dimensions';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+} from 'config/Dimensions';
+import {COLORS, FONTS} from 'config/Miscellaneous';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 
 const PrivacySecurityScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const PnPRef = useRef(null);
+  const PnPRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(
     () => [heightPercentageToDP(10), heightPercentageToDP(25)],
     [],
@@ -103,7 +107,7 @@ const PrivacySecurityScreen = () => {
           titleColor={COLORS.black}
           enableDescription
           descriptionText={phoneNumberStatus === 'none' ? 'Everyone' : 'Nobody'}
-          withDivider
+          withDivider={true}
           onPressTrigger={() => handleOpenModal()}
         />
         <ViewItem
@@ -114,7 +118,7 @@ const PrivacySecurityScreen = () => {
           descriptionText={
             lastSeenNOnline === 'normal' ? 'Online' : 'Last seen recently'
           }
-          withDivider
+          withDivider={true}
           onPressTrigger={() => navigation?.navigate('activeStatus')}
         />
         <View style={styles.greyView}>
@@ -127,7 +131,7 @@ const PrivacySecurityScreen = () => {
           titleText={'Passcode lock'}
           rippleColor={COLORS.rippleColor}
           titleColor={COLORS.black}
-          withDivider
+          withDivider={true}
           onPressTrigger={() => {
             if (__DEV__) {
               navigation?.navigate('passcodeSetup');
@@ -146,7 +150,7 @@ const PrivacySecurityScreen = () => {
           titleText={'Devices'}
           rippleColor={COLORS.rippleColor}
           titleColor={COLORS.black}
-          withDivider
+          withDivider={true}
           onPressTrigger={() => navigation?.navigate('devices')}
         />
         <View style={styles.greyView}>
@@ -156,8 +160,8 @@ const PrivacySecurityScreen = () => {
         </View>
         <PrivacyBottomSheet
           sheetRef={PnPRef}
-          sheetIndex={0}
-          sheetSnapPoints={snapPoints}
+          index={0}
+          snapPoints={snapPoints}
           phoneNumberStatus={phoneNumberStatus}
         />
       </Pressable>

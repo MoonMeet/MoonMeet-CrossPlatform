@@ -3,34 +3,71 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen sbai, 2021-2024.
  */
 
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
-import {COLORS, FONTS} from '../../config/Miscellaneous';
+import React from 'react';
+import {COLORS, FONTS} from 'config/Miscellaneous';
 import {Avatar, Divider} from 'react-native-paper';
 import moment from 'moment';
 import {uniqBy} from 'lodash';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
-import {fontValue} from '../../config/Dimensions';
-import {UserDataMMKV} from '../../config/MMKV/UserDataMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+import {fontValue, heightPercentageToDP} from 'config/Dimensions.ts';
+import {PurpleBackground} from 'index';
 
-const ActivePeopleList = ({ListData}) => {
-  const navigation = useNavigation();
+interface ActivePeopleProps {
+  ListData: any;
+}
 
-  const [Me] = useState(JSON.parse(UserDataMMKV.getString('Me')));
+interface ItemProps {
+  avatar?: string;
+  uid?: string;
+  first_name?: string;
+  last_name?: string;
+  active_time?: any;
+}
 
-  const listEmptyComponent = lastSeenHidden => {
+const ActivePeopleList = (props: ActivePeopleProps) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const storedData = StorageInstance?.getString('Me') || '{}';
+  const [Me] = React.useState(JSON.parse(storedData));
+
+  const headingStyles = (align: string, isRead: boolean) => ({
+    fontSize: fontValue(16),
+    textAlign: align as 'auto' | 'left' | 'right' | 'center' | 'justify',
+    color: COLORS.black,
+    opacity: isRead ? 0.6 : 1,
+    fontFamily: FONTS.regular,
+  });
+
+  const subheadingStyles = (
+    align: string,
+    isMessage: boolean,
+    isRead: boolean,
+  ) => ({
+    fontSize: isMessage ? fontValue(14) : fontValue(11.5),
+    paddingTop: heightPercentageToDP(1),
+    textAlign: align as 'auto' | 'left' | 'right' | 'center' | 'justify',
+    color: COLORS.black,
+    opacity: isRead ? 0.6 : 1,
+    fontFamily: FONTS.regular,
+  });
+  const listEmptyComponent = (lastSeenHidden: boolean) => {
     return (
       <View style={styles.emptyView}>
-        <Text style={styles.heading('center', false)}>
+        <Text style={headingStyles('center', false)}>
           {lastSeenHidden
             ? "You can't see who's active."
             : 'No one active, yet.'}
         </Text>
-        <Text style={styles.subheading('center', false, true)}>
+        <Text style={subheadingStyles('center', false, true)}>
           {lastSeenHidden
             ? "turn on your active status to see who's active"
             : "there's no one active at the moment."}
@@ -39,7 +76,7 @@ const ActivePeopleList = ({ListData}) => {
     );
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({item}: {item: ItemProps}) => {
     if (Me?.active_time === 'Last seen recently') {
       return listEmptyComponent(true);
     }
@@ -51,8 +88,10 @@ const ActivePeopleList = ({ListData}) => {
           onPress={() => {
             if (item?.uid !== auth()?.currentUser?.uid) {
               navigation.navigate('userProfile', {
-                uid: item?.uid,
-                cameFrom: 'others',
+                userProfile: {
+                  uid: item?.uid,
+                  cameFrom: 'others',
+                },
               });
             }
           }}
@@ -63,15 +102,15 @@ const ActivePeopleList = ({ListData}) => {
           }}>
           <View style={styles.left_side}>
             <Avatar.Image
-              source={item?.avatar ? {uri: item?.avatar} : null}
+              source={item?.avatar ? {uri: item?.avatar} : PurpleBackground}
               size={52.5}
             />
           </View>
           <View style={styles.mid_side}>
-            <Text style={styles.heading('left', true)}>
+            <Text style={headingStyles('left', true)}>
               {item?.first_name + ' ' + item?.last_name}
             </Text>
-            <Text style={styles.subheading('left', true, true)}>
+            <Text style={subheadingStyles('left', true, true)}>
               {moment(item?.active_time?.toDate())?.calendar()}
             </Text>
           </View>
@@ -83,7 +122,7 @@ const ActivePeopleList = ({ListData}) => {
 
   return (
     <FlatList
-      data={uniqBy(ListData, 'uid')}
+      data={uniqBy(props.ListData, 'uid') as ItemProps[]}
       contentContainerStyle={{
         paddingStart: '1%',
         paddingEnd: '1%',
@@ -92,7 +131,9 @@ const ActivePeopleList = ({ListData}) => {
       removeClippedSubviews={true}
       initialNumToRender={25}
       ListEmptyComponent={listEmptyComponent}
-      keyExtractor={item => item?.avatar}
+      keyExtractor={(item: ItemProps, index: number) =>
+        item?.avatar || String(index)
+      }
       renderItem={renderItem}
     />
   );
@@ -113,25 +154,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: '2.5%',
     marginRight: '2.5%',
-  },
-  heading: (align, isRead) => {
-    return {
-      fontSize: fontValue(16),
-      textAlign: align,
-      color: COLORS.black,
-      opacity: isRead ? 0.6 : 1,
-      fontFamily: FONTS.regular,
-    };
-  },
-  subheading: (align, isMessage, isRead) => {
-    return {
-      fontSize: isMessage ? fontValue(14) : fontValue(11.5),
-      paddingTop: '1%',
-      textAlign: align,
-      color: COLORS.black,
-      opacity: isRead ? 0.6 : 1,
-      fontFamily: FONTS.regular,
-    };
   },
   emptyView: {
     marginTop: 16 - 0.1 * 16,

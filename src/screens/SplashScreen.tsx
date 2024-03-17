@@ -28,7 +28,6 @@ import {
   Text,
   ToastAndroid,
 } from 'react-native';
-import LogoImage from '../assets/images/logo.png';
 import {
   fontValue,
   heightPercentageToDP,
@@ -42,7 +41,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
 import {getVersion} from 'react-native-device-info';
 import {inRange, isEmpty, isNull} from 'lodash';
 import UpdateBottomSheet from '../components/SplashScreen/UpdateBottomSheet';
@@ -51,23 +50,27 @@ import {
   InfoToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import {useBottomSheetModal} from '@gorhom/bottom-sheet';
-import {ThemeContext} from '../config/Theme/Context';
+import {ThemeContext} from 'config/Theme/Context.ts';
+import {LogoImage} from '../index.d';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../config/NavigationTypes/NavigationTypes';
 
 const SplashScreen = () => {
   const {isThemeDark} = useContext(ThemeContext);
-  const navigation = useNavigation();
-
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   /**
    * Passcode Checking
    */
 
-  const [havePasscode, setHavePasscode] = React.useState(null);
+  const [havePasscode, setHavePasscode] = React.useState<Boolean>(false);
   /**
    * Bottom Sheet
    */
   const {dismissAll} = useBottomSheetModal();
-  const updateSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ['45%'], []);
+  const updateSheetRef = useRef<BottomSheetModalMethods | null>(null);
+  const snapPoints = useMemo(() => ['50%'], []);
   const handleModalShow = useCallback(() => {
     updateSheetRef?.current?.present();
   }, []);
@@ -133,6 +136,8 @@ const SplashScreen = () => {
                     'bottom',
                     'Please re-login',
                     'You need to re-login and complete your profile',
+                    true,
+                    1000,
                   );
                   navigation?.navigate('login');
                 });
@@ -165,24 +170,24 @@ const SplashScreen = () => {
 
   const isViewPagerCompleted = () => {
     return (
-      OnboardingMMKV?.contains('onboardingComplete') &&
-      OnboardingMMKV?.getBoolean('onboardingComplete')
+      StorageInstance?.contains('onboardingComplete') &&
+      StorageInstance?.getBoolean('onboardingComplete')
     );
   };
   useEffect(() => {
     const AnimateSceneTimerTask = setTimeout(() => {
-      scaleX.value = withDelay(30, withTiming(0.09, {duration: 275}));
-      scaleY.value = withDelay(30, withTiming(0.09, {duration: 275}));
+      scaleX.value = withDelay(30, withTiming(0.08, {duration: 275}));
+      scaleY.value = withDelay(30, withTiming(0.08, {duration: 275}));
       opacity.value = withTiming(0, {duration: 275});
-      translateY.value = withDelay(0, withTiming(375, {duration: 500}));
-      translateY.value = withDelay(300, withTiming(0, {duration: 750}));
-      scaleX.value = withSpring(0.09);
-      scaleY.value = withSpring(0.09);
+      translateY.value = withDelay(0, withTiming(-35, {duration: 250}));
+      translateY.value = withDelay(300, withTiming(40, {duration: 375}));
+      scaleX.value = withSpring(0.08);
+      scaleY.value = withSpring(0.08);
       scaleX.value = withSpring(0);
       scaleY.value = withSpring(0);
       opacity.value = withSpring(1);
-      scaleX.value = withDelay(750, withTiming(0.09, {duration: 250}));
-      scaleY.value = withDelay(750, withTiming(0.09, {duration: 250}));
+      scaleX.value = withDelay(750, withTiming(0.08, {duration: 250}));
+      scaleY.value = withDelay(750, withTiming(0.08, {duration: 250}));
     }, 1000);
     return () => {
       clearTimeout(AnimateSceneTimerTask);
@@ -196,13 +201,13 @@ const SplashScreen = () => {
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
-          if (documentSnapshot?.data().server_status === 'running') {
+          if (documentSnapshot?.data()?.server_status === 'running') {
             setUpdateRequired(documentSnapshot?.data()?.isRequired);
             setUpdateVersion(documentSnapshot?.data()?.version);
             setUpdateURL(documentSnapshot?.data()?.updateURL);
           } else if (documentSnapshot?.data()?.server_status === 'stopped') {
             ToastAndroid.show(
-              'Server maintenace, try again later.',
+              'Server maintenance, try again later.',
               ToastAndroid.LONG,
             );
             BackHandler.exitApp();
@@ -217,7 +222,7 @@ const SplashScreen = () => {
       })
       .finally(() => {
         if (!isEmpty(updateVersion)) {
-          if (currentAppVersion !== updateVersion) {
+          if (currentAppVersion !== updateVersion && !__DEV__) {
             handleModalShow();
           } else {
             if (isViewPagerCompleted()) {
@@ -258,6 +263,8 @@ const SplashScreen = () => {
                             'bottom',
                             'Please re-login',
                             'You need to re-login and complete your profile',
+                            true,
+                            1000,
                           );
                           navigation?.navigate('login');
                         });
@@ -339,12 +346,21 @@ const SplashScreen = () => {
   function newYearDescription() {
     const dateObject = new Date();
     const currentDay = dateObject.getDate();
+    const currentMonth = dateObject.getMonth();
     const currentYear = dateObject.getFullYear();
     let sloganText = 'We give people the closest distances';
-    if (inRange(currentDay, 24, 32) && currentYear === 2022) {
-      sloganText = 'Hoping you shimmy shake your way into 2023';
-    } else if (inRange(currentDay, 1, 4) && currentYear === 2023) {
-      sloganText = 'Wishing you the best in 2023';
+    if (
+      inRange(currentDay, 15, 32) &&
+      currentMonth === 11 &&
+      currentYear === 2024
+    ) {
+      sloganText = 'Hoping you shimmy shake your way into 2024';
+    } else if (
+      inRange(currentDay, 1, 11) &&
+      currentMonth === 0 &&
+      currentYear === 2025
+    ) {
+      sloganText = 'Wishing you the best in 2024';
     }
     return sloganText;
   }
@@ -378,9 +394,9 @@ const SplashScreen = () => {
         sheetIndex={0}
         sheetSnapPoints={snapPoints}
         required={updatedRequired}
-        onDownloadNowPress={() => {
-          if (Linking.canOpenURL(updateURL)) {
-            Linking.openURL(updateURL);
+        onDownloadNowPress={async () => {
+          if (await Linking.canOpenURL(updateURL)) {
+            await Linking.openURL(updateURL);
           }
           dismissAll();
           BackHandler?.exitApp();

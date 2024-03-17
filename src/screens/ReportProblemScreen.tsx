@@ -8,8 +8,14 @@
 
 import React from 'react';
 import BaseView from '../components/BaseView/BaseView';
-import {Image, StyleSheet, Text, View, Pressable} from 'react-native';
-import {FAB, HelperText, TextInput, Chip, Avatar} from 'react-native-paper';
+import {
+  Image as ImageView,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {Avatar, Chip, FAB, HelperText, TextInput} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
@@ -17,8 +23,8 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
 import {
-  SuccessToast,
   ErrorToast,
+  SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {
@@ -26,12 +32,12 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-import RemoveIcon from '../assets/images/clear.png';
 import {getRandomString} from '../utils/generators/getRandomString';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {ScreenWidth} from '../utils/device/DeviceInfo';
+import {RemoveIcon} from 'index.d';
+import ImagePicker, {Image} from 'react-native-image-crop-picker';
 
 const ReportProblemScreen = () => {
   const navigation = useNavigation();
@@ -39,17 +45,17 @@ const ReportProblemScreen = () => {
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
    */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState?.isConnected;
-  });
+  let isConnected: Promise<boolean> = NetInfo.fetch().then(
+    networkState => networkState?.isConnected ?? false,
+  );
   const [ReportText, setReportText] = React.useState('');
 
   const [loaderVisible, setLoaderVisible] = React.useState(false);
 
-  const onReportTextChange = _reportText => setReportText(_reportText);
-  const [UserPhoto, setUserPhoto] = React.useState(null);
+  const onReportTextChange = (reportText: string) => setReportText(reportText);
+  const [UserPhoto, setUserPhoto] = React.useState<Image | null>(null);
 
-  function pushReport(type) {
+  function pushReport(type: string) {
     setLoaderVisible(true);
     switch (type) {
       case 'text':
@@ -77,7 +83,7 @@ const ReportProblemScreen = () => {
               ErrorToast(
                 'bottom',
                 'Reporting Failed',
-                'An error occurred while sending your report.',
+                error.toString(),
                 true,
                 2000,
               );
@@ -88,21 +94,17 @@ const ReportProblemScreen = () => {
         break;
       case 'image':
         {
+          // TODO: substr to substring
           let reportImageRef = `reports/image/${getRandomString(
             10,
-          )}.${UserPhoto?.path?.substr(
+          )}.${UserPhoto?.path?.substring(
             UserPhoto.path?.lastIndexOf('.') + 1,
             3,
           )}`;
 
           const storageRef = storage().ref(reportImageRef);
 
-          /**
-           * Uploading image to Firebase Storage
-           * @type {FirebaseStorageTypes.Task}
-           */
-
-          const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+          const uploadImageTask = storageRef.putFile(UserPhoto?.path as string);
 
           /**
            * an async function to get {avatarUrl} and upload all user data.
@@ -133,7 +135,7 @@ const ReportProblemScreen = () => {
                 ErrorToast(
                   'bottom',
                   'Reporting Failed',
-                  'An error occurred while sending your report.',
+                  error.toString(),
                   true,
                   2000,
                 );
@@ -173,7 +175,7 @@ const ReportProblemScreen = () => {
           multiline={true}
           value={ReportText}
           placeholder={
-            'Breifly explain what happened and what we need to do to reprrduce the problem.'
+            'Briefly explain what happened and what we need to do to reproduce the problem.'
           }
           theme={{
             colors: {
@@ -197,7 +199,7 @@ const ReportProblemScreen = () => {
       <View style={styles.attachView}>
         {UserPhoto ? (
           <>
-            <Image
+            <ImageView
               source={{uri: UserPhoto?.path}}
               style={{
                 marginTop: heightPercentageToDP(0.5),
@@ -281,8 +283,8 @@ const ReportProblemScreen = () => {
             primaryContainer: COLORS.accentLight,
           },
         }}
-        onPress={() => {
-          if (isConnected) {
+        onPress={async () => {
+          if (await isConnected) {
             if (!hasMoreLength() && !hasLessLength()) {
               pushReport(UserPhoto?.path ? 'image' : 'text');
             } else {

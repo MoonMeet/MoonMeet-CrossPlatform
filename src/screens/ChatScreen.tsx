@@ -41,11 +41,6 @@ import ImagePicker from 'react-native-image-crop-picker';
 import ImageView from 'react-native-image-viewing';
 import OneSignal from 'react-native-onesignal';
 import {Avatar, Divider} from 'react-native-paper';
-import Animated, {
-  FadeInDown,
-  FadeOutDown,
-  Layout,
-} from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {EmojiKeyboard} from 'rn-emoji-keyboard';
 import {v4 as uuidv4} from 'uuid';
@@ -61,12 +56,21 @@ import {
   widthPercentageToDP,
 } from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
 import {useAppInactive} from '../hooks/useAppInactive';
 import {PurpleBackground} from '../index.d';
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import {getRandomString} from '../utils/generators/getRandomString';
+
+interface ChatTitleProps {
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  myStatus: string;
+  userStatus: string;
+  userTime: Date;
+}
 
 const ChatTitle = ({
   firstName,
@@ -75,7 +79,7 @@ const ChatTitle = ({
   myStatus,
   userStatus,
   userTime,
-}) => {
+}: ChatTitleProps) => {
   return (
     <Pressable
       style={{
@@ -121,10 +125,11 @@ const ChatTitle = ({
             : myStatus === 'normal' && userStatus === 'recently'
             ? 'last seen recently'
             : myStatus === 'normal' && userStatus === 'normal'
-            ? firestore?.Timestamp?.fromDate(new Date())?.toDate() - userTime >
+            ? firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
+                userTime >
               86400000
               ? `last seen on ${moment(userTime)?.format('YYYY MMMM DD')}`
-              : firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+              : firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
                   userTime <
                 180000
               ? 'Active now'
@@ -143,7 +148,7 @@ const ChatScreen = () => {
   const destinedUser = useMemo(() => stackRoute?.params?.item, []);
 
   const [statusBarColor, setStatusBarColor] = React.useState('light');
-  const [isTyping, setIsTyping] = React.useState();
+  const [isTyping, setIsTyping] = React.useState<boolean>();
   const [imageViewVisible, setImageViewVisible] = React.useState(false);
   /**
    * "User" Credentials, we use those variables to get his data from firebase, then implement it in our App!
@@ -163,8 +168,27 @@ const ChatScreen = () => {
 
   useEffect(() => {
     try {
-      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
+      const meFromStorage = StorageInstance?.getString('Me');
+      if (meFromStorage) {
+        const meObject = JSON?.parse(meFromStorage);
+        if (Array.isArray(meObject)) {
+          setMe(meObject);
+        } else {
+          if (__DEV__) {
+            console.error("Parsed 'Me' is not an array.");
+          }
+          setMe([]);
+        }
+      } else {
+        if (__DEV__) {
+          console.error("'Me' is not set in UserDataMMKV.");
+        }
+        setMe([]);
+      }
     } catch (error) {
+      if (__DEV__) {
+        console.error("Error while parsing 'Me' from UserDataMMKV: ", error);
+      }
       setMe([]);
     }
   }, []);
@@ -206,7 +230,7 @@ const ChatScreen = () => {
   }, [destinedUser]);
 
   /**
-   * Called when new message from `Me` in the database are avaialable
+   * Called when new message from `Me` in the database are available
    * but not marked as sent.
    */
   const updateMySentStatus = useCallback(async () => {
@@ -284,7 +308,7 @@ const ChatScreen = () => {
       .doc(auth()?.currentUser?.uid);
     return await myTypingRef?.get()?.then(documentSnapshot => {
       if (documentSnapshot?.exists) {
-        if (isNull(documentSnapshot?.data()?.typing) === false) {
+        if (!isNull(documentSnapshot?.data()?.typing)) {
           documentSnapshot?.ref?.update({
             typing: null,
           });
@@ -303,10 +327,10 @@ const ChatScreen = () => {
       .get();
     userTypingRef?.docChanges()?.forEach(change => {
       if (change?.doc?.id === destinedUser) {
-        if (isNull(change?.doc?.data()?.typing) === false) {
+        if (!isNull(change?.doc?.data()?.typing)) {
           if (
-            firestore.Timestamp.fromDate(new Date())?.toDate() -
-              change?.doc?.data()?.typing?.toDate() <
+            firestore.Timestamp.fromDate(new Date())?.toDate()?.getTime() -
+              change?.doc?.data()?.typing?.toDate()?.getTime() <
             10000
           ) {
             setIsTyping(true);
@@ -319,9 +343,11 @@ const ChatScreen = () => {
       }
     });
   }, [destinedUser]);
+
   /**
    * Delete message from database using param `id`
-   * @param {string} id
+   * @param {string} messageData
+   * @param {boolean} forEveryone
    */
   async function deleteMessage(messageData, forEveryone) {
     const meMessageRef = firestore()
@@ -342,7 +368,7 @@ const ChatScreen = () => {
           if (documentSnapshot?.id === messageData?.id) {
             documentSnapshot?.ref?.delete();
             filter(mChatData, element => {
-              element?.id === messageData?.id;
+              return element?.id === messageData?.id;
             });
           }
         });
@@ -352,7 +378,7 @@ const ChatScreen = () => {
           if (documentSnapshot?.data()?._id === messageData?._id) {
             documentSnapshot?.ref?.delete();
             filter(mChatData, element => {
-              element?.id === messageData?.id;
+              return element?.id === messageData?.id;
             });
           }
         });
@@ -389,7 +415,7 @@ const ChatScreen = () => {
               try {
                 Clipboard?.setString(message?.text);
               } catch (e) {
-                ErrorToast(
+                new ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -402,7 +428,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, true);
               } catch (e) {
-                ErrorToast(
+                new ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -415,7 +441,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, false);
               } catch (e) {
-                ErrorToast(
+                new ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -431,7 +457,7 @@ const ChatScreen = () => {
               try {
                 Clipboard?.setString(message?.text);
               } catch (e) {
-                ErrorToast(
+                new ErrorToast(
                   'bottom',
                   'Unexcpected Error Occured',
                   `${e}`,
@@ -444,7 +470,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, false);
               } catch (e) {
-                ErrorToast(
+                new ErrorToast(
                   'bottom',
                   'Unexcpected Error Occured',
                   `${e}`,
@@ -541,7 +567,7 @@ const ChatScreen = () => {
                   typing: null,
                 });
             } catch (e) {
-              ErrorToast(
+              new ErrorToast(
                 'bottom',
                 'Failed to send message',
                 'a problem occured when sending a message',
@@ -569,7 +595,7 @@ const ChatScreen = () => {
            */
 
           uploadImageTask.on('state_changed', taskSnapshot => {
-            InfoToast(
+            new InfoToast(
               'bottom',
               'Sending Image',
               `${bytesToSize(
@@ -665,7 +691,7 @@ const ChatScreen = () => {
           });
         }
       } else {
-        ErrorToast(
+        new ErrorToast(
           'bottom',
           'Internet connection required',
           'Please enable Wi-Fi or Mobile data to send messages',
@@ -876,7 +902,7 @@ const ChatScreen = () => {
         if (userSnapshot?.exists) {
           if (
             userSnapshot?.data()?.avatar &&
-            userSnapshot?.data().first_name &&
+            userSnapshot?.data()?.first_name &&
             userSnapshot?.data()?.last_name
           ) {
             setUserFirstName(userSnapshot?.data()?.first_name);
@@ -1243,7 +1269,7 @@ const ChatScreen = () => {
         ) : (
           <></>
         )}
-        <Divider inset={false} />
+        <Divider leftInset={false} />
         <MoonInputToolbar
           messageGetter={mMessageText}
           messageSetter={setMessageText}

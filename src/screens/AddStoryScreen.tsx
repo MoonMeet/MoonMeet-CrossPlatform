@@ -13,7 +13,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {useBottomSheetModal} from '@gorhom/bottom-sheet';
+import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -21,12 +21,11 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {
   BackHandler,
   Image,
+  Keyboard,
   Pressable,
   StyleSheet,
   Text,
   View,
-  Keyboard,
-  TouchableHighlight,
 } from 'react-native';
 import {
   ActivityIndicator,
@@ -34,11 +33,9 @@ import {
   HelperText,
   TextInput,
 } from 'react-native-paper';
-import DoneImage from '../assets/images/done.png';
-import PickImage from '../assets/images/pick-photo.png';
 import BaseView from '../components/BaseView/BaseView';
-import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import ImagePickerActionSheet from '@components/ImagePickerActionSheet/ImagePickerActionSheet.tsx';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import Spacer from '../components/Spacer/Spacer';
 import {
   ErrorToast,
@@ -52,7 +49,6 @@ import {
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {getRandomString} from '../utils/generators/getRandomString';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
-import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
 import {EncryptAES} from '../utils/crypto/cryptoTools';
 import Animated, {
   useAnimatedKeyboard,
@@ -62,9 +58,17 @@ import {waitForAnd} from '../utils/timers/delay';
 import ImagePicker from 'react-native-image-crop-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
+import {DoneImage, PickImage} from 'index.d';
+import {PhotoType} from 'config/Image-Picker-Config.ts';
+
+type UserType = {first_name?: string; last_name?: string; avatar?: string};
 
 const AddStoryScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const keyboard = useAnimatedKeyboard();
 
@@ -82,7 +86,7 @@ const AddStoryScreen = () => {
     };
   });
 
-  const pickerRef = useRef(null);
+  const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['20%'], []);
 
   const handlePresentModal = useCallback(() => {
@@ -101,7 +105,10 @@ const AddStoryScreen = () => {
 
   const [StoryTextInput, setStoryTextInput] = React.useState('');
 
-  const onStoryTextInputChange = _storyText => setStoryTextInput(_storyText);
+  const onStoryTextInputChange = (storyText: string) =>
+    setStoryTextInput(storyText);
+
+  const [UserPhoto, setUserPhoto] = React.useState<PhotoType | null>(null);
 
   const [imageVisible, setImageVisible] = React.useState(false);
 
@@ -111,18 +118,19 @@ const AddStoryScreen = () => {
 
   const {dismissAll} = useBottomSheetModal();
 
-  const [Me, setMe] = React.useState([]);
+  const [Me, setMe] = React.useState<UserType>({});
 
   useEffect(() => {
-    try {
-      setMe(JSON?.parse(UserDataMMKV?.getString('Me')));
-    } catch {
-      setMe([]);
+    const storedMe = StorageInstance?.getString('Me');
+    if (storedMe) {
+      setMe(JSON.parse(storedMe));
+    } else {
+      setMe({});
     }
   }, []);
 
-  const onSecondStoryTextInputChange = _secondStoryText =>
-    setSecondStoryTextInput(_secondStoryText);
+  const onSecondStoryTextInputChange = (secondStoryText: string) =>
+    setSecondStoryTextInput(secondStoryText);
 
   const secondTextInputHasLessLength = () => {
     return StoryTextInput?.trim()?.length < 1;
@@ -138,144 +146,6 @@ const AddStoryScreen = () => {
     setLoading(false);
     return () => {};
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        if (hideMainScreen && userSelection) {
-          setHideMainScreen(false);
-          setUserSelection('');
-          navigation?.setOptions({
-            title: 'Add story',
-            headerRight: null,
-          });
-          if (imageVisible) {
-            setUserPhoto(null);
-            setImageVisible(false);
-          }
-          if (StoryTextInput) {
-            setStoryTextInput('');
-          }
-          if (inputEnabledForImage) {
-            setInputEnabledForImage(false);
-          }
-          if (SecondStoryTextInput) {
-            setSecondStoryTextInput('');
-          }
-          handleCloseModal();
-          return true;
-        } else {
-          return false;
-        }
-      };
-
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [
-      SecondStoryTextInput,
-      StoryTextInput,
-      handleCloseModal,
-      hideMainScreen,
-      imageVisible,
-      inputEnabledForImage,
-      navigation,
-      userSelection,
-    ]),
-  );
-
-  const [UserPhoto, setUserPhoto] = React.useState(null);
-
-  function TitleText() {
-    return (
-      <Pressable hitSlop={20} onPress={() => pushTextStory()}>
-        <Avatar.Icon
-          icon={DoneImage}
-          size={36.5}
-          color={COLORS.black}
-          style={{
-            overflow: 'hidden',
-          }}
-          theme={{
-            colors: {
-              primary: COLORS.transparent,
-            },
-          }}
-        />
-      </Pressable>
-    );
-  }
-
-  function ImageTitle() {
-    return (
-      <>
-        <Pressable
-          hitSlop={20}
-          onPress={() => {
-            setInputEnabledForImage(!inputEnabledForImage);
-          }}>
-          <Text style={styles.enableText}>Aa</Text>
-        </Pressable>
-        <SpacerHorizontal width={widthPercentageToDP(0.5)} />
-        <Pressable
-          hitSlop={20}
-          onPress={() => {
-            pushImageStory();
-          }}>
-          <Avatar.Icon
-            icon={DoneImage}
-            size={36.5}
-            color={COLORS.black}
-            style={{
-              overflow: 'hidden',
-            }}
-            theme={{
-              colors: {
-                primary: COLORS.transparent,
-              },
-            }}
-          />
-        </Pressable>
-      </>
-    );
-  }
-
-  useLayoutEffect(() => {
-    if (!hideMainScreen) {
-      navigation?.setOptions({
-        headerTitle: 'Add story',
-      });
-    } else if (userSelection === 'text') {
-      navigation?.setOptions({
-        headerTitle: Loading ? '' : 'Text story',
-        headerBackVisible: Loading === false,
-        headerRight:
-          Loading === false ? props => <TitleText {...props} /> : null,
-      });
-    } else {
-      navigation?.setOptions({
-        headerTitle: Loading ? '' : 'Image story',
-        headerBackVisible: Loading === false,
-        headerRight:
-          Loading === false ? props => <ImageTitle {...props} /> : null,
-      });
-    }
-  }, [
-    hideMainScreen,
-    inputEnabledForImage,
-    navigation,
-    pushImageStory,
-    pushTextStory,
-    userSelection,
-    StoryTextInput, // should be added manually.
-    SecondStoryTextInput, // should be added manually.
-    Loading, // should be added manually.
-    UserPhoto, // should be added manually.
-    Me?.first_name,
-    Me?.last_name,
-    Me?.avatar,
-  ]);
 
   const pushTextStory = useCallback(() => {
     if (StoryTextInput?.trim()?.length < 1) {
@@ -312,13 +182,14 @@ const AddStoryScreen = () => {
             'bottom',
             'Story shared',
             'Your story has been shared successfully.',
+            true,
+            3000,
           );
           if (navigation?.canGoBack()) {
             navigation?.goBack();
           }
         });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     StoryTextInput,
     Loading,
@@ -326,11 +197,10 @@ const AddStoryScreen = () => {
     Me?.last_name,
     Me?.avatar,
     navigation,
-    pushTextStory,
   ]);
 
   const pushImageData = useCallback(
-    storyImageURL => {
+    (storyImageURL: string) => {
       firestore()
         .collection('stories')
         .add({
@@ -413,6 +283,137 @@ const AddStoryScreen = () => {
     }
   }, [Loading, UserPhoto, pushImageData]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (hideMainScreen && userSelection) {
+          setHideMainScreen(false);
+          setUserSelection('');
+          navigation?.setOptions({
+            title: 'Add story',
+            headerRight: undefined,
+          });
+          if (imageVisible) {
+            setUserPhoto(null);
+            setImageVisible(false);
+          }
+          if (StoryTextInput) {
+            setStoryTextInput('');
+          }
+          if (inputEnabledForImage) {
+            setInputEnabledForImage(false);
+          }
+          if (SecondStoryTextInput) {
+            setSecondStoryTextInput('');
+          }
+          handleCloseModal();
+          return true;
+        } else {
+          return false;
+        }
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [
+      SecondStoryTextInput,
+      StoryTextInput,
+      handleCloseModal,
+      hideMainScreen,
+      imageVisible,
+      inputEnabledForImage,
+      navigation,
+      userSelection,
+    ]),
+  );
+
+  const TitleText = React.useCallback(() => {
+    return (
+      <Pressable hitSlop={20} onPress={() => pushTextStory()}>
+        {' '}
+        <Avatar.Icon
+          icon={DoneImage}
+          size={36.5}
+          color={COLORS.black}
+          style={{overflow: 'hidden'}}
+          theme={{colors: {primary: COLORS.transparent}}}
+        />
+      </Pressable>
+    );
+  }, [pushTextStory]);
+
+  const ImageTitle = React.useCallback(() => {
+    return (
+      <>
+        <Pressable
+          hitSlop={20}
+          onPress={() => {
+            setInputEnabledForImage(!inputEnabledForImage);
+          }}>
+          <Text style={styles.enableText}>Aa</Text>
+        </Pressable>
+        <SpacerHorizontal width={widthPercentageToDP(0.5)} />
+        <Pressable
+          hitSlop={20}
+          onPress={() => {
+            pushImageStory();
+          }}>
+          <Avatar.Icon
+            icon={DoneImage}
+            size={36.5}
+            color={COLORS.black}
+            style={{
+              overflow: 'hidden',
+            }}
+            theme={{
+              colors: {
+                primary: COLORS.transparent,
+              },
+            }}
+          />
+        </Pressable>
+      </>
+    );
+  }, [inputEnabledForImage, setInputEnabledForImage, pushImageStory]);
+
+  useLayoutEffect(() => {
+    if (!hideMainScreen) {
+      navigation?.setOptions({
+        headerTitle: 'Add story',
+      });
+    } else if (userSelection === 'text') {
+      navigation?.setOptions({
+        headerTitle: Loading ? '' : 'Text story',
+        headerBackVisible: !Loading,
+        headerRight: !Loading ? () => <TitleText /> : undefined,
+      });
+    } else {
+      navigation?.setOptions({
+        headerTitle: Loading ? '' : 'Image story',
+        headerBackVisible: !Loading,
+        headerRight: !Loading ? () => <ImageTitle /> : undefined,
+      });
+    }
+  }, [
+    hideMainScreen,
+    inputEnabledForImage,
+    navigation,
+    pushImageStory,
+    pushTextStory,
+    userSelection,
+    StoryTextInput,
+    SecondStoryTextInput,
+    Loading,
+    UserPhoto,
+    Me.first_name,
+    Me.last_name,
+    Me.avatar,
+    TitleText,
+    ImageTitle,
+  ]);
+
   if (Loading) {
     return (
       <MiniBaseView>
@@ -433,7 +434,7 @@ const AddStoryScreen = () => {
   } else if (!hideMainScreen) {
     return (
       <MiniBaseView>
-        <Spacer height={'2%'} />
+        <Spacer height={heightPercentageToDP(2)} />
         <View style={styles.userChoice}>
           <Pressable
             onPress={() => {
@@ -449,11 +450,11 @@ const AddStoryScreen = () => {
                 size={24}
                 style={{overflow: 'hidden', marginRight: '1.5%'}}
               />
-              <Spacer height={'1%'} />
+              <Spacer height={heightPercentageToDP(1)} />
               <Text style={styles.userChoiceSubheadingText}>Image</Text>
             </LinearGradient>
           </Pressable>
-          <Spacer height={'5%'} />
+          <Spacer height={heightPercentageToDP(5)} />
           <Pressable
             onPress={() => {
               setHideMainScreen(true);
@@ -468,7 +469,7 @@ const AddStoryScreen = () => {
                 size={24}
                 style={{overflow: 'hidden', marginRight: '1.5%'}}
               />
-              <Spacer height={'1%'} />
+              <Spacer height={heightPercentageToDP(1)} />
               <Text style={styles.userChoiceSubheadingText}>Text</Text>
             </LinearGradient>
           </Pressable>
@@ -507,14 +508,16 @@ const AddStoryScreen = () => {
             <HelperText type="info" visible={textInputHasLessLength()}>
               Story Text must be longer longer than 1 characters.
             </HelperText>
-          ) : null}
+          ) : (
+            <></>
+          )}
         </Animated.View>
       </BaseView>
     );
   } else if (userSelection === 'image') {
     return (
       <BaseView>
-        <Spacer height={'2%'} />
+        <Spacer height={heightPercentageToDP(2)} />
         <Pressable
           onPress={() => handlePresentModal()}
           style={styles.imageInputFlexedView}>
@@ -567,12 +570,16 @@ const AddStoryScreen = () => {
               onChangeText={onSecondStoryTextInputChange}
             />
           </Animated.View>
-        ) : null}
+        ) : (
+          <></>
+        )}
         {secondTextInputHasLessLength() && inputEnabledForImage ? (
           <HelperText type="info" visible={textInputHasLessLength()}>
             Story Text must be longer longer than 1 characters.
           </HelperText>
-        ) : null}
+        ) : (
+          <></>
+        )}
         <ImagePickerActionSheet
           sheetRef={pickerRef}
           index={0}
@@ -585,7 +592,7 @@ const AddStoryScreen = () => {
               mediaType: 'photo',
             })
               .then(async image => {
-                setUserPhoto(image);
+                setUserPhoto(image as PhotoType);
                 setImageVisible(true);
               })
               .catch(() => {
@@ -607,7 +614,7 @@ const AddStoryScreen = () => {
               mediaType: 'photo',
             })
               .then(async image => {
-                setUserPhoto(image);
+                setUserPhoto(image as PhotoType);
                 setImageVisible(true);
               })
               .catch(() => {
@@ -624,6 +631,8 @@ const AddStoryScreen = () => {
         />
       </BaseView>
     );
+  } else {
+    return <></>;
   }
 };
 const styles = StyleSheet.create({

@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2024.
  */
 
 import React, {useCallback, useEffect} from 'react';
@@ -18,28 +18,48 @@ import {
 } from 'react-native';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {fontValue, screenWidth} from '../config/Dimensions';
+import {
+  fontValue,
+  heightPercentageToDP,
+  screenWidth,
+} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {FlatGrid} from 'react-native-super-grid';
 import {DecryptAES} from '../utils/crypto/cryptoTools';
 import {reverse, sortBy, uniqBy} from 'lodash';
-import {StoryMMKV} from '../config/MMKV/StoryMMKV';
-import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
-import {isDate} from 'moment';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+
+interface ItemType {
+  image?: string;
+  avatar?: string;
+  uid?: string;
+  id?: string;
+  first_name?: string;
+  last_name?: string;
+  time?: any;
+}
+
+interface RenderItemProps {
+  item: ItemType;
+  index: number;
+}
 
 const HomePeopleScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [avatarURL, setAvatarURL] = React.useState('');
 
   const [storyLoading, setStoryLoading] = React.useState(true);
 
-  const [storiesData, setStoriesData] = React.useState([]);
+  const [storiesData, setStoriesData] = React.useState<ItemType[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -55,15 +75,52 @@ const HomePeopleScreen = () => {
     }, []),
   );
 
-  const renderItem = ({item, index}) => {
+  const heading = (
+    align: 'auto' | 'left' | 'right' | 'center' | 'justify',
+    isRead: boolean,
+  ) => {
+    return {
+      fontSize: 16,
+      textAlign: align,
+      color: COLORS.black,
+      opacity: isRead ? 0.6 : 1,
+      fontFamily: FONTS.regular,
+    };
+  };
+
+  const subheading = (
+    align: 'auto' | 'left' | 'right' | 'center' | 'justify',
+    isMessage: boolean,
+    isRead: boolean,
+  ) => {
+    return {
+      fontSize: isMessage ? fontValue(14) : fontValue(11.5),
+      paddingTop: heightPercentageToDP(1),
+      textAlign: align,
+      color: COLORS.black,
+      opacity: isRead ? 0.6 : 1,
+      fontFamily: FONTS.regular,
+    };
+  };
+
+  const renderItem = ({item, index}: RenderItemProps) => {
     let currentSid = storiesData[index]?.id;
-    let storySeenAlready = StoryMMKV.contains(currentSid);
+    let storySeenAlready = false;
+    if (currentSid != null) {
+      storySeenAlready = StorageInstance.contains(currentSid);
+    }
     return (
       <Pressable
         style={styles.itemContainer}
         android_ripple={{color: COLORS.rippleColor}}
         onPress={() => {
-          StoryMMKV.set(currentSid, JSON.stringify(item));
+          if (currentSid != null) {
+            StorageInstance.set(currentSid, JSON.stringify(item));
+          } else {
+            if (__DEV__) {
+              console.log('currentSid is undefined');
+            }
+          }
           navigation?.navigate('story', {
             userUID: item?.uid,
             myUID: auth()?.currentUser?.uid,
@@ -113,7 +170,7 @@ const HomePeopleScreen = () => {
           style={{
             position: 'absolute',
             textAlign: 'left',
-            lineHeightight: 14,
+            lineHeight: 14,
             fontSize: Platform.OS === 'ios' ? fontValue(12) : fontValue(14),
             fontWeight: '600',
             color: COLORS.white,
@@ -136,8 +193,8 @@ const HomePeopleScreen = () => {
    * @param {string} sid
    * @returns {Promise<void>}
    */
-  const deleteCurrentStory = useCallback(async sid => {
-    return await firestore().collection('stories')?.doc(sid)?.delete();
+  const deleteCurrentStory = useCallback((sid: string) => {
+    return firestore().collection('stories')?.doc(sid)?.delete();
   }, []);
 
   useEffect(() => {
@@ -150,7 +207,7 @@ const HomePeopleScreen = () => {
             (subDocument?.data()?.text || subDocument?.data()?.image)
           ) {
             if (
-              firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+              firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
                 subDocument?.data()?.time?.toDate() >
               86400000
             ) {
@@ -177,11 +234,15 @@ const HomePeopleScreen = () => {
               documentSnapshot?.data()?.active_time
             ) {
               setAvatarURL(documentSnapshot?.data()?.avatar);
-              UserDataMMKV.set('Me', JSON?.stringify(documentSnapshot?.data()));
+              StorageInstance.set(
+                'Me',
+                JSON?.stringify(documentSnapshot?.data()),
+              );
             }
           }
         });
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const activeStatusSubscribe = firestore()
       .collection('users')
       ?.doc(auth()?.currentUser?.uid)
@@ -210,14 +271,16 @@ const HomePeopleScreen = () => {
         if (collectionSnapshot?.empty) {
           setStoriesData([]);
         } else {
-          let collectionDocs = collectionSnapshot?.docs?.map(element => ({
-            ...element?.data(),
-            image:
-              element.data()?.image === undefined
-                ? ''
-                : DecryptAES(element?.data()?.image),
-            id: element?.id,
-          }));
+          let collectionDocs: ItemType[] = collectionSnapshot?.docs?.map(
+            element => ({
+              ...element?.data(),
+              image:
+                element.data()?.image === undefined
+                  ? ''
+                  : DecryptAES(element?.data()?.image),
+              id: element?.id,
+            }),
+          );
 
           collectionDocs = sortBy(collectionDocs, [
             docs => docs?.time?.toDate(),
@@ -236,12 +299,10 @@ const HomePeopleScreen = () => {
   const listEmptyComponent = () => {
     return (
       <View style={styles.emptyView}>
-        <Text adjustsFontSizeToFit style={styles.heading('center', false)}>
+        <Text adjustsFontSizeToFit style={heading('center', false)}>
           No stories available, yet.
         </Text>
-        <Text
-          adjustsFontSizeToFit
-          style={styles.subheading('center', false, true)}>
+        <Text adjustsFontSizeToFit style={subheading('center', false, true)}>
           there's no stories at the moment.
         </Text>
       </View>
@@ -382,25 +443,6 @@ const styles = StyleSheet.create({
     height: 250,
     backgroundColor: COLORS.white,
     borderRadius: 10,
-  },
-  heading: (align, isRead) => {
-    return {
-      fontSize: 16,
-      textAlign: align,
-      color: COLORS.black,
-      opacity: isRead ? 0.6 : 1,
-      fontFamily: FONTS.regular,
-    };
-  },
-  subheading: (align, isMessage, isRead) => {
-    return {
-      fontSize: isMessage ? fontValue(14) : fontValue(11.5),
-      paddingTop: '1%',
-      textAlign: align,
-      color: COLORS.black,
-      opacity: isRead ? 0.6 : 1,
-      fontFamily: FONTS.regular,
-    };
   },
   emptyView: {
     flex: 1,

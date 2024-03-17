@@ -3,13 +3,13 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Moon, 2021-2023.
  */
 
 import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import {HelperText, Switch} from 'react-native-paper';
 import Spacer from '../components/Spacer/Spacer';
 import {useNavigation} from '@react-navigation/native';
@@ -21,20 +21,29 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
 
 const ActiveStatusScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   /**
    * Checking if network is OK before sending SMS or catching a SnackBar Exception.
    */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState?.isConnected;
-  });
+  const [isConnected, setIsConnected] = React.useState<boolean | null>(null);
 
-  const [newActiveTime, setNewActiveTime] = React.useState('');
+  useEffect(() => {
+    NetInfo.fetch().then(networkState => {
+      setIsConnected(networkState?.isConnected);
+    });
+  }, []);
 
-  const [switchState, setSwitchState] = React.useState(false);
+  const [newActiveTime, setNewActiveTime] = React.useState<String>('');
+
+  const [switchState, setSwitchState] = React.useState<boolean | undefined>(
+    false,
+  );
 
   useEffect(() => {
     firestore()
@@ -47,7 +56,7 @@ const ActiveStatusScreen = () => {
             documentSnapshot?.data()?.active_status &&
             documentSnapshot?.data()?.active_time
           ) {
-            if (documentSnapshot?.data().active_status === 'normal') {
+            if (documentSnapshot?.data()?.active_status === 'normal') {
               setSwitchState(true);
             } else {
               setSwitchState(false);

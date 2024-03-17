@@ -3,36 +3,34 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2024.
  */
 
-import React, {useCallback, useMemo} from 'react';
+import React, {Ref, useCallback, useMemo} from 'react';
 import {StyleSheet, Text} from 'react-native';
 
-import {COLORS, FONTS} from '../../../config/Miscellaneous';
+import {COLORS, FONTS} from 'config/Miscellaneous.ts';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-  useBottomSheetDynamicSnapPoints,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 import {SharedValue} from 'react-native-reanimated';
 import {ScrollView} from 'react-native-gesture-handler';
-import {fontValue} from '../../../config/Dimensions';
+import {fontValue} from 'config/Dimensions.ts';
+import {BottomSheetDefaultBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 
 interface PrivacyPolicyInterface {
-  sheetRef?: Ref | undefined;
+  sheetRef?: Ref<BottomSheetModal> | undefined;
   snapPoints?:
     | Array<string | number>
     | SharedValue<Array<string | number>>
     | undefined;
   index?: number | undefined;
 }
-const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
-  const {animatedHandleHeight, handleContentLayout} =
-    useBottomSheetDynamicSnapPoints(props.snapPoints);
 
+const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -45,15 +43,14 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
     () => ({
       ...styles.sheetContainer,
       shadowColor: COLORS.black,
-      padding: '2.5%',
     }),
     [],
   );
 
   const renderBackdrop = useCallback(
-    props => (
+    (backProps: BottomSheetDefaultBackdropProps) => (
       <BottomSheetBackdrop
-        {...props}
+        {...backProps}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
       />
@@ -68,14 +65,17 @@ const PrivacyPolicy = (props: PrivacyPolicyInterface) => {
       snapPoints={props?.snapPoints}
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
-      handleHeight={animatedHandleHeight}
+      enableDynamicSizing={true}
       animationConfigs={animationConfigs}
       backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
-        style={{flex: 1, backgroundColor: COLORS.primaryLight, bottom: '0.25%'}}
-        onLayout={handleContentLayout}>
+        style={{
+          flex: 1,
+          backgroundColor: COLORS.primaryLight,
+          bottom: '0.25%',
+        }}>
         <Text style={styles.headerText}>Privacy Policy</Text>
         <ScrollView
           nestedScrollEnabled={true}

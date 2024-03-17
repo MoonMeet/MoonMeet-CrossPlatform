@@ -19,7 +19,7 @@ import {
   TextInput,
 } from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import Spacer from '../components/Spacer/Spacer';
 import {
@@ -36,9 +36,13 @@ const ChangeUsernameScreen = () => {
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
    */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState?.isConnected;
-  });
+  const [isConnected, setIsConnected] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    NetInfo.fetch().then(networkState => {
+      setIsConnected(!!networkState?.isConnected);
+    });
+  }, []);
 
   const [UsernameText, setUsernameText] = React.useState('');
   const [oldUsernameText, setOldUsernameText] = React.useState('');
@@ -46,7 +50,8 @@ const ChangeUsernameScreen = () => {
   const [loaderVisible, setLoaderVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
 
-  const onUsernameTextChange = _usernameText => setUsernameText(_usernameText);
+  const onUsernameTextChange = (usernameText: string) =>
+    setUsernameText(usernameText);
 
   useEffect(() => {
     firestore()
@@ -204,7 +209,7 @@ const ChangeUsernameScreen = () => {
           if (isConnected) {
             if (!hasMoreLength() && !hasLessLength()) {
               if (UsernameText?.trim() === oldUsernameText?.trim()) {
-                if (navigation?.canGoBack) {
+                if (navigation?.canGoBack()) {
                   navigation?.goBack();
                 }
               } else {

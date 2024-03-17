@@ -6,54 +6,58 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useEffect, useRef, useCallback} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   BackHandler,
-  StyleSheet,
-  View,
-  Text,
   Image,
   Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
-import {fontValue, heightPercentageToDP} from '../config/Dimensions';
-import {COLORS, FONTS} from '../config/Miscellaneous';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {fontValue, heightPercentageToDP} from 'config/Dimensions';
+import {COLORS, FONTS} from 'config/Miscellaneous';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {Snackbar} from 'react-native-paper';
-import OTPTextView from '../components/OtpView/OTPTextInput';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
-import {Avatar, TextInput, FAB, HelperText} from 'react-native-paper';
+import {Avatar, FAB, HelperText, Snackbar, TextInput} from 'react-native-paper';
+import OTPTextView, {OTPTextViewHandle} from 'components/OtpView/OTPTextInput';
+import {InfoToast} from 'components/ToastInitializer/ToastInitializer';
 
-import AuthenticationImage from '../assets/images/authentication.png';
-import RecoveryImage from '../assets/images/recovery.png';
-import BackImage from '../assets/images/back.png';
-import ArrowForward from '../assets/images/arrow-forward.png';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes';
+import {
+  ArrowForward,
+  AuthenticationImage,
+  BackImage,
+  RecoveryImage,
+} from 'index.d';
 
 const VerifyPasscodeScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const mPINRef = useRef();
+  const pinRef = useRef<OTPTextViewHandle | null>(null);
 
-  const [mIsForgetpassword, setIsForgetPassword] = React.useState(false);
-  const [mPINCode, setPINCode] = React.useState('');
-  const [mPasscodeHint, setPasscodeHint] = React.useState('');
-  const [mPasscRecovery, setPassRecovery] = React.useState('');
+  const [forgottenPassword, setForgottenPassword] = React.useState(false);
+  const [pinCode, setPINCode] = React.useState('');
+  const [passcodeHint, setPasscodeHint] = React.useState('');
+  const [passRecovery, setPassRecovery] = React.useState('');
 
-  const [mRecoveryTextInput, setRecoveryTextInput] = React.useState('');
-  const onRecoveryTextInputChange = RePass => {
+  const [recoveryTextInput, setRecoveryTextInput] = React.useState('');
+  const onRecoveryTextInputChange = (RePass: string) => {
     setRecoveryTextInput(RePass);
   };
   const passwordHasLessLength = () => {
-    if (mRecoveryTextInput?.trim()?.length === 0) {
+    if (recoveryTextInput?.trim()?.length === 0) {
       return false;
     }
-    return mRecoveryTextInput?.trim()?.length < 3;
+    return recoveryTextInput?.trim()?.length < 3;
   };
 
-  const checkCode = code => {
-    if (code === mPINCode) {
+  const checkCode = (code: string) => {
+    if (code === pinCode) {
       navigation?.navigate('home');
     } else {
       setErrorSnackbarText('Wrong PIN, Try again.');
@@ -61,15 +65,24 @@ const VerifyPasscodeScreen = () => {
     }
   };
 
-  const [mBottomMargin, setBottomMargin] = React.useState(0);
+  const [bottomMargin, setBottomMargin] = React.useState(0);
 
-  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState(false);
+  const [ErrorSnackbarText, setErrorSnackbarText] = React.useState('');
 
   const [ErrorSnackBarVisible, setErrorSnackBarVisible] = React.useState(false);
 
   const onDismissErrorSnackBar = () => {
     setBottomMargin(0);
     setErrorSnackBarVisible(!ErrorSnackBarVisible);
+  };
+
+  const fabStyle = (bottomMargin: number) => {
+    return {
+      position: 'absolute' as 'absolute',
+      margin: 16 - 0.1 * 16,
+      right: 0,
+      bottom: bottomMargin,
+    };
   };
 
   useEffect(() => {
@@ -108,12 +121,12 @@ const VerifyPasscodeScreen = () => {
     }, []),
   );
 
-  if (mIsForgetpassword) {
+  if (forgottenPassword) {
     return (
       <BaseView>
         <View style={styles.toolbar}>
           <View style={styles.left_side}>
-            <Pressable onPress={() => setIsForgetPassword(!mIsForgetpassword)}>
+            <Pressable onPress={() => setForgottenPassword(!forgottenPassword)}>
               <Avatar.Icon
                 icon={BackImage}
                 size={37.5}
@@ -154,17 +167,11 @@ const VerifyPasscodeScreen = () => {
             mode="outlined"
             label="Recovery Password"
             multiline={false}
-            value={mRecoveryTextInput}
+            value={recoveryTextInput}
             maxLength={20}
             theme={{
               colors: {
-                text: COLORS.black,
                 primary: COLORS.accentLight,
-                backgroundColor: COLORS.rippleColor,
-                placeholder: COLORS.darkGrey,
-                underlineColor: '#566193',
-                selectionColor: '#DADADA',
-                outlineColor: '#566193',
               },
             }}
             onChangeText={onRecoveryTextInputChange}
@@ -189,13 +196,12 @@ const VerifyPasscodeScreen = () => {
                 color: COLORS.darkGrey,
                 fontFamily: FONTS.regular,
               }}>
-              {mPasscodeHint}
+              {passcodeHint}
             </Text>
           </HelperText>
         </View>
         <FAB
-          style={styles.fab(mBottomMargin)}
-          normal
+          style={fabStyle(bottomMargin)}
           icon={ArrowForward}
           color={COLORS.primaryLight}
           animated={true}
@@ -205,11 +211,11 @@ const VerifyPasscodeScreen = () => {
             },
           }}
           onPress={() => {
-            if (mRecoveryTextInput?.trim()?.length < 1) {
+            if (recoveryTextInput?.trim()?.length < 1) {
               setBottomMargin(heightPercentageToDP(7));
               setErrorSnackbarText('Please submit your recovery password');
               setErrorSnackBarVisible(!ErrorSnackBarVisible);
-            } else if (mRecoveryTextInput !== mPasscRecovery) {
+            } else if (recoveryTextInput !== passRecovery) {
               setBottomMargin(heightPercentageToDP(7));
               setErrorSnackbarText('Wrong Password, Try again.');
               setErrorSnackBarVisible(!ErrorSnackBarVisible);
@@ -284,7 +290,7 @@ const VerifyPasscodeScreen = () => {
           }}>
           <OTPTextView
             inputCount={4}
-            ref={mPINRef}
+            ref={pinRef}
             tintColor={COLORS.accentLight}
             offTintColor={COLORS.controlHighlight}
             containerStyle={styles.TextInputContainer}
@@ -296,7 +302,7 @@ const VerifyPasscodeScreen = () => {
             }}
             keyboardType={'numeric'}
           />
-          <Pressable onPress={() => setIsForgetPassword(!mIsForgetpassword)}>
+          <Pressable onPress={() => setForgottenPassword(!forgottenPassword)}>
             <Text style={styles.forget_password}>Forget Password ?</Text>
           </Pressable>
         </View>
@@ -394,14 +400,6 @@ const styles = StyleSheet.create({
   RoundedTextInput: {
     borderRadius: heightPercentageToDP(1),
     borderWidth: 2,
-  },
-  fab: bottomMargin => {
-    return {
-      position: 'absolute',
-      margin: 16 - 0.1 * 16,
-      right: 0,
-      bottom: bottomMargin,
-    };
   },
 });
 

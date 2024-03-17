@@ -7,31 +7,34 @@
  */
 
 import React, {useEffect} from 'react';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import {StyleSheet, Text, View} from 'react-native';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
+import {StyleProp, StyleSheet, Text, TextStyle, View} from 'react-native';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
 import ScrollViewData from '../components/SettingsScreen/ScrollViewContainer';
-import {ThemeContext} from '../config/Theme/Context';
+import {ThemeContext} from 'config/Theme/Context.ts';
 import {PurpleBackground} from '../index.d';
 import {fontValue} from '../config/Dimensions';
 import {ScrollView} from 'react-native-gesture-handler';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const SettingsScreen = () => {
-  const [Loading, setLoading] = React.useState(true);
+  const [Loading, setLoading] = React.useState<boolean>(true);
 
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const [avatarURL, setAvatarURL] = React.useState('');
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
-  const [userName, setUserName] = React.useState('');
-  const [userBio, setUserBio] = React.useState('');
-  const [activeStatus, setActiveStatus] = React.useState('');
-  const [activeTime, setActiveTime] = React.useState('');
+  const [avatarURL, setAvatarURL] = React.useState<string>('');
+  const [firstName, setFirstName] = React.useState<string>('');
+  const [lastName, setLastName] = React.useState<string>('');
+  const [userName, setUserName] = React.useState<string>('');
+  const [userBio, setUserBio] = React.useState<string>('');
+  const [activeStatus, setActiveStatus] = React.useState<string>('');
+  const [activeTime, setActiveTime] = React.useState<string>('');
 
   const {isThemeDark} = React.useContext(ThemeContext);
 
@@ -51,20 +54,21 @@ const SettingsScreen = () => {
       color: isThemeDark ? COLORS.white : COLORS.black,
       fontFamily: FONTS.regular,
     },
-    bioText: userBio => {
-      return {
-        position: 'relative',
-        fontSize: fontValue(16),
-        paddingLeft: '2.5%',
-        paddingRight: '2.5%',
-        paddingTop: '1%',
-        textAlign: 'center',
-        color: isThemeDark ? COLORS.white : COLORS.black,
-        opacity: userBio ? 0.6 : 0.4,
-        fontFamily: FONTS.regular,
-      };
-    },
   });
+
+  const bioTextStyle = (isUserBioText: string): StyleProp<TextStyle> => {
+    return {
+      position: 'relative',
+      fontSize: fontValue(16),
+      paddingLeft: '2.5%',
+      paddingRight: '2.5%',
+      paddingTop: '1%',
+      textAlign: 'center',
+      color: isThemeDark ? COLORS.white : COLORS.black,
+      opacity: isUserBioText ? 0.6 : 0.4,
+      fontFamily: FONTS.regular,
+    };
+  };
 
   useEffect(() => {
     const usersSubsriber = firestore()
@@ -84,6 +88,7 @@ const SettingsScreen = () => {
         }
         setLoading(false);
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const activeStatusSubscribe = firestore()
       .collection('users')
       ?.doc(auth()?.currentUser?.uid)
@@ -150,14 +155,14 @@ const SettingsScreen = () => {
               adjustsFontSizeToFit={true}
               numberOfLines={1}
               onPress={() => navigation?.navigate('addBio')}
-              style={styles.bioText(userBio)}>
+              style={bioTextStyle(userBio)}>
               {userBio}
             </Text>
           ) : (
             <Text
               adjustsFontSizeToFit={true}
               numberOfLines={1}
-              style={styles.bioText(userBio)}
+              style={bioTextStyle(userBio)}
               onPress={() => navigation?.navigate('addBio')}>
               Tap to add a bio
             </Text>

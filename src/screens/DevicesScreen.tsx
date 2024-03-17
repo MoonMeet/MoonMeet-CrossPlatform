@@ -8,7 +8,9 @@
 
 import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
 import {reverse, sortBy} from 'lodash';
 import React, {useEffect} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
@@ -23,18 +25,19 @@ import {
 import {ActivityIndicator} from 'react-native-paper';
 import {v4 as uuidv4} from 'uuid';
 import DevicesList from '../components/DevicesScreen/DevicesList';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import Spacer from '../components/Spacer/Spacer';
 import {ErrorToast} from '../components/ToastInitializer/ToastInitializer';
 import {heightPercentageToDP, widthPercentageToDP} from '../config/Dimensions';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance.ts';
 import {isWeb, isWindows} from '../utils/device/DeviceInfo';
 
 const DevicesScreen = () => {
-  const [masterData, setMasterData] = React.useState([]);
-
-  const [Loading, setLoading] = React.useState(true);
+  const [masterData, setMasterData] = React.useState<
+    FirebaseFirestoreTypes.DocumentData[]
+  >([]);
+  const [Loading, setLoading] = React.useState<boolean>(true);
 
   let newJwtKey = uuidv4();
 
@@ -44,20 +47,24 @@ const DevicesScreen = () => {
       .doc(auth()?.currentUser?.uid)
       .collection('devices')
       .onSnapshot(collectionSnapshot => {
-        const devicesSnapshot = [];
-        collectionSnapshot?.forEach(childSnapshot => {
-          if (
-            childSnapshot?.data()?.app_version &&
-            childSnapshot?.data()?.manufacturer &&
-            childSnapshot?.data()?.model &&
-            childSnapshot?.data()?.product &&
-            childSnapshot?.data()?.system_version &&
-            childSnapshot?.data()?.system_name &&
-            childSnapshot?.data()?.time
-          ) {
-            devicesSnapshot.push(childSnapshot?.data());
-          }
-        });
+        const devicesSnapshot: FirebaseFirestoreTypes.DocumentData[] = [];
+        collectionSnapshot?.forEach(
+          (childSnapshot: FirebaseFirestoreTypes.QueryDocumentSnapshot) => {
+            if (
+              childSnapshot?.data()?.app_version &&
+              childSnapshot?.data()?.manufacturer &&
+              childSnapshot?.data()?.model &&
+              childSnapshot?.data()?.product &&
+              childSnapshot?.data()?.system_version &&
+              childSnapshot?.data()?.system_name &&
+              childSnapshot?.data()?.time
+            ) {
+              devicesSnapshot.push(
+                childSnapshot?.data() as FirebaseFirestoreTypes.DocumentData,
+              );
+            }
+          },
+        );
         setMasterData(
           reverse(sortBy(devicesSnapshot, [data => data?.time?.toDate()])),
         );
@@ -69,23 +76,30 @@ const DevicesScreen = () => {
   }, []);
 
   /**
-   * Copied from LoginScreen.js, needed to resend current logged in device
+   * Copied from LoginScreen.tsx, needed to resend current logged in device
    * after terminating all sessions from the user account.
    */
-  const [systemName, setSystemName] = React.useState(getSystemName());
-  const [systemVersion, setSystemVersion] = React.useState(getSystemVersion());
-  const [Manufacturer, setManufacturer] = React.useState(
+  const [systemName, setSystemName] = React.useState<string>('');
+  const [systemVersion, setSystemVersion] = React.useState<string>('');
+  const [Manufacturer, setManufacturer] = React.useState<string>('');
+  const [Product, setProduct] = React.useState<string>('');
+  const [Model, setModel] = React.useState<string>('');
+  const [appVersion, setAppVersion] = React.useState<string>('');
+
+  React.useEffect(() => {
+    setSystemName(getSystemName());
+    setSystemVersion(getSystemVersion());
+    setModel(getModel());
+    setAppVersion(getVersion());
+
     getManufacturer().then(manufacturer => {
       setManufacturer(manufacturer);
-    }),
-  );
-  const [Product, setProduct] = React.useState(
+    });
+
     getProduct().then(product => {
       setProduct(product);
-    }),
-  );
-  const [Model, setModel] = React.useState(getModel());
-  const [appVersion, setAppVersion] = React.useState(getVersion());
+    });
+  }, []);
 
   async function resendCurrentDevice() {
     if (!isWindows && !isWeb) {
@@ -161,7 +175,7 @@ const DevicesScreen = () => {
             let response = await NetInfo?.fetch();
             if (response?.isConnected) {
               try {
-                JwtKeyMMKV.set('currentUserJwtKey', newJwtKey);
+                StorageInstance.set('currentUserJwtKey', newJwtKey);
               } catch {
                 if (__DEV__) {
                   console.error('failed updating JwtKey');
@@ -198,8 +212,8 @@ const DevicesScreen = () => {
       <Text style={styles.miniHeaderText}>Active sessions</Text>
       <DevicesList
         ListData={masterData}
-        onPressTrigger={null}
-        onLongPressTrigger={null}
+        onPressTrigger={() => {}}
+        onLongPressTrigger={() => {}}
       />
     </MiniBaseView>
   );

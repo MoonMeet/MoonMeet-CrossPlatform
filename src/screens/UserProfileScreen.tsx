@@ -6,32 +6,45 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useEffect, useMemo} from 'react';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {Image, Pressable, StatusBar, StyleSheet} from 'react-native';
+import React, {useEffect} from 'react';
+import {RouteProp, useNavigation} from '@react-navigation/native';
+import {
+  Image,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import {COLORS, FONTS} from '../config/Miscellaneous';
-import {Text, View} from 'react-native';
+import {COLORS, FONTS} from 'config/Miscellaneous';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import {ScrollView} from 'react-native-gesture-handler';
 import {PurpleBackground} from '../index.d';
-import {fontValue} from '../config/Dimensions';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import {fontValue, heightPercentageToDP} from 'config/Dimensions';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView';
 import Spacer from '../components/Spacer/Spacer';
 import ViewItem from '../components/UserProfileScreen/ViewItem';
 import ViewItemTitle from '../components/UserProfileScreen/ViewItemTitle';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {InfoToast} from 'components/ToastInitializer/ToastInitializer';
 import ImageView from 'react-native-image-viewing';
 import {ActivityIndicator} from 'react-native-paper';
-import {DecryptAES} from '../utils/crypto/cryptoTools';
+import {DecryptAES} from 'utils/crypto/cryptoTools';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
 
-const UserProfileScreen = () => {
-  const navigation = useNavigation();
-  const stackRoute = useRoute();
-  const userUID = useMemo(() => stackRoute?.params?.uid, []);
-  const cameFrom = useMemo(() => stackRoute?.params?.cameFrom, []);
+interface UserProfileProps {
+  route: RouteProp<RootStackParamList, 'userProfile'>;
+}
+
+const UserProfileScreen = (props: UserProfileProps) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const userUID = props?.route?.params?.userProfile?.uid;
+  const cameFrom = props?.route?.params?.userProfile?.cameFrom;
 
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -41,7 +54,7 @@ const UserProfileScreen = () => {
   const [usernameText, setUsername] = React.useState('');
   const [phoneNumber, setPhoneNumber] = React.useState('');
   const [activeStatus, setActiveStatus] = React.useState('');
-  const [activeTime, setActiveTime] = React.useState();
+  const [activeTime, setActiveTime] = React.useState<string | Date>('');
   const [phoneNumberStatus, setPhoneNumberStatus] = React.useState('');
 
   const [loading, setLoading] = React.useState(true);
@@ -148,9 +161,11 @@ const UserProfileScreen = () => {
                 styles.text,
                 {color: COLORS.black, opacity: 0.4, fontSize: fontValue(14)},
               ]}>
-              {activeStatus === 'normal'
-                ? firestore?.Timestamp?.fromDate(new Date())?.toDate() -
-                    activeTime >
+              {activeTime instanceof Date && activeStatus === 'normal'
+                ? firestore?.Timestamp?.fromDate(new Date())
+                    ?.toDate()
+                    .getTime() -
+                    activeTime.getTime() >
                   86400000
                   ? `active on ${moment(activeTime)?.format(
                       "YYYY 'MMMM DD - hh:mm A",
@@ -159,7 +174,7 @@ const UserProfileScreen = () => {
                 : 'Last seen recently'}
             </Text>
           </View>
-          <Spacer />
+          <Spacer height={heightPercentageToDP(2)} />
           <ViewItemTitle titleItem={'Info'} />
           {bioText ? (
             <ViewItem
@@ -176,6 +191,8 @@ const UserProfileScreen = () => {
                   'bottom',
                   'Biography copied!',
                   `${firstName}${' '}${lastName}'s biography has been copied to Clipboard.`,
+                  true,
+                  3000,
                 );
               }}
             />
@@ -199,6 +216,8 @@ const UserProfileScreen = () => {
                   'bottom',
                   'Number copied!',
                   `${firstName}${' '}${lastName}'s number has been copied to Clipboard.`,
+                  true,
+                  3000,
                 );
               }
             }}
@@ -217,6 +236,8 @@ const UserProfileScreen = () => {
                 'bottom',
                 'username copied!',
                 `${firstName}${' '}${lastName}'s username has been copied to Clipboard.`,
+                true,
+                3000,
               );
             }}
           />
@@ -236,6 +257,8 @@ const UserProfileScreen = () => {
                 'bottom',
                 'username copied!',
                 `${firstName}${' '}${lastName}'s username has been copied to Clipboard.`,
+                true,
+                3000,
               );
             }}
           />

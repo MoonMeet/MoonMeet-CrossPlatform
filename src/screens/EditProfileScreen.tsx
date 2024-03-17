@@ -6,8 +6,8 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useEffect, useRef, useMemo, useCallback} from 'react';
-import {Pressable, StyleSheet, View, Keyboard} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {Keyboard, Pressable, StyleSheet, View} from 'react-native';
 import BaseView from '../components/BaseView/BaseView';
 import {
   ActivityIndicator,
@@ -21,43 +21,49 @@ import {useNavigation} from '@react-navigation/native';
 import Spacer from '../components/Spacer/Spacer';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import CameraIcon from '../assets/images/photo-camera.png';
-import ImagePickerActionSheet from '../components/ImagePickerActionSheet/ImagePickerActionSheet';
+import ImagePickerActionSheet from '@components/ImagePickerActionSheet/ImagePickerActionSheet.tsx';
 import {
   ErrorToast,
+  InfoToast,
   SuccessToast,
 } from '../components/ToastInitializer/ToastInitializer';
 import NetInfo from '@react-native-community/netinfo';
 import storage from '@react-native-firebase/storage';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 import {lowerToUppercase} from '../utils/converters/lowerToUppercase';
-import {PurpleBackground} from '../index.d';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
-import {useBottomSheetModal} from '@gorhom/bottom-sheet';
-import ImagePicker from 'react-native-image-crop-picker';
+import {CameraIcon, PurpleBackground} from '../index.d';
+import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
+import ImagePicker, {Image} from 'react-native-image-crop-picker';
 import {waitForAnd} from '../utils/timers/delay';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
 
 const EditProfileScreen = () => {
-  const pickerRef = useRef(null);
+  const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['25%', '35%'], []);
   const {dismissAll} = useBottomSheetModal();
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handlePresentModal = useCallback(() => {
     Keyboard.dismiss();
     pickerRef?.current?.present();
   }, []);
 
-  const navigation = useNavigation();
-
   /**
    * Checking if network is OK before sending SMS or catching and SnackBar Exception.
    */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState?.isConnected;
-  });
+  const [isConnected, setIsConnected] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    NetInfo.fetch().then(networkState => {
+      setIsConnected(!!networkState?.isConnected);
+    });
+  }, []);
 
   const [avatarURL, setAvatarURL] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
@@ -66,10 +72,12 @@ const EditProfileScreen = () => {
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
 
-  const [UserPhoto, setUserPhoto] = React.useState(null);
+  const [UserPhoto, setUserPhoto] = React.useState<Image | null>(null);
 
-  const onFirstnameTextChange = _firstnameText => setFirstName(_firstnameText);
-  const onLastnameTextChange = _lastnameText => setLastName(_lastnameText);
+  const onFirstnameTextChange = (firstnameText: string) =>
+    setFirstName(firstnameText);
+  const onLastnameTextChange = (lastnameText: string) =>
+    setLastName(lastnameText);
 
   const [Loading, setLoading] = React.useState(true);
   const [loaderVisible, setLoaderVisible] = React.useState(false);
@@ -82,7 +90,7 @@ const EditProfileScreen = () => {
       .then(documentSnapshot => {
         if (
           documentSnapshot?.data()?.first_name &&
-          documentSnapshot?.data().last_name &&
+          documentSnapshot?.data()?.last_name &&
           documentSnapshot?.data()?.avatar
         ) {
           setAvatarURL(documentSnapshot?.data()?.avatar);
@@ -106,41 +114,49 @@ const EditProfileScreen = () => {
   async function pushUserData() {
     let _avatarRef = `avatars/${
       auth()?.currentUser?.uid
-    }.${UserPhoto.path?.substring(UserPhoto.path?.lastIndexOf('.') + 1, 3)}`;
+    }.${UserPhoto?.path?.substring(UserPhoto?.path?.lastIndexOf('.') + 1, 3)}`;
 
     const storageRef = storage().ref(_avatarRef);
 
-    /**
-     * Uploading image to Firebase Storage
-     * @type {FirebaseStorageTypes.Task}
-     */
+    if (UserPhoto?.path) {
+      /**
+       * Uploading image to Firebase Storage
+       */
 
-    const uploadImageTask = storageRef.putFile(UserPhoto?.path);
+      const uploadImageTask = storageRef.putFile(UserPhoto.path);
+      uploadImageTask.on('state_changed', taskSnapshot => {
+        if (__DEV__) {
+          console.log(
+            `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
+          );
+        }
+      });
 
-    uploadImageTask.on('state_changed', taskSnapshot => {
-      if (__DEV__) {
-        console.log(
-          `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-        );
-      }
-    });
-
-    /**
-     * an async function to get {avatarUrl} and upload all user data.
-     */
-    uploadImageTask.then(async () => {
-      const _avatar = await storage().ref(_avatarRef).getDownloadURL();
-      if (_avatar.length > 0) {
-        pushImage(_avatar);
-      }
-    });
+      /**
+       * an async function to get {avatarUrl} and upload all user data.
+       */
+      uploadImageTask.then(async () => {
+        const _avatar = await storage().ref(_avatarRef).getDownloadURL();
+        if (_avatar.length > 0) {
+          pushImage(_avatar);
+        }
+      });
+    } else {
+      ErrorToast(
+        'bottom',
+        'An error ouccured',
+        'please select your image again',
+        true,
+        3000,
+      );
+    }
   }
 
   /**
    * Push image url to currentUser.
    * @param pureImageUrl
    */
-  function pushImage(pureImageUrl) {
+  function pushImage(pureImageUrl: string) {
     firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -387,7 +403,7 @@ const EditProfileScreen = () => {
             primaryContainer: COLORS.accentLight,
           },
         }}
-        visible={loaderVisible === false}
+        visible={!loaderVisible}
         onPress={() => {
           if (isConnected) {
             if (!firstnameHasLessLength() && !lastnameHasLessLength()) {

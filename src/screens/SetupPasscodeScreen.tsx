@@ -3,25 +3,28 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2024.
  */
 
 import {useNavigation} from '@react-navigation/native';
 import React, {useRef} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Text, TextInput, HelperText, FAB} from 'react-native-paper';
+import {StyleSheet, View} from 'react-native';
+import {FAB, HelperText, Text, TextInput} from 'react-native-paper';
 import BaseView from '../components/BaseView/BaseView';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import OTPTextView from '../components/OtpView/OTPTextInput';
+import OTPTextView, {OTPTextViewHandle} from 'components/OtpView/OTPTextInput';
 import {fontValue, heightPercentageToDP} from '../config/Dimensions';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Spacer from '../components/Spacer/Spacer';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
 
 const SetupPasscodeScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [mRecoveryPassword, setRecoveryPassword] = React.useState('');
   const [mRecoveryPasswordHint, setRecoveryPasswordHint] = React.useState('');
@@ -39,9 +42,9 @@ const SetupPasscodeScreen = () => {
     return mRecoveryPasswordHint?.trim()?.length < 3;
   };
 
-  const mPINRef = useRef();
+  const mPINRef = useRef<OTPTextViewHandle | null>(null);
 
-  const [mPinCode, setPINCode] = React.useState(null);
+  const [mPinCode, setPINCode] = React.useState<string>('');
   const [mConfirmingCodeForSetup, setConfirmingCodeForSetup] =
     React.useState(false);
 
@@ -215,14 +218,14 @@ const SetupPasscodeScreen = () => {
               if (text.length > 3) {
                 if (mConfirmingCodeForSetup) {
                   if (text !== mPinCode) {
-                    mPINRef.current.clear();
+                    mPINRef?.current?.clear();
                   } else {
                     setSettingRecoveryPassword(true);
                   }
                 } else {
                   setPINCode(text);
                   setConfirmingCodeForSetup(true);
-                  mPINRef.current.clear();
+                  mPINRef?.current?.clear();
                 }
               }
             }}
@@ -252,9 +255,9 @@ const SetupPasscodeScreen = () => {
                   fontFamily: FONTS.regular,
                 }}
                 onPress={() => {
-                  mPINRef.current.clear();
+                  mPINRef?.current?.clear();
                   setConfirmingCodeForSetup(false);
-                  setPINCode(null);
+                  setPINCode('');
                   setSettingRecoveryPassword(false);
                 }}>
                 WRONG PIN

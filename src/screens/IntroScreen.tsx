@@ -11,15 +11,18 @@ import {BackHandler} from 'react-native';
 import PagerView from 'react-native-pager-view';
 
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import AppOverview from '../components/IntroScreen/AppOverview';
-import AppDiscover from '../components/IntroScreen/AppDiscover';
-import AppGetStarted from '../components/IntroScreen/AppGetStarted';
-import {OnboardingMMKV} from '../config/MMKV/OnboardingMMKV';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import AppOverview from '@components/IntroScreen/AppOverview.tsx';
+import AppDiscover from '@components/IntroScreen/AppDiscover.tsx';
+import AppGetStarted from '@components/IntroScreen/AppGetStarted.tsx';
+import {StorageInstance} from '../config/MMKV/StorageInstance';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import auth from '@react-native-firebase/auth';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../config/NavigationTypes/NavigationTypes';
 
 const IntroScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useFocusEffect(
     useCallback(() => {
@@ -35,7 +38,7 @@ const IntroScreen = () => {
     }, []),
   );
   const setViewPagerCompleted = () => {
-    OnboardingMMKV?.set('onboardingComplete', true);
+    StorageInstance?.set('onboardingComplete', true);
   };
 
   return (

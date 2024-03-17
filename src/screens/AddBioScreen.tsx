@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Moon, 2021-2024.
  */
 
 import React, {useEffect} from 'react';
@@ -25,7 +25,7 @@ import {
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import NetInfo from '@react-native-community/netinfo';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import LoadingIndicator from '../components/Modals/CustomLoader/LoadingIndicator';
 import {heightPercentageToDP} from '../config/Dimensions';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -35,7 +35,7 @@ const AddBioScreen = () => {
 
   const [BioText, setBioText] = React.useState('');
   const [oldBioText, setOldBioText] = React.useState('');
-  const onBioTextChange = _bioText => setBioText(_bioText);
+  const onBioTextChange = (bioText: string) => setBioText(bioText);
 
   const [loaderVisible, setLoaderVisible] = React.useState(false);
   const [Loading, setLoading] = React.useState(true);
@@ -43,9 +43,10 @@ const AddBioScreen = () => {
   /**
    * Checking if network is OK.
    */
-  let isConnected = NetInfo.fetch().then(networkState => {
-    isConnected = networkState?.isConnected;
-  });
+  const fetchNetworkInfo = async () => {
+    const networkState = await NetInfo.fetch();
+    return networkState?.isConnected;
+  };
 
   useEffect(() => {
     firestore()
@@ -89,7 +90,7 @@ const AddBioScreen = () => {
         setOldBioText(BioText?.trim());
         setLoaderVisible(false);
       })
-      .catch(error => {
+      .catch(() => {
         ErrorToast(
           'bottom',
           'Failed to update bio',
@@ -175,7 +176,8 @@ const AddBioScreen = () => {
             primaryContainer: COLORS.accentLight,
           },
         }}
-        onPress={() => {
+        onPress={async () => {
+          const isConnected = await fetchNetworkInfo();
           if (isConnected) {
             if (!hasMoreLength()) {
               if (BioText?.trim() === oldBioText?.trim()) {

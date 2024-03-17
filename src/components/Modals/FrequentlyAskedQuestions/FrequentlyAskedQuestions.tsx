@@ -6,31 +6,27 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, {useCallback, useMemo} from 'react';
+import React, {Ref, useCallback, useMemo} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {COLORS, FONTS} from '../../../config/Miscellaneous';
+import {COLORS, FONTS} from 'config/Miscellaneous';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
-  useBottomSheetDynamicSnapPoints,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
-import {fontValue} from '../../../config/Dimensions';
+import {fontValue} from 'config/Dimensions';
 import {ScrollView} from 'react-native-gesture-handler';
+import {BottomSheetModalMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
+import {BottomSheetDefaultBackdropProps} from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types';
 
 interface FAQInterface {
-  sheetRef?: Ref | undefined;
-  snapPoints?:
-    | Array<string | number>
-    | SharedValue<Array<string | number>>
-    | undefined;
+  sheetRef?: Ref<BottomSheetModalMethods> | undefined;
+  snapPoints?: (string | number)[];
   index?: number | undefined;
 }
-const FrequentlyAskedQuestions = (props: FAQInterface) => {
-  const {animatedHandleHeight, handleContentLayout} =
-    useBottomSheetDynamicSnapPoints(props.snapPoints);
 
+const FrequentlyAskedQuestions = (props: FAQInterface) => {
   const animationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -42,16 +38,15 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
   const sheetStyle = useMemo(
     () => ({
       ...styles.sheetContainer,
-      padding: '0.5%',
       shadowColor: COLORS.black,
     }),
     [],
   );
 
   const renderBackdrop = useCallback(
-    props => (
+    (backProps: BottomSheetDefaultBackdropProps) => (
       <BottomSheetBackdrop
-        {...props}
+        {...backProps}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
       />
@@ -66,13 +61,11 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
       snapPoints={props?.snapPoints}
       handleIndicatorStyle={{backgroundColor: COLORS.darkGrey}}
       enablePanDownToClose={true}
-      handleHeight={animatedHandleHeight}
       animationConfigs={animationConfigs}
       backdropComponent={renderBackdrop}
       animateOnMount={true}
       style={sheetStyle}>
       <BottomSheetView
-        onLayout={handleContentLayout}
         style={{
           flex: 1,
           backgroundColor: COLORS.primaryLight,
@@ -86,7 +79,7 @@ const FrequentlyAskedQuestions = (props: FAQInterface) => {
           </Text>
           <Text style={styles.subText}>Q&A 2: Who it is for ?</Text>
           <Text style={styles.subText}>
-            Moon Meet is allowed for everyone above 13 years old.
+            Moo,n Meet is allowed for everyone above 13 years old.
           </Text>
           <Text style={styles.subText}>Q&A 3: Why Moon Meet?</Text>
           <Text style={styles.subText}>

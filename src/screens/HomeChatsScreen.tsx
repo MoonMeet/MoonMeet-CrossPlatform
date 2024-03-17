@@ -8,35 +8,38 @@
 
 import React, {useCallback, useEffect} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
-import {COLORS, FONTS} from '../config/Miscellaneous';
+import {COLORS, FONTS} from 'config/Miscellaneous';
 import auth from '@react-native-firebase/auth';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
-import MessagesList from '../components/HomeScreen/MessagesList';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
+import MessagesList from '@components/HomeScreen/MessagesList';
 import firestore from '@react-native-firebase/firestore';
-import {fontValue, heightPercentageToDP} from '../config/Dimensions';
-import {InfoToast} from '../components/ToastInitializer/ToastInitializer';
+import {fontValue, heightPercentageToDP} from 'config/Dimensions';
+import {InfoToast} from 'components/ToastInitializer/ToastInitializer';
 import {PurpleBackground} from '../index.d';
 import {reverse, sortBy} from 'lodash';
-import {JwtKeyMMKV} from '../config/MMKV/JwtKeyMMKV';
 import Spacer from '../components/Spacer/Spacer';
-import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+
+type ChatData = {typing: any; id: string; time: Date};
 
 const HomeChatsScreen = () => {
-  const navigation = useNavigation();
-
-  const [chatsData, setChatsData] = React.useState([]);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [chatsData, setChatsData] = React.useState<ChatData[]>([]);
 
   const [avatarURL, setAvatarURL] = React.useState('');
 
   const [chatsLoading, setChatsLoading] = React.useState(true);
 
   const checkJwtKey = useCallback(
-    currentJwtKey => {
-      const currentKey = JwtKeyMMKV?.getString('currentUserJwtKey');
+    (currentJwtKey: string) => {
+      const currentKey = StorageInstance?.getString('currentUserJwtKey');
       if (currentKey !== currentJwtKey) {
-        JwtKeyMMKV?.delete('currentUserJwtKey');
+        StorageInstance?.delete('currentUserJwtKey');
         if (auth()?.currentUser !== null) {
           auth()
             ?.signOut()
@@ -81,7 +84,7 @@ const HomeChatsScreen = () => {
   );
 
   useEffect(() => {
-    const userSusbcribe = firestore()
+    const userSubscribe = firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
         collectionSnapshot?.forEach(documentSnapshot => {
@@ -95,7 +98,7 @@ const HomeChatsScreen = () => {
               ) {
                 setAvatarURL(documentSnapshot?.data()?.avatar);
                 checkJwtKey(documentSnapshot?.data()?.jwtKey);
-                UserDataMMKV.set(
+                StorageInstance.set(
                   'Me',
                   JSON?.stringify(documentSnapshot?.data()),
                 );
@@ -104,6 +107,7 @@ const HomeChatsScreen = () => {
           }
         });
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const activeStatusSubscribe = firestore()
       .collection('users')
       ?.doc(auth()?.currentUser?.uid)
@@ -121,7 +125,7 @@ const HomeChatsScreen = () => {
         });
       });
     return () => {
-      userSusbcribe();
+      userSubscribe();
     };
   }, [checkJwtKey]);
 
@@ -138,6 +142,7 @@ const HomeChatsScreen = () => {
             ...subMap?.data(),
             typing: subMap?.data()?.typing,
             id: subMap?.id,
+            time: subMap?.data()?.time,
           }));
           collectionDocs = sortBy(collectionDocs, [
             data => data?.time?.toDate(),

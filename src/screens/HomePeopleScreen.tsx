@@ -3,34 +3,38 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen sbai, 2021-2024.
  */
 
 import React, {useCallback, useEffect} from 'react';
 import {BackHandler, Pressable, StyleSheet, Text, View} from 'react-native';
 import {ActivityIndicator, Avatar} from 'react-native-paper';
 import {COLORS, FONTS} from '../config/Miscellaneous';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import ActivePeopleList from '../components/HomeScreen/ActivePeopleList';
+import ActivePeopleList from '@components/HomeScreen/ActivePeopleList.tsx';
 import {fontValue} from '../config/Dimensions';
 import {PurpleBackground} from '../index.d';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {UserDataMMKV} from '../config/MMKV/UserDataMMKV';
+import {StorageInstance} from 'config/MMKV/StorageInstance';
 import {remove} from 'lodash';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const HomePeopleScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [Loading, setLoading] = React.useState(true);
 
-  const [avatarURL, setAvatarURL] = React.useState('');
+  const [avatarURL, setAvatarURL] = React.useState<String>('');
 
-  const [masterData, setMasterData] = React.useState([]);
+  const [masterData, setMasterData] = React.useState<(unknown | string)[]>([]);
 
-  const [Me] = React.useState(JSON.parse(UserDataMMKV?.getString('Me')));
+  const storedData = StorageInstance?.getString('Me') || '{}';
+  const [Me] = React.useState(JSON.parse(storedData));
 
   useFocusEffect(
     useCallback(() => {
@@ -50,7 +54,7 @@ const HomePeopleScreen = () => {
     const userSusbcribe = firestore()
       .collection('users')
       .onSnapshot(collectionSnapshot => {
-        let activeSnapshot = [];
+        let activeSnapshot: (unknown | string)[] = [];
         collectionSnapshot?.forEach(documentSnapshot => {
           if (documentSnapshot?.id === auth()?.currentUser?.uid) {
             if (
@@ -60,14 +64,16 @@ const HomePeopleScreen = () => {
               documentSnapshot?.data()?.active_time
             ) {
               setAvatarURL(documentSnapshot?.data()?.avatar);
-              UserDataMMKV.set('Me', JSON?.stringify(documentSnapshot?.data()));
+              StorageInstance.set(
+                'Me',
+                JSON?.stringify(documentSnapshot?.data()),
+              );
             }
           }
           if (
             Me?.active_status === 'normal' &&
-            (documentSnapshot?.data()?.active_time === 'Last seen recently') ===
-              false &&
-            firestore?.Timestamp?.fromDate(new Date())?.toDate() -
+            !(documentSnapshot?.data()?.active_time === 'Last seen recently') &&
+            firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
               documentSnapshot?.data()?.active_time?.toDate() <
               180000
           ) {
@@ -89,6 +95,7 @@ const HomePeopleScreen = () => {
         });
         setMasterData(activeSnapshot);
       });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const activeStatusSubscribe = firestore()
       .collection('users')
       ?.doc(auth()?.currentUser?.uid)

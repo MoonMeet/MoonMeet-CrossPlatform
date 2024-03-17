@@ -9,21 +9,19 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import Spacer from '../components/Spacer/Spacer';
-import MiniBaseView from '../components/MiniBaseView/MiniBaseView';
+import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import {
   fontValue,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../config/Dimensions';
-import {withTheme} from 'react-native-paper';
-import {RadioButton, useTheme} from 'react-native-paper';
-import {ThemeContext} from '../config/Theme/Context';
+import {RadioButton, withTheme} from 'react-native-paper';
+import {ThemeContext} from '../config/Theme/Context.ts';
 import {COLORS, FONTS} from '../config/Miscellaneous';
 import SpacerHorizontal from '../components/Spacer/SpacerHorizontal';
-import {ThemeMMKV} from '../config/MMKV/ThemeMMKV';
+import {StorageInstance} from '../config/MMKV/StorageInstance';
 
 const DarkModeSettings = () => {
-  const theme = useTheme();
   const {toggleTheme, isThemeDark} = React.useContext(ThemeContext);
 
   const styles = StyleSheet.create({
@@ -48,11 +46,11 @@ const DarkModeSettings = () => {
         <RadioButton
           color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
           status={isThemeDark ? 'checked' : 'unchecked'}
-          value={true}
+          value={'true'}
           onPress={() => {
             if (!isThemeDark) {
               toggleTheme();
-              ThemeMMKV.set('isThemeDark', true);
+              StorageInstance.set('isThemeDark', true);
             }
           }}
         />
@@ -63,11 +61,11 @@ const DarkModeSettings = () => {
         <RadioButton
           color={isThemeDark ? COLORS.accentDark : COLORS.accentLight}
           status={!isThemeDark ? 'checked' : 'unchecked'}
-          value={false}
+          value={'false'}
           onPress={() => {
             if (isThemeDark) {
               toggleTheme();
-              ThemeMMKV.set('isThemeDark', false);
+              StorageInstance.set('isThemeDark', false);
             }
           }}
         />
