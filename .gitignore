@@ -64,7 +64,7 @@ yarn-error.log
 .cxx/
 
 # Sensitive Information
-src/secrets/sensitive.js
+src/secrets/sensitive.ts
 /.vscode/
 
 # Temporary files created by Metro to check the health of the file watcher
