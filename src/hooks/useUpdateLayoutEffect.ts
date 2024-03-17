@@ -1,9 +1,19 @@
 import {DependencyList, useLayoutEffect, useRef} from 'react';
+
 /**
- * A custom useEffect hook that only triggers on updates, not on initial mount
- * Idea stolen from: https://stackoverflow.com/a/55075818/1526448
- * @param {() => void} effect the function to call
- * @param {DependencyList} dependencies the state(s) that fires the update
+ * Executes the given effect function after the initial mount of the component and then on subsequent updates.
+ * This hook is similar to useLayoutEffect, but skips the effect during the initial mount of the component.
+ *
+ * @param {() => void} effect - The effect function to be executed.
+ * @param {DependencyList} [dependencies=[]] - An optional array of dependencies which triggers the effect.
+ *
+ * @example
+ *
+ * // Usage example
+ * useUpdateLayoutEffect(() => {
+ *    console.log("Component updated");
+ * }, [propA, propB]);
+ *
  */
 export function useUpdateLayoutEffect(
   effect: () => void,

@@ -6,7 +6,7 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import {Platform, Dimensions} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 // Screen Constants
 const Screen = Dimensions.get('window');
 const ScreenWidth: number = Screen.width;

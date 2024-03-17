@@ -6,7 +6,13 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-const waitForAnd = (millis: number) =>
+/**
+ * Waits for a specified number of milliseconds before resolving the promise.
+ *
+ * @param {number} millis - The number of milliseconds to wait.
+ * @returns {Promise} - A promise that resolves after the specified milliseconds.
+ */
+const waitForAnd = (millis: number): Promise<any> =>
   new Promise(toResolve => setTimeout(toResolve, millis));
 
 export {waitForAnd};

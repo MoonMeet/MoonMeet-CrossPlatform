@@ -7,17 +7,28 @@
  */
 
 import CryptoJS from 'crypto-js';
-import {EncryptionKey} from '../../secrets/sensitive';
+import {EncryptionKey} from 'secrets/sensitive.ts';
 
 /**
- * Add your secret key from your file in /src/sensitive.js
+ * Add your secret key from your file in /src/sensitive.ts
  */
 
-const EncryptAES = (word: string) => {
+/**
+ * Encrypts a word using AES encryption with a specified encryption key.
+ * @param {string} word - The word to be encrypted.
+ * @returns {string} - The encrypted word.
+ */
+const EncryptAES = (word: string): string => {
   return CryptoJS?.AES?.encrypt(word, EncryptionKey)?.toString();
 };
 
-const DecryptAES = (word: string) => {
+/**
+ * DecryptAES - Decrypts a string using AES encryption
+ *
+ * @param {string} word - The input string to be decrypted
+ * @returns {string} - The decrypted string, or `undefined` if decryption fails
+ */
+const DecryptAES = (word: string): string => {
   return CryptoJS?.AES?.decrypt(word, EncryptionKey)?.toString(
     CryptoJS?.enc?.Utf8,
   );

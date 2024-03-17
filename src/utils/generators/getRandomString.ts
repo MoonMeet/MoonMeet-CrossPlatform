@@ -6,7 +6,13 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-function getRandomString(length: number) {
+/**
+ * Generates a random string of a specified length.
+ *
+ * @param {number} length - The length of the random string.
+ * @return {string} - A randomly generated string.
+ */
+function getRandomString(length: number): string {
   const randomChars: string =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result: string = '';
