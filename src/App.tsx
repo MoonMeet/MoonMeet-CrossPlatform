@@ -23,6 +23,9 @@ import appCheck from '@react-native-firebase/app-check';
 import OneSignal from 'react-native-onesignal';
 import {enableLayoutAnimations} from 'react-native-reanimated';
 import {FIREBASE_APPCHECK_DEBUG_TOKEN} from './secrets/sensitive';
+import {DevSupport} from '@react-buddy/ide-toolbox';
+import {useInitial} from '/dev/useInitial.ts';
+import ComponentPreviews from 'dev/previews.tsx';
 
 /**
  * It enables the firebase tools.
@@ -176,7 +179,12 @@ const App = () => {
           <GestureHandlerRootView
             style={isThemeDark ? GHRVStyles.dark : GHRVStyles.light}>
             <BottomSheetModalProvider>
-              <StackNavigator />
+              <DevSupport
+                ComponentPreviews={ComponentPreviews}
+                devmode={__DEV__}
+                useInitialHook={useInitial}>
+                <StackNavigator />
+              </DevSupport>
               <Toast />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
