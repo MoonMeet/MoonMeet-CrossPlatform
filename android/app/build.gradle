@@ -164,3 +164,7 @@ dependencies {
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+
+println "storePassword: ${System.getenv('KEYPASS')}"
+println "keyAlias: ${System.getenv('KEYALIAS')}"
+println "keyPassword: ${System.getenv('KEYALIASPASS')}"

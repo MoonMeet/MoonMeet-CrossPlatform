@@ -171,7 +171,8 @@ const ChatScreen = () => {
       const meFromStorage = StorageInstance?.getString('Me');
       if (meFromStorage) {
         const meObject = JSON?.parse(meFromStorage);
-        if (Array.isArray(meObject)) {
+        console.warn(meFromStorage);
+        if (meObject) {
           setMe(meObject);
         } else {
           if (__DEV__) {
@@ -408,14 +409,14 @@ const ChatScreen = () => {
         options,
         cancelButtonIndex,
       },
-      buttonIndex => {
+      (buttonIndex: Number) => {
         if (options?.length === 4) {
           switch (buttonIndex) {
             case 0:
               try {
                 Clipboard?.setString(message?.text);
               } catch (e) {
-                new ErrorToast(
+                ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -428,7 +429,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, true);
               } catch (e) {
-                new ErrorToast(
+                ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -441,7 +442,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, false);
               } catch (e) {
-                new ErrorToast(
+                ErrorToast(
                   'bottom',
                   'Unexpected Error Occured',
                   `${e}`,
@@ -457,7 +458,7 @@ const ChatScreen = () => {
               try {
                 Clipboard?.setString(message?.text);
               } catch (e) {
-                new ErrorToast(
+                ErrorToast(
                   'bottom',
                   'Unexcpected Error Occured',
                   `${e}`,
@@ -470,7 +471,7 @@ const ChatScreen = () => {
               try {
                 deleteMessage(message, false);
               } catch (e) {
-                new ErrorToast(
+                ErrorToast(
                   'bottom',
                   'Unexcpected Error Occured',
                   `${e}`,
@@ -486,7 +487,7 @@ const ChatScreen = () => {
   }
 
   const sendMessage = useCallback(
-    async (mChatData = [], image) => {
+    async (mChatData = [], image: string) => {
       let connectionStatus = await NetInfo?.fetch();
       if (connectionStatus?.isConnected) {
         if (!image) {
@@ -496,7 +497,7 @@ const ChatScreen = () => {
             try {
               // Send message to user logic goes here.
               setMessageText(mMessageText?.trim()); // Message text already trimmed here!
-              firestore()
+              await firestore()
                 .collection('users')
                 .doc(auth()?.currentUser?.uid)
                 .collection('messages')
@@ -512,7 +513,7 @@ const ChatScreen = () => {
                     _id: auth()?.currentUser?.uid,
                   },
                 });
-              firestore()
+              await firestore()
                 .collection('users')
                 .doc(destinedUser)
                 .collection('messages')
@@ -533,7 +534,7 @@ const ChatScreen = () => {
               );
               // HomeScreen recent chats.
 
-              firestore()
+              await firestore()
                 .collection('chats')
                 .doc(auth()?.currentUser?.uid)
                 .collection('discussions')
@@ -550,7 +551,7 @@ const ChatScreen = () => {
                   read: false,
                   typing: null,
                 });
-              firestore()
+              await firestore()
                 .collection('chats')
                 .doc(destinedUser)
                 .collection('discussions')
@@ -567,7 +568,7 @@ const ChatScreen = () => {
                   typing: null,
                 });
             } catch (e) {
-              new ErrorToast(
+              ErrorToast(
                 'bottom',
                 'Failed to send message',
                 'a problem occured when sending a message',
@@ -595,7 +596,7 @@ const ChatScreen = () => {
            */
 
           uploadImageTask.on('state_changed', taskSnapshot => {
-            new InfoToast(
+            InfoToast(
               'bottom',
               'Sending Image',
               `${bytesToSize(
@@ -691,7 +692,7 @@ const ChatScreen = () => {
           });
         }
       } else {
-        new ErrorToast(
+        ErrorToast(
           'bottom',
           'Internet connection required',
           'Please enable Wi-Fi or Mobile data to send messages',
@@ -713,7 +714,7 @@ const ChatScreen = () => {
     ],
   );
 
-  const handlePick = emojiObject => {
+  const handlePick = (emojiObject: {emoji: string}) => {
     setMessageText(mMessageText + emojiObject?.emoji);
   };
 
@@ -1017,7 +1018,7 @@ const ChatScreen = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, []),
+    }, [deleteMyTypingRef]),
   );
 
   useAppInactive(() => {

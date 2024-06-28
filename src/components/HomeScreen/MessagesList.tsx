@@ -179,7 +179,7 @@ const MessagesList = (props: MessageListProps) => {
     to_first_name?: string;
     to_last_name?: string;
     read?: boolean;
-    time?: Date;
+    time?: Array<string>;
   }
 
   const renderItem = ({item, index}: {item: Item; index: number}) => {
@@ -254,7 +254,7 @@ const MessagesList = (props: MessageListProps) => {
               adjustsFontSizeToFit
               numberOfLines={1}
               style={subheading('right', false, readValue)}>
-              {moment(item?.time?.getTime())?.format('MMM ddd HH:MM A')}
+              {moment(item?.time?.seconds)?.format('MMM ddd HH:MM A')}
             </Text>
           </View>
         </Pressable>

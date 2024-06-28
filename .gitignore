@@ -27,7 +27,8 @@ ios/.xcode.env.local
 
 # Android/IntelliJ
 #
-.idea
+.idea/*
+!.idea/rcb-settings.xml
 .gradle
 android/app/google-services.json
 android/app/config/keystore.properties

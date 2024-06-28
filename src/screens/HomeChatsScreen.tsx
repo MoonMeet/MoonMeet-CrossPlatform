@@ -3,7 +3,7 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2022.
  */
 
 import React, {useCallback, useEffect} from 'react';
