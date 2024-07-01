@@ -81,13 +81,13 @@ const UserList = (props: UserListProps) => {
                   ? firestore?.Timestamp?.fromDate(new Date())
                       ?.toDate()
                       .getTime() -
-                      item?.active_time?.getTime() >
+                      item?.active_time?.seconds * 1000 >
                     86400000
                     ? `last seen on ${moment(
-                        item?.active_time?.getTime(),
+                        item?.active_time?.seconds * 1000,
                       )?.format('YYYY MMMM DD')}`
                     : `last seen on ${moment(
-                        item?.active_time?.getTime(),
+                        item?.active_time?.seconds * 1000,
                       )?.format('HH:MM A')}`
                   : 'long time ago'}
               </Text>

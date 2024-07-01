@@ -124,7 +124,7 @@ const App = () => {
       if (deviceState !== null) {
         let { isSubscribed } = deviceState;
         if (isSubscribed) {
-          OneSignal.addTrigger("unsubscribed", "false");
+          OneSignal.addTrigger('unsubscribed', 'false');
         } else {
           OneSignal.promptForPushNotificationsWithUserResponse(true);
         }
