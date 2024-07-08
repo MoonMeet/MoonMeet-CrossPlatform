@@ -11,10 +11,8 @@ import {View} from 'react-native';
 import {COLORS} from '../config/Miscellaneous';
 import MiniBaseView from '@components/MiniBaseView/MiniBaseView.tsx';
 import {ActivityIndicator} from 'react-native-paper';
-import Spacer from '../components/Spacer/Spacer';
 import UserList from '../components/DiscoverPeopleScreen/UserList';
 import firestore from '@react-native-firebase/firestore';
-import {heightPercentageToDP} from '../config/Dimensions';
 import auth from '@react-native-firebase/auth';
 
 const DiscoverPeopleScreen = () => {
@@ -62,6 +60,7 @@ const DiscoverPeopleScreen = () => {
       discoverSubscribe();
     };
   }, []);
+
   if (Loading) {
     return (
       <MiniBaseView>
@@ -80,11 +79,6 @@ const DiscoverPeopleScreen = () => {
       </MiniBaseView>
     );
   }
-  return (
-    <MiniBaseView>
-      <Spacer height={heightPercentageToDP(0.5)} />
-      <UserList ListData={masterData} />
-    </MiniBaseView>
-  );
+  return <UserList ListData={masterData} />;
 };
 export default DiscoverPeopleScreen;

@@ -104,11 +104,12 @@ const MessagesList = (props: MessageListProps) => {
   };
 
   const messageText = (item: Message) => {
+    console.log(item);
     if (
       item &&
       item?.typing &&
       firestore.Timestamp.fromDate(new Date())?.toDate().getTime() -
-        item?.typing?.getTime() <
+        item?.typing?.seconds * 1000 <
         10000
     ) {
       return 'typing...';
@@ -179,7 +180,7 @@ const MessagesList = (props: MessageListProps) => {
     to_first_name?: string;
     to_last_name?: string;
     read?: boolean;
-    time?: Array<string>;
+    time?: {seconds: number};
   }
 
   const renderItem = ({item, index}: {item: Item; index: number}) => {

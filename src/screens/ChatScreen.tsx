@@ -12,6 +12,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {
+  RouteProp,
   useFocusEffect,
   useNavigation,
   useRoute,
@@ -21,8 +22,10 @@ import moment from 'moment';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {
   BackHandler,
+  GestureResponderEvent,
   Linking,
   PermissionsAndroid,
+  Platform,
   Pressable,
   StatusBar,
   Text,
@@ -62,6 +65,7 @@ import {PurpleBackground} from '../index.d';
 import {bytesToSize} from '../utils/converters/bytesToSize';
 import {DecryptAES, EncryptAES} from '../utils/crypto/cryptoTools';
 import {getRandomString} from '../utils/generators/getRandomString';
+import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
 
 interface ChatTitleProps {
   firstName: string;
@@ -69,8 +73,20 @@ interface ChatTitleProps {
   avatar: string;
   myStatus: string;
   userStatus: string;
-  userTime: Date;
+  userTime: {seconds: number; nanoseconds: number};
 }
+
+type CollectionDocsType = {
+  image: string;
+  text: string;
+  id: string | undefined;
+  sent: any;
+  user: {
+    name: string | null | undefined;
+    _id: any;
+    avatar: string | null | undefined;
+  };
+}[];
 
 const ChatTitle = ({
   firstName,
@@ -109,7 +125,7 @@ const ChatTitle = ({
             color: COLORS.black,
             opacity: 0.9,
           }}>
-          {`${firstName}${' '}${lastName}`}
+          {`${firstName} ${lastName}`}
         </Text>
         <Text
           adjustsFontSizeToFit
@@ -126,14 +142,18 @@ const ChatTitle = ({
             ? 'last seen recently'
             : myStatus === 'normal' && userStatus === 'normal'
             ? firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
-                userTime >
+                userTime.seconds * 1000 >
               86400000
-              ? `last seen on ${moment(userTime)?.format('YYYY MMMM DD')}`
+              ? `last seen on ${moment(userTime?.seconds * 1000)?.format(
+                  'YYYY MMMM DD',
+                )}`
               : firestore?.Timestamp?.fromDate(new Date())?.toDate().getTime() -
-                  userTime <
+                  userTime.seconds <
                 180000
               ? 'Active now'
-              : `last seen on ${moment(userTime)?.format('HH:MM A')}`
+              : `last seen on ${moment(userTime?.seconds * 1000)?.format(
+                  'HH:MM A',
+                )}`
             : 'long time ago'}
         </Text>
       </View>
@@ -144,8 +164,11 @@ const ChatTitle = ({
 const ChatScreen = () => {
   /* V A R I A B L E S */
   const navigation = useNavigation();
-  const stackRoute = useRoute();
-  const destinedUser = useMemo(() => stackRoute?.params?.item, []);
+  const stackRoute = useRoute<RouteProp<RootStackParamList, 'chat'>>();
+  const destinedUser = useMemo(
+    () => stackRoute?.params?.item,
+    [stackRoute?.params?.item],
+  );
 
   const [statusBarColor, setStatusBarColor] = React.useState('light');
   const [isTyping, setIsTyping] = React.useState<boolean>();
@@ -164,7 +187,12 @@ const ChatScreen = () => {
    * "Me" Credentials, same as "User" Credentials above, this is the data of the currently logged-in User.
    */
 
-  const [Me, setMe] = React.useState([]);
+  const [Me, setMe] = React.useState<{
+    avatar?: string;
+    first_name?: string;
+    last_name?: string;
+    active_status?: string;
+  }>({});
 
   useEffect(() => {
     try {
@@ -176,21 +204,21 @@ const ChatScreen = () => {
           setMe(meObject);
         } else {
           if (__DEV__) {
-            console.error("Parsed 'Me' is not an array.");
+            console.error("Parsed 'Me' is not an object.");
           }
-          setMe([]);
+          setMe({});
         }
       } else {
         if (__DEV__) {
           console.error("'Me' is not set in UserDataMMKV.");
         }
-        setMe([]);
+        setMe({});
       }
     } catch (error) {
       if (__DEV__) {
         console.error("Error while parsing 'Me' from UserDataMMKV: ", error);
       }
-      setMe([]);
+      setMe({});
     }
   }, []);
 
@@ -307,7 +335,7 @@ const ChatScreen = () => {
       .doc(destinedUser)
       .collection('discussions')
       .doc(auth()?.currentUser?.uid);
-    return await myTypingRef?.get()?.then(documentSnapshot => {
+    return myTypingRef?.get()?.then(documentSnapshot => {
       if (documentSnapshot?.exists) {
         if (!isNull(documentSnapshot?.data()?.typing)) {
           documentSnapshot?.ref?.update({
@@ -350,7 +378,10 @@ const ChatScreen = () => {
    * @param {string} messageData
    * @param {boolean} forEveryone
    */
-  async function deleteMessage(messageData, forEveryone) {
+  async function deleteMessage(
+    messageData: {id: string; _id: any},
+    forEveryone: boolean,
+  ) {
     const meMessageRef = firestore()
       .collection('users')
       .doc(auth()?.currentUser?.uid)
@@ -368,7 +399,7 @@ const ChatScreen = () => {
         collectionSnapshot?.docs?.map(documentSnapshot => {
           if (documentSnapshot?.id === messageData?.id) {
             documentSnapshot?.ref?.delete();
-            filter(mChatData, element => {
+            filter(mChatData, (element: {id: string}) => {
               return element?.id === messageData?.id;
             });
           }
@@ -378,19 +409,19 @@ const ChatScreen = () => {
         collectionSnapshot?.docs.map(documentSnapshot => {
           if (documentSnapshot?.data()?._id === messageData?._id) {
             documentSnapshot?.ref?.delete();
-            filter(mChatData, element => {
+            filter(mChatData, (element: {id: string}) => {
               return element?.id === messageData?.id;
             });
           }
         });
       });
     } else {
-      return await meMessageRef?.get()?.then(collectionSnapshot => {
+      return meMessageRef?.get()?.then(collectionSnapshot => {
         collectionSnapshot?.docs?.map(documentSnapshot => {
           if (documentSnapshot?.id === messageData?.id) {
             documentSnapshot?.ref?.delete();
-            filter(mChatData, element => {
-              element?.id === messageData?.id;
+            filter(mChatData, (element: {id: string}) => {
+              return element?.id === messageData?.id;
             });
           }
         });
@@ -398,7 +429,7 @@ const ChatScreen = () => {
     }
   }
 
-  function onLongPress(context, message) {
+  function onLongPress(context: any, message: any) {
     const options =
       message?.user?._id === auth()?.currentUser?.uid
         ? ['Copy Message', 'Delete For Everyone', 'Delete For Me', 'Cancel']
@@ -418,7 +449,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexpected Error Occured',
+                  'Unexpected Error Occurred',
                   `${e}`,
                   true,
                   1500,
@@ -444,7 +475,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexpected Error Occured',
+                  'Unexpected Error Occurred',
                   `${e}`,
                   true,
                   1500,
@@ -460,7 +491,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexcpected Error Occured',
+                  'Unexpected Error Occurred',
                   `${e}`,
                   true,
                   1500,
@@ -473,7 +504,7 @@ const ChatScreen = () => {
               } catch (e) {
                 ErrorToast(
                   'bottom',
-                  'Unexcpected Error Occured',
+                  'Unexpected Error Occurred',
                   `${e}`,
                   true,
                   1500,
@@ -718,7 +749,9 @@ const ChatScreen = () => {
     setMessageText(mMessageText + emojiObject?.emoji);
   };
 
-  const mAttachPressCallback = async () => {
+  const mAttachPressCallback = async (
+    _: GestureResponderEvent,
+  ): Promise<void | null | undefined> => {
     try {
       const requestResult = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -806,7 +839,9 @@ const ChatScreen = () => {
     }
   };
 
-  const mCameraPressCallback = async () => {
+  const mCameraPressCallback = async (
+    _: GestureResponderEvent,
+  ): Promise<void | null | undefined> => {
     try {
       const requestResult = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -817,7 +852,10 @@ const ChatScreen = () => {
           buttonPositive: 'Grant',
         },
       );
-      if (requestResult === PermissionsAndroid.RESULTS.GRANTED) {
+      if (
+        requestResult === PermissionsAndroid.RESULTS.GRANTED ||
+        Platform.OS === 'ios'
+      ) {
         ImagePicker.openCamera({
           height: 1024,
           width: 1024,
@@ -914,13 +952,13 @@ const ChatScreen = () => {
             if (userSnapshot?.data()?.active_time === 'Last seen recently') {
               setUserActiveTime(userSnapshot?.data()?.active_time);
             } else {
-              setUserActiveTime(userSnapshot?.data()?.active_time?.toDate());
+              setUserActiveTime(userSnapshot?.data()?.active_time);
             }
           }
         }
       });
     return () => userSubscribe();
-  }, []);
+  }, [destinedUser]);
 
   useEffect(() => {
     const messagesSubscribe = firestore()
@@ -933,55 +971,56 @@ const ChatScreen = () => {
         if (collectionSnapshot?.empty) {
           setChatData([]);
         } else {
-          let collectionDocs = collectionSnapshot?.docs?.map(subMap => {
-            if (subMap?.data()?.image) {
-              return {
-                ...subMap?.data(),
-                id: subMap?.id,
-                seen: subMap?.data()?.seen,
-                sent: subMap?.data()?.sent,
-                image: DecryptAES(subMap?.data()?.image),
-                user: {
-                  _id:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.uid
-                      : destinedUser,
-                  name:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.displayName
-                      : userFirstName + ' ' + userLastName,
-                  avatar:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.photoURL
-                      : userAvatar,
-                },
-              };
-            } else {
-              return {
-                ...subMap?.data(),
-                id: subMap?.id,
-                text: DecryptAES(subMap?.data()?.text),
-                seen: subMap?.data()?.seen,
-                sent: subMap?.data()?.sent,
-                user: {
-                  _id:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.uid
-                      : destinedUser,
-                  name:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.displayName
-                      : userFirstName + ' ' + userLastName,
-                  avatar:
-                    subMap?.data()?.user?._id === auth()?.currentUser?.uid
-                      ? auth()?.currentUser?.photoURL
-                      : userAvatar,
-                },
-              };
-            }
-          });
+          let collectionDocs: CollectionDocsType =
+            collectionSnapshot?.docs?.map(subMap => {
+              if (subMap?.data()?.image) {
+                return {
+                  ...subMap?.data(),
+                  id: subMap?.id,
+                  seen: subMap?.data()?.seen,
+                  sent: subMap?.data()?.sent,
+                  image: DecryptAES(subMap?.data()?.image),
+                  user: {
+                    _id:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.uid
+                        : destinedUser,
+                    name:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.displayName
+                        : userFirstName + ' ' + userLastName,
+                    avatar:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.photoURL
+                        : userAvatar,
+                  },
+                };
+              } else {
+                return {
+                  ...subMap?.data(),
+                  id: subMap?.id,
+                  text: DecryptAES(subMap?.data()?.text),
+                  seen: subMap?.data()?.seen,
+                  sent: subMap?.data()?.sent,
+                  user: {
+                    _id:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.uid
+                        : destinedUser,
+                    name:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.displayName
+                        : userFirstName + ' ' + userLastName,
+                    avatar:
+                      subMap?.data()?.user?._id === auth()?.currentUser?.uid
+                        ? auth()?.currentUser?.photoURL
+                        : userAvatar,
+                  },
+                };
+              }
+            });
           filter(collectionDocs, [
-            (docs, index) => {
+            (docs: {image?: string}, index: number) => {
               if (docs?.image) {
                 collectionDocs[index].text = '';
               }
@@ -1027,7 +1066,6 @@ const ChatScreen = () => {
 
   useEffect(() => {
     fetchUserIsTyping();
-    return () => fetchUserIsTyping();
   }, [fetchUserIsTyping]);
 
   useEffect(() => {
@@ -1136,9 +1174,6 @@ const ChatScreen = () => {
             return (
               <MessageImage
                 {...props}
-                containerStyle={{
-                  ...props.containerStyle,
-                }}
                 imageStyle={{
                   width: widthPercentageToDP(50),
                   height: heightPercentageToDP(20),
@@ -1155,13 +1190,11 @@ const ChatScreen = () => {
                 {...props}
                 textStyle={{
                   left: {
-                    ...props?.textStyle?.left,
                     color: COLORS.black,
                     textAlign: 'right',
                     fontFamily: FONTS.regular,
                   },
                   right: {
-                    ...props?.textStyle?.right,
                     color: COLORS.white,
                     textAlign: 'left',
                     fontFamily: FONTS.regular,
@@ -1176,11 +1209,9 @@ const ChatScreen = () => {
                 {...props}
                 wrapperStyle={{
                   right: {
-                    ...props?.wrapperStyle?.right,
                     backgroundColor: COLORS.accentLight,
                   },
                   left: {
-                    ...props?.wrapperStyle?.left,
                     backgroundColor: COLORS.chats.leftBubble,
                   },
                 }}
@@ -1194,7 +1225,7 @@ const ChatScreen = () => {
             return (
               <SystemMessage
                 {...props}
-                textStyle={{...props?.textStyle, fontFamily: FONTS.regular}}
+                textStyle={{fontFamily: FONTS.regular}}
               />
             );
           }}
@@ -1330,7 +1361,7 @@ const ChatScreen = () => {
             emojiSize={28 - 0.1 * 28}
             onEmojiSelected={handlePick}
             enableRecentlyUsed
-            containerStyles={{borderRadius: 0}}
+            styles={{container: {borderRadius: 0}}}
           />
         ) : (
           <></>

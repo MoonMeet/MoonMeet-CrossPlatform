@@ -472,7 +472,7 @@ const LoginScreen = () => {
                         ),
                         phone_status: 'none',
                         country_code: EncryptAES(CountryText),
-                        pushToken: pushToken,
+                        pushToken: pushToken || '',
                         OneSignalID: userId,
                       },
                     });
