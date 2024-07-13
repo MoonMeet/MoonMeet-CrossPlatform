@@ -20,11 +20,9 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-ios/.xcode.env.local
+**/.xcode.env.local
 .cxx
 cxx/
-ios/.xcode.env.local
-
 # Android/IntelliJ
 #
 .idea/*
@@ -59,7 +57,7 @@ yarn-error.log
 *.jsbundle
 
 # CocoaPods
-/ios/Pods/
+**/Pods/
 *.hprof
 *.lock
 .cxx/
@@ -72,6 +70,16 @@ src/secrets/sensitive.ts
 .metro-health-check*
 
 
-# testing
+# Testing
 /coverage
+
+# Firebase
 /android/app/src/google-services.json
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
