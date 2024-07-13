@@ -6,22 +6,22 @@
  * Copyright Rayen sbai, 2021-2022.
  */
 
-import React, { useEffect } from "react";
-import StackNavigator from "./config/Stack";
-import { StatusBar, StyleSheet } from "react-native";
-import Toast from "react-native-toast-message";
-import { COLORS } from "./config/Miscellaneous";
-import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
-import { ThemeContext } from "config/Theme/Context.ts";
-import { StorageInstance } from "config/MMKV/StorageInstance.ts";
-import { MoonMeetDarkTheme } from "config/Theme/Theme.ts";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import crashlytics from "@react-native-firebase/crashlytics";
-import analytics from "@react-native-firebase/analytics";
-import appCheck from "@react-native-firebase/app-check";
-import OneSignal from "react-native-onesignal";
-import { enableLayoutAnimations } from "react-native-reanimated";
+import React, {useEffect} from 'react';
+import StackNavigator from './config/Stack';
+import {StatusBar, StyleSheet} from 'react-native';
+import Toast from 'react-native-toast-message';
+import {COLORS} from './config/Miscellaneous';
+import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
+import {ThemeContext} from 'config/Theme/Context.ts';
+import {StorageInstance} from 'config/MMKV/StorageInstance.ts';
+import {MoonMeetDarkTheme} from 'config/Theme/Theme.ts';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import crashlytics from '@react-native-firebase/crashlytics';
+import analytics from '@react-native-firebase/analytics';
+import appCheck from '@react-native-firebase/app-check';
+import {OneSignal} from 'react-native-onesignal';
+import {enableLayoutAnimations} from 'react-native-reanimated';
 
 /**
  * It enables the firebase tools.
@@ -44,7 +44,7 @@ async function firebaseToolsEnablement() {
     }
   } catch (err) {
     if (__DEV__) {
-      console.error("Failed to enable Firebase tools: ", err);
+      console.error('Failed to enable Firebase tools: ', err);
     }
   }
 }
@@ -59,11 +59,11 @@ async function appCheckInitialization(rnFbProvider: any) {
   try {
     await appCheck().initializeAppCheck({
       provider: rnFbProvider,
-      isTokenAutoRefreshEnabled: true
+      isTokenAutoRefreshEnabled: true,
     });
   } catch (err) {
     if (__DEV__) {
-      console.error("Failed to initialize Firebase App Check: ", err);
+      console.error('Failed to initialize Firebase App Check: ', err);
     }
   }
 }
@@ -72,13 +72,13 @@ const GHRVStyles = StyleSheet.create({
   light: {
     flex: 1,
     flexGrow: 1,
-    backgroundColor: COLORS.primaryLight
+    backgroundColor: COLORS.primaryLight,
   },
   dark: {
     flex: 1,
     flexGrow: 1,
-    backgroundColor: COLORS.primaryDark
-  }
+    backgroundColor: COLORS.primaryDark,
+  },
 });
 
 /**
@@ -87,17 +87,17 @@ const GHRVStyles = StyleSheet.create({
 let rnFbProvider: any = appCheck().newReactNativeFirebaseAppCheckProvider();
 rnFbProvider.configure({
   android: {
-    provider: __DEV__ ? "debug" : "playIntegrity",
-    debugToken: "FIREBASE_APPCHECK_DEBUG_TOKEN"
+    provider: __DEV__ ? 'debug' : 'playIntegrity',
+    debugToken: 'FIREBASE_APPCHECK_DEBUG_TOKEN',
   },
   apple: {
-    provider: __DEV__ ? "debug" : "appAttestWithDeviceCheckFallback",
-    debugToken: "NO-TOKEN"
+    provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
+    debugToken: 'NO-TOKEN',
   },
   web: {
-    provider: "reCaptchaV3",
-    siteKey: "NO-TOKEN"
-  }
+    provider: 'reCaptchaV3',
+    siteKey: 'NO-TOKEN',
+  },
 });
 
 /**
@@ -106,11 +106,12 @@ rnFbProvider.configure({
 enableLayoutAnimations(false);
 
 const App = () => {
-  const [isThemeDark, setIsThemeDark] = React.useState(
-    StorageInstance.contains("isThemeDark")
-      ? StorageInstance.getBoolean("isThemeDark") === true
-      : false
-  );
+  /*const [isThemeDark, setIsThemeDark] = React.useState(
+    StorageInstance.contains('isThemeDark')
+      ? StorageInstance.getBoolean('isThemeDark') === true
+      : false,
+  );*/
+  const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   useEffect(() => {
     appCheckInitialization(rnFbProvider);
@@ -120,16 +121,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    OneSignal.getDeviceState().then(deviceState => {
-      if (deviceState !== null) {
-        let { isSubscribed } = deviceState;
-        if (isSubscribed) {
-          OneSignal.addTrigger('unsubscribed', 'false');
-        } else {
-          OneSignal.promptForPushNotificationsWithUserResponse(true);
-        }
+    const OneSignalShit = async () => {
+      let isSubscribed =
+        await OneSignal.User.pushSubscription.getOptedInAsync();
+      if (isSubscribed) {
+        OneSignal.InAppMessages.addTrigger('unsubscribed', 'false');
+      } else {
+        await OneSignal.Notifications.requestPermission(true);
       }
-    });
+    };
+    OneSignalShit();
   }, []);
 
   let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
@@ -141,26 +142,26 @@ const App = () => {
   const themePreferences = React.useMemo(
     () => ({
       toggleTheme,
-      isThemeDark
+      isThemeDark,
     }),
-    [toggleTheme, isThemeDark]
+    [toggleTheme, isThemeDark],
   );
 
   useEffect(() => {
-    if (StorageInstance.contains("isThemeDark")) {
-      if (StorageInstance.getBoolean("isThemeDark")) {
+    /*if (StorageInstance.contains('isThemeDark')) {
+      if (StorageInstance.getBoolean('isThemeDark')) {
         if (!isThemeDark) {
           toggleTheme();
         }
       } else {
-        StorageInstance.set("isThemeDark", false);
+        StorageInstance.set('isThemeDark', false);
       }
     } else {
       if (isThemeDark) {
         toggleTheme();
-        StorageInstance.set("isThemeDark", false);
+        StorageInstance.set('isThemeDark', false);
       }
-    }
+    }*/
   }, [isThemeDark, toggleTheme]);
 
   return (
@@ -168,7 +169,7 @@ const App = () => {
       <StatusBar
         backgroundColor={isThemeDark ? COLORS.primaryDark : COLORS.primaryLight}
         animated={true}
-        barStyle={isThemeDark ? "light-content" : "dark-content"}
+        barStyle={isThemeDark ? 'light-content' : 'dark-content'}
       />
       <ThemeContext.Provider value={themePreferences}>
         <PaperProvider theme={theme}>

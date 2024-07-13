@@ -169,10 +169,11 @@ const SplashScreen = () => {
   const opacity = useSharedValue(1);
 
   const isViewPagerCompleted = () => {
-    return (
+    /**return (
       StorageInstance?.contains('onboardingComplete') &&
       StorageInstance?.getBoolean('onboardingComplete')
-    );
+    );*/
+    return true;
   };
   useEffect(() => {
     const AnimateSceneTimerTask = setTimeout(() => {

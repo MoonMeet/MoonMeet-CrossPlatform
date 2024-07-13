@@ -50,7 +50,7 @@ import axios from 'axios';
 import {waitForAnd} from 'utils/timers/delay';
 import {getRandomString} from 'utils/generators/getRandomString';
 import {EncryptAES} from 'utils/crypto/cryptoTools';
-import OneSignal from 'react-native-onesignal';
+import {OneSignal} from 'react-native-onesignal';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -90,10 +90,11 @@ const LoginScreen = () => {
 
   const initializeDevice = useCallback(async () => {
     try {
-      const deviceState = await OneSignal.getDeviceState();
-      setPushToken(deviceState?.pushToken);
-      setUserId(deviceState?.userId);
-      setSubscribed(deviceState?.isSubscribed);
+      const deviceState = await OneSignal.User.pushSubscription;
+      setPushToken(deviceState?.getTokenAsync);
+      setUserId(deviceState?.getIdAsync);
+      console.warn(userId);
+      // setSubscribed(deviceState?.isSubscribed);
       if (__DEV__) {
         console.log(pushToken, isSubscribed, userId);
       }
