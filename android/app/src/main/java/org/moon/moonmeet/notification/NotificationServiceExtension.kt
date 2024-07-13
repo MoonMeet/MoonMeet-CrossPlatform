@@ -3,19 +3,18 @@
  * It is licensed under GNU GPL v. 3.
  * You should have received a copy of the license in this archive (see LICENSE).
  *
- * Copyright Rayen sbai, 2021-2022.
+ * Copyright Rayen Sbai, 2021-2024.
  */
 package org.moon.moonmeet.notification
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.annotation.Keep
 import androidx.core.app.NotificationCompat
-import com.onesignal.OSMutableNotification
-import com.onesignal.OSNotification
-import com.onesignal.OSNotificationReceivedEvent
-import com.onesignal.OneSignal.OSRemoteNotificationReceivedHandler;
+import com.onesignal.notifications.IDisplayableMutableNotification
+import com.onesignal.notifications.INotificationReceivedEvent
+import com.onesignal.notifications.INotificationServiceExtension
 import org.json.JSONException
 import org.json.JSONObject
 import org.moon.moonmeet.R
@@ -24,8 +23,9 @@ import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.net.URL
 
-@Suppress("unused")
-class NotificationServiceExtension : OSRemoteNotificationReceivedHandler {
+@Keep
+class NotificationServiceExtension : INotificationServiceExtension {
+
     private fun getBitmapFromURL(src: String): Bitmap? {
         return try {
             val url = URL(src)
@@ -40,87 +40,74 @@ class NotificationServiceExtension : OSRemoteNotificationReceivedHandler {
         }
     }
 
-    override fun remoteNotificationReceived(
-        context: Context?,
-        notificationReceivedEvent: OSNotificationReceivedEvent
-    ) {
-        val osNotification: OSNotification = notificationReceivedEvent.notification
-        val notificationAdditionalData: JSONObject = osNotification.additionalData
+    override fun onNotificationReceived(event: INotificationReceivedEvent) {
+        val notification: IDisplayableMutableNotification = event.notification
+        val notificationAdditionalData: JSONObject? = notification.additionalData
         Log.i(TAG, notificationAdditionalData.toString())
-        val mutableNotification: OSMutableNotification = osNotification.mutableCopy()
+
         try {
-            if (notificationAdditionalData.getString("type") == "chat") {
-                mutableNotification.setExtender { builder : NotificationCompat.Builder ->
-                    if (notificationAdditionalData.has("imageDelivered")) {
-                        try {
-                            builder.setChannelId("messages")
-                            builder.setSmallIcon(R.drawable.moon_icon)
-                            builder.setColor(BigInteger("FF566193", 16).toInt())
-                            builder.setContentTitle(notificationAdditionalData.getString("senderName"))
-                            builder.setContentText(notificationAdditionalData.getString("imageDelivered"))
-                            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
-                            builder.setWhen(
-                                notificationAdditionalData.getString("messageTime").toLong()
-                            )
-                            builder.setLargeIcon(
-                                getBitmapFromURL(
-                                    notificationAdditionalData.getString(
-                                        "senderPhoto"
-                                    )
+            if (notificationAdditionalData != null) {
+                if (notificationAdditionalData.getString("type") == "chat") {
+                    notification.setExtender { builder: NotificationCompat.Builder ->
+                        if (notificationAdditionalData.has("imageDelivered")) {
+                            try {
+                                builder.setChannelId("messages")
+                                builder.setSmallIcon(R.drawable.moon_icon)
+                                builder.setColor(BigInteger("FF566193", 16).toInt())
+                                builder.setContentTitle(notificationAdditionalData.getString("senderName"))
+                                builder.setContentText(notificationAdditionalData.getString("imageDelivered"))
+                                builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+                                builder.setWhen(
+                                    notificationAdditionalData.getString("messageTime").toLong()
                                 )
-                            )
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                            notificationReceivedEvent.complete(null)
+                                builder.setLargeIcon(
+                                    getBitmapFromURL(notificationAdditionalData.getString("senderPhoto"))
+                                )
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                                event.preventDefault()
+                            }
+                        } else if (notificationAdditionalData.has("messageDelivered")) {
+                            try {
+                                builder.setChannelId("messages")
+                                builder.setSmallIcon(R.drawable.moon_icon)
+                                builder.setStyle(
+                                    NotificationCompat.BigTextStyle()
+                                        .bigText(notificationAdditionalData.getString("messageDelivered"))
+                                )
+                                builder.setColor(BigInteger("FF566193", 16).toInt())
+                                builder.setContentTitle(notificationAdditionalData.getString("senderName"))
+                                builder.setContentText(
+                                    "New message from " + notificationAdditionalData.getString("senderName")
+                                )
+                                builder.setPriority(NotificationCompat.PRIORITY_HIGH)
+                                builder.setWhen(
+                                    notificationAdditionalData.getString("messageTime").toLong()
+                                )
+                                builder.setLargeIcon(
+                                    getBitmapFromURL(notificationAdditionalData.getString("senderPhoto"))
+                                )
+                            } catch (e: JSONException) {
+                                e.printStackTrace()
+                                event.preventDefault()
+                            }
                         }
-                    } else if (notificationAdditionalData.has("messageDelivered")) {
-                        try {
-                            builder.setChannelId("messages")
-                            builder.setSmallIcon(R.drawable.moon_icon)
-                            builder.setStyle(
-                                NotificationCompat.BigTextStyle()
-                                    .bigText(notificationAdditionalData.getString("messageDelivered"))
-                            )
-                            builder.setColor(BigInteger("FF566193", 16).toInt())
-                            builder.setContentTitle(notificationAdditionalData.getString("senderName"))
-                            builder.setContentText(
-                                "New message from " + notificationAdditionalData.getString(
-                                    "senderName"
-                                )
-                            )
-                            builder.setPriority(NotificationCompat.PRIORITY_HIGH)
-                            builder.setWhen(
-                                notificationAdditionalData.getString("messageTime").toLong()
-                            )
-                            builder.setLargeIcon(
-                                getBitmapFromURL(
-                                    notificationAdditionalData.getString(
-                                        "senderPhoto"
-                                    )
-                                )
-                            )
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                            notificationReceivedEvent.complete(null)
-                        }
+                        builder
                     }
-                    Log.i(TAG, "returning a builder from notification chat type.")
-                    builder
-                }
-            } else {
-                mutableNotification.setExtender { builder : NotificationCompat.Builder->
-                    builder.setChannelId("default")
-                    builder.setSmallIcon(R.drawable.moon_icon)
-                    builder.setColor(BigInteger("FF566193", 16).toInt())
-                    builder.setContentTitle(osNotification.title)
-                    builder.setContentText(osNotification.body)
-                    builder
+                } else {
+                    notification.setExtender { builder: NotificationCompat.Builder ->
+                        builder.setChannelId("default")
+                        builder.setSmallIcon(R.drawable.moon_icon)
+                        builder.setColor(BigInteger("FF566193", 16).toInt())
+                        builder.setContentTitle(notification.title)
+                        builder.setContentText(notification.body)
+                        builder
+                    }
                 }
             }
-            notificationReceivedEvent.complete(mutableNotification)
         } catch (e: JSONException) {
             e.printStackTrace()
-            notificationReceivedEvent.complete(null)
+            event.preventDefault()
         }
     }
 
