@@ -8,5 +8,23 @@
     "crashlytics_ndk_enabled": true,
     "perf_auto_collection_enabled": true,
     "tokenAutoRefreshEnabled": true
+  },
+  "emulators": {
+    "auth": {
+      "port": 1920
+    },
+    "firestore": {
+      "port": 9990
+    },
+    "database": {
+      "port": 9000
+    },
+    "storage": {
+      "port": 9199
+    },
+    "ui": {
+      "enabled": true
+    },
+    "singleProjectMode": true
   }
 }

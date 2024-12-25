@@ -332,7 +332,6 @@ const AddStoryScreen = () => {
   const TitleText = React.useCallback(() => {
     return (
       <Pressable hitSlop={20} onPress={() => pushTextStory()}>
-        {' '}
         <Avatar.Icon
           icon={DoneImage}
           size={36.5}

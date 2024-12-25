@@ -6,7 +6,7 @@
  * Copyright Rayen Sbai, 2021-2023.
  */
 import {AppRegistry} from 'react-native';
-import OneSignal from 'react-native-onesignal';
+import {LogLevel, OneSignal} from 'react-native-onesignal';
 import App from './src/App';
 import {name as MoonMeet} from './app.json';
 import {ONESIGNAL_APP_ID} from 'secrets/sensitive';
@@ -41,17 +41,22 @@ notifee.isChannelCreated('messages').then(created => {
  *Initialize OneSignal
  */
 
-OneSignal.setAppId(ONESIGNAL_APP_ID);
-OneSignal.setLanguage('en');
+if (__DEV__) {
+  OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+}
 
-OneSignal.setNotificationWillShowInForegroundHandler(
-  async notificationReceivedEvent => {
-    let NotificationAdditionalData =
-      notificationReceivedEvent?.getNotification()?.additionalData;
+OneSignal.initialize(ONESIGNAL_APP_ID);
+
+OneSignal.Notifications.addEventListener(
+  'foregroundWillDisplay',
+  async event => {
+    const notification = event.getNotification();
+    const NotificationAdditionalData = notification?.additionalData;
+
     if (NotificationAdditionalData?.type === 'chat') {
       if (NotificationAdditionalData?.messageDelivered) {
         await notifee.displayNotification({
-          title: `${NotificationAdditionalData?.senderName}`,
+          title: NotificationAdditionalData.senderName,
           body: `New message from ${NotificationAdditionalData?.senderName}`,
           android: {
             channelId: 'messages',
@@ -61,14 +66,14 @@ OneSignal.setNotificationWillShowInForegroundHandler(
             smallIcon: 'moon_icon',
             style: {
               type: AndroidStyle.BIGTEXT,
-              text: `${NotificationAdditionalData?.messageDelivered}`,
+              text: NotificationAdditionalData.messageDelivered,
             },
           },
         });
       } else if (NotificationAdditionalData?.imageDelivered) {
         await notifee.displayNotification({
-          title: `${NotificationAdditionalData?.senderName}`,
-          body: `${NotificationAdditionalData?.imageDelivered}`,
+          title: NotificationAdditionalData?.senderName,
+          body: NotificationAdditionalData?.imageDelivered,
           android: {
             channelId: 'messages',
             largeIcon: NotificationAdditionalData?.senderPhoto,
@@ -78,11 +83,9 @@ OneSignal.setNotificationWillShowInForegroundHandler(
           },
         });
       }
-      notificationReceivedEvent.complete(null);
+      event.preventDefault(); // Prevent OneSignal notification from being displayed
     } else {
-      notificationReceivedEvent.complete(
-        notificationReceivedEvent?.getNotification(),
-      );
+      event.getNotification().display(); // Display the OneSignal notification
     }
   },
 );

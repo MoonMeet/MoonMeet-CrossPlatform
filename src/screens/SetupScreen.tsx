@@ -336,46 +336,46 @@ const SetupScreen = (props: SetupScreenProps) => {
                    * an async function to get {avatarUrl} and upload all user data.
                    */
 
-                  uploadImageTask.then(async () => {
-                    const avatarUrl = await storage()
-                      .ref(_userAvatarRef)
-                      .getDownloadURL();
+                  uploadImageTask
+                    .then(async () => {
+                      const avatarUrl = await storage()
+                        .ref(_userAvatarRef)
+                        .getDownloadURL();
+                      const deviceInfo = {
+                        manufacturer: Manufacturer,
+                        system_name: systemName,
+                        system_version: systemVersion,
+                        product: Product,
+                        model: Model,
+                        app_version: appVersion,
+                        time: firestore.Timestamp.fromDate(new Date()),
+                      };
 
-                    /**
-                     * pushing device information for later use in DeviceScreen.js
-                     */
-                    if (!isWindows && !isWeb) {
-                      firestore()
-                        .collection('users')
-                        .doc(auth()?.currentUser?.uid)
-                        .collection('devices')
-                        .add({
-                          manufacturer: Manufacturer,
-                          system_name: systemName,
-                          system_version: systemVersion,
-                          product: Product,
-                          model: Model,
-                          app_version: appVersion,
-                          time: firestore.Timestamp.fromDate(new Date()),
-                        })
-                        .catch(error => {
-                          if (__DEV__) {
+                      console.log(
+                        '=>(SetupScreen.tsx:342) _userAvatarRef',
+                        _userAvatarRef,
+                      );
+                      console.log(
+                        '=>(SetupScreen.tsx:348)',
+                        deviceInfo,
+                        user,
+                        avatarUrl,
+                      );
+
+                      if (!isWindows && !isWeb) {
+                        firestore()
+                          .collection('users')
+                          .doc(auth()?.currentUser?.uid)
+                          .collection('devices')
+                          .add(deviceInfo)
+                          .catch(error => {
                             console.error(error);
-                          }
-                          setLoaderVisible(false);
-                        });
-                    }
+                            setLoaderVisible(false);
+                          });
+                      }
 
-                    /**
-                     * Since we got everything except a girlfriend.
-                     * we must push data to firebase.
-                     */
-
-                    StorageInstance?.set('currentUserJwtKey', jwt_key);
-                    firestore()
-                      .collection('users')
-                      .doc(auth()?.currentUser?.uid)
-                      .set({
+                      StorageInstance?.set('currentUserJwtKey', jwt_key);
+                      const userData = {
                         ...user,
                         first_name: _firstName,
                         last_name: _lastName,
@@ -396,27 +396,31 @@ const SetupScreen = (props: SetupScreenProps) => {
                         passcode: {
                           passcode_enabled: false,
                         },
-                      })
+                      };
+                      console.log('=>(SetupScreen.tsx:401) userData', userData);
 
-                      .finally(async () => {
-                        /**
-                         * Updating user profile.
-                         */
-
-                        await auth()?.currentUser?.updateProfile({
-                          displayName: `${_firstName} ${_lastName}`,
-                          photoURL: avatarUrl,
+                      firestore()
+                        .collection('users')
+                        .doc(auth()?.currentUser?.uid)
+                        .set(userData)
+                        .finally(async () => {
+                          await auth()?.currentUser?.updateProfile({
+                            displayName: `${_firstName} ${_lastName}`,
+                            photoURL: avatarUrl,
+                          });
+                          navigation?.dispatch(
+                            CommonActions?.reset({
+                              index: 0,
+                              routes: [{name: 'setup'}],
+                            }),
+                          );
+                          navigation?.navigate('home');
+                          setLoaderVisible(false);
                         });
-                        navigation?.dispatch(
-                          CommonActions?.reset({
-                            index: 0,
-                            routes: [{name: 'setup'}],
-                          }),
-                        );
-                        navigation?.navigate('home');
-                        setLoaderVisible(false);
-                      });
-                  });
+                    })
+                    .catch(e => {
+                      console.log('=>(SetupScreen.tsx:435) e', e);
+                    });
                 } catch (e) {
                   setLoaderVisible(false);
                   ErrorToast(

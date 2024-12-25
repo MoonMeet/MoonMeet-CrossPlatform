@@ -32,7 +32,7 @@ interface MoonInputProps {
   ) => void | null | undefined;
   attachPressCallback?: (
     event: GestureResponderEvent,
-  ) => void | null | undefined;
+  ) => Promise<void | null | undefined>;
   userUID?: string;
 }
 

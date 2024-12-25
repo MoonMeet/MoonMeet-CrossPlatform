@@ -169,10 +169,11 @@ const SplashScreen = () => {
   const opacity = useSharedValue(1);
 
   const isViewPagerCompleted = () => {
-    return (
+    /**return (
       StorageInstance?.contains('onboardingComplete') &&
       StorageInstance?.getBoolean('onboardingComplete')
-    );
+    );*/
+    return true;
   };
   useEffect(() => {
     const AnimateSceneTimerTask = setTimeout(() => {
@@ -349,18 +350,10 @@ const SplashScreen = () => {
     const currentMonth = dateObject.getMonth();
     const currentYear = dateObject.getFullYear();
     let sloganText = 'We give people the closest distances';
-    if (
-      inRange(currentDay, 15, 32) &&
-      currentMonth === 11 &&
-      currentYear === 2024
-    ) {
-      sloganText = 'Hoping you shimmy shake your way into 2024';
-    } else if (
-      inRange(currentDay, 1, 11) &&
-      currentMonth === 0 &&
-      currentYear === 2025
-    ) {
-      sloganText = 'Wishing you the best in 2024';
+    if (inRange(currentDay, 15, 32) && currentMonth === 11) {
+      sloganText = `Hoping you shimmy shake your way into ${currentYear + 1}`;
+    } else if (inRange(currentDay, 1, 11) && currentMonth === 0) {
+      sloganText = `Wishing you the best in ${currentYear}`;
     }
     return sloganText;
   }

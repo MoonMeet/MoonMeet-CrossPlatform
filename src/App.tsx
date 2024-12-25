@@ -20,12 +20,8 @@ import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import crashlytics from '@react-native-firebase/crashlytics';
 import analytics from '@react-native-firebase/analytics';
 import appCheck from '@react-native-firebase/app-check';
-import OneSignal from 'react-native-onesignal';
+import {OneSignal} from 'react-native-onesignal';
 import {enableLayoutAnimations} from 'react-native-reanimated';
-import {FIREBASE_APPCHECK_DEBUG_TOKEN} from './secrets/sensitive';
-import {DevSupport} from '@react-buddy/ide-toolbox';
-import {useInitial} from '/dev/useInitial.ts';
-import ComponentPreviews from 'dev/previews.tsx';
 
 /**
  * It enables the firebase tools.
@@ -92,7 +88,7 @@ let rnFbProvider: any = appCheck().newReactNativeFirebaseAppCheckProvider();
 rnFbProvider.configure({
   android: {
     provider: __DEV__ ? 'debug' : 'playIntegrity',
-    debugToken: FIREBASE_APPCHECK_DEBUG_TOKEN,
+    debugToken: 'FIREBASE_APPCHECK_DEBUG_TOKEN',
   },
   apple: {
     provider: __DEV__ ? 'debug' : 'appAttestWithDeviceCheckFallback',
@@ -110,11 +106,12 @@ rnFbProvider.configure({
 enableLayoutAnimations(false);
 
 const App = () => {
-  const [isThemeDark, setIsThemeDark] = React.useState(
+  /*const [isThemeDark, setIsThemeDark] = React.useState(
     StorageInstance.contains('isThemeDark')
       ? StorageInstance.getBoolean('isThemeDark') === true
       : false,
-  );
+  );*/
+  const [isThemeDark, setIsThemeDark] = React.useState(false);
 
   useEffect(() => {
     appCheckInitialization(rnFbProvider);
@@ -124,16 +121,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    OneSignal.getDeviceState().then(deviceState => {
-      if (deviceState !== null) {
-        let {isSubscribed} = deviceState;
-        if (isSubscribed) {
-          OneSignal.addTrigger('unsubscribed', 'false');
-        } else {
-          OneSignal.promptForPushNotificationsWithUserResponse(true);
-        }
+    const OneSignalShit = async () => {
+      let isSubscribed =
+        await OneSignal.User.pushSubscription.getOptedInAsync();
+      if (isSubscribed) {
+        OneSignal.InAppMessages.addTrigger('unsubscribed', 'false');
+      } else {
+        await OneSignal.Notifications.requestPermission(true);
       }
-    });
+    };
+    OneSignalShit();
   }, []);
 
   let theme = isThemeDark ? MoonMeetDarkTheme : DefaultTheme;
@@ -151,7 +148,7 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (StorageInstance.contains('isThemeDark')) {
+    /*if (StorageInstance.contains('isThemeDark')) {
       if (StorageInstance.getBoolean('isThemeDark')) {
         if (!isThemeDark) {
           toggleTheme();
@@ -164,7 +161,7 @@ const App = () => {
         toggleTheme();
         StorageInstance.set('isThemeDark', false);
       }
-    }
+    }*/
   }, [isThemeDark, toggleTheme]);
 
   return (
@@ -179,12 +176,7 @@ const App = () => {
           <GestureHandlerRootView
             style={isThemeDark ? GHRVStyles.dark : GHRVStyles.light}>
             <BottomSheetModalProvider>
-              <DevSupport
-                ComponentPreviews={ComponentPreviews}
-                devmode={__DEV__}
-                useInitialHook={useInitial}>
-                <StackNavigator />
-              </DevSupport>
+              <StackNavigator />
               <Toast />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

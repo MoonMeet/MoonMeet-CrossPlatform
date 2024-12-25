@@ -60,7 +60,7 @@ type RootStackParamList = {
   discover: {} | undefined;
   story: {story: StoryParams} | undefined;
   addStory: {} | undefined;
-  chat: {} | undefined;
+  chat: {item: any} | undefined;
   chatSettings: {} | undefined;
   passcodeSetup: {} | undefined;
   passcodeVerify: {} | undefined;

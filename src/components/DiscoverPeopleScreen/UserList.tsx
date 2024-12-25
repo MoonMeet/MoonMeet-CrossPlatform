@@ -15,7 +15,7 @@ import auth from '@react-native-firebase/auth';
 import moment from 'moment';
 import {PurpleBackground} from '../../index.d';
 import {uniqBy} from 'lodash';
-import {fontValue} from 'config/Dimensions.ts';
+import {fontValue, heightPercentageToDP} from 'config/Dimensions.ts';
 import {StorageInstance} from 'config/MMKV/StorageInstance';
 import firestore from '@react-native-firebase/firestore';
 import {RootStackParamList} from 'config/NavigationTypes/NavigationTypes.ts';
@@ -31,7 +31,7 @@ interface Item {
   first_name?: string;
   last_name?: string;
   active_status?: string;
-  active_time?: Date;
+  active_time?: {seconds: number};
 }
 
 const UserList = (props: UserListProps) => {
@@ -81,13 +81,13 @@ const UserList = (props: UserListProps) => {
                   ? firestore?.Timestamp?.fromDate(new Date())
                       ?.toDate()
                       .getTime() -
-                      item?.active_time?.getTime() >
+                      item?.active_time?.seconds * 1000 >
                     86400000
                     ? `last seen on ${moment(
-                        item?.active_time?.getTime(),
+                        item?.active_time?.seconds * 1000,
                       )?.format('YYYY MMMM DD')}`
                     : `last seen on ${moment(
-                        item?.active_time?.getTime(),
+                        item?.active_time?.seconds * 1000,
                       )?.format('HH:MM A')}`
                   : 'long time ago'}
               </Text>
@@ -106,6 +106,7 @@ const UserList = (props: UserListProps) => {
       contentContainerStyle={{
         paddingStart: '0.5%',
         paddingEnd: '0.5%',
+        paddingTop: heightPercentageToDP(1),
       }}
       showsVerticalScrollIndicator={false}
       removeClippedSubviews={true}

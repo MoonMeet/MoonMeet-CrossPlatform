@@ -18,11 +18,7 @@ const BaseView: React.FC<BaseViewProps> = ({children}) => {
   });
   return (
     <SafeAreaView style={styles.container}>
-      <Pressable
-        style={styles.container}
-        onPress={() => {
-          Keyboard.dismiss();
-        }}>
+      <Pressable style={styles.container} onPress={Keyboard.dismiss}>
         {children}
       </Pressable>
     </SafeAreaView>

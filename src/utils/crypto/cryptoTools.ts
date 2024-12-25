@@ -7,7 +7,7 @@
  */
 
 import CryptoJS from 'crypto-js';
-import {EncryptionKey} from 'secrets/sensitive.ts';
+import {EncryptionKey} from 'secrets/sensitive';
 
 /**
  * Add your secret key from your file in /src/sensitive.ts

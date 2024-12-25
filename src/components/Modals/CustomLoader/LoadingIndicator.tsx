@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import {Modal, StyleSheet, View} from 'react-native';
+import {Modal, Platform, StyleSheet, View} from 'react-native';
 import LottieView from 'lottie-react-native';
 import {LoadingAnimation} from 'index.d';
 
@@ -16,6 +16,9 @@ interface LoadingIndicatorInterface {
 }
 
 const LoadingIndicator = (props: LoadingIndicatorInterface) => {
+  if (Platform.OS === 'ios') {
+    return null;
+  }
   return (
     <Modal
       style={{
